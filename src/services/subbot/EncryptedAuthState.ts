@@ -5,7 +5,7 @@ import {
   type SignalDataTypeMap,
   type SignalKeyStore,
 } from 'baileys';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { encrypt, decrypt, isEncryptionEnabled } from '@/utils/encryption.js';
 import { logger } from '@/utils/logger.js';
@@ -123,16 +123,4 @@ export async function useEncryptedMultiFileAuthState(sessionPath: string): Promi
     },
     saveCreds: result.saveCreds,
   };
-}
-
-export function clearSession(sessionPath: string): void {
-  try {
-    if (existsSync(sessionPath)) {
-      for (const file of readdirSync(sessionPath)) {
-        try {
-          unlinkSync(join(sessionPath, file));
-        } catch {}
-      }
-    }
-  } catch {}
 }
