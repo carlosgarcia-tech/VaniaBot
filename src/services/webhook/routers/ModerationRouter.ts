@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { serviceManager } from '@/services/system/Servicemanager.js';
+import { requireApiToken } from './auth.js';
 
-export function createModerationRouter(): Router {
+export function createModerationRouter(webhookToken: string): Router {
   const router = Router();
+
+  // All moderation data is sensitive (user JIDs, reasons, moderator names).
+  // The dashboard must send the token in the `x-api-token` header.
+  router.use(requireApiToken(webhookToken));
 
   router.get('/bans', async (_req: Request, res: Response) => {
     try {

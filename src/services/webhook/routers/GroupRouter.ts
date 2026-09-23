@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { serviceManager } from '@/services/system/Servicemanager.js';
+import { requireApiToken } from './auth.js';
 
-export function createGroupRouter(): Router {
+export function createGroupRouter(webhookToken: string): Router {
   const router = Router();
+
+  // Groups expose JIDs, member counts and configuration; the dashboard must
+  // send the token in the `x-api-token` header.
+  router.use(requireApiToken(webhookToken));
 
   router.get('/', async (_req: Request, res: Response) => {
     try {
