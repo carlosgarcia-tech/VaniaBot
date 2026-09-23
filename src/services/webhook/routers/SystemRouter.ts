@@ -6,14 +6,10 @@ import { subBotDatabase } from '@/services/subbot/SubBotDatabase.js';
 import { healthCheckService } from '@/services/system/HealthCheckService.js';
 import { cacheManager } from '@/core/CacheManager.js';
 import type { WhatsAppClient } from '@/core/Client.js';
+import { requireApiToken } from './auth.js';
 
 function getClient() {
   return (global as { client?: WhatsAppClient }).client;
-}
-
-function validateApiToken(token: string | undefined, webhookToken: string): boolean {
-  if (!webhookToken) return false;
-  return token === webhookToken;
 }
 
 export function createSystemRouter(webhookToken: string): Router {
@@ -191,12 +187,8 @@ export function createSystemRouter(webhookToken: string): Router {
     });
   });
 
-  router.post('/settings', (req: Request, res: Response) => {
-    const token = req.headers['x-api-token'] as string;
-    if (!validateApiToken(token, webhookToken)) {
-      res.status(401).json({ success: false, message: 'Invalid API token' });
-      return;
-    }
+  // Mutating endpoint: requires the API token (header or ?token= query).
+  router.post('/settings', requireApiToken(webhookToken), (req: Request, res: Response) => {
     const { publicRequests, maxSlots } = req.body;
     if (typeof publicRequests === 'boolean') subBotDatabase.setPublicRequests(publicRequests);
     if (typeof maxSlots === 'number' && maxSlots > 0 && maxSlots <= 50)

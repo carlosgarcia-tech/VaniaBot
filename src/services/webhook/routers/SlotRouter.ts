@@ -2,10 +2,26 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { subBotDatabase } from '@/services/subbot/SubBotDatabase.js';
 import { subBotManager } from '@/services/subbot/SubBotManager.js';
+import type { SubBotSlot } from '@/types/subbot.js';
+import { requireApiToken } from './auth.js';
 
-function validateApiToken(token: string | undefined, webhookToken: string): boolean {
-  if (!webhookToken) return false;
-  return token === webhookToken;
+/**
+ * Masks PII (owner JID, full phone number) for unauthenticated GET responses.
+ * The dashboard only needs status/name plus a partially-masked phone.
+ */
+function sanitizeSlot(slot: SubBotSlot): Record<string, unknown> {
+  const phone = slot.phoneNumber || '';
+  const maskedPhone =
+    phone.length > 10 ? `${phone.slice(0, 6)}****${phone.slice(-4)}` : phone ? '****' : '';
+  return {
+    slot: slot.slot,
+    status: slot.status,
+    ownerName: slot.ownerName ?? null,
+    name: slot.name ?? null,
+    phoneNumber: maskedPhone || null,
+    connectedAt: slot.connectedAt ?? null,
+    // ownerJid intentionally omitted: not needed by the dashboard.
+  };
 }
 
 export function createSlotRouter(webhookToken: string): Router {
@@ -15,15 +31,7 @@ export function createSlotRouter(webhookToken: string): Router {
     const slots = subBotDatabase.getAllSlots();
     res.json({
       maxSlots: subBotDatabase.getMaxSlots(),
-      slots: slots.map(s => ({
-        slot: s.slot,
-        status: s.status,
-        ownerName: s.ownerName,
-        ownerJid: s.ownerJid,
-        phoneNumber: s.phoneNumber,
-        name: s.name,
-        connectedAt: s.connectedAt,
-      })),
+      slots: slots.map(s => sanitizeSlot(s)),
     });
   });
 
@@ -39,26 +47,17 @@ export function createSlotRouter(webhookToken: string): Router {
     res.json({
       success: true,
       slot: {
-        slot: slot.slot,
-        status: slot.status,
-        ownerName: slot.ownerName,
-        ownerJid: slot.ownerJid,
-        phoneNumber: slot.phoneNumber,
-        name: slot.name,
+        ...sanitizeSlot(slot),
         bio: slot.bio,
-        connectedAt: slot.connectedAt,
         requestedAt: slot.requestedAt,
       },
     });
   });
 
-  router.post('/:slot/reconnect', async (req: Request, res: Response) => {
-    const token = req.headers['x-api-token'] as string;
-    if (!validateApiToken(token, webhookToken)) {
-      res.status(401).json({ success: false, message: 'Invalid API token' });
-      return;
-    }
+  // Mutating endpoints require the API token (header or ?token= query).
+  router.use(requireApiToken(webhookToken));
 
+  router.post('/:slot/reconnect', async (req: Request, res: Response) => {
     const slotNumber = parseInt(req.params.slot as string);
     const slot = subBotDatabase.getSlot(slotNumber);
 
@@ -78,12 +77,6 @@ export function createSlotRouter(webhookToken: string): Router {
   });
 
   router.post('/:slot/release', async (req: Request, res: Response) => {
-    const token = req.headers['x-api-token'] as string;
-    if (!validateApiToken(token, webhookToken)) {
-      res.status(401).json({ success: false, message: 'Invalid API token' });
-      return;
-    }
-
     const slotNumber = parseInt(req.params.slot as string);
     const slot = subBotDatabase.getSlot(slotNumber);
 
