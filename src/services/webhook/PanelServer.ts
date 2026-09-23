@@ -17,6 +17,12 @@ import { createSlotRouter } from './routers/SlotRouter.js';
 import { createModerationRouter } from './routers/ModerationRouter.js';
 import { createGroupRouter } from './routers/GroupRouter.js';
 
+/**
+ * Header the web dashboard sends on every API call. Kept here so routers and
+ * the panel stay in sync; the dashboard stores the same token in localStorage.
+ */
+export const PANEL_API_TOKEN_HEADER = 'x-api-token';
+
 export interface PanelConfig {
   port: number;
   host: string;
@@ -56,6 +62,9 @@ export class PanelServer {
 
   private constructor() {
     this.config = loadPanelConfig();
+    // env (zod-validated, reads .env) takes precedence over panel-config.json
+    // so the dashboard and the routers always agree on the token.
+    if (env.PANEL_WEBHOOK_TOKEN) this.config.webhookToken = env.PANEL_WEBHOOK_TOKEN;
     this.app = express();
     this.setupMiddleware();
     this.setupRoutes();
@@ -127,8 +136,8 @@ export class PanelServer {
     this.app.use('/api/webhook', createWebhookRouter(this.config.webhookToken));
     this.app.use('/api/slot', createSlotRouter(this.config.webhookToken));
     this.app.use('/api/slots', createSlotRouter(this.config.webhookToken));
-    this.app.use('/api/moderation', createModerationRouter());
-    this.app.use('/api/groups', createGroupRouter());
+    this.app.use('/api/moderation', createModerationRouter(this.config.webhookToken));
+    this.app.use('/api/groups', createGroupRouter(this.config.webhookToken));
   }
 
   private setupErrorHandling(): void {
@@ -213,6 +222,15 @@ export class PanelServer {
           logger.warn(`⚠️ Panel port ${this.config.port} in use, trying ${this.config.port + 1}`);
           this.server?.close();
           this.server = http.createServer(this.app);
+          // Attach an error handler BEFORE listening: without it, a second
+          // EADDRINUSE would surface as an uncaughtException.
+          this.server.on('error', (retryError: NodeJS.ErrnoException) => {
+            logger.error(
+              `❌ Panel server could not bind ${this.config.port} or ${this.config.port + 1}:`,
+              retryError,
+            );
+            resolve(); // keep the bot running even if the panel fails to bind
+          });
           this.server.listen(this.config.port + 1, this.config.host, () => {
             logger.info(
               `🌸 VaniaBot Panel running at http://${this.config.host}:${this.config.port + 1}`,
