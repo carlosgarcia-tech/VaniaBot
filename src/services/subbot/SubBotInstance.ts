@@ -15,14 +15,14 @@
  * @author **Carlos G** ⭐
  * @github CARLOSGRCIAGRCIA
  */
-import makeWASocket, {
-  makeCacheableSignalKeyStore,
-  DisconnectReason,
-  type WASocket,
-  type ConnectionState,
-  type SignalKeyStore,
-} from 'baileys';
-import pino from 'pino';
+import { DisconnectReason, type WASocket, type ConnectionState } from 'baileys';
+import {
+  buildWASocketOptions,
+  createCacheableKeyStore,
+  createWASocket,
+  getWAVersion,
+  WA_BROWSER_PAIRING,
+} from '@/core/WASocketFactory.js';
 import { mkdirSync, existsSync, readdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { EventEmitter } from 'events';
@@ -37,8 +37,6 @@ import {
   MAX_RECONNECT_DELAY,
   MAX_RECONNECT_ATTEMPTS,
 } from '@/utils/constants.js';
-
-const SILENT_LOGGER = pino({ level: 'silent' });
 
 const CONFLICT_RECONNECT_DELAY = 20_000;
 
@@ -61,25 +59,6 @@ const NETWORK_CODES = new Set<number>([
 ]);
 
 const CONFLICT_CODE = 440;
-
-/**
- * IMPORTANT (July 2026): fetchLatestBaileysVersion() queries an endpoint
- * that has been returning outdated versions (reported in issues #2376 and
- * #2485 of WhiskeySockets/Baileys). WhatsApp rejects these versions with
- * a 405 "Connection Failure" error.
- *
- * As a workaround, we manually hardcode the latest verified version instead
- * of relying on that remote fetch.
- *
- * Source for updating when it fails again: https://wppconnect.io/whatsapp-versions/
- *   (take the first number from the "stable" list)
- *
- * Last updated: July 28, 2026
- */
-
-const FORCED_WA_VERSION: [number, number, number] = [2, 3000, 1043984129];
-
-let _cachedVersion: [number, number, number] | null = null;
 
 export class SubBotInstance extends EventEmitter {
   public sock?: WASocket;
@@ -109,16 +88,12 @@ export class SubBotInstance extends EventEmitter {
   }
 
   /**
-   * Obtiene la versión de WhatsApp Web a usar.
-   * Usa versión forzada en lugar de fetchLatestBaileysVersion() que está desactualizado.
+   * Obtiene la versión de WhatsApp Web a usar (delegada al factory compartido).
    */
-  private async getWAVersion(): Promise<[number, number, number]> {
-    if (_cachedVersion) return _cachedVersion;
-    _cachedVersion = FORCED_WA_VERSION;
-    logger.debug(
-      `[SubBot ${this.config.id}] Usando versión WA forzada: ${_cachedVersion.join('.')}`,
-    );
-    return _cachedVersion;
+  private getWAVersion(): [number, number, number] {
+    const version = getWAVersion();
+    logger.debug(`[SubBot ${this.config.id}] Usando versión WA forzada: ${version.join('.')}`);
+    return version;
   }
 
   private startPing(): void {
@@ -277,7 +252,7 @@ export class SubBotInstance extends EventEmitter {
 
     try {
       mkdirSync(this.config.sessionPath, { recursive: true });
-      const version = await this.getWAVersion();
+      const version = this.getWAVersion();
       const { state, saveCreds } = await useEncryptedMultiFileAuthState(this.config.sessionPath);
       const hasExistingCreds = !!state.creds.registered;
 
@@ -286,28 +261,17 @@ export class SubBotInstance extends EventEmitter {
           ` | versión WA: ${version.join('.')}`,
       );
 
-      const keyStore = makeCacheableSignalKeyStore(state.keys, SILENT_LOGGER);
+      const keyStore = createCacheableKeyStore(state.keys);
 
-      this.sock = makeWASocket({
-        version,
-        auth: {
-          creds: state.creds,
-          keys: keyStore as SignalKeyStore,
-        },
-        logger: SILENT_LOGGER,
-        printQRInTerminal: false,
-        browser: ['Ubuntu', 'Chrome', '131.0.6778.0'],
-        defaultQueryTimeoutMs: 60_000,
-        connectTimeoutMs: 120_000,
-        keepAliveIntervalMs: 15_000,
-        getMessage: async () => undefined,
-        syncFullHistory: false,
-        markOnlineOnConnect: true,
-        generateHighQualityLinkPreview: false,
-        retryRequestDelayMs: 250,
-        shouldIgnoreJid: (jid: string) => jid?.endsWith('@broadcast'),
-        emitOwnEvents: false,
-      });
+      this.sock = createWASocket(
+        buildWASocketOptions({
+          auth: { creds: state.creds, keys: keyStore },
+          overrides: {
+            browser: WA_BROWSER_PAIRING,
+            keepAliveIntervalMs: 15_000,
+          },
+        }),
+      );
 
       this.sock.ev.on('creds.update', () => {
         saveCreds().catch((err: unknown) =>

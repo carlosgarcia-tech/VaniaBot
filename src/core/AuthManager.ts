@@ -11,15 +11,21 @@
  * @created 2026-03-16
  */
 
-import makeWASocket, {
+import {
   useMultiFileAuthState,
-  makeCacheableSignalKeyStore,
   DisconnectReason,
   type WASocket,
   type ConnectionState,
-  type SignalKeyStore,
 } from 'baileys';
-import pino from 'pino';
+import {
+  buildWASocketOptions,
+  createCacheableKeyStore,
+  createWASocket,
+  getWAVersion,
+  WA_BROWSER_PAIRING,
+  WA_BROWSER_QR,
+  type ErrorWithStatus,
+} from '@/core/WASocketFactory.js';
 import { config } from '@/config/index.js';
 import { logger, logError } from '@/utils/logger.js';
 import { displayQR, displayPairingCode, validatePhoneNumber } from '@/utils/qr.js';
@@ -31,10 +37,6 @@ import {
 import { unlinkSync, readdirSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
-const WA_BROWSER_PAIRING: [string, string, string] = ['Ubuntu', 'Chrome', '131.0.6778.0'];
-const WA_BROWSER_QR: [string, string, string] = ['VaniaBot', 'Chrome', '131.0.6778.0'];
-const SILENT_LOGGER = pino({ level: 'silent' });
-
 const MAX_QR_RETRIES = 10;
 const CONNECTION_TIMEOUT = 120_000;
 const PAIRING_CODE_TIMEOUT = 180_000;
@@ -44,41 +46,8 @@ const HEALTH_CHECK_INTERVAL_MS = 60000;
 const ERROR_515_MAX_RETRIES = 3;
 const ERROR_515_WAIT_TIME = 3_000;
 
-/**
- * IMPORTANT (July 2026): fetchLatestBaileysVersion() queries an endpoint
- * that has been returning outdated versions (reported in issues #2376 and
- * #2485 of WhiskeySockets/Baileys). WhatsApp rejects these versions with
- * a 405 "Connection Failure" error.
- *
- * As a workaround, we manually hardcode the latest verified version instead
- * of relying on that remote fetch.
- *
- * Source for updating when it fails again: https://wppconnect.io/whatsapp-versions/
- *   (take the first number from the "stable" list)
- *
- * Last updated: July 28, 2026
- */
-
-const FORCED_WA_VERSION: [number, number, number] = [2, 3000, 1043984129];
-
-let _cachedVersion: [number, number, number] | null = null;
-
-interface ErrorWithStatus {
-  output?: {
-    statusCode?: number;
-  };
-  message?: string;
-}
-
 interface PatchedStdout extends NodeJS.WriteStream {
   __baileysPatch?: boolean;
-}
-
-async function getWAVersion(): Promise<[number, number, number]> {
-  if (_cachedVersion) return _cachedVersion;
-  _cachedVersion = FORCED_WA_VERSION;
-  logger.debug(`[AuthManager] Usando versión WA forzada: ${_cachedVersion.join('.')}`);
-  return _cachedVersion;
 }
 
 function patchStdout(): void {
@@ -238,13 +207,10 @@ export class AuthManager {
       await new Promise(resolve => setTimeout(resolve, delay));
     }
 
-    const versionPromise = getWAVersion();
+    const version = getWAVersion();
     mkdirSync(config.sessionPath, { recursive: true });
 
-    const [version, { state, saveCreds }] = await Promise.all([
-      versionPromise,
-      useMultiFileAuthState(config.sessionPath),
-    ]);
+    const { state, saveCreds } = await useMultiFileAuthState(config.sessionPath);
 
     const isRegistered = state.creds.registered;
     const credsMe = state.creds.me;
@@ -264,29 +230,19 @@ export class AuthManager {
 
     const browser = config.auth.usePairingCode ? WA_BROWSER_PAIRING : WA_BROWSER_QR;
 
-    const keyStore = makeCacheableSignalKeyStore(state.keys, SILENT_LOGGER);
+    const keyStore = createCacheableKeyStore(state.keys);
 
-    const sock = makeWASocket({
-      version,
-      auth: {
-        creds: state.creds,
-        keys: keyStore as SignalKeyStore,
-      },
-      logger: SILENT_LOGGER,
-      printQRInTerminal: false,
-      browser,
-      defaultQueryTimeoutMs: 60_000,
-      connectTimeoutMs: CONNECTION_TIMEOUT,
-      keepAliveIntervalMs: 20_000,
-      getMessage: async () => undefined,
-      syncFullHistory: false,
-      markOnlineOnConnect: true,
-      generateHighQualityLinkPreview: false,
-      retryRequestDelayMs: 150,
-      shouldIgnoreJid: (jid: string) => jid?.endsWith('@broadcast'),
-      emitOwnEvents: false,
-      qrTimeout: 60_000,
-    });
+    const sock = createWASocket(
+      buildWASocketOptions({
+        auth: { creds: state.creds, keys: keyStore },
+        overrides: {
+          browser,
+          connectTimeoutMs: CONNECTION_TIMEOUT,
+          retryRequestDelayMs: 150,
+          qrTimeout: 60_000,
+        },
+      }),
+    );
 
     sock.ev.on('creds.update', () => {
       saveCreds().catch((error: unknown) => logError('[AuthManager]', error));

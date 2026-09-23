@@ -2,17 +2,14 @@ import {
   useMultiFileAuthState,
   type AuthenticationState,
   type AuthenticationCreds,
-  makeCacheableSignalKeyStore,
   type SignalDataTypeMap,
   type SignalKeyStore,
 } from 'baileys';
-import pino from 'pino';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { encrypt, decrypt, isEncryptionEnabled } from '@/utils/encryption.js';
 import { logger } from '@/utils/logger.js';
-
-const SILENT_LOGGER = pino({ level: 'silent' });
+import { createCacheableKeyStore } from '@/core/WASocketFactory.js';
 
 interface AuthResult {
   state: AuthenticationState;
@@ -117,7 +114,7 @@ export async function useEncryptedMultiFileAuthState(sessionPath: string): Promi
   logger.info(`[Auth] Using encrypted storage for ${sessionPath}`);
   const result = await useEncryptedAuthState(sessionPath);
 
-  const cacheableKeys = makeCacheableSignalKeyStore(result.state.keys, SILENT_LOGGER);
+  const cacheableKeys = createCacheableKeyStore(result.state.keys);
 
   return {
     state: {
