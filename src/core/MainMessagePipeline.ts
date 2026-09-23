@@ -16,6 +16,7 @@ import { handleAudioResponse } from '@/handlers/AudioResponseHandler.js';
 import type { IMiddleware } from '@/types/index.js';
 import { CommandCategory } from '@/types/index.js';
 import { rateLimitService } from '@/services/system/RateLimitService.js';
+import { withTimeout } from '@/services/system/RetryService.js';
 import { persistenceService } from '@/services/system/PersistenceService.js';
 import { antiDeleteService } from '@/services/system/AntiDeleteService.js';
 import { runtimeStateRepository } from '@/repositories/RuntimeStateRepository.js';
@@ -31,26 +32,6 @@ interface MiddlewareConfig {
 }
 
 const COMMAND_TIMEOUT_MS = 30000;
-
-async function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number,
-  commandName: string,
-): Promise<T> {
-  let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  const timeoutPromise = new Promise<never>((_resolve, reject) => {
-    timeoutId = setTimeout(() => {
-      reject(new Error(`Command ${commandName} timed out after ${timeoutMs}ms`));
-    }, timeoutMs);
-  });
-  try {
-    return await Promise.race([promise, timeoutPromise]);
-  } finally {
-    if (timeoutId !== undefined) {
-      clearTimeout(timeoutId);
-    }
-  }
-}
 
 interface PipelineStats {
   messagesReceived: number;
@@ -310,7 +291,11 @@ export class MainMessagePipeline {
                   }
                 }
                 try {
-                  await withTimeout(command.execute(ctx), COMMAND_TIMEOUT_MS, command.name);
+                  await withTimeout(
+                    command.execute(ctx),
+                    COMMAND_TIMEOUT_MS,
+                    `Command ${command.name} timed out after ${COMMAND_TIMEOUT_MS}ms`,
+                  );
                   this.stats.commandsExecuted++;
                   this.trackCommandMetric(command.name, Date.now() - cmdStartTime, false);
                 } catch (error) {

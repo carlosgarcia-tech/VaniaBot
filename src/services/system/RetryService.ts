@@ -195,18 +195,26 @@ export async function withRetry<T>(
   return result.result;
 }
 
+/**
+ * Races a promise against a timeout. The timer is cleared as soon as the
+ * operation settles so pending timeouts do not keep the event loop alive.
+ */
 export function withTimeout<T>(
   promise: Promise<T>,
   timeoutMs: number,
   timeoutError?: string,
 ): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(
+      () => reject(new Error(timeoutError || `Operation timed out after ${timeoutMs}ms`)),
+      timeoutMs,
+    );
+  });
   return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(
-        () => reject(new Error(timeoutError || `Operation timed out after ${timeoutMs}ms`)),
-        timeoutMs,
-      ),
-    ),
-  ]);
+    promise.finally(() => {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    }),
+    timeoutPromise,
+  ]) as Promise<T>;
 }
