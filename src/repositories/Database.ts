@@ -13,7 +13,7 @@
 
 import initSqlJs from 'sql.js';
 import type { Database as SqlJsDatabase } from 'sql.js';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, rmSync } from 'fs';
 import { join } from 'path';
 import { logger, logError } from '@/utils/logger.js';
 
@@ -614,14 +614,25 @@ class DatabaseManager {
   private saveToFile(): void {
     if (!this.db) return;
     const dbPath = this.config.path ?? DB_PATH;
+    const tmpPath = `${dbPath}.tmp`;
     try {
       const data = this.db.export();
       const buffer = Buffer.from(data);
-      writeFileSync(dbPath, buffer);
+      // Atomic write: write to a temp file then rename. If the process dies
+      // mid-write, the original DB file stays intact instead of being truncated.
+      writeFileSync(tmpPath, buffer);
+      try {
+        rmSync(dbPath, { force: true });
+      } catch {}
+      renameSync(tmpPath, dbPath);
       this.dirty = false;
       logger.debug('💾 Database saved to disk');
     } catch (error) {
       logError('[Database] Save to file failed', error);
+      // Clean up the orphaned temp file if rename did not happen.
+      try {
+        if (existsSync(tmpPath)) rmSync(tmpPath, { force: true });
+      } catch {}
     }
   }
 
