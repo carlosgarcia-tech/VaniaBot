@@ -25,6 +25,7 @@ import {
   clearSessionFiles,
   extractDisconnectInfo,
   nextBackoff,
+  socketTransportState,
 } from '@/core/WADisconnectPolicy.js';
 import { config } from '@/config/index.js';
 import { logger, logError } from '@/utils/logger.js';
@@ -178,10 +179,9 @@ export class AuthManager {
     if (!this.currentSocket || !this.connectionEstablished) return false;
 
     try {
-      const socket = this.currentSocket as unknown as { ws?: { readyState: number } };
-      if (!socket.ws) return false;
-      if (socket.ws.readyState === 0 || socket.ws.readyState === 3) return false;
-      if (!this.currentSocket.user?.id) return false;
+      const transport = socketTransportState(this.currentSocket);
+      if (transport.readyState === 0 || transport.readyState === 3) return false;
+      if (!transport.hasUser) return false;
       return true;
     } catch {
       return false;

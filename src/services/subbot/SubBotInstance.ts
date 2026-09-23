@@ -41,6 +41,7 @@ import {
   clearSessionFiles,
   computeReconnectDelayMs,
   extractDisconnectInfo,
+  socketTransportState,
 } from '@/core/WADisconnectPolicy.js';
 
 const CONFLICT_RECONNECT_DELAY = 20_000;
@@ -157,8 +158,7 @@ export class SubBotInstance extends EventEmitter {
         return true;
       }
 
-      const ws = (this.sock as unknown as { ws?: { readyState?: number } }).ws;
-      const readyState = ws?.readyState;
+      const { readyState } = socketTransportState(this.sock);
 
       if (readyState === 3) return false;
 
