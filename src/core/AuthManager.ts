@@ -11,12 +11,7 @@
  * @created 2026-03-16
  */
 
-import {
-  useMultiFileAuthState,
-  DisconnectReason,
-  type WASocket,
-  type ConnectionState,
-} from 'baileys';
+import { useMultiFileAuthState, type WASocket, type ConnectionState } from 'baileys';
 import {
   buildWASocketOptions,
   createCacheableKeyStore,
@@ -24,8 +19,13 @@ import {
   getWAVersion,
   WA_BROWSER_PAIRING,
   WA_BROWSER_QR,
-  type ErrorWithStatus,
 } from '@/core/WASocketFactory.js';
+import {
+  classifyDisconnect,
+  clearSessionFiles,
+  extractDisconnectInfo,
+  nextBackoff,
+} from '@/core/WADisconnectPolicy.js';
 import { config } from '@/config/index.js';
 import { logger, logError } from '@/utils/logger.js';
 import { displayQR, displayPairingCode, validatePhoneNumber } from '@/utils/qr.js';
@@ -34,8 +34,7 @@ import {
   RECONNECT_BASE_DELAY,
   MAX_RECONNECT_DELAY,
 } from '@/utils/constants.js';
-import { unlinkSync, readdirSync, existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync } from 'fs';
 
 const MAX_QR_RETRIES = 10;
 const CONNECTION_TIMEOUT = 120_000;
@@ -388,14 +387,14 @@ export class AuthManager {
     this.isConnecting = false;
     this.stopPing();
 
-    const error = lastDisconnect?.error as ErrorWithStatus | undefined;
-    const statusCode = error?.output?.statusCode;
-    const reason = error?.message ?? 'Desconocido';
+    const { statusCode, message } = extractDisconnectInfo(lastDisconnect);
+    const category = classifyDisconnect(statusCode);
+    const reason = message ?? 'Desconocido';
 
-    logger.warn(`⚠️ Desconectado [${statusCode}]: ${reason}`);
+    logger.warn(`⚠️ Desconectado [${statusCode}]: ${reason} (${category})`);
 
-    switch (statusCode) {
-      case DisconnectReason.badSession:
+    switch (category) {
+      case 'badSession':
         this.badSessionCount++;
         logger.warn(`⚠️ Sesión corrupta [${this.badSessionCount}/3] → reintentando`);
         if (this.badSessionCount >= 3) {
@@ -407,8 +406,8 @@ export class AuthManager {
         this.scheduleReconnectInternal();
         break;
 
-      case DisconnectReason.loggedOut:
-        this.loggedOutCount++;
+      case 'loggedOut':
+        this.loggedOutCount++; // max 3, from constants of the old behavior
         logger.warn(
           `⚠️ Sesión cerrada desde el teléfono [${this.loggedOutCount}/3] → reintentando`,
         );
@@ -421,11 +420,12 @@ export class AuthManager {
         this.scheduleReconnectInternal();
         break;
 
-      case 515:
+      case 'restartRequired':
+        // 515 restartRequired: handled with its own retry budget.
         this.handle515ErrorInternal();
         break;
 
-      case 408:
+      case 'timedOut':
         if (config.auth.usePairingCode) {
           logger.error('❌ Timeout del código de pareamiento');
         } else {
@@ -434,23 +434,16 @@ export class AuthManager {
         this.scheduleReconnectInternal();
         break;
 
-      case DisconnectReason.connectionReplaced:
+      case 'conflict':
         logger.warn('⚠️ Conexión reemplazada');
         this.scheduleReconnectInternal();
         break;
 
-      case DisconnectReason.connectionClosed:
-      case DisconnectReason.connectionLost:
-      case DisconnectReason.timedOut:
+      case 'network':
         this.scheduleReconnectInternal();
         break;
 
-      case DisconnectReason.restartRequired:
-        logger.info('🔄 Reinicio requerido');
-        this.scheduleReconnectInternal();
-        break;
-
-      default:
+      case 'unknown':
         this.scheduleReconnectInternal(statusCode);
         break;
     }
@@ -489,7 +482,7 @@ export class AuthManager {
     logger.warn(
       `🔄 Reconexión [${this.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}] en ${Math.round(delay / 1000)}s`,
     );
-    this.reconnectDelay = Math.min(this.reconnectDelay * 1.5, MAX_RECONNECT_DELAY);
+    this.reconnectDelay = nextBackoff(this.reconnectDelay, MAX_RECONNECT_DELAY);
 
     setTimeout(() => {
       void (async () => {
@@ -559,21 +552,9 @@ export class AuthManager {
 
   private clearSession(): void {
     try {
-      if (!existsSync(config.sessionPath)) return;
-
-      const files = readdirSync(config.sessionPath);
-      if (files.length === 0) return;
-
-      logger.info(`Limpiando ${files.length} archivos...`);
-
-      for (const file of files) {
-        try {
-          unlinkSync(join(config.sessionPath, file));
-        } catch (error) {
-          logError('[AuthManager]', error);
-        }
-      }
-
+      const removed = clearSessionFiles(config.sessionPath, '[AuthManager]');
+      if (removed === 0) return;
+      logger.info(`Limpiando ${removed} archivos...`);
       logger.info('✅ Sesión limpiada');
     } catch (error) {
       logError('clearSession', error);

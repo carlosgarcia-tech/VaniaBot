@@ -15,7 +15,7 @@
  * @author **Carlos G** ⭐
  * @github CARLOSGRCIAGRCIA
  */
-import { DisconnectReason, type WASocket, type ConnectionState } from 'baileys';
+import type { WASocket, ConnectionState } from 'baileys';
 import {
   buildWASocketOptions,
   createCacheableKeyStore,
@@ -23,8 +23,7 @@ import {
   getWAVersion,
   WA_BROWSER_PAIRING,
 } from '@/core/WASocketFactory.js';
-import { mkdirSync, existsSync, readdirSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync } from 'fs';
 import { EventEmitter } from 'events';
 import type { SubBotConfig } from '@/types/subbot.js';
 import { subBotDatabase } from './SubBotDatabase.js';
@@ -37,6 +36,12 @@ import {
   MAX_RECONNECT_DELAY,
   MAX_RECONNECT_ATTEMPTS,
 } from '@/utils/constants.js';
+import {
+  classifyDisconnect,
+  clearSessionFiles,
+  computeReconnectDelayMs,
+  extractDisconnectInfo,
+} from '@/core/WADisconnectPolicy.js';
 
 const CONFLICT_RECONNECT_DELAY = 20_000;
 
@@ -46,19 +51,6 @@ const RECENT_DISCONNECT_COOLDOWN = 90_000;
 const PING_INTERVAL = 30_000;
 
 const MAX_TRUE_LOGOUTS = 2;
-
-const NETWORK_CODES = new Set<number>([
-  DisconnectReason.timedOut,
-  DisconnectReason.connectionLost,
-  DisconnectReason.connectionClosed,
-  DisconnectReason.connectionReplaced,
-  DisconnectReason.restartRequired,
-  408,
-  502,
-  503,
-]);
-
-const CONFLICT_CODE = 440;
 
 export class SubBotInstance extends EventEmitter {
   public sock?: WASocket;
@@ -219,10 +211,7 @@ export class SubBotInstance extends EventEmitter {
 
     const delay =
       fixedDelay ??
-      Math.min(
-        FIRST_RECONNECT_DELAY * Math.pow(1.5, this.reconnectAttempts - 1),
-        MAX_RECONNECT_DELAY,
-      );
+      computeReconnectDelayMs(this.reconnectAttempts, FIRST_RECONNECT_DELAY, MAX_RECONNECT_DELAY);
 
     logger.info(
       `🔄 SubBot[${this.config.id}] reconectando en ${Math.round(delay / 1000)}s` +
@@ -329,13 +318,12 @@ export class SubBotInstance extends EventEmitter {
   private async handleConnection(update: Partial<ConnectionState>): Promise<void> {
     const { connection, lastDisconnect } = update;
 
-    const err = lastDisconnect?.error as
-      { output?: { statusCode?: number }; message?: string } | undefined;
-    const statusCode = err?.output?.statusCode as number | undefined;
+    const { statusCode, message } = extractDisconnectInfo(lastDisconnect);
+    const category = classifyDisconnect(statusCode);
 
     if (statusCode !== undefined) {
       logger.warn(
-        `🔍 SubBot[${this.config.id}] lastDisconnect: status=${statusCode} msg=${err?.message}`,
+        `🔍 SubBot[${this.config.id}] lastDisconnect: status=${statusCode} msg=${message} (${category})`,
       );
     }
 
@@ -343,7 +331,7 @@ export class SubBotInstance extends EventEmitter {
       this.lastDisconnectTime = Date.now();
     }
 
-    if (statusCode === CONFLICT_CODE) {
+    if (category === 'conflict') {
       if (this.destroyed || this.isReconnecting) return;
       logger.warn(
         `⚡ SubBot[${this.config.id}] conflicto de sesión (440) — ` +
@@ -357,7 +345,7 @@ export class SubBotInstance extends EventEmitter {
       return;
     }
 
-    if (statusCode === DisconnectReason.loggedOut) {
+    if (category === 'loggedOut') {
       this.trueLogoutCount++;
       logger.warn(
         `⚠️ SubBot[${this.config.id}] loggedOut 401 (${this.trueLogoutCount}/${MAX_TRUE_LOGOUTS})`,
@@ -379,14 +367,14 @@ export class SubBotInstance extends EventEmitter {
       return;
     }
 
-    if (statusCode === DisconnectReason.badSession) {
+    if (category === 'badSession') {
       logger.warn(`⚠️ SubBot[${this.config.id}] badSession — reconectando sin limpiar sesión`);
       if (connection === 'close') this.scheduleReconnect();
       return;
     }
 
-    if (statusCode !== undefined && NETWORK_CODES.has(statusCode)) {
-      logger.info(`🌐 SubBot[${this.config.id}] error de red (${statusCode})`);
+    if (category === 'restartRequired' || category === 'timedOut' || category === 'network') {
+      logger.info(`🌐 SubBot[${this.config.id}] error recuperable (${statusCode ?? category})`);
       if (connection === 'close') this.scheduleReconnect();
       return;
     }
@@ -509,19 +497,12 @@ export class SubBotInstance extends EventEmitter {
   clearSession(): void {
     logger.info(`🧹 SubBot[${this.config.id}] clearing session...`);
     this.hasNotifiedReady = false;
-    try {
-      if (!existsSync(this.config.sessionPath)) return;
-      const files = readdirSync(this.config.sessionPath);
-      for (const file of files) {
-        try {
-          unlinkSync(join(this.config.sessionPath, file));
-        } catch {
-          /* ignore */
-        }
-      }
-      logger.info(`✅ SubBot[${this.config.id}] session cleared (${files.length} files)`);
-    } catch (err) {
-      logError(`SubBot[${this.config.id}].clearSession`, err);
+    const removed = clearSessionFiles(
+      this.config.sessionPath,
+      `SubBot[${this.config.id}].clearSession`,
+    );
+    if (removed > 0) {
+      logger.info(`✅ SubBot[${this.config.id}] session cleared (${removed} files)`);
     }
   }
 
