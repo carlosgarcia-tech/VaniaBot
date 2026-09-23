@@ -669,8 +669,13 @@ export class SubBotManager extends EventEmitter {
         this.scheduleRuntimeStateWrite(runtimeState);
 
         try {
+          // Guard: if the socket is not ready yet, skip preload instead of
+          // racing `undefined` against the timeout (which resolves instantly).
+          const preloadPromise = instance.sock
+            ? instance.sock.groupFetchAllParticipating()
+            : Promise.reject(new Error('Socket not ready'));
           const groups = await Promise.race([
-            instance.sock?.groupFetchAllParticipating(),
+            preloadPromise,
             new Promise<never>((_, reject) =>
               setTimeout(() => reject(new Error('Timed Out')), 10000),
             ),
