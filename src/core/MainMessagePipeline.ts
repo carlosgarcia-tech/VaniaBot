@@ -16,6 +16,7 @@ import { handleAudioResponse } from '@/handlers/AudioResponseHandler.js';
 import type { IMiddleware } from '@/types/index.js';
 import { CommandCategory } from '@/types/index.js';
 import { rateLimitService } from '@/services/system/RateLimitService.js';
+import { persistenceService } from '@/services/system/PersistenceService.js';
 import { antiDeleteService } from '@/services/system/AntiDeleteService.js';
 import { runtimeStateRepository } from '@/repositories/RuntimeStateRepository.js';
 import { processedMessagesRepository } from '@/repositories/ProcessedMessagesRepository.js';
@@ -107,6 +108,8 @@ export class MainMessagePipeline {
       if (update.connection === 'open' && this.sock.user?.id) {
         this.mainBotId = this.sock.user.id;
         runtimeStateRepository.setStartupTimestamp(this.mainBotId);
+        // Re-schedule persisted reminders/polls now that we have a live socket.
+        persistenceService.setSocket(this.sock);
         logger.info(`[Client] Set startup timestamp for ${this.mainBotId}`);
       }
     });
