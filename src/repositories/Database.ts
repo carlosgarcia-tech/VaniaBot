@@ -29,6 +29,8 @@ export interface Migration {
   version: number;
   name: string;
   up: string;
+  /** Optional safe runner used when the SQL cannot be made idempotent. */
+  custom?: (db: SqlJsDatabase) => void;
 }
 
 const MIGRATIONS: Migration[] = [
@@ -452,6 +454,42 @@ const MIGRATIONS: Migration[] = [
       ALTER TABLE listas ADD COLUMN updatedAt INTEGER;
     `,
   },
+  {
+    version: 23,
+    name: 'add_quiz_stats_column',
+    up: '',
+    custom: (db: SqlJsDatabase): void => {
+      // ADD COLUMN is not idempotent in SQLite: check before altering.
+      const cols = db.exec('PRAGMA table_info(users)');
+      const existing: string[] = cols.length > 0 ? cols[0].values.map(row => String(row[1])) : [];
+      if (existing.length > 0 && !existing.includes('quizStats')) {
+        db.run('ALTER TABLE users ADD COLUMN quizStats TEXT');
+      }
+    },
+  },
+  {
+    version: 24,
+    name: 'add_bot_runtime_state_missing_columns',
+    up: '',
+    custom: (db: SqlJsDatabase): void => {
+      // Columns used by RuntimeStateRepository (Watchdog/Recovery/Quarantine)
+      // that were never created by migration v9.
+      const cols = db.exec('PRAGMA table_info(bot_runtime_state)');
+      const existing: string[] = cols.length > 0 ? cols[0].values.map(row => String(row[1])) : [];
+      if (existing.length === 0) return;
+      const additions: Array<[string, string]> = [
+        ['error_count_total', 'INTEGER DEFAULT 0'],
+        ['messages_total', 'INTEGER DEFAULT 0'],
+        ['quarantined_until', 'TEXT'],
+        ['quarantine_count', 'INTEGER DEFAULT 0'],
+      ];
+      for (const [column, definition] of additions) {
+        if (!existing.includes(column)) {
+          db.run(`ALTER TABLE bot_runtime_state ADD COLUMN ${column} ${definition}`);
+        }
+      }
+    },
+  },
 ];
 
 export interface QueryResult {
@@ -537,7 +575,11 @@ class DatabaseManager {
       for (const migration of MIGRATIONS) {
         if (!appliedVersions.includes(migration.version)) {
           logger.debug(`🔄 Running migration v${migration.version}: ${migration.name}`);
-          this.db.run(migration.up);
+          if (migration.custom) {
+            migration.custom(this.db);
+          } else {
+            this.db.run(migration.up);
+          }
           this.db.run('INSERT INTO _migrations (version, name, applied_at) VALUES (?, ?, ?)', [
             migration.version,
             migration.name,
