@@ -17,12 +17,6 @@ import { createSlotRouter } from './routers/SlotRouter.js';
 import { createModerationRouter } from './routers/ModerationRouter.js';
 import { createGroupRouter } from './routers/GroupRouter.js';
 
-/**
- * Header the web dashboard sends on every API call. Kept here so routers and
- * the panel stay in sync; the dashboard stores the same token in localStorage.
- */
-export const PANEL_API_TOKEN_HEADER = 'x-api-token';
-
 export interface PanelConfig {
   port: number;
   host: string;
