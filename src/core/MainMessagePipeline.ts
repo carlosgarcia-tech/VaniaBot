@@ -140,14 +140,16 @@ export class MainMessagePipeline {
     }
 
     const text = message.message?.conversation || message.message?.extendedTextMessage?.text || '';
-    const isCommand =
-      text.startsWith(config.prefix) || text.startsWith('.') || text.startsWith('!');
-    const commandName = text.slice(1).split(' ')[0].toLowerCase();
-    const fullCommandName = text.startsWith(config.prefix)
-      ? text.slice(1).toLowerCase()
-      : text.startsWith('.') || text.startsWith('!')
-        ? text.slice(1).toLowerCase()
-        : null;
+    // Match the longest configured prefix first so multi-char prefixes
+    // (e.g. '..') are not swallowed by shorter ones ('.').
+    const prefixes = [config.prefix, '.', '!']
+      .filter((p, i, arr): p is string => Boolean(p) && arr.indexOf(p) === i)
+      .sort((a, b) => b.length - a.length);
+    const matchedPrefix = prefixes.find(p => text.startsWith(p));
+    const isCommand = matchedPrefix !== undefined;
+    const commandRest = matchedPrefix ? text.slice(matchedPrefix.length) : '';
+    const commandName = commandRest.split(' ')[0]?.toLowerCase() ?? '';
+    const fullCommandName = matchedPrefix ? commandRest.toLowerCase() : null;
     let isParallelizable = false;
     if (isCommand && fullCommandName) {
       const cmd = commandRegistry.get(fullCommandName) || commandRegistry.get(commandName);

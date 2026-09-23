@@ -73,7 +73,12 @@ export class MessageContext implements IMessageContext {
    * @returns Object with command name and arguments
    */
   private parseCommand() {
-    const prefix = [config.prefix, '.', '!'].find(p => this.text.startsWith(p));
+    // Longest prefix first so multi-char prefixes (e.g. '..') are not
+    // truncated by shorter ones ('.').
+    const prefix = [config.prefix, '.', '!']
+      .filter((p, i, arr): p is string => Boolean(p) && arr.indexOf(p) === i)
+      .sort((a, b) => b.length - a.length)
+      .find(p => this.text.startsWith(p));
     if (!prefix) {
       return { command: '', args: [] };
     }
