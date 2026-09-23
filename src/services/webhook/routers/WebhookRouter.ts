@@ -8,7 +8,10 @@ export function createWebhookRouter(webhookToken: string): Router {
 
   function validateToken(req: Request): boolean {
     const token = req.headers['x-bot-webhook-token'] as string;
-    return !webhookToken || token === webhookToken;
+    // Fail closed: if no token is configured, reject everything. Otherwise
+    // anyone could create/cancel subbots on an unauthenticated panel.
+    if (!webhookToken) return false;
+    return token === webhookToken;
   }
 
   router.post('/request', async (req: Request, res: Response) => {
