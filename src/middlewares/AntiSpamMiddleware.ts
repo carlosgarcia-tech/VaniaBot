@@ -43,6 +43,8 @@ export class AntiSpamMiddleware extends Middleware {
       this.userMessages.set(key, tracker);
     }
 
+    this.decayWarnings(key);
+
     tracker.messages = tracker.messages.filter(time => now - time < timeWindow);
     tracker.messages.push(now);
 
@@ -90,6 +92,20 @@ export class AntiSpamMiddleware extends Middleware {
       if (tracker.messages.length === 0 || tracker.messages.every(time => now - time > maxAge)) {
         this.userMessages.delete(key);
       }
+    }
+  }
+
+  /** Reset a user's accumulated warnings if they behaved for a while. */
+  private decayWarnings(key: string): void {
+    const tracker = this.userMessages.get(key);
+    if (!tracker) return;
+    const WARNING_DECAY_MS = 10 * 60 * 1000;
+    const now = Date.now();
+    // If no messages were flagged recently, treat old warnings as expired.
+    const lastActivity =
+      tracker.messages.length > 0 ? tracker.messages[tracker.messages.length - 1] : 0;
+    if (tracker.warnings > 0 && now - lastActivity > WARNING_DECAY_MS) {
+      tracker.warnings = 0;
     }
   }
 

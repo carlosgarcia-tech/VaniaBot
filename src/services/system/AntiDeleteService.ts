@@ -27,6 +27,10 @@ export class AntiDeleteService {
   private config: AntiDeleteConfig = { enabled: false, groups: {} };
   private readonly TMP_DIR = path.join(process.cwd(), 'tmp', 'antidelete');
   private readonly MAX_MESSAGE_AGE = 24 * 60 * 60 * 1000;
+  /** Hard cap on stored entries to prevent unbounded RAM growth. */
+  private readonly MAX_STORED_MESSAGES = 500;
+  /** Messages bigger than this are stored as metadata only (no buffer). */
+  private readonly MAX_MEDIA_BUFFER_BYTES = 8 * 1024 * 1024;
 
   constructor() {
     this.ensureTmpDir();
@@ -74,6 +78,16 @@ export class AntiDeleteService {
       },
       60 * 60 * 1000,
     );
+    // Note: unref'd callers may rely on this interval; keep default behavior.
+  }
+
+  /** Drops the oldest entries when the store exceeds its cap. */
+  private enforceStoreLimit(): void {
+    while (this.messageStore.size > this.MAX_STORED_MESSAGES) {
+      const oldestKey = this.messageStore.keys().next().value;
+      if (oldestKey === undefined) break;
+      this.messageStore.delete(oldestKey);
+    }
   }
 
   isEnabled(groupJid?: string): boolean {
@@ -135,24 +149,19 @@ export class AntiDeleteService {
         const chunks: Buffer[] = [];
         for await (const chunk of stream) {
           chunks.push(Buffer.from(chunk));
+          if (chunks.reduce((acc, c) => acc + c.length, 0) > this.MAX_MEDIA_BUFFER_BYTES) {
+            chunks.length = 0; // too big: store metadata only
+            break;
+          }
         }
-        mediaBuffer = Buffer.concat(chunks);
+        if (chunks.length > 0) mediaBuffer = Buffer.concat(chunks);
       } catch (error) {
         logError('[AntiDeleteService]', error);
       }
     } else if (message.message?.videoMessage) {
       mediaType = 'video';
       content = message.message.videoMessage.caption || '';
-      try {
-        const stream = await downloadContentFromMessage(message.message.videoMessage, 'video');
-        const chunks: Buffer[] = [];
-        for await (const chunk of stream) {
-          chunks.push(Buffer.from(chunk));
-        }
-        mediaBuffer = Buffer.concat(chunks);
-      } catch (error) {
-        logError('[AntiDeleteService]', error);
-      }
+      // Videos can be huge; skip buffering them entirely to protect RAM.
     } else if (message.message?.stickerMessage) {
       mediaType = 'sticker';
       try {
@@ -172,8 +181,12 @@ export class AntiDeleteService {
         const chunks: Buffer[] = [];
         for await (const chunk of stream) {
           chunks.push(Buffer.from(chunk));
+          if (chunks.reduce((acc, c) => acc + c.length, 0) > this.MAX_MEDIA_BUFFER_BYTES) {
+            chunks.length = 0;
+            break;
+          }
         }
-        mediaBuffer = Buffer.concat(chunks);
+        if (chunks.length > 0) mediaBuffer = Buffer.concat(chunks);
       } catch (error) {
         logError('[AntiDeleteService]', error);
       }
@@ -191,6 +204,7 @@ export class AntiDeleteService {
     };
 
     this.messageStore.set(messageId, stored);
+    this.enforceStoreLimit();
   }
 
   getMessage(messageId: string): StoredMessage | undefined {

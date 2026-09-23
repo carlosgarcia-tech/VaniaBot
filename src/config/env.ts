@@ -17,6 +17,22 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 /**
+ * Tolerant enum parser: trims, lowercases and falls back to the default value
+ * instead of throwing a cryptic ZodError at import time (e.g. LOG_LEVEL=" info").
+ */
+function tolerantEnum<T extends readonly string[]>(values: T, fallback: T[number]) {
+  return z
+    .string()
+    .optional()
+    .transform(val => {
+      const cleaned = val?.trim().toLowerCase();
+      return (values as readonly string[]).includes(cleaned ?? '')
+        ? (cleaned as T[number])
+        : fallback;
+    });
+}
+
+/**
  * Environment schema with validation and transformation.
  * All values have sensible defaults but can be overridden via .env
  */
@@ -93,13 +109,13 @@ const envSchema = z.object({
   PHONE_NUMBER: z.string().default(''),
 
   /** Database type: 'json', 'mongodb' or 'sqlite' */
-  DB_TYPE: z.enum(['json', 'mongodb', 'sqlite']).default('sqlite'),
+  DB_TYPE: tolerantEnum(['json', 'mongodb', 'sqlite'] as const, 'sqlite'),
 
   /** MongoDB connection URI (required if DB_TYPE=mongodb) */
   DB_URI: z.string().optional(),
 
   /** Node environment: 'development' or 'production' */
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: tolerantEnum(['development', 'production', 'test'] as const, 'development'),
 
   /** Maximum reconnection attempts on connection failure */
   MAX_RECONNECT_ATTEMPTS: z
@@ -147,10 +163,7 @@ const envSchema = z.object({
   PANEL_WEBHOOK_TOKEN: z.string().optional(),
 
   /** Log level: error | warn | info | debug */
-  LOG_LEVEL: z
-    .enum(['error', 'warn', 'info', 'debug'])
-    .transform(val => val?.trim())
-    .default('debug'),
+  LOG_LEVEL: tolerantEnum(['error', 'warn', 'info', 'debug'] as const, 'debug'),
 
   /** WebSocket connection timeout in milliseconds */
   CONNECT_TIMEOUT: z
