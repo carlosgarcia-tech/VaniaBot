@@ -21,7 +21,7 @@ console.error = function (...args: unknown[]) {
 let client: WhatsAppClient;
 
 async function main(): Promise<void> {
-  const isDocker = process.env.DOCKER === 'true';
+  const isDocker = process.env.DOCKER_MODE === 'true' || process.env.DOCKER === 'true';
   const startupProgress = isDocker ? createStartupProgress() : null;
 
   if (!isDocker) {
@@ -46,6 +46,8 @@ async function main(): Promise<void> {
   }
 
   client = new WhatsAppClient();
+  // Expose globally so HealthCheckService / panel routers can read metrics.
+  globalThis.client = client;
   await client.initialize();
 
   if (!isDocker) {
@@ -90,4 +92,9 @@ process.on('unhandledRejection', reason => {
 
 main().catch(error => {
   logError('main', error);
+  // Fatal startup error: exit non-zero so the vania.ts supervisor restarts us.
+  // Staying alive here would leave a zombie bot with no connection and no panel.
+  void logger.flush().finally(() => {
+    process.exit(1);
+  });
 });
