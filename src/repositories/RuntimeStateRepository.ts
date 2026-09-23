@@ -278,6 +278,14 @@ export class RuntimeStateRepository {
 
   setStartupTimestamp(botId: string): void {
     const now = new Date().toISOString();
+    // Ensure the row exists first: a bare UPDATE would silently no-op for
+    // bots that never got a runtime-state row created.
+    getDatabase().query(
+      'INSERT OR IGNORE INTO bot_runtime_state (bot_id, updated_at) VALUES (?, ?)',
+      {
+        params: [botId, now],
+      },
+    );
     getDatabase().query(
       'UPDATE bot_runtime_state SET last_startup_at = ?, updated_at = ? WHERE bot_id = ?',
       { params: [now, now, botId] },
