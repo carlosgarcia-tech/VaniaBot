@@ -1,52 +1,98 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { RetryService, withRetry } from '../../src/services/system/RetryService.js';
-
-describe('RetryService', () => {
-  let retryService: RetryService;
-
-  beforeEach(() => {
-    retryService = new RetryService(
-      {
-        maxAttempts: 3,
-        baseDelay: 5,
-        maxDelay: 50,
-        backoffMultiplier: 2,
-      },
-      'test-retry',
-    );
-  });
-
-  it('should succeed on first try', async () => {
-    const result = await retryService.execute(async () => 'success');
-
-    expect(result.success).toBe(true);
-    expect(result.result).toBe('success');
-  });
-
-  it('should fail after max attempts', async () => {
-    const result = await retryService.execute(async () => {
-      throw new Error('always fails');
-    });
-
-    expect(result.success).toBe(false);
-    expect(result.attempts).toBe(3);
-  });
-});
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { withRetry, withTimeout } from '../../src/services/system/RetryService.js';
 
 describe('withRetry', () => {
-  it('should return result on success', async () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should return result on first success', async () => {
     const result = await withRetry(async () => 'success', { maxAttempts: 3, baseDelay: 5 });
     expect(result).toBe('success');
   });
 
-  it('should throw on failure', async () => {
+  it('should retry retryable errors and eventually succeed', async () => {
+    let calls = 0;
+    const result = await withRetry(
+      async () => {
+        calls++;
+        if (calls < 3) throw new Error('ECONNRESET: connection reset');
+        return 'recovered';
+      },
+      { maxAttempts: 3, baseDelay: 5, maxDelay: 20 },
+    );
+    expect(result).toBe('recovered');
+    expect(calls).toBe(3);
+  });
+
+  it('should throw immediately on non-retryable errors', async () => {
+    let calls = 0;
     await expect(
       withRetry(
         async () => {
-          throw new Error('fail');
+          calls++;
+          throw new Error('invalid credentials');
+        },
+        { maxAttempts: 3, baseDelay: 5 },
+      ),
+    ).rejects.toThrow('invalid credentials');
+    expect(calls).toBe(1);
+  });
+
+  it('should throw after max attempts on persistent retryable errors', async () => {
+    let calls = 0;
+    await expect(
+      withRetry(
+        async () => {
+          calls++;
+          throw new Error('503 service unavailable');
         },
         { maxAttempts: 2, baseDelay: 5 },
       ),
-    ).rejects.toThrow('fail');
+    ).rejects.toThrow('503 service unavailable');
+    expect(calls).toBe(2);
+  });
+
+  it('should respect onRetry veto', async () => {
+    let calls = 0;
+    await expect(
+      withRetry(
+        async () => {
+          calls++;
+          throw new Error('ETIMEDOUT');
+        },
+        { maxAttempts: 3, baseDelay: 5, onRetry: () => false },
+      ),
+    ).rejects.toThrow('ETIMEDOUT');
+    expect(calls).toBe(1);
+  });
+});
+
+describe('withTimeout', () => {
+  it('should resolve when the promise wins the race', async () => {
+    const result = await withTimeout(Promise.resolve('ok'), 1000);
+    expect(result).toBe('ok');
+  });
+
+  it('should reject with the timeout error when it expires', async () => {
+    await expect(
+      withTimeout(
+        new Promise<string>(() => {}),
+        20,
+        'custom timeout message',
+      ),
+    ).rejects.toThrow('custom timeout message');
+  });
+
+  it('should clear the timer when the operation settles', async () => {
+    vi.useFakeTimers();
+    try {
+      const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+      const promise = withTimeout(Promise.resolve('fast'), 10_000);
+      await promise;
+      expect(clearTimeoutSpy).toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

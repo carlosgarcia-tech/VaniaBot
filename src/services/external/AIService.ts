@@ -9,7 +9,7 @@ import {
   circuitBreakerManager,
   CircuitOpenError,
 } from '@/services/system/CircuitBreakerService.js';
-import { retryManager } from '@/services/system/RetryService.js';
+import { withRetry } from '@/services/system/RetryService.js';
 import { unifiedCache } from '@/services/system/UnifiedCacheService.js';
 import { logError, logger } from '@/utils/logger.js';
 import { ServiceUnavailableError, NetworkError, ValidationError } from '@/utils/errors.js';
@@ -143,17 +143,15 @@ export class AIService {
     });
 
     try {
-      const result = await circuitBreaker.execute(async () => {
-        return await retryManager.retryOperation(
-          'ai-chat',
+      const completion = await circuitBreaker.execute(async () => {
+        return await withRetry(
           async () => {
-            const completion = await client.chat.completions.create({
+            return await client.chat.completions.create({
               model: fast ? GROQ_MODELS.fast : GROQ_MODELS.chat,
               messages,
               max_tokens: 1024,
               temperature: 0.7,
             });
-            return completion;
           },
           {
             maxAttempts: 2,
@@ -163,11 +161,6 @@ export class AIService {
         );
       });
 
-      if (!result.result) {
-        throw result.error || new Error('AI request failed');
-      }
-
-      const completion = result.result;
       const text = completion.choices[0]?.message?.content?.trim() ?? '';
 
       session.history.push(
@@ -218,11 +211,10 @@ export class AIService {
     });
 
     try {
-      const result = await circuitBreaker.execute(async () => {
-        return await retryManager.retryOperation(
-          'ai-generate',
+      const completion = await circuitBreaker.execute(async () => {
+        return await withRetry(
           async () => {
-            const completion = await client.chat.completions.create({
+            return await client.chat.completions.create({
               model: GROQ_MODELS.chat,
               messages: [
                 { role: 'system', content: 'Eres VaniaBot, el bot más perfecto e inteligente.' },
@@ -231,7 +223,6 @@ export class AIService {
               max_tokens: maxTokens,
               temperature: 0.7,
             });
-            return completion;
           },
           {
             maxAttempts: 2,
@@ -241,11 +232,6 @@ export class AIService {
         );
       });
 
-      if (!result.result) {
-        throw result.error || new Error('AI request failed');
-      }
-
-      const completion = result.result;
       const text = completion.choices[0]?.message?.content?.trim() ?? '';
       const response = right(text);
       await this.cacheResponse(cacheKey, response, 600);
@@ -278,11 +264,10 @@ export class AIService {
         name: 'ai-store',
       });
 
-      const result = await circuitBreaker.execute(async () => {
-        return await retryManager.retryOperation(
-          'ai-store-chat',
+      const completion = await circuitBreaker.execute(async () => {
+        return await withRetry(
           async () => {
-            const completion = await client.chat.completions.create({
+            return await client.chat.completions.create({
               model: GROQ_MODELS.chat,
               messages: [
                 { role: 'system', content: customSystemPrompt },
@@ -291,7 +276,6 @@ export class AIService {
               max_tokens: 1024,
               temperature: 0.7,
             });
-            return completion;
           },
           {
             maxAttempts: 2,
@@ -301,11 +285,7 @@ export class AIService {
         );
       });
 
-      if (!result.result) {
-        throw result.error || new Error('AI request failed');
-      }
-
-      return result.result.choices[0]?.message?.content?.trim() ?? '';
+      return completion.choices[0]?.message?.content?.trim() ?? '';
     } catch (error) {
       if (error instanceof CircuitOpenError) {
         return 'Servicio de IA temporalmente no disponible. Intenta más tarde.';
