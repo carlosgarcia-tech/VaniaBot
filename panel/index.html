@@ -1536,9 +1536,140 @@
         border-top: 1px solid var(--border);
         margin-top: 1rem;
       }
+
+      /* ---------- Token auth overlay ---------- */
+      .logout-btn {
+        background: transparent;
+        border: 1px solid rgba(255, 71, 87, 0.35);
+        border-radius: 2rem;
+        color: #ff4757;
+        cursor: pointer;
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        padding: 0.55rem 1.1rem;
+        transition: background 0.3s, transform 0.2s;
+      }
+      .logout-btn:hover {
+        background: rgba(255, 71, 87, 0.12);
+        transform: translateY(-1px);
+      }
+
+      .token-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(5, 10, 26, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .token-overlay.visible {
+        display: flex;
+      }
+      .token-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 212, 170, 0.25);
+        border-radius: 16px 4px 16px 4px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        padding: 2.5rem;
+        max-width: 400px;
+        width: calc(100% - 2rem);
+        text-align: center;
+        font-family: 'Outfit', sans-serif;
+      }
+      .token-emoji {
+        font-size: 3rem;
+        margin-bottom: 0.75rem;
+        filter: drop-shadow(0 0 12px rgba(0, 212, 170, 0.5));
+      }
+      .token-card h2 {
+        background: linear-gradient(135deg, var(--aurora-green) 0%, var(--aurora-blue) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+      }
+      .token-card p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1.25rem;
+      }
+      .token-card .token-hint {
+        font-size: 0.75rem;
+      }
+      .token-card code {
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 4px;
+        padding: 0.1rem 0.35rem;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.75rem;
+      }
+      .token-card input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(0, 212, 170, 0.25);
+        border-radius: 10px;
+        color: var(--text-primary);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.95rem;
+        padding: 0.8rem 1rem;
+        outline: none;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+      .token-card input:focus {
+        border-color: var(--aurora-green);
+        box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+      }
+      .token-error {
+        color: #ff4757;
+        font-size: 0.8rem;
+        margin-top: 0.75rem;
+      }
+      .token-btn {
+        margin-top: 1.25rem;
+        width: 100%;
+        background: linear-gradient(135deg, var(--aurora-green), var(--aurora-blue));
+        border: none;
+        border-radius: 10px;
+        color: #050a1a;
+        cursor: pointer;
+        font-family: 'Outfit', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        padding: 0.85rem;
+        transition: transform 0.2s, box-shadow 0.3s;
+      }
+      .token-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
+      }
     </style>
   </head>
   <body>
+    <div class="token-overlay" id="tokenOverlay">
+      <form class="token-card" id="tokenForm" autocomplete="off">
+        <div class="token-emoji">🔐</div>
+        <h2>Acceso al Dashboard</h2>
+        <p>Ingresa el token del panel para ver los datos.<br><span class="token-hint">Es el valor de <code>PANEL_WEBHOOK_TOKEN</code> en tu <code>.env</code>.</span></p>
+        <input
+          type="password"
+          id="tokenInput"
+          placeholder="Token del panel"
+          autocomplete="current-password"
+          spellcheck="false"
+        />
+        <div class="token-error" id="tokenError" style="display: none"></div>
+        <button type="submit" class="token-btn">Entrar</button>
+      </form>
+    </div>
+
     <div class="dashboard">
       <header>
         <div class="logo">
@@ -1554,6 +1685,7 @@
             <span class="loading" id="refreshLoading" style="display: none"></span>
             <span id="refreshText">Actualizar</span>
           </button>
+          <button class="logout-btn" id="logoutBtn" title="Cerrar sesión">Salir</button>
         </div>
       </header>
 
@@ -1799,9 +1931,95 @@
 
     <script>
       const API_BASE = '';
+      const TOKEN_STORAGE_KEY = 'vania_panel_token';
       let activityChart, memoryChart;
       let refreshInterval;
       let counterAnimations = {};
+
+      // ---------- Token auth ----------
+      function getStoredToken() {
+        try {
+          return localStorage.getItem(TOKEN_STORAGE_KEY) || '';
+        } catch {
+          return '';
+        }
+      }
+
+      function storeToken(token) {
+        try {
+          localStorage.setItem(TOKEN_STORAGE_KEY, token);
+        } catch {
+          /* storage unavailable (private mode); token lives for this session only */
+        }
+      }
+
+      function clearToken() {
+        try {
+          localStorage.removeItem(TOKEN_STORAGE_KEY);
+        } catch {
+          /* ignore */
+        }
+        const input = document.getElementById('tokenInput');
+        if (input) input.value = '';
+      }
+
+      function showTokenOverlay(errorMessage) {
+        const overlay = document.getElementById('tokenOverlay');
+        if (!overlay) return;
+        const errEl = document.getElementById('tokenError');
+        if (errEl) {
+          errEl.textContent = errorMessage || '';
+          errEl.style.display = errorMessage ? 'block' : 'none';
+        }
+        overlay.classList.add('visible');
+        setTimeout(() => document.getElementById('tokenInput')?.focus(), 100);
+      }
+
+      function hideTokenOverlay() {
+        const overlay = document.getElementById('tokenOverlay');
+        if (overlay) overlay.classList.remove('visible');
+      }
+
+      function stopAutoRefresh() {
+        if (refreshInterval) {
+          clearInterval(refreshInterval);
+          refreshInterval = null;
+        }
+      }
+
+      function handleTokenSubmit() {
+        const input = document.getElementById('tokenInput');
+        const token = (input?.value || '').trim();
+        if (!token) {
+          showTokenOverlay('Ingresa el token del panel (PANEL_WEBHOOK_TOKEN).');
+          return;
+        }
+        storeToken(token);
+        hideTokenOverlay();
+        loadAllData().catch(err => console.error('loadAllData failed:', err));
+        stopAutoRefresh();
+        refreshInterval = setInterval(loadAllData, 30000);
+      }
+
+      /**
+       * fetch wrapper that attaches the panel token and reacts to 401
+       * by asking for a new one.
+       */
+      async function apiFetch(url, options = {}) {
+        const headers = { ...(options.headers || {}) };
+        const token = getStoredToken();
+        if (token) headers['x-api-token'] = token;
+
+        const res = await fetch(url, { ...options, headers });
+        if (res.status === 401) {
+          clearToken();
+          stopAutoRefresh();
+          showTokenOverlay('Token inv\u00e1lido o expirado. Ingresa el token nuevamente.');
+          throw new Error('Unauthorized (401): ' + url);
+        }
+        return res;
+      }
+      // ---------- end token auth ----------
 
       document.addEventListener('DOMContentLoaded', () => {
         try {
@@ -1811,8 +2029,29 @@
         }
         setupTabs();
         addLiveIndicator();
-        loadAllData();
-        refreshInterval = setInterval(loadAllData, 30000);
+
+        const tokenForm = document.getElementById('tokenForm');
+        if (tokenForm) {
+          tokenForm.addEventListener('submit', e => {
+            e.preventDefault();
+            handleTokenSubmit();
+          });
+        }
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', () => {
+            clearToken();
+            stopAutoRefresh();
+            showTokenOverlay();
+          });
+        }
+
+        if (getStoredToken()) {
+          loadAllData().catch(err => console.error('loadAllData failed:', err));
+          refreshInterval = setInterval(loadAllData, 30000);
+        } else {
+          showTokenOverlay();
+        }
       });
 
       function animateCounter(elementId, targetValue, prefix = '', suffix = '') {
@@ -1992,7 +2231,7 @@
 
       async function loadStats() {
         try {
-          const res = await fetch(API_BASE + '/api/stats');
+          const res = await apiFetch('/api/stats');
           if (!res.ok) {
             console.error('[panel] /api/stats failed:', res.status, res.statusText);
             return;
@@ -2050,7 +2289,7 @@
 
       async function loadMetrics() {
         try {
-          const res = await fetch(API_BASE + '/api/metrics/realtime');
+          const res = await apiFetch('/api/metrics/realtime');
           const data = await res.json();
 
           const history = data.history || [];
@@ -2071,7 +2310,7 @@
 
       async function loadCommands() {
         try {
-          const res = await fetch(API_BASE + '/api/commands/metrics');
+          const res = await apiFetch('/api/commands/metrics');
           const data = await res.json();
 
           const top = (data.topCommands || data.commands || []).slice(0, 8);
@@ -2122,9 +2361,9 @@
       async function loadModeration() {
         try {
           const [actionsRes, bansRes, mutesRes] = await Promise.all([
-            fetch(API_BASE + '/api/moderation/actions?limit=20'),
-            fetch(API_BASE + '/api/moderation/bans'),
-            fetch(API_BASE + '/api/moderation/mutes'),
+            apiFetch('/api/moderation/actions?limit=20'),
+            apiFetch('/api/moderation/bans'),
+            apiFetch('/api/moderation/mutes'),
           ]);
 
           const actions = await actionsRes.json();
@@ -2197,7 +2436,7 @@
 
       async function loadGroups() {
         try {
-          const res = await fetch(API_BASE + '/api/groups');
+          const res = await apiFetch('/api/groups');
           const data = await res.json();
 
           document.getElementById('totalGroups').textContent = data.total || 0;
@@ -2236,7 +2475,7 @@
 
       async function loadSlots() {
         try {
-          const res = await fetch(API_BASE + '/api/slots');
+          const res = await apiFetch('/api/slots');
           const data = await res.json();
 
           const slotsGrid = document.getElementById('slotsGrid');
@@ -2263,7 +2502,7 @@
 
       async function loadHealth() {
         try {
-          const res = await fetch(API_BASE + '/api/health/detailed');
+          const res = await apiFetch('/api/health/detailed');
           const data = await res.json();
 
           const healthGrid = document.getElementById('healthGrid');
@@ -2316,7 +2555,7 @@
 
       async function loadLogs() {
         try {
-          const res = await fetch(API_BASE + '/api/logs?limit=50');
+          const res = await apiFetch('/api/logs?limit=50');
           const data = await res.json();
 
           const container = document.getElementById('logsContainer');
