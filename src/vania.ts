@@ -14,7 +14,8 @@ const RESTART_WINDOW_MS = env.RESTART_WINDOW_MS;
 const MAX_RESTART_DELAY_MS = env.MAX_RESTART_DELAY_MS;
 const FORCE_RESTART_WAIT_MS = env.FORCE_RESTART_WAIT_MS;
 
-const IS_DOCKER = process.env.DOCKER === 'true';
+const IS_DOCKER =
+  process.env.DOCKER === 'true' || process.env.DOCKER_MODE === 'true' || existsSync('/.dockerenv');
 
 let isRunning = false;
 let childProcess: ChildProcess | null = null;
@@ -85,7 +86,7 @@ function startBot(authMode: 'qr' | 'code'): void {
   }
 
   childProcess = spawn('node_modules/.bin/tsx', ['src/index.ts'], {
-    stdio: 'inherit',
+    stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
     env: {
       ...process.env,
       ...dockerEnv,
