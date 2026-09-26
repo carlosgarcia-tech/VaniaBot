@@ -5,6 +5,8 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 interface UserMessageTracker {
   messages: number[];
   warnings: number;
+  /** Last time a warning was issued; drives warning decay. */
+  lastWarningAt: number;
 }
 
 export class AntiSpamMiddleware extends Middleware {
@@ -39,7 +41,7 @@ export class AntiSpamMiddleware extends Middleware {
 
     let tracker = this.userMessages.get(key);
     if (!tracker) {
-      tracker = { messages: [], warnings: 0 };
+      tracker = { messages: [], warnings: 0, lastWarningAt: 0 };
       this.userMessages.set(key, tracker);
     }
 
@@ -50,6 +52,7 @@ export class AntiSpamMiddleware extends Middleware {
 
     if (tracker.messages.length > maxMessages) {
       tracker.warnings++;
+      tracker.lastWarningAt = now;
 
       if (tracker.warnings === 1) {
         await ctx.reply('⚠️ *Advertencia:* No hagas spam');
@@ -95,16 +98,17 @@ export class AntiSpamMiddleware extends Middleware {
     }
   }
 
-  /** Reset a user's accumulated warnings if they behaved for a while. */
+  /**
+   * Reset a user's accumulated warnings if they behaved for a while.
+   * Uses lastWarningAt as the reference: the messages array is already
+   * filtered to the current window, so deriving activity from its newest
+   * entry would make the decay almost never fire.
+   */
   private decayWarnings(key: string): void {
     const tracker = this.userMessages.get(key);
     if (!tracker) return;
     const WARNING_DECAY_MS = 10 * 60 * 1000;
-    const now = Date.now();
-    // If no messages were flagged recently, treat old warnings as expired.
-    const lastActivity =
-      tracker.messages.length > 0 ? tracker.messages[tracker.messages.length - 1] : 0;
-    if (tracker.warnings > 0 && now - lastActivity > WARNING_DECAY_MS) {
+    if (tracker.warnings > 0 && Date.now() - tracker.lastWarningAt > WARNING_DECAY_MS) {
       tracker.warnings = 0;
     }
   }

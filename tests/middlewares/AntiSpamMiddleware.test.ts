@@ -75,10 +75,11 @@ describe('AntiSpamMiddleware', () => {
       text: '',
     }) as unknown as MessageContext;
 
-  const seedTracker = (warnings: number, msgCount: number): void => {
+  const seedTracker = (warnings: number, msgCount: number, lastWarningAt?: number): void => {
     const now = Date.now();
     (middleware as any).userMessages.set('group@test.g.us:user@test.com', {
       warnings,
+      lastWarningAt: lastWarningAt ?? (warnings > 0 ? now : 0),
       messages: Array.from({ length: msgCount }, (_, i) => now - i * 1000),
     });
   };
@@ -145,6 +146,50 @@ describe('AntiSpamMiddleware', () => {
       expect(ctx.reply).toHaveBeenCalledWith(
         '❌ Spam detectado. Serías expulsado si el bot fuera administrador.',
       );
+    });
+  });
+
+  describe('warning decay', () => {
+    it('resets warnings after the decay window so the user is not stuck at final warning', async () => {
+      vi.useFakeTimers();
+      try {
+        const staleWarningAt = Date.now() - 11 * 60 * 1000;
+        seedTracker(2, 0, staleWarningAt);
+        const ctx = createGroupCtx();
+
+        await middleware.execute(ctx, mockNext);
+
+        // Warnings decayed to 0: the message is within limit again, so the
+        // handler runs instead of issuing the final-warning reply.
+        expect(mockNext).toHaveBeenCalled();
+        expect(ctx.reply).not.toHaveBeenCalled();
+        expect((middleware as any).userMessages.get('group@test.g.us:user@test.com').warnings).toBe(
+          0,
+        );
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('keeps warnings while the user keeps misbehaving within the decay window', async () => {
+      vi.useFakeTimers();
+      try {
+        seedTracker(2, 5, Date.now() - 5 * 60 * 1000);
+        const ctx = createGroupCtx(false);
+
+        await middleware.execute(ctx, mockNext);
+
+        // warnings 2 -> 3 (not reset to 0 -> 1): the escalation message is
+        // the non-admin variant, proving the counter survived the check.
+        expect(ctx.reply).toHaveBeenCalledWith(
+          '❌ Spam detectado. Serías expulsado si el bot fuera administrador.',
+        );
+        expect((middleware as any).userMessages.get('group@test.g.us:user@test.com').warnings).toBe(
+          3,
+        );
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
