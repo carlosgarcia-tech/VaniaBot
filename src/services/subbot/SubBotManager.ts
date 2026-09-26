@@ -48,7 +48,6 @@ import { AntiSpamMiddleware } from '@/middlewares/AntiSpamMiddleware.js';
 import { AutoRegisterMiddleware } from '@/middlewares/AutoRegisterMiddleware.js';
 import { MuteMiddleware } from '@/middlewares/MuteMiddleware.js';
 import { LoggerMiddleware } from '@/middlewares/LoggerMiddleware.js';
-import { VaniaToggleMiddleware } from '@/middlewares/VaniaToggleMiddleware.js';
 import { AntiSpamService } from '@/services/system/AntiSpamService.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { commandRegistry } from '@/core/CommandRegistry.js';
@@ -319,7 +318,6 @@ export class SubBotManager extends EventEmitter {
     logger.debug(`🔧 SubBot[${subBotId}] construyendo pipeline de middlewares...`);
     const mws: MiddlewareConfig[] = [
       { middleware: new AutoRegisterMiddleware(), priority: 1, canRunParallel: false },
-      { middleware: new VaniaToggleMiddleware(), priority: 2, canRunParallel: false },
       { middleware: new MuteMiddleware(), priority: 3, canRunParallel: false },
       { middleware: new LoggerMiddleware(), priority: 4, canRunParallel: true },
       { middleware: new ValidationMiddleware(commandRegistry), priority: 5, canRunParallel: true },

@@ -9,7 +9,6 @@ import { PermissionMiddleware } from '@/middlewares/PermissionMiddleware.js';
 import { LoggerMiddleware } from '@/middlewares/LoggerMiddleware.js';
 import { AntiSpamMiddleware } from '@/middlewares/AntiSpamMiddleware.js';
 import { MuteMiddleware } from '@/middlewares/MuteMiddleware.js';
-import { VaniaToggleMiddleware } from '@/middlewares/VaniaToggleMiddleware.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { logger, logError } from '@/utils/logger.js';
 import { cacheManager } from '@/core/CacheManager.js';
@@ -120,7 +119,6 @@ export class WhatsAppClient {
 
     this.middlewares.push(
       { middleware: new RegistrationMiddleware(), priority: 1, canRunParallel: false },
-      { middleware: new VaniaToggleMiddleware(), priority: 2, canRunParallel: false },
       { middleware: new MuteMiddleware(), priority: 3, canRunParallel: false },
       { middleware: new LoggerMiddleware(), priority: 3, canRunParallel: true },
       {

@@ -42,6 +42,10 @@ export class VaniaToggleService {
   /**
    * Unified toggle guard for the MAIN bot pipeline.
    *
+   * This is the ONLY gate for the main path — MainMessagePipeline.runGuards
+   * runs it for every group message (command or not) before the middleware
+   * chain, which no longer repeats the check.
+   *
    * Toggle commands (`vaniaon/off/status`) are routed here:
    * - Bare (or non-numeric/<=0 slot) toggles pass through so the main bot
    *   executes them against itself.
@@ -66,8 +70,12 @@ export class VaniaToggleService {
    * Toggle commands always pass: SubBotMessageHandler skips bare toggles
    * upstream (they belong to the main bot) and slot-addressed toggles
    * bypass the enabled check entirely. Non-toggle messages pass only
-   * when this subbot is enabled in the chat. Fail-open on DB errors,
-   * matching what VaniaToggleMiddleware already did in subbot chains.
+   * when this subbot is enabled in the chat. Fail-open on DB errors so a
+   * broken toggle store does not silence the whole subbot.
+   *
+   * This is the ONLY gate for the subbot path — SubBotMessageHandler runs
+   * it for every group message (command or not) before the middleware
+   * chain, which no longer repeats the check.
    */
   async isAllowedForSubbot(chatJid: string, botId: string, command: string): Promise<boolean> {
     if (VANIA_TOGGLE_COMMANDS.includes(command)) {
