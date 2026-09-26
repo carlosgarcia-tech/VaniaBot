@@ -48,6 +48,9 @@ const mockGetBotPermissions = vi.fn();
 const mockGetUserPermissions = vi.fn();
 const mockGetBlockedLinkInfo = vi.fn();
 const mockAddChatMessage = vi.fn();
+const mockVerifyPin = vi.fn();
+const mockBuildPendingCommandContext = vi.fn();
+const mockIsOwner = vi.fn();
 
 vi.mock('../../src/services/system/Servicemanager.js', () => ({
   serviceManager: {
@@ -97,6 +100,14 @@ vi.mock('../../src/services/chat/ChatSummaryService.js', () => ({
   },
 }));
 
+vi.mock('../../src/services/system/PinVerificationService.js', () => ({
+  pinVerificationService: {
+    verifyPin: (...args: unknown[]) => mockVerifyPin(...args),
+    buildPendingCommandContext: (...args: unknown[]) =>
+      mockBuildPendingCommandContext(...args),
+  },
+}));
+
 vi.mock('../../src/repositories/RuntimeStateRepository.js', () => ({
   runtimeStateRepository: {
     getLastStartupAt: (...args: unknown[]) => mockGetLastStartupAt(...args),
@@ -138,7 +149,7 @@ vi.mock('../../src/handlers/AudioResponseHandler.js', () => ({
 vi.mock('../../src/services/PermissionService.js', () => ({
   normalizeJid: (jid: string) => jid,
   PermissionService: {
-    isOwner: () => false,
+    isOwner: (...args: unknown[]) => mockIsOwner(...args),
     isOwnerAsync: async () => false,
     getUserPermissions: (...args: unknown[]) => mockGetUserPermissions(...args),
     getBotPermissions: (...args: unknown[]) => mockGetBotPermissions(...args),
@@ -286,6 +297,9 @@ describe('MainMessagePipeline', () => {
     mockGetUserPermissions.mockResolvedValue({ isAdmin: false, isOwner: false, isSuperAdmin: false });
     mockGetBlockedLinkInfo.mockReturnValue({ blocked: false, link: null, action: 'delete' });
     mockAddChatMessage.mockClear();
+    mockVerifyPin.mockResolvedValue({ valid: false });
+    mockBuildPendingCommandContext.mockClear();
+    mockIsOwner.mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -655,6 +669,87 @@ describe('MainMessagePipeline', () => {
       await flush();
 
       expect(mockAddChatMessage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('PIN confirmation guard', () => {
+    it('confirms the pending command and runs it through the middleware chain', async () => {
+      const { execute } = registerCommand('pinexec');
+      mockVerifyPin.mockResolvedValue({ valid: true, command: 'pinexec', args: 'hola' });
+      mockBuildPendingCommandContext.mockReturnValue({ command: 'pinexec', args: ['hola'] });
+
+      const { fire } = createPipeline({ mainBotId: BOT_JID });
+      // Owner private message: bare 6-digit code.
+      mockIsOwner.mockReturnValue(true);
+      const msg = makeMessage('123456', {
+        key: { id: 'pin-1', remoteJid: PRIVATE_JID, fromMe: false },
+      });
+
+      fireUpsert(fire, msg);
+      await flush();
+
+      expect(mockVerifyPin).toHaveBeenCalledWith(PRIVATE_JID, '123456');
+      expect(mockBuildPendingCommandContext).toHaveBeenCalledWith('pinexec', 'hola');
+      expect(execute).toHaveBeenCalledTimes(1);
+      const ctx = execute.mock.calls[0][0] as IMessageContext;
+      expect(ctx.command).toBe('pinexec');
+      expect(ctx.args).toEqual(['hola']);
+      expect(ctx.pinConfirmed).toBe(true);
+      expect(cacheManager.hasProcessedMessage('pin-1')).toBe(true);
+    });
+
+    it('rejects a non-whitelisted pending command without executing anything', async () => {
+      const { execute } = registerCommand('roguecmd');
+      mockVerifyPin.mockResolvedValue({ valid: true, command: 'roguecmd', args: 'x' });
+      mockBuildPendingCommandContext.mockReturnValue(null);
+      mockIsOwner.mockReturnValue(true);
+
+      const { fire, sock } = createPipeline({ mainBotId: BOT_JID });
+      const msg = makeMessage('123456', {
+        key: { id: 'pin-2', remoteJid: PRIVATE_JID, fromMe: false },
+      });
+
+      fireUpsert(fire, msg);
+      await flush();
+
+      expect(execute).not.toHaveBeenCalled();
+      expect(sock.sendMessage).toHaveBeenCalledWith(
+        PRIVATE_JID,
+        expect.objectContaining({ text: expect.stringContaining('no permitido') }),
+        expect.objectContaining({ quoted: expect.anything() }),
+      );
+      expect(cacheManager.hasProcessedMessage('pin-2')).toBe(true);
+    });
+
+    it('replies invalid-PIN and stops when verification fails', async () => {
+      mockVerifyPin.mockResolvedValue({ valid: false });
+      mockIsOwner.mockReturnValue(true);
+
+      const { fire, sock } = createPipeline({ mainBotId: BOT_JID });
+      const msg = makeMessage('999999', {
+        key: { id: 'pin-3', remoteJid: PRIVATE_JID, fromMe: false },
+      });
+
+      fireUpsert(fire, msg);
+      await flush();
+
+      expect(sock.sendMessage).toHaveBeenCalledWith(
+        PRIVATE_JID,
+        expect.objectContaining({ text: expect.stringContaining('PIN inválido') }),
+        expect.objectContaining({ quoted: expect.anything() }),
+      );
+      expect(cacheManager.hasProcessedMessage('pin-3')).toBe(true);
+    });
+
+    it('ignores 6-digit messages from non-owners without touching the PIN service', async () => {
+      const { fire } = createPipeline();
+      const msg = makeMessage('123456');
+
+      fireUpsert(fire, msg);
+      await flush();
+
+      expect(mockVerifyPin).not.toHaveBeenCalled();
+      expect(cacheManager.hasProcessedMessage(String(msg.key.id))).toBe(true);
     });
   });
 

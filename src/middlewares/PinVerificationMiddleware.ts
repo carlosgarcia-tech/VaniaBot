@@ -1,48 +1,66 @@
+/**
+ * PinVerificationMiddleware.ts
+ *
+ * Owner PIN confirmation for destructive commands (eval/exec/grant/
+ * setowner/restart). Runs as a GUARD inside MainMessagePipeline.runGuards —
+ * NOT as a chain middleware — because only guards see messages without a
+ * resolved command, and a bare 6-digit code resolves to no command.
+ *
+ * Flow: !exec ls → owner-only, creates a pending verification and DMs a PIN;
+ * the owner replies "123456" in the same private chat → this guard verifies
+ * it, injects the stored command/args into the context and lets the message
+ * continue through the FULL middleware chain (validation, permissions,
+ * cooldown, gates), closing the previous bypass that executed the command
+ * directly. Commands outside PIN_ALLOWED_COMMANDS are never confirmed.
+ *
+ * @author **Carlos G** ⭐
+ */
+
 import { Middleware } from './Middleware.js';
 import type { MessageContext } from '@/types/index.js';
-import type { CommandRegistry } from '@/core/CommandRegistry.js';
 import { pinVerificationService } from '@/services/system/PinVerificationService.js';
 import { logger } from '@/utils/logger.js';
-
-export const PIN_COMMANDS = ['eval', 'exec', 'grant', 'setowner', 'restart'];
 
 export class PinVerificationMiddleware extends Middleware {
   name = 'pin-verification';
 
-  constructor(private registry: CommandRegistry) {
-    super();
-  }
-
   async execute(ctx: MessageContext, next: () => Promise<void>): Promise<void> {
     if (!ctx.chat.isGroup && ctx.sender.isOwner) {
-      const messageText = ctx.args.join(' ').trim();
+      // A bare reply has command:'' and args:[], so the code lives in text;
+      // a prefixed '.123456' resolves to command:'123456' instead.
+      const messageText = (ctx.command || ctx.text).trim();
 
       if (/^\d{6}$/.test(messageText)) {
         const result = await pinVerificationService.verifyPin(ctx.sender.jid, messageText);
 
-        if (result.valid && result.command && result.args) {
-          await ctx.react('✅');
-
-          const command = this.registry.get(result.command);
-          if (command) {
-            ctx.args = result.args.split(' ').filter(arg => arg.length > 0);
-            try {
-              await command.execute(ctx);
-            } catch (error) {
-              logger.error(`[PinVerification] Error executing command ${result.command}`, {
-                error: error instanceof Error ? error.message : 'Unknown',
-              });
-              await ctx.reply(
-                `❌ Error al ejecutar el comando: ${error instanceof Error ? error.message : 'Unknown'}`,
-              );
-            }
+        if (result.valid && result.command) {
+          // Whitelist gate: refuse to confirm anything outside the list.
+          const pending = pinVerificationService.buildPendingCommandContext(
+            result.command,
+            result.args ?? '',
+          );
+          if (!pending) {
+            logger.warn(`[PinVerification] Refusing non-whitelisted command '${result.command}'`);
+            await ctx.react('❌');
+            await ctx.reply('⚠️ Comando no permitido para confirmación por PIN.');
             return;
           }
+
+          await ctx.react('✅');
+
+          // Inject the verified command so the message continues through the
+          // full middleware chain instead of executing the command directly.
+          // The flag tells checkPinVerification inside the command not to
+          // challenge for another PIN on this authorized run.
+          ctx.command = pending.command;
+          ctx.args = pending.args;
+          ctx.pinConfirmed = true;
+          await next();
         } else {
           await ctx.react('❌');
           await ctx.reply('⚠️ PIN inválido o expirado. Necesitas ejecutar el comando de nuevo.');
-          return;
         }
+        return;
       }
     }
 

@@ -11,11 +11,17 @@ export async function checkPinVerification(
   sock?: WASocket,
 ): Promise<{ requiresPin: boolean; canExecute: boolean }> {
   const socket = sock || ctx.sock;
-  const hasPending = await pinVerificationService.hasPendingVerification(ctx.sender.jid);
 
-  if (hasPending) {
-    return { requiresPin: true, canExecute: true };
+  // This run was authorized through the PIN confirmation flow (the guard
+  // injected the command). Without this flag the confirmed execution would
+  // re-enter and demand yet another PIN forever.
+  if (ctx.pinConfirmed) {
+    return { requiresPin: false, canExecute: true };
   }
+
+  // NOTE: previously a pending verification allowed re-issuing the command
+  // WITHOUT a PIN (canExecute: true). That was a bypass window — every
+  // fresh execution of a protected command must challenge for a PIN.
 
   if (!PIN_PROTECTED_COMMANDS.includes(commandName)) {
     return { requiresPin: false, canExecute: true };

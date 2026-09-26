@@ -22,7 +22,7 @@ export class ProcinfoCommand extends Command {
   aliases = ['procinfo', 'processinfo'];
   usage = '!procinfo';
   examples = ['!procinfo'];
-  permission = PermissionLevel.OWNER;
+  permissions = { user: [PermissionLevel.OWNER] };
   contexts = [CommandContext.BOTH];
 
   formatBytes(bytes: number): string {

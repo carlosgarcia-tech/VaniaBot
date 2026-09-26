@@ -124,7 +124,7 @@ export class WhatsAppClient {
       { middleware: new MuteMiddleware(), priority: 3, canRunParallel: false },
       { middleware: new LoggerMiddleware(), priority: 3, canRunParallel: true },
       {
-        middleware: new PinVerificationMiddleware(commandRegistry),
+        middleware: new PinVerificationMiddleware(),
         priority: 3,
         canRunParallel: true,
       },

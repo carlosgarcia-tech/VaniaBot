@@ -12,6 +12,15 @@ export interface PendingVerification {
 const PIN_TTL_SECONDS = 60;
 const _PIN_LENGTH = 6;
 
+/** Commands that may be executed through PIN confirmation. */
+export const PIN_ALLOWED_COMMANDS: readonly string[] = [
+  'eval',
+  'exec',
+  'grant',
+  'setowner',
+  'restart',
+];
+
 export class PinVerificationService {
   private static instance: PinVerificationService;
 
@@ -80,6 +89,20 @@ export class PinVerificationService {
       command: pending.command,
       args: pending.args,
     };
+  }
+
+  /**
+   * Validates a PIN-confirmed command and splits its stored args. Returns
+   * null for commands outside the PIN whitelist — the confirmation flow must
+   * never become a way to execute arbitrary registry entries.
+   */
+  buildPendingCommandContext(
+    command: string,
+    args: string,
+  ): { command: string; args: string[] } | null {
+    const normalized = command.toLowerCase();
+    if (!PIN_ALLOWED_COMMANDS.includes(normalized)) return null;
+    return { command: normalized, args: args.split(/\s+/).filter(arg => arg.length > 0) };
   }
 
   async cancelPendingVerification(ownerJid: string): Promise<void> {

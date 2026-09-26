@@ -26,7 +26,7 @@ export class UpdateCommand extends Command {
   aliases = ['actualizar', 'gitpull'];
   usage = '!update';
   examples = ['!update'];
-  permission = PermissionLevel.OWNER;
+  permissions = { user: [PermissionLevel.OWNER] };
   contexts = [CommandContext.BOTH];
 
   async execute(ctx: MessageContext): Promise<void> {

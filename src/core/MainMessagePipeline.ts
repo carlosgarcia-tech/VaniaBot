@@ -24,6 +24,7 @@ import { middlewareCache } from '@/middlewares/MiddlewareCache.js';
 import { contactsCache } from '@/utils/ContactsCache.js';
 import { antilinkService } from '@/services/moderation/AntilinkService.js';
 import { chatSummaryService } from '@/services/chat/ChatSummaryService.js';
+import { PinVerificationMiddleware } from '@/middlewares/PinVerificationMiddleware.js';
 import type { RealTimeMessageProcessor } from './RealTimeMessageProcessor.js';
 
 interface MiddlewareConfig {
@@ -52,6 +53,15 @@ enum GuardResult {
 }
 
 export class MainMessagePipeline {
+  /**
+   * Owner PIN confirmation. Runs as a guard (not a chain middleware)
+   * because only guards see messages without a resolved command — a bare
+   * 6-digit code is exactly that. On success it injects the verified
+   * command/args into the context so the message continues through the
+   * FULL middleware chain.
+   */
+  private readonly pinVerificationGuard = new PinVerificationMiddleware();
+
   constructor(
     private sock: WASocket,
     private middlewares: MiddlewareConfig[],
@@ -215,11 +225,39 @@ export class MainMessagePipeline {
     }
 
     if (!ctx.command) {
-      cacheManager.markMessageProcessed(messageId);
-      return GuardResult.Stop;
+      if (this.isPinConfirmationMessage(ctx)) {
+        const confirmed = await this.confirmPin(ctx);
+        if (!confirmed) {
+          cacheManager.markMessageProcessed(messageId);
+          return GuardResult.Stop;
+        }
+        // Confirmed: the guard injected ctx.command/args — fall through so
+        // the command resolves and runs through the middleware chain below.
+      } else {
+        cacheManager.markMessageProcessed(messageId);
+        return GuardResult.Stop;
+      }
     }
 
     return GuardResult.Continue;
+  }
+
+  /** True for a bare 6-digit message in a private chat from the owner. */
+  private isPinConfirmationMessage(ctx: MessageContext): boolean {
+    const code = ctx.command || ctx.text.trim();
+    return !ctx.chat.isGroup && ctx.sender.isOwner && /^\d{6}$/.test(code);
+  }
+
+  /**
+   * Delegates to the PIN guard; true when the guard called next(), which
+   * only happens after a successful verification and command injection.
+   */
+  private async confirmPin(ctx: MessageContext): Promise<boolean> {
+    let confirmed = false;
+    await this.pinVerificationGuard.execute(ctx, async () => {
+      confirmed = true;
+    });
+    return confirmed;
   }
 
   /** True when the text starts with any configured command prefix. */

@@ -84,6 +84,12 @@ export interface MessageContext {
   mentionedJid?: string;
   contextInfo?: proto.IContextInfo;
   media?: Buffer;
+  /**
+   * True when this execution was authorized through the owner PIN
+   * confirmation flow (PinVerificationMiddleware injected the command);
+   * checkPinVerification uses it to skip the challenge on this run.
+   */
+  pinConfirmed?: boolean;
   reply(text: string): Promise<void>;
   react(emoji: string): Promise<void>;
   sendMessage(content: AnyMessageContent): Promise<void>;

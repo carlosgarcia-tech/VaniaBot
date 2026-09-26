@@ -26,7 +26,7 @@ export class ProcesosCommand extends Command {
   aliases = ['ps', 'tasks'];
   usage = '!procesos';
   examples = ['!procesos'];
-  permission = PermissionLevel.OWNER;
+  permissions = { user: [PermissionLevel.OWNER] };
   contexts = [CommandContext.BOTH];
 
   async execute(ctx: MessageContext): Promise<void> {

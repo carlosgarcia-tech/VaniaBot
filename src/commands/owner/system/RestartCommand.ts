@@ -23,7 +23,7 @@ export class RestartCommand extends Command {
   aliases = ['reiniciar'];
   usage = '!restart';
   examples = ['!restart'];
-  permission = PermissionLevel.OWNER;
+  permissions = { user: [PermissionLevel.OWNER] };
   contexts = [CommandContext.BOTH];
 
   async execute(ctx: MessageContext): Promise<void> {
