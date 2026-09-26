@@ -1,37 +1,42 @@
-import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
-import { logError } from '@/utils/logger.js';
-import {
-  CommandCategory,
-  CommandContext,
-  PermissionLevel,
-  type MessageContext,
-} from '@/types/index.js';
+import { NsfwMediaBase } from './NsfwMediaBase.js';
+import { CommandContext } from '@/types/index.js';
 
-export class TiktokCommand extends Command {
-  name = 'tiktok';
+/**
+ * Random NSFW TikTok-style video.
+ *
+ * Note: the `tiktok` command name belongs to media/download/TiktokCommand
+ * (the URL downloader). This command is reachable via `tiktoknsfw` to avoid
+ * the registry name collision that previously made `!tiktok <url>`
+ * non-deterministically resolve to either command.
+ */
+export class TiktokCommand extends NsfwMediaBase {
+  name = 'tiktoknsfw';
   description = 'Obtiene un video de TikTok aleatorio';
-  category = CommandCategory.ANIME;
-  aliases = ['tiktok', 'tiktoknsfw'];
-  cooldown = 15000;
+  aliases = ['tiktoknsfw'];
+  usage = '!tiktoknsfw';
+  examples = ['!tiktoknsfw'];
   contexts = [CommandContext.BOTH];
-  usage = '!tiktok';
-  examples = ['!tiktok'];
-  permissions = { user: [PermissionLevel.USER], bot: [] };
-  enabled = false;
 
-  async execute(ctx: MessageContext): Promise<void> {
-    await ctx.react('🔞');
-    try {
-      const videoUrl = await deliriusService.getNsfwImage('tiktok');
-      await ctx.sock.sendMessage(ctx.chat.jid, {
-        video: { url: videoUrl },
-      });
-      await ctx.react('✅');
-    } catch (error) {
-      logError('[TiktokCommand]', error);
-      await ctx.react('❌');
-      await ctx.reply('❌ No pude obtener el video. Intenta de nuevo.');
-    }
+  protected override get usageEmoji(): string {
+    return '🔞';
+  }
+
+  protected readonly searchEmoji = '🔞';
+
+  protected override requiresQuery(): boolean {
+    return false;
+  }
+
+  protected async fetchMedia(): Promise<string | null> {
+    return deliriusService.getNsfwImage('tiktok');
+  }
+
+  protected buildMessage(mediaUrl: string): { video: { url: string } } {
+    return { video: { url: mediaUrl } };
+  }
+
+  protected override errorMessage(): string {
+    return '❌ No pude obtener el video. Intenta de nuevo.';
   }
 }

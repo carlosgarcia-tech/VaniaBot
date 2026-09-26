@@ -6,8 +6,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
-
-let nsfwEnabled = false;
+import { logError } from '@/utils/logger.js';
 
 export class NsfwToggleCommand extends Command {
   name = 'nsfw';
@@ -22,45 +21,44 @@ export class NsfwToggleCommand extends Command {
     user: [PermissionLevel.OWNER],
   };
 
+  /**
+   * @deprecated Legacy in-memory flag kept for backwards compatibility with
+   * code that reads NsfwToggleCommand.isEnabled(). The source of truth is
+   * now serviceManager.nsfwToggleService (persisted across restarts).
+   */
+  private static legacyEnabled = false;
+
   async execute(ctx: MessageContext): Promise<void> {
     const action = ctx.args?.[0]?.toLowerCase();
     const groupJid = ctx.chat.isGroup ? ctx.chat.jid : null;
 
-    if (!action || action === 'status') {
-      const status = nsfwEnabled ? '✅ *HABILITADOS*' : '❌ *DESHABILITADOS*';
-      let groupStatus = '';
-      if (groupJid) {
-        try {
-          const group = await serviceManager.groupService.getGroup(groupJid);
-          groupStatus = group.nsfw
-            ? '\n📌 *Este grupo:* ✅ habilitado'
-            : '\n📌 *Este grupo:* ❌ deshabilitado';
-        } catch {
-          groupStatus = '\n📌 *Este grupo:* ⚠️ no verificado';
-        }
+    try {
+      if (!action || action === 'status') {
+        const enabled = await serviceManager.nsfwToggleService.isEnabled(groupJid);
+        const status = enabled ? '✅ *HABILITADOS*' : '❌ *DESHABILITADOS*';
+        const scope = groupJid ? '📌 *Este grupo:*' : '🌐 *Global:*';
+        await ctx.reply(`🔞 NSFW ${scope} ${status}\n\nUsa: !nsfw on/off`);
+        return;
       }
-      await ctx.reply(`🔞 *NSFW global:* ${status}${groupStatus}\n\nUsa: !nsfw on/off`);
-      return;
-    }
 
-    if (action === 'on') {
-      nsfwEnabled = true;
-      if (groupJid) {
-        await serviceManager.groupService.toggleNSFW(groupJid, true);
+      if (action === 'on') {
+        await serviceManager.nsfwToggleService.setEnabled(true, ctx.sender.jid, groupJid);
+        NsfwToggleCommand.legacyEnabled = true;
+        await ctx.reply('✅ *Comandos NSFW habilitados*');
+      } else if (action === 'off') {
+        await serviceManager.nsfwToggleService.setEnabled(false, ctx.sender.jid, groupJid);
+        NsfwToggleCommand.legacyEnabled = false;
+        await ctx.reply('❌ *Comandos NSFW deshabilitados*');
+      } else {
+        await ctx.reply('✍️ *Uso:* !nsfw <on/off/status>');
       }
-      await ctx.reply('✅ *Comandos NSFW habilitados*');
-    } else if (action === 'off') {
-      nsfwEnabled = false;
-      if (groupJid) {
-        await serviceManager.groupService.toggleNSFW(groupJid, false);
-      }
-      await ctx.reply('❌ *Comandos NSFW deshabilitados*');
-    } else {
-      await ctx.reply('✍️ *Uso:* !nsfw <on/off/status>');
+    } catch (error) {
+      logError('[NsfwToggleCommand] Error', error);
+      await ctx.reply('❌ No pude cambiar el estado NSFW. Intenta de nuevo.');
     }
   }
 
   static isEnabled(): boolean {
-    return nsfwEnabled;
+    return NsfwToggleCommand.legacyEnabled;
   }
 }

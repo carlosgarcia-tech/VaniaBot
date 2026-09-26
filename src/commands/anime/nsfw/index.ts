@@ -1,3 +1,4 @@
+export { NsfwMediaBase } from './NsfwMediaBase.js';
 export { TiktokCommand } from './TiktokCommand.js';
 export { Rule34Command } from './Rule34Command.js';
 export { TotalCharactersCommand } from './TotalCharactersCommand.js';
@@ -6,3 +7,4 @@ export { HentaitvCommand } from './HentaitvCommand.js';
 export { PixivCommand } from './PixivCommand.js';
 export { NhentaisearchCommand } from './NhentaisearchCommand.js';
 export { HitomiCommand } from './HitomiCommand.js';
+export { NhentaiCommand } from './NhentaiCommand.js';

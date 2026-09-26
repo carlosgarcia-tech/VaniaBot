@@ -1,49 +1,28 @@
-import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
-import { logError } from '@/utils/logger.js';
-import {
-  CommandCategory,
-  CommandContext,
-  PermissionLevel,
-  type MessageContext,
-} from '@/types/index.js';
+import { NsfwMediaBase } from './NsfwMediaBase.js';
+import { CommandContext, type MessageContext } from '@/types/index.js';
 
-export class Rule34Command extends Command {
+export class Rule34Command extends NsfwMediaBase {
   name = 'rule34';
   description = 'Busca en Rule34';
-  category = CommandCategory.ANIME;
   aliases = ['rule34'];
-  cooldown = 10000;
-  contexts = [CommandContext.BOTH];
   usage = '!rule34 <busqueda>';
   examples = ['!rule34 anime'];
-  permissions = { user: [PermissionLevel.USER], bot: [] };
-  enabled = false;
+  contexts = [CommandContext.BOTH];
 
-  async execute(ctx: MessageContext): Promise<void> {
-    const query = ctx.args?.join(' ').trim();
+  protected readonly searchEmoji = '🔞';
 
-    if (!query) {
-      await ctx.reply('✍️ *Uso:* !rule34 <busqueda>\n_Ejemplo: !rule34 anime');
-      return;
-    }
+  protected async fetchMedia(ctx: MessageContext): Promise<string | null> {
+    const query = ctx.args?.join(' ').trim() ?? '';
+    const data = (await deliriusService.search('rule34', { query })) as { result?: string };
+    return data?.result ?? null;
+  }
 
-    await ctx.react('🔞');
-    try {
-      const data = (await deliriusService.search('rule34', { query })) as { result?: string };
+  protected buildMessage(mediaUrl: string): { image: { url: string } } {
+    return { image: { url: mediaUrl } };
+  }
 
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No se encontraron resultados.');
-      }
-    } catch (error) {
-      logError('[Rule34Command]', error);
-      await ctx.react('❌');
-      await ctx.reply('❌ Error al buscar. Intenta de nuevo.');
-    }
+  protected override errorMessage(): string {
+    return '❌ Error al buscar. Intenta de nuevo.';
   }
 }

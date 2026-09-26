@@ -1,12 +1,28 @@
+import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
-import { primeService } from '@/services/system/PrimeService.js';
 import { FacebookDownloader } from '@/services/download/FacebookDownloader.js';
-import { MediaCardService } from '@/services/creative/MediaCardService.js';
 import { isRight } from '@/utils/either.js';
-import fs from 'fs';
-import axios from 'axios';
+import { MediaPreviewBase, type PreviewInfo } from './MediaPreviewBase.js';
+
+class FacebookPreview extends MediaPreviewBase {
+  async send(ctx: MessageContext, info: PreviewInfo, status: string): Promise<void> {
+    await this.sendPreview(
+      ctx,
+      info,
+      {
+        thumbnail: info.thumbnail,
+        title: info.title,
+        platform: 'facebook',
+        author: info.author,
+        quality: 'HD',
+      },
+      { header: '📺 *Facebook*', extraLines: ['⬇️ descargando...'] },
+      status,
+    );
+  }
+}
 
 export class FacebookCommand extends Command {
   name = 'facebook';
@@ -21,6 +37,7 @@ export class FacebookCommand extends Command {
   cooldown = 30000;
 
   private downloader: FacebookDownloader;
+  private preview = new FacebookPreview();
 
   constructor() {
     super();
@@ -54,39 +71,16 @@ export class FacebookCommand extends Command {
       const infoResult = await this.downloader.getVideoInfo(url);
       const info = infoResult._tag === 'Right' ? infoResult.right : null;
 
-      const thumbnailUrl = info?.thumbnailUrl;
-      const thumbnailBuffer = await this.getPreviewImage(thumbnailUrl);
-
-      try {
-        const card = await MediaCardService.generate({
-          thumbnail: thumbnailUrl,
+      await this.preview.send(
+        ctx,
+        {
           title: info?.title || 'Facebook video',
-          platform: 'facebook',
+          url,
+          thumbnail: info?.thumbnailUrl,
           author: info?.author,
-          quality: 'HD',
-        });
-
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: card,
-          caption: `> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕`,
-        });
-      } catch {
-        const caption =
-          `📺 *Facebook*\n` +
-          (info ? `✿ ${info.title.substring(0, 60)}\n✿ *autor:* ${info.author}\n` : '') +
-          `⬇️ descargando...\n` +
-          `🔗 ${url}`;
-
-        if (thumbnailBuffer) {
-          await ctx.sock.sendMessage(ctx.chat.jid, {
-            image: thumbnailBuffer,
-            caption,
-            mimetype: 'image/jpeg',
-          });
-        } else {
-          await ctx.reply(caption);
-        }
-      }
+        },
+        '> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+      );
 
       await ctx.react('⏳');
 
@@ -101,33 +95,22 @@ export class FacebookCommand extends Command {
       const downloadSuccess = result.right;
       const filePath = downloadSuccess.filePath;
 
-      const _footer = await primeService.formatFooter(ctx.sock, ctx.chat.jid, ctx.chat.isGroup);
-      await ctx.sock.sendMessage(ctx.chat.jid, {
-        video: fs.readFileSync(filePath),
-        mimetype: 'video/mp4',
-      });
+      try {
+        // Stream from the file path: Baileys reads it in chunks, avoiding
+        // loading the whole video into RAM.
+        await ctx.sock.sendMessage(ctx.chat.jid, {
+          video: { url: filePath },
+          mimetype: 'video/mp4',
+        });
 
-      await ctx.react('✅');
-
-      await this.downloader['cleanup'](filePath);
+        await ctx.react('✅');
+      } finally {
+        await this.downloader.cleanup(filePath);
+      }
     } catch (error: unknown) {
       logError('[FacebookCommand] Error', error);
       await ctx.react('❌');
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      await ctx.reply(`❌ Error: ${errorMessage}`);
-    }
-  }
-
-  private async getPreviewImage(thumbnailUrl?: string): Promise<Buffer | null> {
-    if (!thumbnailUrl) return null;
-    try {
-      const response = await axios.get<ArrayBuffer>(thumbnailUrl, {
-        responseType: 'arraybuffer',
-        timeout: 10000,
-      });
-      return Buffer.from(response.data);
-    } catch {
-      return null;
+      await ctx.reply(`❌ Error: ${errorMessage(error)}`);
     }
   }
 }

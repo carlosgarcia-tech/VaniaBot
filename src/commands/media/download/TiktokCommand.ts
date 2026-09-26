@@ -1,12 +1,35 @@
+import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
-import { primeService } from '@/services/system/PrimeService.js';
 import { TikTokDownloader } from '@/services/download/TikTokDownloader.js';
-import { MediaCardService } from '@/services/creative/MediaCardService.js';
 import { isRight } from '@/utils/either.js';
-import fs from 'fs';
-import axios from 'axios';
+import { MediaPreviewBase, type PreviewInfo } from './MediaPreviewBase.js';
+
+class TikTokPreview extends MediaPreviewBase {
+  async send(
+    ctx: MessageContext,
+    info: PreviewInfo,
+    status: string,
+    quality: string,
+  ): Promise<void> {
+    await this.sendPreview(
+      ctx,
+      info,
+      {
+        thumbnail: info.thumbnail,
+        title: info.title,
+        duration: info.duration,
+        platform: 'tiktok',
+        author: info.author,
+        quality: `${quality}p`,
+        music: 'Original Sound',
+      },
+      { header: '🎬', quality: `${quality}p` },
+      status,
+    );
+  }
+}
 
 export class TiktokCommand extends Command {
   name = 'tiktok';
@@ -22,6 +45,7 @@ export class TiktokCommand extends Command {
   cooldown = 30000;
 
   private downloader: TikTokDownloader;
+  private preview = new TikTokPreview();
 
   constructor() {
     super();
@@ -57,18 +81,15 @@ export class TiktokCommand extends Command {
       const infoResult = await this.downloader.getVideoInfo(url);
       const info = infoResult._tag === 'Right' ? infoResult.right : null;
 
-      const thumbnailBuffer = await this.getPreviewImage(info?.thumbnailUrl);
-
-      await this.sendPreviewWithThumbnail(
+      await this.preview.send(
         ctx,
         {
           title: info?.title ?? 'TikTok video',
           author: info?.author ?? 'unknown',
           url,
-          thumbnailUrl: info?.thumbnailUrl,
+          thumbnail: info?.thumbnailUrl,
           duration: info?.duration,
         },
-        thumbnailBuffer,
         '\n> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
         quality,
       );
@@ -86,81 +107,22 @@ export class TiktokCommand extends Command {
       const downloadSuccess = result.right;
       const filePath = downloadSuccess.filePath;
 
-      const _footer = await primeService.formatFooter(ctx.sock, ctx.chat.jid, ctx.chat.isGroup);
-      await ctx.sock.sendMessage(ctx.chat.jid, {
-        video: fs.readFileSync(filePath),
-        mimetype: 'video/mp4',
-      });
+      try {
+        // Stream from the file path: Baileys reads it in chunks, avoiding
+        // loading the whole video into RAM.
+        await ctx.sock.sendMessage(ctx.chat.jid, {
+          video: { url: filePath },
+          mimetype: 'video/mp4',
+        });
 
-      await ctx.react('✅');
-
-      await this.downloader['cleanup'](filePath);
+        await ctx.react('✅');
+      } finally {
+        await this.downloader.cleanup(filePath);
+      }
     } catch (error: unknown) {
       logError('[TiktokCommand] Error', error);
       await ctx.react('❌');
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      await ctx.reply(`❌ Error: ${errorMessage}`);
-    }
-  }
-
-  private async getPreviewImage(thumbnailUrl?: string): Promise<Buffer | null> {
-    if (!thumbnailUrl) return null;
-
-    try {
-      const response = await axios.get<ArrayBuffer>(thumbnailUrl, {
-        responseType: 'arraybuffer',
-        timeout: 10000,
-      });
-      return Buffer.from(response.data);
-    } catch {
-      return null;
-    }
-  }
-
-  private async sendPreviewWithThumbnail(
-    ctx: MessageContext,
-    info: {
-      title: string;
-      author: string;
-      url: string;
-      thumbnailUrl?: string;
-      duration?: string;
-    },
-    thumbnail: Buffer | null,
-    status: string,
-    quality: string,
-  ): Promise<void> {
-    try {
-      const card = await MediaCardService.generate({
-        thumbnail: info.thumbnailUrl,
-        title: info.title,
-        duration: info.duration,
-        platform: 'tiktok',
-        author: info.author,
-        quality: `${quality}p`,
-        music: 'Original Sound',
-      });
-
-      await ctx.sock.sendMessage(ctx.chat.jid, {
-        image: card,
-        caption: `${status}`,
-      });
-    } catch {
-      const caption =
-        `🎬 *@${info.author}*\n` +
-        `✿ ${info.title.substring(0, 60)}${info.title.length > 60 ? '...' : ''}\n` +
-        (info.duration ? `⏱️ ${info.duration}\n` : '') +
-        `📦 Calidad: ${quality}p\n`;
-
-      if (thumbnail) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: thumbnail,
-          caption,
-          mimetype: 'image/jpeg',
-        });
-      } else {
-        await ctx.reply(caption);
-      }
+      await ctx.reply(`❌ Error: ${errorMessage(error)}`);
     }
   }
 }

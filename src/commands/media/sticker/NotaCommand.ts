@@ -1,3 +1,4 @@
+import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { StickerHelper } from '@/utils/StickerHelper.js';
@@ -79,7 +80,7 @@ export class NotaCommand extends Command {
       await ctx.sock.sendMessage(ctx.chat.jid, { sticker });
       await ctx.react('✅');
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
+      const message = errorMessage(error);
       await ctx.reply(`❌ Error: ${message}`);
       await ctx.react('❌');
     }

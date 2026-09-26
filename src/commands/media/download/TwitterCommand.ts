@@ -1,11 +1,26 @@
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { TwitterDownloader } from '@/services/download/TwitterDownloader.js';
-import { MediaCardService } from '@/services/creative/MediaCardService.js';
 import { logger } from '@/utils/logger.js';
 import { isRight } from '@/utils/either.js';
-import fs from 'fs';
-import axios from 'axios';
+import { MediaPreviewBase, type PreviewInfo } from './MediaPreviewBase.js';
+
+class TwitterPreview extends MediaPreviewBase {
+  async send(ctx: MessageContext, info: PreviewInfo, status: string): Promise<void> {
+    await this.sendPreview(
+      ctx,
+      info,
+      {
+        thumbnail: info.thumbnail,
+        title: info.title,
+        platform: 'twitter',
+        author: info.author,
+      },
+      { header: '🐦 *Twitter/X*', extraLines: ['⬇️ descargando...'] },
+      status,
+    );
+  }
+}
 
 export class TwitterCommand extends Command {
   name = 'twitter';
@@ -22,6 +37,7 @@ export class TwitterCommand extends Command {
   mediaGroup = true;
 
   private downloader = new TwitterDownloader();
+  private preview = new TwitterPreview();
 
   async execute(ctx: MessageContext): Promise<void> {
     const url = ctx.args[0];
@@ -48,38 +64,16 @@ export class TwitterCommand extends Command {
       const infoResult = await this.downloader.getVideoInfo(url);
       const info = infoResult._tag === 'Right' ? infoResult.right : null;
 
-      const thumbnailUrl = info?.thumbnailUrl;
-      const thumbnailBuffer = await this.getPreviewImage(thumbnailUrl);
-
-      try {
-        const card = await MediaCardService.generate({
-          thumbnail: thumbnailUrl,
+      await this.preview.send(
+        ctx,
+        {
           title: info?.title || 'Twitter/X video',
-          platform: 'twitter',
+          url,
+          thumbnail: info?.thumbnailUrl,
           author: info?.author,
-        });
-
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: card,
-          caption: `> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕`,
-        });
-      } catch {
-        const caption =
-          `🐦 *Twitter/X*\n` +
-          (info ? `✿ ${info.title.substring(0, 60)}\n` : '') +
-          `⬇️ descargando...\n` +
-          `🔗 ${url}`;
-
-        if (thumbnailBuffer) {
-          await ctx.sock.sendMessage(ctx.chat.jid, {
-            image: thumbnailBuffer,
-            caption,
-            mimetype: 'image/jpeg',
-          });
-        } else {
-          await ctx.reply(caption);
-        }
-      }
+        },
+        '> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+      );
 
       await ctx.react('⬇️');
 
@@ -91,32 +85,22 @@ export class TwitterCommand extends Command {
       }
 
       const downloadResult = result.right;
-      const fileBuffer = fs.readFileSync(downloadResult.filePath);
 
-      await ctx.sock.sendMessage(ctx.chat.jid, {
-        video: fileBuffer,
-        mimetype: 'video/mp4',
-      });
+      try {
+        // Stream from the file path: Baileys reads it in chunks, avoiding
+        // loading the whole video into RAM.
+        await ctx.sock.sendMessage(ctx.chat.jid, {
+          video: { url: downloadResult.filePath },
+          mimetype: 'video/mp4',
+        });
 
-      await ctx.react('✅');
-
-      await this.downloader['cleanup'](downloadResult.filePath);
+        await ctx.react('✅');
+      } finally {
+        await this.downloader.cleanup(downloadResult.filePath);
+      }
     } catch (error) {
       logger.error('Twitter command error:', error);
       await ctx.reply('❌ Error al descargar el video.');
-    }
-  }
-
-  private async getPreviewImage(thumbnailUrl?: string): Promise<Buffer | null> {
-    if (!thumbnailUrl) return null;
-    try {
-      const response = await axios.get<ArrayBuffer>(thumbnailUrl, {
-        responseType: 'arraybuffer',
-        timeout: 10000,
-      });
-      return Buffer.from(response.data);
-    } catch {
-      return null;
     }
   }
 }

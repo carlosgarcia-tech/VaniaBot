@@ -1,12 +1,35 @@
+import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
-import { primeService } from '@/services/system/PrimeService.js';
 import { YouTubeDownloader } from '@/services/download/YouTubeDownloader.js';
-import { MediaCardService } from '@/services/creative/MediaCardService.js';
 import { isRight } from '@/utils/either.js';
-import fs from 'fs';
-import axios from 'axios';
+import { MediaPreviewBase, type PreviewInfo } from './MediaPreviewBase.js';
+
+class YtVideoPreview extends MediaPreviewBase {
+  async send(
+    ctx: MessageContext,
+    info: PreviewInfo,
+    status: string,
+    quality: string,
+  ): Promise<void> {
+    await this.sendPreview(
+      ctx,
+      info,
+      {
+        thumbnail: info.thumbnail,
+        title: info.title,
+        duration: info.duration,
+        views: this.formatCount(info.viewCount),
+        platform: 'youtube',
+        author: info.author,
+        quality: `${quality}p`,
+      },
+      { header: `✦ ˚₊· 𝙔𝙤𝙪𝙏𝙪𝙗𝙚 𝙑𝙞𝙙𝙚𝙤 ·₊˚ ✦`, quality: `${quality}p` },
+      status,
+    );
+  }
+}
 
 export class YtMp4Command extends Command {
   name = 'ytmp4';
@@ -22,6 +45,7 @@ export class YtMp4Command extends Command {
   cooldown = 30000;
 
   private downloader: YouTubeDownloader;
+  private preview = new YtVideoPreview();
 
   constructor() {
     super();
@@ -53,20 +77,17 @@ export class YtMp4Command extends Command {
         return;
       }
 
-      const thumbnailBuffer = await this.getPreviewImage(video.thumbnail);
-
-      await this.sendPreviewWithThumbnail(
+      await this.preview.send(
         ctx,
         {
           title: video.title,
           url: video.url,
           thumbnail: video.thumbnail,
           duration: video.duration,
-          channel: video.channel,
+          author: video.channel,
           viewCount: video.viewCount,
           likeCount: video.likeCount,
         },
-        thumbnailBuffer,
         '> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
         quality,
       );
@@ -84,101 +105,22 @@ export class YtMp4Command extends Command {
       const downloadSuccess = result.right;
       const filePath = downloadSuccess.filePath;
 
-      const _footer = await primeService.formatFooter(ctx.sock, ctx.chat.jid, ctx.chat.isGroup);
-      await ctx.sock.sendMessage(ctx.chat.jid, {
-        video: fs.readFileSync(filePath),
-        mimetype: 'video/mp4',
-      });
+      try {
+        // Stream from the file path: Baileys reads it in chunks, avoiding
+        // loading the whole video into RAM.
+        await ctx.sock.sendMessage(ctx.chat.jid, {
+          video: { url: filePath },
+          mimetype: 'video/mp4',
+        });
 
-      await ctx.react('✅');
-
-      await this.downloader['cleanup'](filePath);
+        await ctx.react('✅');
+      } finally {
+        await this.downloader.cleanup(filePath);
+      }
     } catch (error: unknown) {
       logError('[YtMp4Command] Error', error);
       await ctx.react('❌');
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      await ctx.reply(`❌ Error: ${errorMessage}`);
-    }
-  }
-
-  private async getPreviewImage(thumbnailUrl: string): Promise<Buffer | null> {
-    try {
-      const response = await axios.get<ArrayBuffer>(thumbnailUrl, {
-        responseType: 'arraybuffer',
-        timeout: 10000,
-      });
-      return Buffer.from(response.data);
-    } catch {
-      return null;
-    }
-  }
-
-  private async sendPreviewWithThumbnail(
-    ctx: MessageContext,
-    info: {
-      title: string;
-      url: string;
-      thumbnail?: string;
-      duration?: string;
-      channel?: string;
-      viewCount?: number;
-      likeCount?: number;
-    },
-    thumbnail: Buffer | null,
-    status: string,
-    quality: string,
-  ): Promise<void> {
-    const formatCount = (n?: number): string => {
-      if (!n) return '—';
-      if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-      if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-      return n.toString();
-    };
-
-    try {
-      const card = await MediaCardService.generate({
-        thumbnail: info.thumbnail,
-        title: info.title,
-        duration: info.duration,
-        views: formatCount(info.viewCount),
-        platform: 'youtube',
-        author: info.channel,
-        quality: `${quality}p`,
-      });
-
-      await ctx.sock.sendMessage(ctx.chat.jid, {
-        image: card,
-        caption: `${status}`,
-      });
-    } catch {
-      const title = info.title.length > 55 ? info.title.substring(0, 55) + '…' : info.title;
-
-      const lines = [
-        `✦ ˚₊· 𝙔𝙤𝙪𝙏𝙪𝙗𝙚 𝙑𝙞𝙙𝙚𝙤 ·₊˚ ✦`,
-        ``,
-        `꒰ 🎀 ꒱ ${title}`,
-        ...(info.channel ? [`꒰ 🌸 ꒱ ${info.channel}`] : []),
-        ...(info.duration ? [`꒰ ⏳ ꒱ ${info.duration}`] : []),
-        `꒰ 🎞️ ꒱ ${quality}p`,
-        ``,
-        `꒰ 👁 ꒱ ${formatCount(info.viewCount)} vistas  ·  ꒰ 🤍 ꒱ ${formatCount(info.likeCount)} likes`,
-        ``,
-        `꒰ ✨ ꒱ ${status}...`,
-        ``,
-        `🔗 ${info.url}`,
-      ];
-
-      const caption = lines.join('\n');
-
-      if (thumbnail) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: thumbnail,
-          caption,
-          mimetype: 'image/jpeg',
-        });
-      } else {
-        await ctx.reply(caption);
-      }
+      await ctx.reply(`❌ Error: ${errorMessage(error)}`);
     }
   }
 }
