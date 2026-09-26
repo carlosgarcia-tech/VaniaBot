@@ -1,18 +1,37 @@
-import fs from 'fs';
 import path from 'path';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
 export interface AntiCallConfig {
   enabled: boolean;
   blockedUsers: string[];
 }
 
+function validateAntiCallConfig(data: unknown): AntiCallConfig {
+  const raw = (data ?? {}) as Record<string, unknown>;
+  return {
+    enabled: raw.enabled === true,
+    blockedUsers: Array.isArray(raw.blockedUsers)
+      ? raw.blockedUsers.filter((user): user is string => typeof user === 'string')
+      : [],
+  };
+}
+
 export class AntiCallService {
   private static instance: AntiCallService;
-  private config: AntiCallConfig = { enabled: false, blockedUsers: [] };
-  private readonly CONFIG_PATH = path.join(process.cwd(), 'data', 'anticall.json');
+  private config: AntiCallConfig;
+  /**
+   * Atomic file-backed store for the anti-call config. Replaces the
+   * previous plain writeFileSync, which could corrupt the file on a
+   * crash mid-write.
+   */
+  private readonly configStore = new JsonFileStore<AntiCallConfig>({
+    filePath: path.join(process.cwd(), 'data', 'anticall.json'),
+    defaults: () => ({ enabled: false, blockedUsers: [] }),
+    validate: validateAntiCallConfig,
+  });
 
   constructor() {
-    this.loadConfig();
+    this.config = this.configStore.load();
   }
 
   static getInstance(): AntiCallService {
@@ -22,22 +41,8 @@ export class AntiCallService {
     return AntiCallService.instance;
   }
 
-  private loadConfig(): void {
-    try {
-      if (fs.existsSync(this.CONFIG_PATH)) {
-        this.config = JSON.parse(fs.readFileSync(this.CONFIG_PATH, 'utf-8'));
-      }
-    } catch {
-      this.config = { enabled: false, blockedUsers: [] };
-    }
-  }
-
   private saveConfig(): void {
-    const dataDir = path.dirname(this.CONFIG_PATH);
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
-    fs.writeFileSync(this.CONFIG_PATH, JSON.stringify(this.config, null, 2));
+    this.configStore.save(this.config);
   }
 
   isEnabled(): boolean {

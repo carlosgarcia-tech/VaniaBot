@@ -1,9 +1,13 @@
 import path from 'path';
-import fs from 'fs';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 import { normalizeJid } from '../PermissionService.js';
 
-const DB_DIR = path.join(process.cwd(), 'database');
-const FILE = path.join(DB_DIR, 'antiarab.json');
+const FILE = path.join(process.cwd(), 'database', 'antiarab.json');
+
+const antiArabStore = new JsonFileStore<AntiArabStore>({
+  filePath: FILE,
+  defaults: () => ({ groups: {} }),
+});
 
 const DEFAULT_PREFIXES = [
   '212', // Morocco
@@ -33,39 +37,11 @@ export interface AntiArabStore {
   groups: Record<string, AntiArabConfig>;
 }
 
-function ensureDir(): void {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
-  }
-}
-
-function loadStore(): AntiArabStore {
-  ensureDir();
-  try {
-    if (!fs.existsSync(FILE)) {
-      return { groups: {} };
-    }
-    const raw = fs.readFileSync(FILE, 'utf-8');
-    const data = JSON.parse(raw);
-    if (typeof data === 'object' && data !== null) {
-      return data as AntiArabStore;
-    }
-    return { groups: {} };
-  } catch {
-    return { groups: {} };
-  }
-}
-
-function saveStore(store: AntiArabStore): void {
-  ensureDir();
-  fs.writeFileSync(FILE, JSON.stringify(store, null, 2));
-}
-
 export class AntiArabService {
   private store: AntiArabStore;
 
   constructor() {
-    this.store = loadStore();
+    this.store = antiArabStore.load();
   }
 
   private getOrCreateConfig(groupId: string): AntiArabConfig {
@@ -82,7 +58,7 @@ export class AntiArabService {
   private saveConfig(groupId: string, config: AntiArabConfig): void {
     const key = normalizeJid(groupId);
     this.store.groups[key] = config;
-    saveStore(this.store);
+    antiArabStore.save(this.store);
   }
 
   enableGroup(groupId: string): void {

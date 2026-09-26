@@ -1,9 +1,13 @@
 import path from 'path';
-import fs from 'fs';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 import { normalizeJid } from '../PermissionService.js';
 
-const DB_DIR = path.join(process.cwd(), 'database');
-const FILE = path.join(DB_DIR, 'antilink.json');
+const FILE = path.join(process.cwd(), 'database', 'antilink.json');
+
+const store = new JsonFileStore<AntilinkStore>({
+  filePath: FILE,
+  defaults: () => ({ groups: {} }),
+});
 
 export interface AntilinkConfig {
   enabled: boolean;
@@ -16,34 +20,6 @@ export interface AntilinkConfig {
 
 export interface AntilinkStore {
   groups: Record<string, AntilinkConfig>;
-}
-
-function ensureDir(): void {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
-  }
-}
-
-function loadStore(): AntilinkStore {
-  ensureDir();
-  try {
-    if (!fs.existsSync(FILE)) {
-      return { groups: {} };
-    }
-    const raw = fs.readFileSync(FILE, 'utf-8');
-    const data = JSON.parse(raw);
-    if (typeof data === 'object' && data !== null) {
-      return data as AntilinkStore;
-    }
-    return { groups: {} };
-  } catch {
-    return { groups: {} };
-  }
-}
-
-function saveStore(store: AntilinkStore): void {
-  ensureDir();
-  fs.writeFileSync(FILE, JSON.stringify(store, null, 2));
 }
 
 function normalizeDomain(value: string): string {
@@ -109,7 +85,7 @@ export class AntilinkService {
   private store: AntilinkStore;
 
   constructor() {
-    this.store = loadStore();
+    this.store = store.load();
   }
 
   private getOrCreateConfig(groupId: string): AntilinkConfig {
@@ -123,7 +99,7 @@ export class AntilinkService {
   private saveConfig(groupId: string, config: AntilinkConfig): void {
     const key = normalizeJid(groupId);
     this.store.groups[key] = config;
-    saveStore(this.store);
+    store.save(this.store);
   }
 
   enable(groupId: string): void {

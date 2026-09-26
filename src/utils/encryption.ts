@@ -41,7 +41,9 @@ export function decrypt(encryptedData: string): string {
   const key = getEncryptionKey();
   const [ivHex, authTagHex, encrypted] = encryptedData.split(':');
 
-  if (!ivHex || !authTagHex || !encrypted) {
+  // The ciphertext segment may legitimately be empty (encrypting an empty
+  // string), so only reject when segments are actually missing.
+  if (ivHex === undefined || authTagHex === undefined || encrypted === undefined) {
     throw new Error('Invalid encrypted data format');
   }
 

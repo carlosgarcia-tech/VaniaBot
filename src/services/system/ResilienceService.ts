@@ -1,8 +1,12 @@
 import path from 'path';
-import fs from 'fs';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
-const DB_DIR = path.join(process.cwd(), 'database');
-const FILE = path.join(DB_DIR, 'resilience.json');
+const FILE = path.join(process.cwd(), 'database', 'resilience.json');
+
+const resilienceFileStore = new JsonFileStore<ResilienceStore>({
+  filePath: FILE,
+  defaults: createDefaultStore,
+});
 
 export interface CommandFailureEntry {
   failures: number[];
@@ -17,34 +21,6 @@ export interface ResilienceStore {
   windowMs: number;
   cooldownMs: number;
   commands: Record<string, CommandFailureEntry>;
-}
-
-function ensureDir(): void {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
-  }
-}
-
-function loadStore(): ResilienceStore {
-  ensureDir();
-  try {
-    if (!fs.existsSync(FILE)) {
-      return createDefaultStore();
-    }
-    const raw = fs.readFileSync(FILE, 'utf-8');
-    const data = JSON.parse(raw);
-    if (typeof data === 'object' && data !== null) {
-      return data as ResilienceStore;
-    }
-    return createDefaultStore();
-  } catch {
-    return createDefaultStore();
-  }
-}
-
-function saveStore(store: ResilienceStore): void {
-  ensureDir();
-  fs.writeFileSync(FILE, JSON.stringify(store, null, 2));
 }
 
 function createDefaultStore(): ResilienceStore {
@@ -67,7 +43,7 @@ export class ResilienceService {
   private store: ResilienceStore;
 
   constructor() {
-    this.store = loadStore();
+    this.store = resilienceFileStore.load();
   }
 
   private ensureCommand(name: string): CommandFailureEntry {
@@ -105,13 +81,13 @@ export class ResilienceService {
       entry.failures = [];
     }
 
-    saveStore(this.store);
+    resilienceFileStore.save(this.store);
   }
 
   recordSuccess(commandName: string): void {
     const entry = this.ensureCommand(commandName);
     entry.failures = [];
-    saveStore(this.store);
+    resilienceFileStore.save(this.store);
   }
 
   isBlocked(commandName: string): { blocked: boolean; remainingMs: number; lastError: string } {
@@ -122,7 +98,7 @@ export class ResilienceService {
     if (!disabledUntil || now >= disabledUntil) {
       if (disabledUntil) {
         entry.disabledUntil = 0;
-        saveStore(this.store);
+        resilienceFileStore.save(this.store);
       }
       return { blocked: false, remainingMs: 0, lastError: entry.lastError };
     }
@@ -177,13 +153,13 @@ export class ResilienceService {
         15 * 60 * 1000,
       );
     }
-    saveStore(this.store);
+    resilienceFileStore.save(this.store);
   }
 
   clearCommand(commandName: string): void {
     const key = commandName.toLowerCase().trim();
     delete this.store.commands[key];
-    saveStore(this.store);
+    resilienceFileStore.save(this.store);
   }
 }
 

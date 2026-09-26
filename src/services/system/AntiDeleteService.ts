@@ -4,6 +4,7 @@ import type { proto } from 'baileys';
 import fs from 'fs';
 import path from 'path';
 import { logError } from '@/utils/logger.js';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
 export interface StoredMessage {
   id: string;
@@ -21,20 +22,44 @@ export interface AntiDeleteConfig {
   groups: Record<string, boolean>;
 }
 
+function validateAntiDeleteConfig(data: unknown): AntiDeleteConfig {
+  const raw = (data ?? {}) as Record<string, unknown>;
+  const groups: Record<string, boolean> = {};
+  if (typeof raw.groups === 'object' && raw.groups !== null && !Array.isArray(raw.groups)) {
+    for (const [key, value] of Object.entries(raw.groups)) {
+      if (typeof value === 'boolean') groups[key] = value;
+    }
+  }
+  return {
+    enabled: raw.enabled === true,
+    groups,
+  };
+}
+
 export class AntiDeleteService {
   private static instance: AntiDeleteService;
   private messageStore = new Map<string, StoredMessage>();
-  private config: AntiDeleteConfig = { enabled: false, groups: {} };
+  private config: AntiDeleteConfig;
   private readonly TMP_DIR = path.join(process.cwd(), 'tmp', 'antidelete');
   private readonly MAX_MESSAGE_AGE = 24 * 60 * 60 * 1000;
   /** Hard cap on stored entries to prevent unbounded RAM growth. */
   private readonly MAX_STORED_MESSAGES = 500;
   /** Messages bigger than this are stored as metadata only (no buffer). */
   private readonly MAX_MEDIA_BUFFER_BYTES = 8 * 1024 * 1024;
+  /**
+   * Atomic file-backed store for the anti-delete config. Replaces the
+   * previous plain writeFileSync, which could corrupt the file on a
+   * crash mid-write.
+   */
+  private readonly configStore = new JsonFileStore<AntiDeleteConfig>({
+    filePath: path.join(process.cwd(), 'data', 'antidelete.json'),
+    defaults: () => ({ enabled: false, groups: {} }),
+    validate: validateAntiDeleteConfig,
+  });
 
   constructor() {
     this.ensureTmpDir();
-    this.loadConfig();
+    this.config = this.configStore.load();
     this.startCleanupTimer();
   }
 
@@ -49,26 +74,6 @@ export class AntiDeleteService {
     if (!fs.existsSync(this.TMP_DIR)) {
       fs.mkdirSync(this.TMP_DIR, { recursive: true });
     }
-  }
-
-  private loadConfig(): void {
-    const configPath = path.join(process.cwd(), 'data', 'antidelete.json');
-    try {
-      if (fs.existsSync(configPath)) {
-        this.config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-      }
-    } catch {
-      this.config = { enabled: false, groups: {} };
-    }
-  }
-
-  private saveConfig(): void {
-    const configPath = path.join(process.cwd(), 'data', 'antidelete.json');
-    const dataDir = path.dirname(configPath);
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
-    fs.writeFileSync(configPath, JSON.stringify(this.config, null, 2));
   }
 
   private startCleanupTimer(): void {
@@ -100,21 +105,19 @@ export class AntiDeleteService {
   enable(groupJid?: string): void {
     if (groupJid) {
       this.config.groups[groupJid] = true;
-      this.saveConfig();
     } else {
       this.config.enabled = true;
-      this.saveConfig();
     }
+    this.saveConfig();
   }
 
   disable(groupJid?: string): void {
     if (groupJid) {
       this.config.groups[groupJid] = false;
-      this.saveConfig();
     } else {
       this.config.enabled = false;
-      this.saveConfig();
     }
+    this.saveConfig();
   }
 
   getConfig(): AntiDeleteConfig {
@@ -144,52 +147,17 @@ export class AntiDeleteService {
     } else if (message.message?.imageMessage) {
       mediaType = 'image';
       content = message.message.imageMessage.caption || '';
-      try {
-        const stream = await downloadContentFromMessage(message.message.imageMessage, 'image');
-        const chunks: Buffer[] = [];
-        for await (const chunk of stream) {
-          chunks.push(Buffer.from(chunk));
-          if (chunks.reduce((acc, c) => acc + c.length, 0) > this.MAX_MEDIA_BUFFER_BYTES) {
-            chunks.length = 0; // too big: store metadata only
-            break;
-          }
-        }
-        if (chunks.length > 0) mediaBuffer = Buffer.concat(chunks);
-      } catch (error) {
-        logError('[AntiDeleteService]', error);
-      }
+      mediaBuffer = await this.downloadMediaBuffer(message.message.imageMessage, 'image');
     } else if (message.message?.videoMessage) {
       mediaType = 'video';
       content = message.message.videoMessage.caption || '';
       // Videos can be huge; skip buffering them entirely to protect RAM.
     } else if (message.message?.stickerMessage) {
       mediaType = 'sticker';
-      try {
-        const stream = await downloadContentFromMessage(message.message.stickerMessage, 'sticker');
-        const chunks: Buffer[] = [];
-        for await (const chunk of stream) {
-          chunks.push(Buffer.from(chunk));
-        }
-        mediaBuffer = Buffer.concat(chunks);
-      } catch (error) {
-        logError('[AntiDeleteService]', error);
-      }
+      mediaBuffer = await this.downloadMediaBuffer(message.message.stickerMessage, 'sticker');
     } else if (message.message?.audioMessage) {
       mediaType = 'audio';
-      try {
-        const stream = await downloadContentFromMessage(message.message.audioMessage, 'audio');
-        const chunks: Buffer[] = [];
-        for await (const chunk of stream) {
-          chunks.push(Buffer.from(chunk));
-          if (chunks.reduce((acc, c) => acc + c.length, 0) > this.MAX_MEDIA_BUFFER_BYTES) {
-            chunks.length = 0;
-            break;
-          }
-        }
-        if (chunks.length > 0) mediaBuffer = Buffer.concat(chunks);
-      } catch (error) {
-        logError('[AntiDeleteService]', error);
-      }
+      mediaBuffer = await this.downloadMediaBuffer(message.message.audioMessage, 'audio');
     }
 
     const stored: StoredMessage = {
@@ -205,6 +173,37 @@ export class AntiDeleteService {
 
     this.messageStore.set(messageId, stored);
     this.enforceStoreLimit();
+  }
+
+  /**
+   * Downloads media content up to MAX_MEDIA_BUFFER_BYTES; larger media is
+   * stored as metadata only. Returns undefined on any failure — storing
+   * media is best-effort.
+   */
+  private async downloadMediaBuffer(
+    content: unknown,
+    type: 'image' | 'sticker' | 'audio',
+  ): Promise<Buffer | undefined> {
+    try {
+      const stream = await downloadContentFromMessage(
+        content as Parameters<typeof downloadContentFromMessage>[0],
+        type,
+      );
+      const chunks: Buffer[] = [];
+      let total = 0;
+      for await (const chunk of stream) {
+        total += chunk.length;
+        if (total > this.MAX_MEDIA_BUFFER_BYTES) {
+          chunks.length = 0; // too big: store metadata only
+          break;
+        }
+        chunks.push(Buffer.from(chunk));
+      }
+      return chunks.length > 0 ? Buffer.concat(chunks) : undefined;
+    } catch (error) {
+      logError('[AntiDeleteService]', error);
+      return undefined;
+    }
   }
 
   getMessage(messageId: string): StoredMessage | undefined {
@@ -258,6 +257,10 @@ export class AntiDeleteService {
     }
 
     return message;
+  }
+
+  private saveConfig(): void {
+    this.configStore.save(this.config);
   }
 }
 

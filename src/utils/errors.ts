@@ -217,3 +217,14 @@ export class SessionExpiredError extends AuthError {
     this.name = 'SessionExpiredError';
   }
 }
+
+/**
+ * Safely extracts a human-readable message from an unknown thrown value.
+ * Replaces the repeated `error instanceof Error ? error.message : '...'
+ * ternaries scattered across commands and services.
+ */
+export function errorMessage(error: unknown, fallback = 'Unknown error'): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return fallback;
+}

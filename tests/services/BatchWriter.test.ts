@@ -105,7 +105,9 @@ describe('BatchWriter', () => {
       const flush1 = batchWriter.flushNow();
       const flush2 = batchWriter.flushNow();
 
-      expect(flush2).resolves.toBeUndefined();
+      // Concurrent flush returns early (isWriting guard); await the assertion
+      // explicitly so this stays valid when Vitest 3 stops auto-awaiting.
+      await expect(flush2).resolves.toBeUndefined();
 
       flushResolve();
       await flush1;

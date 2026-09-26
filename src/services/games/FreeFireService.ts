@@ -1,8 +1,12 @@
 import path from 'path';
-import fs from 'fs';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
-const DB_DIR = path.join(process.cwd(), 'database');
-const FILE = path.join(DB_DIR, 'freefire-torneos.json');
+const FILE = path.join(process.cwd(), 'database', 'freefire-torneos.json');
+
+const freeFireFileStore = new JsonFileStore<FreeFireStore>({
+  filePath: FILE,
+  defaults: () => ({ groups: {} }),
+});
 
 const DEFAULT_SCORE_RULES = { win: 3, draw: 1, loss: 0 };
 const DEFAULT_FORMAT_RULES = {
@@ -80,27 +84,6 @@ interface FreeFireStore {
   >;
 }
 
-function ensureDir(): void {
-  if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
-}
-
-function loadStore(): FreeFireStore {
-  ensureDir();
-  try {
-    if (!fs.existsSync(FILE)) return { groups: {} };
-    const raw = fs.readFileSync(FILE, 'utf-8');
-    const data = JSON.parse(raw);
-    return typeof data === 'object' ? data : { groups: {} };
-  } catch {
-    return { groups: {} };
-  }
-}
-
-function saveStore(store: FreeFireStore): void {
-  ensureDir();
-  fs.writeFileSync(FILE, JSON.stringify(store, null, 2));
-}
-
 function nowIso(): string {
   return new Date().toISOString();
 }
@@ -118,7 +101,7 @@ export class FreeFireService {
   private store: FreeFireStore;
 
   constructor() {
-    this.store = loadStore();
+    this.store = freeFireFileStore.load();
   }
 
   private getGroupState(groupId: string) {
@@ -357,7 +340,7 @@ export class FreeFireService {
   }
 
   private save(): void {
-    saveStore(this.store);
+    freeFireFileStore.save(this.store);
   }
 }
 
