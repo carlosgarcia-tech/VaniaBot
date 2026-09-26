@@ -1,5 +1,10 @@
 import { Command } from '../Command.js';
-import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
+import {
+  CommandCategory,
+  CommandContext,
+  PermissionLevel,
+  type MessageContext,
+} from '@/types/index.js';
 import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
 
@@ -7,6 +12,7 @@ export class LogsCommand extends Command {
   name = 'logs';
   description = 'Ver los últimos logs del bot';
   category = CommandCategory.OWNER;
+  permissions = { user: [PermissionLevel.OWNER] };
   aliases = ['log', 'registro'];
   usage = '!logs [número]';
   examples = ['!logs', '!logs 50'];

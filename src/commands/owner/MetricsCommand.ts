@@ -1,5 +1,10 @@
 import { Command } from '../Command.js';
-import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
+import {
+  CommandCategory,
+  CommandContext,
+  PermissionLevel,
+  type MessageContext,
+} from '@/types/index.js';
 import { commandRegistry } from '@/core/CommandRegistry.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { cacheManager } from '@/core/CacheManager.js';
@@ -8,6 +13,7 @@ export class MetricsCommand extends Command {
   name = 'metrics';
   description = 'Muestra métricas y estadísticas del bot';
   category = CommandCategory.OWNER;
+  permissions = { user: [PermissionLevel.OWNER] };
   aliases = ['metricas', 'statsbot', 'botstats'];
   usage = '!metrics';
   examples = ['!metrics'];

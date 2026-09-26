@@ -1,5 +1,5 @@
 import { Command } from '../Command.js';
-import { CommandCategory } from '@/types/index.js';
+import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { listaManager } from '@/services/game/ListaManager.js';
 
@@ -8,7 +8,7 @@ export class ListaTTLCommand extends Command {
   description = 'Configura el tiempo de expiración de las listas (solo owner)';
   aliases = ['lt'];
   category = CommandCategory.OWNER;
-  ownerOnly = true;
+  permissions = { user: [PermissionLevel.OWNER] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const args = ctx.args;

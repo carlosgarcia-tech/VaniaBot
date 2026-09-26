@@ -1,5 +1,5 @@
 import { Command } from '../Command.js';
-import { CommandCategory } from '@/types/index.js';
+import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
@@ -12,7 +12,7 @@ export class PayRandomCommand extends Command {
   aliases = ['payr', 'regalo', 'giveaway'];
   usage = '!payrandom <cantidad>';
   examples = ['!payrandom 1000000'];
-  ownerOnly = true;
+  permissions = { user: [PermissionLevel.OWNER] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const amountStr = ctx.args[0];

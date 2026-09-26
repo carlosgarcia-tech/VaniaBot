@@ -1,5 +1,10 @@
 import { Command } from '../Command.js';
-import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
+import {
+  CommandCategory,
+  CommandContext,
+  PermissionLevel,
+  type MessageContext,
+} from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 
@@ -7,6 +12,7 @@ export class RespaldarDataCommand extends Command {
   name = 'respaldar';
   description = 'Genera un respaldo de tus datos';
   category = CommandCategory.OWNER;
+  permissions = { user: [PermissionLevel.OWNER] };
   aliases = ['backup', 'export', 'misdatos'];
   usage = '!respaldar';
   examples = ['!respaldar'];

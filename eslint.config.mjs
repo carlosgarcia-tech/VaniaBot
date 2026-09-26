@@ -2,6 +2,7 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
+import vaniaPlugin from './eslint-plugin-vania/index.js';
 
 export default [
   {
@@ -53,6 +54,15 @@ export default [
       // Prettier integration - ENABLED
       'prettier/prettier': ['warn', {}, { usePrettierrc: true }],
       ...prettierConfig.rules,
+    },
+  },
+  {
+    // Command permission conventions (see eslint-plugin-vania/index.js).
+    files: ['src/commands/**/*.ts'],
+    plugins: { vania: vaniaPlugin },
+    rules: {
+      'vania/no-permission-typo': 'error',
+      'vania/owner-requires-owner-permission': 'error',
     },
   },
 ];
