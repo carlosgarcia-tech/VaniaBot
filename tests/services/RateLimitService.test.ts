@@ -139,6 +139,31 @@ describe('RateLimitService', () => {
       expect(service.isGroupWhitelisted('other@g.us')).toBe(false);
       expect(service.isGroupWhitelisted('premium@g.us')).toBe(true);
     });
+
+    it('should match whitelist entries exactly, not by substring', () => {
+      service.addGroupToWhitelist('1203630@g.us');
+      // A different JID that merely CONTAINS the whitelisted entry must not
+      // be whitelisted (regression: the old implementation used includes()).
+      expect(service.isGroupWhitelisted('1203630999999@g.us')).toBe(false);
+      expect(service.isUserWhitelisted('1203630@g.us')).toBe(false);
+    });
+  });
+
+  describe('flood warning throttling', () => {
+    it('warns at most once per 5s window while a flood persists', () => {
+      const userJid = 'flooder@test.com';
+
+      const results = [];
+      for (let i = 0; i < 12; i++) {
+        results.push(service.checkFlood(userJid));
+      }
+
+      const warnings = results.filter(r => !r.allowed && r.reason !== undefined);
+      const blocked = results.filter(r => !r.allowed);
+
+      expect(blocked.length).toBeGreaterThan(0);
+      expect(warnings).toHaveLength(1);
+    });
   });
 
   describe('group stats', () => {

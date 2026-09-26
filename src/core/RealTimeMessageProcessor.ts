@@ -25,12 +25,23 @@ export class RealTimeMessageProcessor extends EventEmitter {
     } else {
       this.sequentialQueue.push({ id: messageId, handler, parallel: false });
     }
-    this.processParallelQueue().catch(err => this.emit('error', messageId, err));
-    this.processSequentialQueue().catch(err => this.emit('error', messageId, err));
+    // Schedule per-item instead of "drain the whole queue" calls: a burst of
+    // messages used to call processParallelQueue() repeatedly while it was
+    // still awaiting, spawning N+1 concurrent loops that each shifted an item
+    // off the queue and broke the maxParallel cap (and FIFO order).
+    setImmediate(() => {
+      if (parallel) {
+        void this.processParallelQueue();
+      } else {
+        void this.processSequentialQueue();
+      }
+    });
     return true;
   }
 
   private async processParallelQueue(): Promise<void> {
+    // One item per call: the finally block re-invokes this when a slot frees
+    // up, so the concurrency cap can never be exceeded.
     if (this.activeParallel >= this.maxParallel || this.parallelQueue.length === 0) return;
     const item = this.parallelQueue.shift();
     if (!item) return;
@@ -44,27 +55,33 @@ export class RealTimeMessageProcessor extends EventEmitter {
     } finally {
       this.processing.delete(item.id);
       this.activeParallel--;
-      void this.processParallelQueue();
+      if (this.parallelQueue.length > 0) {
+        setImmediate(() => void this.processParallelQueue());
+      }
     }
   }
 
   private async processSequentialQueue(): Promise<void> {
-    if (this.isProcessingSequential || this.sequentialQueue.length === 0) return;
+    if (this.isProcessingSequential) return;
+    if (this.sequentialQueue.length === 0) return;
     this.isProcessingSequential = true;
-    while (this.sequentialQueue.length > 0) {
-      const item = this.sequentialQueue.shift();
-      if (!item) break;
-      this.processing.add(item.id);
-      try {
-        await item.handler();
-        this.emit('processed', item.id);
-      } catch (error) {
-        this.emit('error', item.id, error);
-      } finally {
-        this.processing.delete(item.id);
+    try {
+      while (this.sequentialQueue.length > 0) {
+        const item = this.sequentialQueue.shift();
+        if (!item) break;
+        this.processing.add(item.id);
+        try {
+          await item.handler();
+          this.emit('processed', item.id);
+        } catch (error) {
+          this.emit('error', item.id, error);
+        } finally {
+          this.processing.delete(item.id);
+        }
       }
+    } finally {
+      this.isProcessingSequential = false;
     }
-    this.isProcessingSequential = false;
   }
 
   getStats() {

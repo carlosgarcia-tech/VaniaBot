@@ -104,15 +104,19 @@ export class RateLimitService {
     const perSecondCount = tracker.messages.filter(time => now - time < 1000).length;
 
     if (perSecondCount >= maxPerSecond) {
-      if (now - tracker.lastWarningTime > 5000) {
-        tracker.lastWarningTime = now;
-        return {
-          allowed: false,
-          reason: '⚠️ Estás escribiendo muy rápido. Espera un momento.',
-          waitTime: 2000,
-        };
-      }
-      return { allowed: false };
+      // Reply only once per 5s window: previously every blocked message got a
+      // warning reply, amplifying floods instead of damping them.
+      const shouldWarn = now - tracker.lastWarningTime > 5000;
+      if (shouldWarn) tracker.lastWarningTime = now;
+      return {
+        allowed: false,
+        ...(shouldWarn
+          ? {
+              reason: '⚠️ Estás escribiendo muy rápido. Espera un momento.',
+              waitTime: 2000,
+            }
+          : {}),
+      };
     }
 
     tracker.messages.push(now);
@@ -120,11 +124,11 @@ export class RateLimitService {
   }
 
   isGroupWhitelisted(groupJid: string): boolean {
-    return this.config.whitelistGroups.some(whitelisted => groupJid.includes(whitelisted));
+    return this.config.whitelistGroups.some(whitelisted => whitelisted === groupJid);
   }
 
   isUserWhitelisted(userJid: string): boolean {
-    return this.config.whitelistUsers.some(whitelisted => userJid.includes(whitelisted));
+    return this.config.whitelistUsers.some(whitelisted => whitelisted === userJid);
   }
 
   addGroupToWhitelist(groupJid: string): void {
@@ -135,7 +139,7 @@ export class RateLimitService {
   }
 
   removeGroupFromWhitelist(groupJid: string): void {
-    const index = this.config.whitelistGroups.findIndex(g => groupJid.includes(g));
+    const index = this.config.whitelistGroups.findIndex(g => g === groupJid);
     if (index !== -1) {
       this.config.whitelistGroups.splice(index, 1);
       logger.info(`[RateLimit] Group ${groupJid} removed from whitelist`);
@@ -150,7 +154,7 @@ export class RateLimitService {
   }
 
   removeUserFromWhitelist(userJid: string): void {
-    const index = this.config.whitelistUsers.findIndex(u => userJid.includes(u));
+    const index = this.config.whitelistUsers.findIndex(u => u === userJid);
     if (index !== -1) {
       this.config.whitelistUsers.splice(index, 1);
       logger.info(`[RateLimit] User ${userJid} removed from whitelist`);
