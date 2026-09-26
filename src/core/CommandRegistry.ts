@@ -22,13 +22,30 @@ export class CommandRegistry {
   private aliases = new Map<string, string>();
   private cooldowns = new Map<string, Map<string, number>>();
   private cooldownTimers = new Map<string, Map<string, NodeJS.Timeout>>();
+  /** Duration (ms) of the active cooldown, keyed `command|user`. */
+  private cooldownDurations = new Map<string, number>();
 
   register(command: ICommand): void {
+    const existing = this.commands.get(command.name);
+    if (existing && existing !== command) {
+      logger.warn(
+        `⚠️ Command name collision: '${command.name}' from ${existing.constructor?.name ?? 'unknown'} ` +
+          `is being overwritten by ${command.constructor?.name ?? 'unknown'}`,
+      );
+    }
+
     this.commands.set(command.name, command);
 
     logger.debug(`Registrando comando: ${command.name}`);
 
     command.aliases?.forEach(alias => {
+      const aliasOwner = this.aliases.get(alias);
+      if (aliasOwner && aliasOwner !== command.name) {
+        logger.warn(
+          `⚠️ Alias collision: '${alias}' currently maps to '${aliasOwner}' ` +
+            `but is being remapped to '${command.name}'`,
+        );
+      }
       this.aliases.set(alias, command.name);
       logger.debug(`  - Alias registrado: ${alias} → ${command.name}`);
     });
@@ -73,11 +90,13 @@ export class CommandRegistry {
     }
 
     timestamps.set(userId, now);
+    this.cooldownDurations.set(`${commandName}|${userId}`, cooldownTime);
     timers.set(
       userId,
       setTimeout(() => {
         timestamps.delete(userId);
         timers.delete(userId);
+        this.cooldownDurations.delete(`${commandName}|${userId}`);
       }, cooldownTime),
     );
 
@@ -92,6 +111,19 @@ export class CommandRegistry {
     }
     this.cooldowns.clear();
     this.cooldownTimers.clear();
+    this.cooldownDurations.clear();
+  }
+
+  /**
+   * Milliseconds left until the user can execute the command again,
+   * 0 when no active cooldown exists.
+   */
+  getCooldownRemaining(commandName: string, userId: string): number {
+    const userTimestamp = this.cooldowns.get(commandName)?.get(userId);
+    const duration = this.cooldownDurations.get(`${commandName}|${userId}`);
+    if (userTimestamp === undefined || duration === undefined) return 0;
+    const remaining = userTimestamp + duration - Date.now();
+    return remaining > 0 ? remaining : 0;
   }
 
   get size(): number {

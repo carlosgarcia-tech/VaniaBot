@@ -13,6 +13,7 @@ export abstract class Command implements ICommand {
   cooldown?: number = 3000;
   parallelizable?: boolean = false;
   enabled?: boolean = true;
+  nsfw?: boolean = false;
 
   permissions?: {
     user?: PermissionLevel[];

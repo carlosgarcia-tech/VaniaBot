@@ -1,7 +1,6 @@
 import { Middleware } from './Middleware.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
-import { logError } from '@/utils/logger.js';
 import { VANIA_TOGGLE_COMMANDS } from '@/config/index.js';
 
 export class VaniaToggleMiddleware extends Middleware {
@@ -18,14 +17,12 @@ export class VaniaToggleMiddleware extends Middleware {
       return;
     }
 
-    try {
-      const isEnabled = await serviceManager.vaniaToggleService.isEnabled(ctx.chat.jid, ctx.botId);
-      if (!isEnabled) {
-        return;
-      }
-    } catch (error) {
-      logError('[VaniaToggle]', error);
-      await next();
+    const allowed = await serviceManager.vaniaToggleService.isAllowedForSubbot(
+      ctx.chat.jid,
+      ctx.botId,
+      ctx.command,
+    );
+    if (!allowed) {
       return;
     }
 

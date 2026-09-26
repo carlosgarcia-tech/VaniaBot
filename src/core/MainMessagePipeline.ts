@@ -3,10 +3,10 @@ import { mediaGroupBuffer } from './MediaGroupBuffer.js';
 import { commandRegistry } from './CommandRegistry.js';
 import { pluginLoader } from './PluginLoader.js';
 import { MessageContext } from './MessageContext.js';
-import { config, VANIA_TOGGLE_COMMANDS } from '@/config/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { logger, logError } from '@/utils/logger.js';
 import { CommandExecutionError } from '@/utils/errors.js';
+import { matchCommandPrefix } from '@/utils/prefix.js';
 import { cacheManager } from '@/core/CacheManager.js';
 import type { AntiSpamService } from '@/services/system/AntiSpamService.js';
 import { handleReaccion } from '@/handlers/ReaccionHandler.js';
@@ -14,7 +14,6 @@ import { quizAnswerHandler } from '@/handlers/QuizAnswerHandler.js';
 import { handleMention } from '@/handlers/AiMentionHandler.js';
 import { handleAudioResponse } from '@/handlers/AudioResponseHandler.js';
 import type { IMiddleware } from '@/types/index.js';
-import { CommandCategory } from '@/types/index.js';
 import { rateLimitService } from '@/services/system/RateLimitService.js';
 import { withTimeout } from '@/services/system/RetryService.js';
 import { persistenceService } from '@/services/system/PersistenceService.js';
@@ -23,6 +22,8 @@ import { runtimeStateRepository } from '@/repositories/RuntimeStateRepository.js
 import { processedMessagesRepository } from '@/repositories/ProcessedMessagesRepository.js';
 import { middlewareCache } from '@/middlewares/MiddlewareCache.js';
 import { contactsCache } from '@/utils/ContactsCache.js';
+import { antilinkService } from '@/services/moderation/AntilinkService.js';
+import { chatSummaryService } from '@/services/chat/ChatSummaryService.js';
 import type { RealTimeMessageProcessor } from './RealTimeMessageProcessor.js';
 
 interface MiddlewareConfig {
@@ -32,6 +33,7 @@ interface MiddlewareConfig {
 }
 
 const COMMAND_TIMEOUT_MS = 30000;
+const STATS_LOG_INTERVAL_MS = 300000;
 
 interface PipelineStats {
   messagesReceived: number;
@@ -41,6 +43,12 @@ interface PipelineStats {
   spamBlocked: number;
   totalProcessingTime: number;
   lastStatsLog: number;
+}
+
+/** Outcome of the per-message guard checks that can short-circuit processing. */
+enum GuardResult {
+  Continue,
+  Stop,
 }
 
 export class MainMessagePipeline {
@@ -102,44 +110,24 @@ export class MainMessagePipeline {
     });
   }
 
+  /**
+   * Entry point for every message. Cheap synchronous filters run inline;
+   * the rest is dispatched through the message processor (dedupe +
+   * sequential/parallel scheduling) inside a microtask.
+   */
   private handleMessage(message: WAMessage): void {
-    if (!message?.message || message.key.fromMe) return;
-    const messageId = message.key.id;
-    if (!messageId) return;
-    if (cacheManager.hasProcessedMessage(messageId)) return;
+    if (!this.isProcessableMessage(message)) return;
+    const messageId = message.key.id as string;
 
-    if (this.mainBotId) {
-      const lastStartup = runtimeStateRepository.getLastStartupAt(this.mainBotId);
-      if (lastStartup) {
-        const rawTimestamp = message.messageTimestamp;
-        const msgTimestamp =
-          rawTimestamp !== undefined && rawTimestamp !== null ? Number(rawTimestamp) * 1000 : 0;
-        const startupTime = new Date(lastStartup).getTime();
-        if (msgTimestamp > 0 && msgTimestamp < startupTime) {
-          processedMessagesRepository.markProcessed(messageId, this.mainBotId);
-          cacheManager.markMessageProcessed(messageId);
-          return;
-        }
-      }
+    if (this.isPreStartupEcho(message)) {
+      processedMessagesRepository.markProcessed(messageId, this.mainBotId as string);
+      cacheManager.markMessageProcessed(messageId);
+      return;
     }
 
-    const text = message.message?.conversation || message.message?.extendedTextMessage?.text || '';
-    // Match the longest configured prefix first so multi-char prefixes
-    // (e.g. '..') are not swallowed by shorter ones ('.').
-    const prefixes = [config.prefix, '.', '!']
-      .filter((p, i, arr): p is string => Boolean(p) && arr.indexOf(p) === i)
-      .sort((a, b) => b.length - a.length);
-    const matchedPrefix = prefixes.find(p => text.startsWith(p));
-    const isCommand = matchedPrefix !== undefined;
-    const commandRest = matchedPrefix ? text.slice(matchedPrefix.length) : '';
-    const commandName = commandRest.split(' ')[0]?.toLowerCase() ?? '';
-    const fullCommandName = matchedPrefix ? commandRest.toLowerCase() : null;
-    let isParallelizable = false;
-    if (isCommand && fullCommandName) {
-      const cmd = commandRegistry.get(fullCommandName) || commandRegistry.get(commandName);
-      isParallelizable = cmd?.parallelizable || false;
-    }
+    const parallelizable = this.isParallelizableCommand(message);
     this.stats.messagesReceived++;
+
     queueMicrotask(() => {
       void (async () => {
         const startTime = Date.now();
@@ -149,188 +137,335 @@ export class MainMessagePipeline {
             try {
               const ctx = new MessageContext(this.sock, message, 'main');
 
-              if (ctx.chat.isGroup) {
-                await ctx.loadBotPermissions();
-
-                const muteCacheKey = `${ctx.chat.jid}:${ctx.sender.jid}`;
-                const mutedCached = middlewareCache.userMuted.get<{ value: boolean }>(muteCacheKey);
-                if (mutedCached?.value === true) {
-                  if (ctx.chat.isBotAdmin) {
-                    try {
-                      await ctx.sock.sendMessage(ctx.chat.jid, { delete: ctx.message.key });
-                    } catch (err) {
-                      logError('[MUTE] Error eliminando mensaje normal', err);
-                    }
-                  }
-                  cacheManager.markMessageProcessed(messageId);
-                  return;
-                }
-              }
-
-              if (ctx.chat.isGroup) {
-                const isVaniaToggleCommand = VANIA_TOGGLE_COMMANDS.includes(ctx.command);
-                if (isVaniaToggleCommand && ctx.args[0]) {
-                  const slotNum = parseInt(ctx.args[0]);
-                  if (!isNaN(slotNum) && slotNum > 0) {
-                    cacheManager.markMessageProcessed(messageId);
-                    return;
-                  }
-                }
-                if (!isVaniaToggleCommand) {
-                  try {
-                    const isEnabled = await serviceManager.vaniaToggleService.isEnabled(
-                      ctx.chat.jid,
-                      'main',
-                    );
-                    if (!isEnabled) {
-                      cacheManager.markMessageProcessed(messageId);
-                      return;
-                    }
-                  } catch (error) {
-                    logError('[MainMessagePipeline]', error);
-                  }
-                }
-              }
-
-              if (ctx.chat.isGroup && !ctx.command) {
-                const quizHandled = await quizAnswerHandler.handle(ctx);
-                if (quizHandled) {
-                  cacheManager.markMessageProcessed(messageId);
-                  return;
-                }
-                const botJid = this.sock.user?.id ?? '';
-                await handleMention(ctx, botJid);
-                cacheManager.markMessageProcessed(messageId);
-                return;
-              }
+              const stop = await this.runGuards(ctx, messageId);
+              if (stop) return;
 
               if (!ctx.command) {
                 cacheManager.markMessageProcessed(messageId);
                 return;
               }
 
-              const rateLimit = this.antiSpam.check(ctx.sender.jid);
-              if (!rateLimit.allowed) {
-                this.stats.spamBlocked++;
-                await ctx
-                  .reply(rateLimit.reason ?? '⚠️ Demasiados mensajes')
-                  .catch((error: unknown) => logError('[MainMessagePipeline]', error));
-                return;
-              }
+              if (!this.checkRateLimits(ctx)) return;
 
-              if (ctx.chat.isGroup) {
-                const floodCheck = rateLimitService.checkFlood(ctx.sender.jid);
-                if (!floodCheck.allowed) {
-                  this.stats.spamBlocked++;
-                  await ctx
-                    .reply(floodCheck.reason ?? '⚠️ Estás escribiendo muy rápido')
-                    .catch((error: unknown) => logError('[MainMessagePipeline]', error));
-                  return;
-                }
-                const groupRateLimit = rateLimitService.checkGroupRateLimit(ctx.chat.jid);
-                if (!groupRateLimit.allowed) {
-                  this.stats.spamBlocked++;
-                  await ctx
-                    .reply(groupRateLimit.reason ?? '⚠️ El grupo está muy activo')
-                    .catch((error: unknown) => logError('[MainMessagePipeline]', error));
-                  return;
-                }
-              }
-
-              const fullCommand = ctx.args.length > 0 ? `${ctx.command} ${ctx.args[0]}` : null;
-              let command =
-                (fullCommand ? commandRegistry.get(fullCommand) : null) ??
-                commandRegistry.get(ctx.command);
-
-              if (!command) {
-                const lazyCmd = await pluginLoader.getCommand(ctx.command);
-                if (lazyCmd) {
-                  commandRegistry.register(lazyCmd);
-                  command = lazyCmd;
-                }
-              }
-
-              if (!command) {
-                logger.warn(`❌ Command not found in registry: ${ctx.command}`);
-                cacheManager.markMessageProcessed(messageId);
-                return;
-              }
-
-              if (fullCommand && commandRegistry.get(fullCommand)) {
-                ctx.args = ctx.args.slice(1);
-              }
-
-              if (command.permissions?.user || command.permissions?.bot) {
-                if (ctx.chat.isGroup) {
-                  await Promise.all([ctx.loadSenderPermissions(), ctx.loadBotPermissions()]);
-                } else {
-                  await ctx.loadSenderPermissions();
-                }
-              }
-
-              await this.executeWithMiddlewares(ctx, async () => {
-                const cmdStartTime = Date.now();
-                if (command.enabled === false) {
-                  const isNsfwCommand = command.category === CommandCategory.ANIME;
-                  if (isNsfwCommand) {
-                    const { NsfwToggleCommand } =
-                      await import('../commands/owner/NsfwToggleCommand.js');
-                    if (!NsfwToggleCommand.isEnabled()) {
-                      await ctx
-                        .reply(
-                          '🔞 Los comandos NSFW están deshabilitados.\nUsa !nsfw on para habilitar.',
-                        )
-                        .catch((error: unknown) => logError('[MainMessagePipeline]', error));
-                      return;
-                    }
-                  } else {
-                    await ctx
-                      .reply('❌ Este comando está deshabilitado.')
-                      .catch((error: unknown) => logError('[MainMessagePipeline]', error));
-                    return;
-                  }
-                }
-                try {
-                  await withTimeout(
-                    command.execute(ctx),
-                    COMMAND_TIMEOUT_MS,
-                    `Command ${command.name} timed out after ${COMMAND_TIMEOUT_MS}ms`,
-                  );
-                  this.stats.commandsExecuted++;
-                  this.trackCommandMetric(command.name, Date.now() - cmdStartTime, false);
-                } catch (error) {
-                  this.stats.errorsCount++;
-                  this.trackCommandMetric(command.name, Date.now() - cmdStartTime, true);
-                  if (error instanceof Error && error.message.includes('timed out')) {
-                    logger.error(`⏱️ Command ${command.name} timed out`);
-                    await ctx
-                      .reply('⏱️ El comando tardó demasiado. Intenta de nuevo.')
-                      .catch((error: unknown) => logError('[MainMessagePipeline]', error));
-                  } else {
-                    logError('Command', new CommandExecutionError(ctx.command, error));
-                    await ctx
-                      .reply('Error al ejecutar el comando.')
-                      .catch((error: unknown) => logError('[MainMessagePipeline]', error));
-                  }
-                }
-              });
-
-              cacheManager.markMessageProcessed(messageId);
-              const processingTime = Date.now() - startTime;
-              this.stats.totalProcessingTime += processingTime;
-              if (processingTime > 500) logger.warn(`⚠️ ${ctx.command}: ${processingTime}ms`);
+              await this.resolveAndExecute(ctx, messageId, startTime);
             } catch (error) {
               logError('handleMessageRealTime', error);
             }
           },
-          isParallelizable,
+          parallelizable,
         );
-        if (Date.now() - this.stats.lastStatsLog > 300000) {
-          this.logStats();
-          this.stats.lastStatsLog = Date.now();
-        }
+        this.maybeLogStats();
       })();
     });
+  }
+
+  /** Cheap synchronous validity checks. */
+  private isProcessableMessage(message: WAMessage): boolean {
+    if (!message?.message || message.key.fromMe) return false;
+    const messageId = message.key.id;
+    if (!messageId) return false;
+    if (cacheManager.hasProcessedMessage(messageId)) return false;
+    return true;
+  }
+
+  /**
+   * True for messages timestamped before the bot's last startup — offline
+   * echoes that must not be re-processed.
+   */
+  private isPreStartupEcho(message: WAMessage): boolean {
+    if (!this.mainBotId) return false;
+    const lastStartup = runtimeStateRepository.getLastStartupAt(this.mainBotId);
+    if (!lastStartup) return false;
+
+    const rawTimestamp = message.messageTimestamp;
+    const msgTimestamp =
+      rawTimestamp !== undefined && rawTimestamp !== null ? Number(rawTimestamp) * 1000 : 0;
+    const startupTime = new Date(lastStartup).getTime();
+    return msgTimestamp > 0 && msgTimestamp < startupTime;
+  }
+
+  private isParallelizableCommand(message: WAMessage): boolean {
+    const text = message.message?.conversation || message.message?.extendedTextMessage?.text || '';
+    const matchedPrefix = matchCommandPrefix(text);
+    if (matchedPrefix === undefined) return false;
+
+    const commandRest = text.slice(matchedPrefix.length);
+    const commandName = commandRest.split(' ')[0]?.toLowerCase() ?? '';
+    const fullCommandName = commandRest.toLowerCase();
+    const cmd = commandRegistry.get(fullCommandName) || commandRegistry.get(commandName);
+    return cmd?.parallelizable || false;
+  }
+
+  /**
+   * Sequential guard chain run before command resolution. Each guard can
+   * short-circuit processing (mute, vania toggle, quiz/mention interception).
+   */
+  private async runGuards(ctx: MessageContext, messageId: string): Promise<GuardResult> {
+    if (ctx.chat.isGroup) {
+      if (await this.handleMutedUser(ctx, messageId)) return GuardResult.Stop;
+      if (await this.handleVaniaToggle(ctx, messageId)) return GuardResult.Stop;
+      if (await this.handleAntilink(ctx, messageId)) return GuardResult.Stop;
+      if (!ctx.command) {
+        // Buffer non-command group chatter for !resumirchat (chat summary).
+        if (ctx.text.length >= 2 && !this.isPrefixed(ctx.text)) {
+          chatSummaryService.addMessage(ctx.chat.jid, ctx.sender.pushName || 'User', ctx.text);
+        }
+        if (await this.handleGroupConversation(ctx, messageId)) return GuardResult.Stop;
+      }
+    }
+
+    if (!ctx.command) {
+      cacheManager.markMessageProcessed(messageId);
+      return GuardResult.Stop;
+    }
+
+    return GuardResult.Continue;
+  }
+
+  /** True when the text starts with any configured command prefix. */
+  private isPrefixed(text: string): boolean {
+    return matchCommandPrefix(text) !== undefined;
+  }
+
+  /**
+   * Per-group antilink moderation (delete/kick). Runs before command
+   * resolution so it also covers plain messages. Replaces the dead
+   * AntilinkMiddleware that was never registered in any pipeline. Owners
+   * and group admins are exempt; commands go through the permission
+   * chain anyway, so only their text is inspected here.
+   */
+  private async handleAntilink(ctx: MessageContext, messageId: string): Promise<boolean> {
+    if (!ctx.text || typeof ctx.text !== 'string') return false;
+    if (ctx.sender.isOwner) return false;
+
+    const checkResult = antilinkService.getBlockedLinkInfo(ctx.chat.jid, ctx.text);
+    if (!checkResult.blocked) return false;
+
+    // Exempt group admins (permission lookup is LRU-cached, so this is cheap
+    // and only runs for messages that actually contain a blocked link).
+    await ctx.loadSenderPermissions();
+    if (ctx.sender.isAdmin) return false;
+
+    try {
+      if (checkResult.action === 'kick' && ctx.chat.isBotAdmin) {
+        const senderJid = ctx.message.key.participant ?? null;
+        if (senderJid) {
+          await ctx.sock.groupParticipantsUpdate(ctx.chat.jid, [senderJid], 'remove');
+          await ctx.reply(
+            `Enlace bloqueado: *${checkResult.link?.domain || checkResult.link?.raw}*\nExpulsado automáticamente.`,
+          );
+          cacheManager.markMessageProcessed(messageId);
+          return true;
+        }
+      }
+      await ctx.sock.sendMessage(ctx.chat.jid, { delete: ctx.message.key });
+      await ctx.reply(`Enlace bloqueado: *${checkResult.link?.domain || checkResult.link?.raw}*`);
+    } catch (error) {
+      logError('[Antilink]', error);
+    }
+    cacheManager.markMessageProcessed(messageId);
+    return true;
+  }
+
+  /** Deletes non-command messages from muted users; true when handled. */
+  private async handleMutedUser(ctx: MessageContext, messageId: string): Promise<boolean> {
+    await ctx.loadBotPermissions();
+
+    const muteCacheKey = `${ctx.chat.jid}:${ctx.sender.jid}`;
+    const mutedCached = middlewareCache.userMuted.get<{ value: boolean }>(muteCacheKey);
+    if (mutedCached?.value !== true) return false;
+
+    if (ctx.chat.isBotAdmin) {
+      try {
+        await ctx.sock.sendMessage(ctx.chat.jid, { delete: ctx.message.key });
+      } catch (err) {
+        logError('[MUTE] Error eliminando mensaje normal', err);
+      }
+    }
+    cacheManager.markMessageProcessed(messageId);
+    return true;
+  }
+
+  /**
+   * Applies the per-chat vania toggle via the shared guard in
+   * VaniaToggleService. Bare toggle commands pass through (the main bot
+   * executes them against itself); slot-addressed toggles are swallowed
+   * here (the subbot instance handles them via its own socket) and
+   * everything else in a disabled chat is dropped. Returns true when the
+   * message was handled (stop processing).
+   */
+  private async handleVaniaToggle(ctx: MessageContext, messageId: string): Promise<boolean> {
+    const allowed = await serviceManager.vaniaToggleService.isAllowedForMain(
+      ctx.chat.jid,
+      ctx.command,
+      ctx.args,
+    );
+
+    if (allowed) return false;
+
+    cacheManager.markMessageProcessed(messageId);
+    return true;
+  }
+
+  /** Routes non-command group chatter to quiz answers or AI mention handling. */
+  private async handleGroupConversation(ctx: MessageContext, messageId: string): Promise<boolean> {
+    const quizHandled = await quizAnswerHandler.handle(ctx);
+    if (quizHandled) {
+      cacheManager.markMessageProcessed(messageId);
+      return true;
+    }
+    const botJid = this.sock.user?.id ?? '';
+    await handleMention(ctx, botJid);
+    cacheManager.markMessageProcessed(messageId);
+    return true;
+  }
+
+  /** Anti-spam / anti-flood / group-load checks. False when blocked. */
+  private checkRateLimits(ctx: MessageContext): boolean {
+    const rateLimit = this.antiSpam.check(ctx.sender.jid);
+    if (!rateLimit.allowed) {
+      this.stats.spamBlocked++;
+      void ctx
+        .reply(rateLimit.reason ?? '⚠️ Demasiados mensajes')
+        .catch((error: unknown) => logError('[MainMessagePipeline]', error));
+      return false;
+    }
+
+    if (ctx.chat.isGroup) {
+      const floodCheck = rateLimitService.checkFlood(ctx.sender.jid);
+      if (!floodCheck.allowed) {
+        this.stats.spamBlocked++;
+        void ctx
+          .reply(floodCheck.reason ?? '⚠️ Estás escribiendo muy rápido')
+          .catch((error: unknown) => logError('[MainMessagePipeline]', error));
+        return false;
+      }
+      const groupRateLimit = rateLimitService.checkGroupRateLimit(ctx.chat.jid);
+      if (!groupRateLimit.allowed) {
+        this.stats.spamBlocked++;
+        void ctx
+          .reply(groupRateLimit.reason ?? '⚠️ El grupo está muy activo')
+          .catch((error: unknown) => logError('[MainMessagePipeline]', error));
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /** Resolves the command (registry → lazy plugin) and runs the full chain. */
+  private async resolveAndExecute(
+    ctx: MessageContext,
+    messageId: string,
+    startTime: number,
+  ): Promise<void> {
+    const fullCommand = ctx.args.length > 0 ? `${ctx.command} ${ctx.args[0]}` : null;
+    let command =
+      (fullCommand ? commandRegistry.get(fullCommand) : null) ?? commandRegistry.get(ctx.command);
+
+    if (!command) {
+      const lazyCmd = await pluginLoader.getCommand(ctx.command);
+      if (lazyCmd) {
+        commandRegistry.register(lazyCmd);
+        command = lazyCmd;
+      }
+    }
+
+    if (!command) {
+      logger.warn(`❌ Command not found in registry: ${ctx.command}`);
+      cacheManager.markMessageProcessed(messageId);
+      return;
+    }
+
+    // Two-word command (e.g. "armor set") consumed its first arg.
+    if (fullCommand && commandRegistry.get(fullCommand)) {
+      ctx.args = ctx.args.slice(1);
+    }
+
+    if (command.permissions?.user || command.permissions?.bot) {
+      if (ctx.chat.isGroup) {
+        await Promise.all([ctx.loadSenderPermissions(), ctx.loadBotPermissions()]);
+      } else {
+        await ctx.loadSenderPermissions();
+      }
+    }
+    await this.executeWithMiddlewares(ctx, async () => {
+      const allowed = await this.checkCommandAvailability(ctx, command);
+      if (!allowed) return;
+      await this.runCommand(ctx, command);
+    });
+
+    cacheManager.markMessageProcessed(messageId);
+    const processingTime = Date.now() - startTime;
+    this.stats.totalProcessingTime += processingTime;
+    if (processingTime > 500) logger.warn(`⚠️ ${ctx.command}: ${processingTime}ms`);
+  }
+
+  /** Enabled/NSFW gates. False when the command must not run. */
+  private async checkCommandAvailability(
+    ctx: MessageContext,
+    command: NonNullable<ReturnType<typeof commandRegistry.get>>,
+  ): Promise<boolean> {
+    if (command.enabled === false) {
+      await ctx
+        .reply('❌ Este comando está deshabilitado.')
+        .catch((error: unknown) => logError('[MainMessagePipeline]', error));
+      return false;
+    }
+
+    if (command.nsfw === true) {
+      const nsfwAllowed = await serviceManager.nsfwToggleService
+        .isEnabled(ctx.chat.isGroup ? ctx.chat.jid : null)
+        .catch((error: unknown) => {
+          logError('[MainMessagePipeline] nsfwToggleService', error);
+          return false; // fail closed
+        });
+      if (!nsfwAllowed) {
+        await ctx
+          .reply('🔞 Los comandos NSFW están deshabilitados.\nUsa !nsfw on para habilitar.')
+          .catch((error: unknown) => logError('[MainMessagePipeline]', error));
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private async runCommand(
+    ctx: MessageContext,
+    command: NonNullable<ReturnType<typeof commandRegistry.get>>,
+  ): Promise<void> {
+    const cmdStartTime = Date.now();
+    try {
+      await withTimeout(
+        command.execute(ctx),
+        COMMAND_TIMEOUT_MS,
+        `Command ${command.name} timed out after ${COMMAND_TIMEOUT_MS}ms`,
+      );
+      this.stats.commandsExecuted++;
+      this.trackCommandMetric(command.name, Date.now() - cmdStartTime, false);
+    } catch (error) {
+      this.stats.errorsCount++;
+      this.trackCommandMetric(command.name, Date.now() - cmdStartTime, true);
+      if (error instanceof Error && error.message.includes('timed out')) {
+        logger.error(`⏱️ Command ${command.name} timed out`);
+        await ctx
+          .reply('⏱️ El comando tardó demasiado. Intenta de nuevo.')
+          .catch((err: unknown) => logError('[MainMessagePipeline]', err));
+      } else {
+        logError('Command', new CommandExecutionError(ctx.command, error));
+        await ctx
+          .reply('Error al ejecutar el comando.')
+          .catch((err: unknown) => logError('[MainMessagePipeline]', err));
+      }
+    }
+  }
+
+  private maybeLogStats(): void {
+    if (Date.now() - this.stats.lastStatsLog > STATS_LOG_INTERVAL_MS) {
+      this.logStats();
+      this.stats.lastStatsLog = Date.now();
+    }
   }
 
   private async executeWithMiddlewares(

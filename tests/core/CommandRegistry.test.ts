@@ -11,7 +11,7 @@
  * @created 2026-03-16
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { CommandRegistry } from '../../src/core/CommandRegistry.js';
 import { CommandCategory, type ICommand } from '../../src/types/index.js';
 
@@ -118,6 +118,49 @@ describe('CommandRegistry', () => {
       const canExecute = registry.checkCooldown('cmd2', 'user1', COOLDOWN);
 
       expect(canExecute).toBe(true);
+    });
+  });
+
+  describe('getCooldownRemaining', () => {
+    const COOLDOWN = 5000;
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('returns 0 when no cooldown is active', () => {
+      expect(registry.getCooldownRemaining('cmd', 'user1')).toBe(0);
+    });
+
+    it('returns the remaining time right after triggering the cooldown', () => {
+      vi.useFakeTimers();
+      registry.checkCooldown('cmd', 'user1', COOLDOWN);
+
+      const remaining = registry.getCooldownRemaining('cmd', 'user1');
+
+      expect(remaining).toBeGreaterThan(0);
+      expect(remaining).toBeLessThanOrEqual(COOLDOWN);
+    });
+
+    it('decreases as time passes and reaches 0 when expired', () => {
+      vi.useFakeTimers();
+      registry.checkCooldown('cmd', 'user1', COOLDOWN);
+
+      vi.advanceTimersByTime(2000);
+      const afterTwoSeconds = registry.getCooldownRemaining('cmd', 'user1');
+      expect(afterTwoSeconds).toBeGreaterThan(0);
+      expect(afterTwoSeconds).toBeLessThanOrEqual(COOLDOWN - 2000);
+
+      vi.advanceTimersByTime(COOLDOWN);
+      expect(registry.getCooldownRemaining('cmd', 'user1')).toBe(0);
+    });
+
+    it('does not leak the duration across different users or commands', () => {
+      vi.useFakeTimers();
+      registry.checkCooldown('cmd', 'user1', COOLDOWN);
+
+      expect(registry.getCooldownRemaining('cmd', 'user2')).toBe(0);
+      expect(registry.getCooldownRemaining('other', 'user1')).toBe(0);
     });
   });
 

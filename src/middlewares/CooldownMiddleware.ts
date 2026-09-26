@@ -21,7 +21,9 @@ export class CooldownMiddleware extends Middleware {
     const canExecute = this.registry.checkCooldown(command.name, ctx.sender.jid, cooldownTime);
 
     if (!canExecute) {
-      const remainingTime = Math.ceil(cooldownTime / 1000);
+      // Real remaining time for this user/command, not the total cooldown.
+      const remainingMs = this.registry.getCooldownRemaining(command.name, ctx.sender.jid);
+      const remainingTime = Math.max(1, Math.ceil(remainingMs / 1000));
       await ctx.reply(`⏱️ Espera ${remainingTime}s antes de usar este comando nuevamente`);
       return;
     }

@@ -13,7 +13,7 @@
 
 import type { WASocket, proto, AnyMessageContent, WAMessage } from 'baileys';
 import type { MessageContext as IMessageContext } from '@/types/index.js';
-import { config } from '@/config/index.js';
+import { matchCommandPrefix } from '@/utils/prefix.js';
 import { PermissionService, normalizeJid } from '@/services/PermissionService.js';
 import { cacheManager } from '@/core/CacheManager.js';
 import { getContextInfo } from '@/utils/getContextInfo.js';
@@ -73,12 +73,7 @@ export class MessageContext implements IMessageContext {
    * @returns Object with command name and arguments
    */
   private parseCommand() {
-    // Longest prefix first so multi-char prefixes (e.g. '..') are not
-    // truncated by shorter ones ('.').
-    const prefix = [config.prefix, '.', '!']
-      .filter((p, i, arr): p is string => Boolean(p) && arr.indexOf(p) === i)
-      .sort((a, b) => b.length - a.length)
-      .find(p => this.text.startsWith(p));
+    const prefix = matchCommandPrefix(this.text);
     if (!prefix) {
       return { command: '', args: [] };
     }

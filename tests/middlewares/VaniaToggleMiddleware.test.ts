@@ -2,7 +2,8 @@
  * VaniaToggleMiddleware.test.ts
  *
  * Unit tests for the VaniaToggleMiddleware class.
- * Tests the toggle bypass security fix (vaniaon, vaniaoff, vaniastatus).
+ * Tests the toggle bypass security fix (vaniaon, vaniaoff, vaniastatus)
+ * and the delegation to the shared VaniaToggleService guard.
  *
  * @author **Carlos G** ⭐
  */
@@ -12,12 +13,12 @@ import { VaniaToggleMiddleware } from '../../src/middlewares/VaniaToggleMiddlewa
 import { middlewareCache } from '../../src/middlewares/MiddlewareCache.js';
 import type { MessageContext } from '../../src/types/index.js';
 
-const mockIsEnabled = vi.fn();
+const mockIsAllowedForSubbot = vi.fn();
 
 vi.mock('../../src/services/system/Servicemanager.js', () => ({
   serviceManager: {
     vaniaToggleService: {
-      isEnabled: (...args: unknown[]) => mockIsEnabled(...args),
+      isAllowedForSubbot: (...args: unknown[]) => mockIsAllowedForSubbot(...args),
     },
   },
 }));
@@ -31,6 +32,7 @@ describe('VaniaToggleMiddleware', () => {
     ({
       command,
       args: [],
+      botId: 'main',
       message: {} as any,
       sock: {} as any,
       chat: { jid: 'group@test.g.us', isGroup: true, isBotAdmin: false },
@@ -44,6 +46,7 @@ describe('VaniaToggleMiddleware', () => {
     ({
       command,
       args: [],
+      botId: 'main',
       message: {} as any,
       sock: {} as any,
       chat: { jid: 'user@s.whatsapp.net', isGroup: false, isBotAdmin: false },
@@ -56,7 +59,7 @@ describe('VaniaToggleMiddleware', () => {
   beforeEach(() => {
     middleware = new VaniaToggleMiddleware();
     mockNext = vi.fn().mockResolvedValue(undefined);
-    mockIsEnabled.mockResolvedValue(true);
+    mockIsAllowedForSubbot.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -85,52 +88,44 @@ describe('VaniaToggleMiddleware', () => {
       mockCtx = createGroupCtx('vaniaon');
       await middleware.execute(mockCtx, mockNext);
       expect(mockNext).toHaveBeenCalled();
-      expect(mockIsEnabled).not.toHaveBeenCalled();
+      expect(mockIsAllowedForSubbot).not.toHaveBeenCalled();
     });
 
     it('should bypass toggle for vaniaoff command', async () => {
       mockCtx = createGroupCtx('vaniaoff');
       await middleware.execute(mockCtx, mockNext);
       expect(mockNext).toHaveBeenCalled();
-      expect(mockIsEnabled).not.toHaveBeenCalled();
+      expect(mockIsAllowedForSubbot).not.toHaveBeenCalled();
     });
 
     it('should bypass toggle for vaniastatus command', async () => {
       mockCtx = createGroupCtx('vaniastatus');
       await middleware.execute(mockCtx, mockNext);
       expect(mockNext).toHaveBeenCalled();
-      expect(mockIsEnabled).not.toHaveBeenCalled();
+      expect(mockIsAllowedForSubbot).not.toHaveBeenCalled();
     });
   });
 
   describe('group chat - non-toggle commands', () => {
-    it('should check toggle status for non-toggle commands', async () => {
+    it('should delegate the guard to the shared service for non-toggle commands', async () => {
       mockCtx = createGroupCtx('help');
       await middleware.execute(mockCtx, mockNext);
-      expect(mockIsEnabled).toHaveBeenCalledWith('group@test.g.us', undefined);
+      expect(mockIsAllowedForSubbot).toHaveBeenCalledWith('group@test.g.us', 'main', 'help');
       expect(mockNext).toHaveBeenCalled();
     });
 
-    it('should block non-toggle commands when bot is disabled', async () => {
+    it('should block non-toggle commands when the guard denies', async () => {
       middlewareCache.groupEnabled.clear();
-      mockIsEnabled.mockResolvedValue(false);
+      mockIsAllowedForSubbot.mockResolvedValue(false);
       mockCtx = createGroupCtx('help');
       await middleware.execute(mockCtx, mockNext);
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should allow non-toggle commands when bot is enabled', async () => {
+    it('should allow non-toggle commands when the guard allows', async () => {
       middlewareCache.groupEnabled.clear();
-      mockIsEnabled.mockResolvedValue(true);
+      mockIsAllowedForSubbot.mockResolvedValue(true);
       mockCtx = createGroupCtx('ping');
-      await middleware.execute(mockCtx, mockNext);
-      expect(mockNext).toHaveBeenCalled();
-    });
-
-    it('should allow continuation if isEnabled throws', async () => {
-      middlewareCache.groupEnabled.clear();
-      mockIsEnabled.mockRejectedValue(new Error('DB error'));
-      mockCtx = createGroupCtx('help');
       await middleware.execute(mockCtx, mockNext);
       expect(mockNext).toHaveBeenCalled();
     });
