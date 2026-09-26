@@ -162,7 +162,11 @@ export class DownloadService {
       .substring(0, maxLength);
   }
 
-  protected async cleanup(filePath: string, delay: number = 30000): Promise<void> {
+  /**
+   * Schedules deletion of a temp file. Public: download commands call this
+   * after sending the file to the chat.
+   */
+  async cleanup(filePath: string, delay: number = 30000): Promise<void> {
     setTimeout(() => {
       if (fs.existsSync(filePath)) {
         try {

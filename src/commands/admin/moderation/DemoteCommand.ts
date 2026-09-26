@@ -1,3 +1,4 @@
+import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
   CommandCategory,
@@ -81,7 +82,7 @@ export class DemoteCommand extends Command {
       await ctx.react('✅');
     } catch (error: unknown) {
       logError('[DemoteCommand] Error', error);
-      const message = error instanceof Error ? error.message : 'Unknown error';
+      const message = errorMessage(error);
       await ctx.reply(`❌ Error demoting user: ${message}`);
       await ctx.react('❌');
     }

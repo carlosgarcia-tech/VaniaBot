@@ -738,6 +738,19 @@ export async function initializeDatabase(config?: DatabaseConfig): Promise<void>
   await _dbManager.initialize();
 }
 
+/**
+ * Bootstraps the SQLite engine only when no live instance exists yet.
+ *
+ * index.ts owns the startup bootstrap (SubBotDatabase and repositories
+ * consume the engine from there); this helper lets ServiceManager reuse
+ * the same instance without re-running the bootstrap, while staying
+ * usable standalone (tests, panel tooling).
+ */
+export async function ensureDatabaseInitialized(config?: DatabaseConfig): Promise<void> {
+  if (_dbManager?.isInitialized()) return;
+  await initializeDatabase(config);
+}
+
 export function getDatabase(): DatabaseManager {
   if (!_dbManager) {
     throw new Error('Database not initialized. Call initializeDatabase() first.');
@@ -752,38 +765,3 @@ export function getDbManager(): DatabaseManager | undefined {
 export { DatabaseManager };
 
 export default DatabaseManager;
-
-const _FIX_MIGRATION = `
-  ALTER TABLE mutes ADD COLUMN userId TEXT;
-  ALTER TABLE bans ADD COLUMN userId TEXT;
-  ALTER TABLE bans ADD COLUMN user_id TEXT;
-  ALTER TABLE bans ADD COLUMN group_id TEXT;
-  ALTER TABLE moderation_logs ADD COLUMN userId TEXT;
-  ALTER TABLE moderation_logs ADD COLUMN group_id TEXT;
-`;
-
-function _applyFixMigration(db: DatabaseManager): void {
-  if (db.isSQLite()) {
-    const sqlDb = db.getDb();
-    try {
-      sqlDb.exec(`
-        ALTER TABLE mutes ADD COLUMN userId TEXT;
-      `);
-    } catch {}
-    try {
-      sqlDb.exec(`ALTER TABLE bans ADD COLUMN userId TEXT;`);
-    } catch {}
-    try {
-      sqlDb.exec(`ALTER TABLE bans ADD COLUMN user_id TEXT;`);
-    } catch {}
-    try {
-      sqlDb.exec(`ALTER TABLE bans ADD COLUMN group_id TEXT;`);
-    } catch {}
-    try {
-      sqlDb.exec(`ALTER TABLE moderation_logs ADD COLUMN userId TEXT;`);
-    } catch {}
-    try {
-      sqlDb.exec(`ALTER TABLE moderation_logs ADD COLUMN group_id TEXT;`);
-    } catch {}
-  }
-}

@@ -11,6 +11,7 @@ import { handleReaccion } from '@/handlers/ReaccionHandler.js';
 import { quizAnswerHandler } from '@/handlers/QuizAnswerHandler.js';
 import { handleMention } from '@/handlers/AiMentionHandler.js';
 import { welcomeService } from '@/services/system/WelcomeService.js';
+import { antiArabService } from '@/services/moderation/AntiArabService.js';
 import { VANIA_TOGGLE_COMMANDS } from '@/config/index.js';
 import { CommandExecutionError } from '@/utils/errors.js';
 import { logger, logError } from '@/utils/logger.js';
@@ -74,10 +75,11 @@ export class SubBotMessageHandler {
         return;
       }
 
-      if (ctx.chat.isGroup && !isVaniaToggleCommand) {
-        const isEnabled = await serviceManager.vaniaToggleService.isEnabled(
+      if (ctx.chat.isGroup) {
+        const isEnabled = await serviceManager.vaniaToggleService.isAllowedForSubbot(
           ctx.chat.jid,
           toggleBotId,
+          ctx.command,
         );
         if (!isEnabled) return;
       }
@@ -204,8 +206,40 @@ export class SubBotMessageHandler {
           }
         }
       }
+
+      await this.handleAntiArab(sock, groupJid, action, participants);
     } catch (error) {
       logError('SubBot.handleGroupUpdate', error);
+    }
+  }
+
+  /** Kicks new participants matching per-group blocked prefixes (AntiArab). */
+  private async handleAntiArab(
+    sock: WASocket,
+    groupJid: string,
+    action: string,
+    participants: GroupParticipantsUpdate['participants'],
+  ): Promise<void> {
+    if (action !== 'add') return;
+    if (!antiArabService.isEnabled(groupJid)) return;
+
+    const botNumber = (sock.user?.id || '').split('@')[0].replace(/[^\d]/g, '');
+
+    for (const participant of participants) {
+      const participantId = typeof participant === 'string' ? participant : participant.id;
+      if (!participantId) continue;
+
+      const number = participantId.replace(/@.*$/, '').replace(/[^\d]/g, '');
+      if (!number || number === botNumber) continue;
+
+      if (antiArabService.shouldBlockNumber(number)) {
+        try {
+          await sock.groupParticipantsUpdate(groupJid, [participantId], 'remove');
+          logger.info(`AntiArab: Usuario ${number} removido del grupo ${groupJid}`);
+        } catch (error) {
+          logger.error(`AntiArab: Error al remover usuario ${number}`, error);
+        }
+      }
     }
   }
 

@@ -159,7 +159,6 @@ export class WhatsAppClient {
     this.setupPipeline(this.sock);
     this.antiSpam.startCleanup();
     this.startMaintenance();
-    await this.warmup();
     this.isReady = true;
     logger.debug(`WhatsAppClient initialized in ${Date.now() - startTime}ms`);
   }
@@ -188,24 +187,6 @@ export class WhatsAppClient {
     sock.ev.on('call', calls => {
       void clientEventHandlers.handleIncomingCalls(sock, calls);
     });
-  }
-
-  private async warmup(): Promise<void> {
-    logger.debug('🔥 Warming up cache...');
-    try {
-      const cachedGroups = Array.from(cacheManager['groupMetadataCache'].keys()).slice(0, 10);
-      for (const groupJid of cachedGroups) {
-        try {
-          const metadata = cacheManager.getGroupMetadata(groupJid);
-          if (metadata) {
-            cacheManager.setGroupMetadata(groupJid, metadata);
-          }
-        } catch {}
-      }
-      logger.debug(`🔥 Warmup complete: ${cachedGroups.length} groups cached`);
-    } catch (error) {
-      logger.debug('Warmup skipped:', error);
-    }
   }
 
   private startMaintenance(): void {

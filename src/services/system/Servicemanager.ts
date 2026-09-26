@@ -8,6 +8,7 @@ import { LevelService } from '../database/LevelService.js';
 import { ModerationService } from '../moderation/ModerationService.js';
 import { ReportService } from './ReportService.js';
 import { VaniaToggleService } from './VaniaToggleService.js';
+import { NsfwToggleService } from './NsfwToggleService.js';
 import { PrimeService } from './PrimeService.js';
 import { licenseService } from './LicenseService.js';
 import { config } from '@/config/index.js';
@@ -16,7 +17,7 @@ import { cleanupService } from './CleanupService.js';
 import { healthCheckService, AutoRestartService } from './HealthCheckService.js';
 import { sessionBackupService } from './SessionBackupService.js';
 import { persistenceService } from './PersistenceService.js';
-import { initializeDatabase } from '@/repositories/Database.js';
+import { ensureDatabaseInitialized } from '@/repositories/Database.js';
 
 export class ServiceManager {
   private static instance: ServiceManager;
@@ -28,6 +29,7 @@ export class ServiceManager {
   public moderationService!: ModerationService;
   public reportService!: ReportService;
   public vaniaToggleService!: VaniaToggleService;
+  public nsfwToggleService!: NsfwToggleService;
   public primeService!: PrimeService;
   public licenseService = licenseService;
   public healthCheckService = healthCheckService;
@@ -61,6 +63,8 @@ export class ServiceManager {
       await this.reportService.initialize();
       this.vaniaToggleService = new VaniaToggleService();
       this.vaniaToggleService.setDatabase(this.db);
+      this.nsfwToggleService = new NsfwToggleService();
+      this.nsfwToggleService.setDatabase(this.db);
       this.primeService = PrimeService.getInstance();
       this.primeService.setGroupService(this.groupService);
       licenseService.setGroupService(this.groupService);
@@ -100,13 +104,15 @@ export class ServiceManager {
 
       case 'sqlite':
         logger.debug('Usando base de datos SQLite');
-        await initializeDatabase();
+        // index.ts already bootstrapped the engine at startup; reuse it
+        // (ensureDatabaseInitialized is a no-op when the engine is live).
+        await ensureDatabaseInitialized();
         this.db = new SQLiteAdapter();
         break;
 
       default:
         logger.warn(`Tipo de base de datos no reconocido: ${dbType}, usando SQLite por defecto`);
-        await initializeDatabase();
+        await ensureDatabaseInitialized();
         this.db = new SQLiteAdapter();
     }
 

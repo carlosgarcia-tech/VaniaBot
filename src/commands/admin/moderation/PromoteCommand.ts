@@ -1,3 +1,4 @@
+import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
   CommandCategory,
@@ -76,7 +77,7 @@ export class PromoteCommand extends Command {
       await ctx.react('✅');
     } catch (error: unknown) {
       logError('[PromoteCommand] Error', error);
-      const message = error instanceof Error ? error.message : 'Unknown error';
+      const message = errorMessage(error);
       await ctx.reply(`❌ Error promoting user: ${message}`);
       await ctx.react('❌');
     }

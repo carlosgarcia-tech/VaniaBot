@@ -30,13 +30,9 @@
   "author": "Carlos G",
   "license": "MIT",
   "dependencies": {
-    "@bochilteam/scraper-mediafire": "^5.0.0",
-    "@google/generative-ai": "^0.24.1",
     "@napi-rs/canvas": "^0.1.98",
     "@resvg/resvg-js": "^2.6.2",
     "baileys": "^7.0.0-rc13",
-    "autoskill": "^0.1.0",
-    "autoskills": "^0.3.5",
     "axios": "^1.13.5",
     "canvas": "^3.2.1",
     "chalk": "^5.6.2",
@@ -68,7 +64,6 @@
     "@types/mathjs": "^9.4.1",
     "@types/node": "^22.19.17",
     "@types/qrcode-terminal": "^0.12.2",
-    "@types/redis": "^4.0.10",
     "@types/sql.js": "^1.4.11",
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
@@ -96,28 +91,5 @@
       "eslint --fix",
       "prettier --write"
     ]
-  },
-  "vitest": {
-    "testTimeout": 10000,
-    "hookTimeout": 10000,
-    "include": [
-      "tests/**/*.test.ts"
-    ],
-    "environment": "node",
-    "coverage": {
-      "provider": "v8",
-      "reporter": [
-        "text",
-        "html"
-      ],
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "src/**/*.test.ts",
-        "src/types/**",
-        "tests/**"
-      ]
-    }
   }
 }

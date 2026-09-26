@@ -1,5 +1,7 @@
 import type { IDatabase } from '../database/Database';
 import { normalizeJid } from '../PermissionService.js';
+import { VANIA_TOGGLE_COMMANDS } from '@/config/index.js';
+import { logError } from '@/utils/logger.js';
 
 export interface ToggleRecord {
   key: string;
@@ -35,6 +37,60 @@ export class VaniaToggleService {
       return false;
     }
     return record.enabled;
+  }
+
+  /**
+   * Unified toggle guard for the MAIN bot pipeline.
+   *
+   * Toggle commands (`vaniaon/off/status`) are routed here:
+   * - Bare (or non-numeric/<=0 slot) toggles pass through so the main bot
+   *   executes them against itself.
+   * - Slot-addressed toggles (`!vaniaon 2`) are swallowed: the subbot
+   *   instance receives the same group message through its own socket and
+   *   handles its own toggle.
+   *
+   * Non-toggle messages pass only when the main bot is enabled in the
+   * chat. Fail-open on DB errors (a broken toggle store must not silence
+   * every group; commands will surface their own DB errors anyway).
+   */
+  async isAllowedForMain(chatJid: string, command: string, args: string[] = []): Promise<boolean> {
+    if (VANIA_TOGGLE_COMMANDS.includes(command)) {
+      return !this.hasValidSlotArg(args);
+    }
+    return this.checkEnabled(chatJid, 'main');
+  }
+
+  /**
+   * Unified toggle guard for a subbot slot.
+   *
+   * Toggle commands always pass: SubBotMessageHandler skips bare toggles
+   * upstream (they belong to the main bot) and slot-addressed toggles
+   * bypass the enabled check entirely. Non-toggle messages pass only
+   * when this subbot is enabled in the chat. Fail-open on DB errors,
+   * matching what VaniaToggleMiddleware already did in subbot chains.
+   */
+  async isAllowedForSubbot(chatJid: string, botId: string, command: string): Promise<boolean> {
+    if (VANIA_TOGGLE_COMMANDS.includes(command)) {
+      return true;
+    }
+    return this.checkEnabled(chatJid, botId);
+  }
+
+  /** True when args[0] parses as a subbot slot number (> 0). */
+  private hasValidSlotArg(args: string[]): boolean {
+    if (args.length === 0) return false;
+    const slotNum = parseInt(args[0], 10);
+    return !isNaN(slotNum) && slotNum > 0;
+  }
+
+  /** Enabled check shared by both guards. Fail-open with an error log. */
+  private async checkEnabled(chatJid: string, botId: string): Promise<boolean> {
+    try {
+      return await this.isEnabled(chatJid, botId);
+    } catch (error) {
+      logError('[VaniaToggleService] guard', error);
+      return true;
+    }
   }
 
   async enable(chatJid: string, enabledBy: string, botId: string = 'main'): Promise<void> {

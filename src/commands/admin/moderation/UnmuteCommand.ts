@@ -1,3 +1,4 @@
+import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
   CommandCategory,
@@ -58,7 +59,7 @@ export class UnmuteCommand extends Command {
       await ctx.react('🔊');
     } catch (error: unknown) {
       logError('[UnmuteCommand] Error', error);
-      const message = error instanceof Error ? error.message : 'Unknown error';
+      const message = errorMessage(error);
       await ctx.reply(`*Error* ${message}`);
       await ctx.react('❌');
     }

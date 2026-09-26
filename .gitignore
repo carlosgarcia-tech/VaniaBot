@@ -8,7 +8,7 @@ data/database.json
 dest
 subbot-sessions
 subbots.json
-coverage
+coverage/
 backups
 
 # WAL files

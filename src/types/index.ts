@@ -10,6 +10,11 @@ export interface ICommand {
   cooldown?: number;
   parallelizable?: boolean;
   enabled?: boolean;
+  /**
+   * Marks the command as NSFW: it is gated behind the persisted global
+   * NSFW toggle (`!nsfw on/off`) even when `enabled` is true.
+   */
+  nsfw?: boolean;
   permissions?: {
     user?: PermissionLevel[];
     bot?: BotPermission[];
