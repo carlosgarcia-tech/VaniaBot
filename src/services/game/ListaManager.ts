@@ -248,6 +248,8 @@ export class ListaManager {
       },
       30 * 60 * 1000,
     );
+    // Cleanup-only timer: must not keep the process alive on shutdown.
+    this.cleanupInterval.unref();
   }
 
   async initialize(): Promise<void> {

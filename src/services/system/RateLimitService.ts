@@ -226,6 +226,8 @@ export class RateLimitService {
         }
       }
     }, 60 * 1000);
+    // Cleanup-only timer: stop() clears it during shutdown anyway.
+    this.cleanupTimer.unref();
   }
 }
 

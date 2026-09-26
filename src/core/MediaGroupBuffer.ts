@@ -16,6 +16,8 @@ export class MediaGroupBuffer {
 
   private constructor() {
     this.cleanupInterval = setInterval(() => this.cleanup(), 30_000);
+    // Cleanup-only timer: must not keep the process alive on shutdown.
+    this.cleanupInterval.unref();
   }
 
   static getInstance(): MediaGroupBuffer {

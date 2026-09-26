@@ -40,6 +40,7 @@ export class AntiDeleteService {
   private static instance: AntiDeleteService;
   private messageStore = new Map<string, StoredMessage>();
   private config: AntiDeleteConfig;
+  private cleanupTimer: NodeJS.Timeout | null = null;
   private readonly TMP_DIR = path.join(process.cwd(), 'tmp', 'antidelete');
   private readonly MAX_MESSAGE_AGE = 24 * 60 * 60 * 1000;
   /** Hard cap on stored entries to prevent unbounded RAM growth. */
@@ -77,13 +78,15 @@ export class AntiDeleteService {
   }
 
   private startCleanupTimer(): void {
-    setInterval(
+    if (this.cleanupTimer) return;
+    this.cleanupTimer = setInterval(
       () => {
         this.cleanup();
       },
       60 * 60 * 1000,
     );
-    // Note: unref'd callers may rely on this interval; keep default behavior.
+    // Maintenance-only timer: must not keep the process alive on shutdown.
+    this.cleanupTimer?.unref();
   }
 
   /** Drops the oldest entries when the store exceeds its cap. */
@@ -208,6 +211,15 @@ export class AntiDeleteService {
 
   getMessage(messageId: string): StoredMessage | undefined {
     return this.messageStore.get(messageId);
+  }
+
+  /** Clears the stored messages and stops the cleanup timer (shutdown). */
+  stop(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+    this.messageStore.clear();
   }
 
   deleteMessage(messageId: string): void {

@@ -12,9 +12,11 @@ import { MuteMiddleware } from '@/middlewares/MuteMiddleware.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { logger, logError } from '@/utils/logger.js';
 import { cacheManager } from '@/core/CacheManager.js';
+import { mediaGroupBuffer } from '@/core/MediaGroupBuffer.js';
 import { AntiSpamService } from '@/services/system/AntiSpamService.js';
 import { subBotManager } from '@/services/subbot/SubBotManager.js';
 import { rateLimitService } from '@/services/system/RateLimitService.js';
+import { listaManager } from '@/services/game/ListaManager.js';
 import { PinVerificationMiddleware } from '@/middlewares/PinVerificationMiddleware.js';
 import { RealTimeMessageProcessor } from './RealTimeMessageProcessor.js';
 import { MainMessagePipeline } from './MainMessagePipeline.js';
@@ -238,6 +240,8 @@ export class WhatsAppClient {
     }
     rateLimitService.stop();
     cacheManager.stop();
+    mediaGroupBuffer.stop();
+    listaManager.destroy();
     await subBotManager.shutdown();
     await serviceManager.shutdown();
     try {

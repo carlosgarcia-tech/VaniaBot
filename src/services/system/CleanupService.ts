@@ -3,6 +3,7 @@ import { logger, logError } from '@/utils/logger.js';
 
 export class CleanupService {
   private cleanupInterval: NodeJS.Timeout | null = null;
+  private initialCleanupTimer: NodeJS.Timeout | null = null;
   private readonly CLEANUP_INTERVAL = 60 * 60 * 1000;
   private readonly INACTIVITY_THRESHOLD = 7 * 24 * 60 * 60 * 1000;
 
@@ -14,7 +15,7 @@ export class CleanupService {
 
     logger.debug('🧹 Servicio de limpieza iniciado');
 
-    setTimeout(
+    this.initialCleanupTimer = setTimeout(
       () => {
         void this.cleanup().catch(error => {
           logError('[CleanupService] Initial cleanup error', error);
@@ -22,15 +23,21 @@ export class CleanupService {
       },
       5 * 60 * 1000,
     );
+    this.initialCleanupTimer.unref();
 
     this.cleanupInterval = setInterval(() => {
       void this.cleanup().catch(error => {
         logError('[CleanupService] Scheduled cleanup error', error);
       });
     }, this.CLEANUP_INTERVAL);
+    this.cleanupInterval.unref();
   }
 
   stop(): void {
+    if (this.initialCleanupTimer) {
+      clearTimeout(this.initialCleanupTimer);
+      this.initialCleanupTimer = null;
+    }
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;

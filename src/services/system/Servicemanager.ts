@@ -17,6 +17,7 @@ import { cleanupService } from './CleanupService.js';
 import { healthCheckService, AutoRestartService } from './HealthCheckService.js';
 import { sessionBackupService } from './SessionBackupService.js';
 import { persistenceService } from './PersistenceService.js';
+import { antiDeleteService } from './AntiDeleteService.js';
 import { ensureDatabaseInitialized } from '@/repositories/Database.js';
 
 export class ServiceManager {
@@ -124,6 +125,9 @@ export class ServiceManager {
       logger.info('Cerrando servicios...');
       cleanupService.stop();
       this.sessionBackupService.stop();
+      this.autoRestartService.stop();
+      persistenceService.stop();
+      antiDeleteService.stop();
       if (this.db) {
         await this.db.disconnect();
       }

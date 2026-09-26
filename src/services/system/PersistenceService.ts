@@ -55,6 +55,7 @@ export class PersistenceService {
   private db: Database | null = null;
   private sock: WASocket | null = null;
   private initialized = false;
+  private cleanupTimer: NodeJS.Timeout | null = null;
 
   private readonly MAX_TOTAL_REMINDERS = 1000;
   private readonly DB_REMINDERS_KEY = 'system:reminders';
@@ -210,7 +211,8 @@ export class PersistenceService {
   }
 
   private startCleanup(): void {
-    setInterval(
+    if (this.cleanupTimer) return;
+    this.cleanupTimer = setInterval(
       () => {
         const now = Date.now();
 
@@ -256,6 +258,26 @@ export class PersistenceService {
       },
       60 * 60 * 1000,
     );
+    this.cleanupTimer.unref();
+  }
+
+  /**
+   * Stops the cleanup interval and every pending reminder/poll timer.
+   * Part of the graceful shutdown chain.
+   */
+  stop(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+    for (const timer of this.reminderTimers.values()) {
+      clearTimeout(timer);
+    }
+    this.reminderTimers.clear();
+    for (const timer of this.pollTimers.values()) {
+      clearTimeout(timer);
+    }
+    this.pollTimers.clear();
   }
 
   private scheduleReminder(reminder: Reminder): void {
