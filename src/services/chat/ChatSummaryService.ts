@@ -1,8 +1,12 @@
 import path from 'path';
-import fs from 'fs';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
-const DB_DIR = path.join(process.cwd(), 'database');
-const FILE = path.join(DB_DIR, 'resumirchat-buffer.json');
+const FILE = path.join(process.cwd(), 'database', 'resumirchat-buffer.json');
+
+const chatSummaryStore = new JsonFileStore<ChatSummaryStore>({
+  filePath: FILE,
+  defaults: () => ({ trackedSince: new Date().toISOString(), groups: {} }),
+});
 
 export interface ChatMessage {
   sender: string;
@@ -86,34 +90,6 @@ const STOPWORDS = new Set([
   'jaja',
 ]);
 
-function ensureDir(): void {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
-  }
-}
-
-function loadStore(): ChatSummaryStore {
-  ensureDir();
-  try {
-    if (!fs.existsSync(FILE)) {
-      return { trackedSince: new Date().toISOString(), groups: {} };
-    }
-    const raw = fs.readFileSync(FILE, 'utf-8');
-    const data = JSON.parse(raw);
-    if (typeof data === 'object' && data !== null) {
-      return data as ChatSummaryStore;
-    }
-    return { trackedSince: new Date().toISOString(), groups: {} };
-  } catch {
-    return { trackedSince: new Date().toISOString(), groups: {} };
-  }
-}
-
-function saveStore(store: ChatSummaryStore): void {
-  ensureDir();
-  fs.writeFileSync(FILE, JSON.stringify(store, null, 2));
-}
-
 function cleanText(value: string): string {
   return String(value || '')
     .replace(/\s+/g, ' ')
@@ -140,9 +116,14 @@ export interface ChatSummary {
 
 export class ChatSummaryService {
   private store: ChatSummaryStore;
+  /**
+   * Pending flush handle for the debounced persist. Non-null while a
+   * setTimeout is scheduled and not yet fired.
+   */
+  private saveTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
-    this.store = loadStore();
+    this.store = chatSummaryStore.load();
   }
 
   private getGroupMessages(groupId: string): ChatMessage[] {
@@ -166,11 +147,28 @@ export class ChatSummaryService {
     if (messages.length > MAX_BUFFER_PER_GROUP) {
       messages.splice(0, messages.length - MAX_BUFFER_PER_GROUP);
     }
-    this.save();
+    this.scheduleSave();
+  }
+
+  /**
+   * Debounced persist: coalesces bursts of messages into one disk write per
+   * second. Replaces the previous per-message synchronous write, which
+   * serialized the hot message path on every group chat.
+   */
+  private scheduleSave(): void {
+    if (this.saveTimer) return;
+    this.saveTimer = setTimeout(() => {
+      this.saveTimer = null;
+      try {
+        chatSummaryStore.save(this.store);
+      } catch {
+        // Never let persistence break message processing.
+      }
+    }, 1000);
   }
 
   private save(): void {
-    saveStore(this.store);
+    chatSummaryStore.save(this.store);
   }
 
   getTopKeywords(messages: ChatMessage[], limit = 6): TopKeyword[] {
@@ -242,6 +240,15 @@ export class ChatSummaryService {
     const key = cleanText(groupId);
     delete this.store.groups[key];
     this.save();
+  }
+
+  /** Flushes any pending debounced write (used by tests and graceful stop). */
+  flush(): void {
+    if (this.saveTimer) {
+      clearTimeout(this.saveTimer);
+      this.saveTimer = null;
+    }
+    chatSummaryStore.save(this.store);
   }
 }
 

@@ -7,6 +7,7 @@ import { welcomeService } from '@/services/system/WelcomeService.js';
 import { cacheManager } from '@/core/CacheManager.js';
 import { PermissionService } from '@/services/PermissionService.js';
 import { getBotJid } from '@/services/permission/JidService.js';
+import { antiArabService } from '@/services/moderation/AntiArabService.js';
 import { logger, logError } from '@/utils/logger.js';
 import { env } from '@/config/env.js';
 import { formatTimeRemaining } from '@/utils/helpers.js';
@@ -156,8 +157,44 @@ export class ClientEventHandlers {
           }
         }
       }
+
+      await this.handleAntiArab(sock, groupJid, action, participants);
     } catch (error) {
       logError('handleGroupUpdate', error);
+    }
+  }
+
+  /**
+   * Kicks newly added participants matching the per-group blocked country
+   * prefixes (AntiArab). Replaces the dead AntiArabMiddleware.onGroupParticipantUpdate
+   * that was never invoked from any pipeline.
+   */
+  private async handleAntiArab(
+    sock: WASocket,
+    groupJid: string,
+    action: string,
+    participants: BaileysEventMap['group-participants.update']['participants'],
+  ): Promise<void> {
+    if (action !== 'add') return;
+    if (!antiArabService.isEnabled(groupJid)) return;
+
+    const botNumber = (sock.user?.id || '').split('@')[0].replace(/[^\d]/g, '');
+
+    for (const participant of participants) {
+      const participantId = typeof participant === 'string' ? participant : participant.id || '';
+      if (!participantId) continue;
+
+      const number = participantId.replace(/@.*$/, '').replace(/[^\d]/g, '');
+      if (!number || number === botNumber) continue;
+
+      if (antiArabService.shouldBlockNumber(number)) {
+        try {
+          await sock.groupParticipantsUpdate(groupJid, [participantId], 'remove');
+          logger.info(`AntiArab: Usuario ${number} removido del grupo ${groupJid}`);
+        } catch (error) {
+          logger.error(`AntiArab: Error al remover usuario ${number}`, error);
+        }
+      }
     }
   }
 
