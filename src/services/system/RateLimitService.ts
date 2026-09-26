@@ -19,6 +19,8 @@ export interface RateLimitResult {
 interface GroupTracker {
   messages: number[];
   warnings: number;
+  /** Last time a warning was issued; drives warning decay. */
+  lastWarningAt: number;
 }
 
 interface UserTracker {
@@ -27,6 +29,9 @@ interface UserTracker {
 }
 
 export class RateLimitService {
+  /** Quiet time before a group's accumulated warnings are reset. */
+  private static readonly WARNING_DECAY_MS = 10 * 60 * 1000;
+
   private groupTrackers = new Map<string, GroupTracker>();
   private userTrackers = new Map<string, UserTracker>();
   private readonly config = config.rateLimit;
@@ -48,15 +53,18 @@ export class RateLimitService {
 
     let tracker = this.groupTrackers.get(groupJid);
     if (!tracker) {
-      tracker = { messages: [], warnings: 0 };
+      tracker = { messages: [], warnings: 0, lastWarningAt: 0 };
       this.groupTrackers.set(groupJid, tracker);
     }
+
+    this.decayWarnings(groupJid);
 
     tracker.messages = tracker.messages.filter(time => now - time < windowMs);
     tracker.messages.push(now);
 
     if (tracker.messages.length > maxMessages) {
       tracker.warnings++;
+      tracker.lastWarningAt = now;
 
       if (tracker.warnings === 1) {
         return {
@@ -121,6 +129,23 @@ export class RateLimitService {
 
     tracker.messages.push(now);
     return { allowed: true };
+  }
+
+  /**
+   * Resets a group's accumulated warnings after WARNING_DECAY_MS of quiet
+   * time since the last warning. Mirrors the decay in AntiSpamMiddleware:
+   * without it a once-active group could stay at "⛔ bloqueado" forever,
+   * because the cleanup pass kept the tracker alive while warnings > 0.
+   */
+  private decayWarnings(groupJid: string): void {
+    const tracker = this.groupTrackers.get(groupJid);
+    if (!tracker) return;
+    if (
+      tracker.warnings > 0 &&
+      Date.now() - tracker.lastWarningAt > RateLimitService.WARNING_DECAY_MS
+    ) {
+      tracker.warnings = 0;
+    }
   }
 
   isGroupWhitelisted(groupJid: string): boolean {
@@ -213,8 +238,9 @@ export class RateLimitService {
       const maxAge = 5 * 60 * 1000;
 
       for (const [groupJid, tracker] of this.groupTrackers.entries()) {
+        this.decayWarnings(groupJid);
         tracker.messages = tracker.messages.filter(time => now - time < maxAge);
-        if (tracker.messages.length === 0 && tracker.warnings === 0) {
+        if (tracker.messages.length === 0) {
           this.groupTrackers.delete(groupJid);
         }
       }

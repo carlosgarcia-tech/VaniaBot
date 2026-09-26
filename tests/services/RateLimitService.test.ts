@@ -149,6 +149,55 @@ describe('RateLimitService', () => {
     });
   });
 
+  describe('group warning decay', () => {
+    it('resets warnings after the decay window so the group is not stuck blocked', () => {
+      const groupJid = 'decay@g.us';
+      vi.useFakeTimers();
+
+      try {
+        // Push the group past its limit to accumulate warnings.
+        for (let i = 0; i < 35; i++) {
+          service.checkGroupRateLimit(groupJid);
+        }
+        expect(service.getGroupStats(groupJid).warnings).toBeGreaterThan(0);
+
+        // Quiet period longer than WARNING_DECAY_MS (10 minutes).
+        vi.advanceTimersByTime(10 * 60 * 1000 + 1000);
+
+        // Next check triggers the decay; the group starts counting from zero,
+        // so a single message after the quiet period is allowed again.
+        const result = service.checkGroupRateLimit(groupJid);
+        expect(result.allowed).toBe(true);
+        expect(service.getGroupStats(groupJid).warnings).toBe(0);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('keeps warnings while the group keeps misbehaving', () => {
+      const groupJid = 'nodecay@g.us';
+      vi.useFakeTimers();
+
+      try {
+        for (let i = 0; i < 35; i++) {
+          service.checkGroupRateLimit(groupJid);
+        }
+        const warningsBefore = service.getGroupStats(groupJid).warnings;
+        expect(warningsBefore).toBeGreaterThan(0);
+
+        // Still misbehaving right before the decay window elapses.
+        vi.advanceTimersByTime(9 * 60 * 1000);
+        for (let i = 0; i < 35; i++) {
+          service.checkGroupRateLimit(groupJid);
+        }
+
+        expect(service.getGroupStats(groupJid).warnings).toBeGreaterThanOrEqual(warningsBefore);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+
   describe('flood warning throttling', () => {
     it('warns at most once per 5s window while a flood persists', () => {
       const userJid = 'flooder@test.com';
