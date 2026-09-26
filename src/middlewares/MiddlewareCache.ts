@@ -55,17 +55,11 @@ export class MiddlewareCache {
 export class MiddlewareCacheManager {
   private static instance: MiddlewareCacheManager;
 
-  readonly groupEnabled: MiddlewareCache;
   readonly userMuted: MiddlewareCache;
   readonly userPermissions: MiddlewareCache;
   readonly onlyAdminMode: MiddlewareCache;
 
   private constructor() {
-    this.groupEnabled = new MiddlewareCache({
-      maxSize: 200,
-      ttlMs: 30 * 1000,
-    });
-
     this.userMuted = new MiddlewareCache({
       maxSize: 500,
       ttlMs: 24 * 60 * 60 * 1000,
@@ -90,7 +84,6 @@ export class MiddlewareCacheManager {
   }
 
   invalidateGroup(groupJid: string): void {
-    this.groupEnabled.invalidateByPrefix(groupJid + ':');
     this.onlyAdminMode.invalidateByPrefix(groupJid + ':');
   }
 
@@ -100,7 +93,6 @@ export class MiddlewareCacheManager {
   }
 
   invalidateAll(): void {
-    this.groupEnabled.clear();
     this.userMuted.clear();
     this.userPermissions.clear();
     this.onlyAdminMode.clear();
