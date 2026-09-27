@@ -257,18 +257,3 @@ export type RightType<T> = T extends Either<infer _L, infer R> ? R : never;
  * Unwrap the Left type from Either
  */
 export type LeftType<T> = T extends Either<infer L, infer _R> ? L : never;
-
-/**
- * @deprecated Use Either<L, R> directly
- */
-export type Result<L, R> = Either<L, R>;
-
-/**
- * @deprecated Use left(value)
- */
-export const fail = left;
-
-/**
- * @deprecated Use right(value)
- */
-export const success = right;
