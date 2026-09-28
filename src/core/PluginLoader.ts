@@ -39,6 +39,9 @@ type CommandConstructor = new () => MaybeCommand;
 function isCommandClass(value: unknown): value is CommandConstructor {
   return (
     typeof value === 'function' &&
+    // Clases con parámetros obligatorios en el constructor (p. ej. ListaCommand)
+    // no pueden instanciarse sin config: el loader solo usa clases sin args.
+    (value as CommandConstructor).length === 0 &&
     typeof (value as CommandConstructor).prototype?.execute === 'function'
   );
 }

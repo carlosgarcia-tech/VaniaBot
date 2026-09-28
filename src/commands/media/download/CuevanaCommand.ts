@@ -22,7 +22,7 @@ export class CuevanaCommand extends Command {
   name = 'cuevana';
   description = 'Busca y descarga películas/series de Cuevana';
   category = CommandCategory.MEDIA;
-  aliases = ['cv', 'pelicula', 'serie'];
+  aliases = ['cv', 'cuevana', 'serie'];
   usage = '!cv <título>';
   examples = ['!cv avatar', '!cv rick and morty'];
   cooldown = 30000;

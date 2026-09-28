@@ -13,7 +13,7 @@ export class LogsCommand extends Command {
   description = 'Ver los últimos logs del bot';
   category = CommandCategory.OWNER;
   permissions = { user: [PermissionLevel.OWNER] };
-  aliases = ['log', 'registro'];
+  aliases = ['log', 'logs'];
   usage = '!logs [número]';
   examples = ['!logs', '!logs 50'];
   cooldown = 30000;

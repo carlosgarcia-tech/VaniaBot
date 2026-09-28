@@ -12,7 +12,7 @@ export class SpotifyCommand extends Command {
   name = 'spotify';
   description = 'Descarga música de Spotify';
   category = CommandCategory.MEDIA;
-  aliases = ['sp', 'spotdl'];
+  aliases = ['sp', 'spotdl', 'spotifydl'];
   cooldown = 60000;
   contexts = [CommandContext.BOTH];
   usage = '!spotify <url>';

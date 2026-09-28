@@ -8,7 +8,7 @@ export class TakeCommand extends Command {
   name = 'take';
   description = 'Change sticker pack name and author';
   category = CommandCategory.MEDIA;
-  aliases = ['steal', 'wm', 'robar'];
+  aliases = ['tomar', 'robarsticker'];
   usage = '!take <packname>|<author>';
   examples = ['!take VaniaBot|Carlos', '!take MyPack|MyName'];
   cooldown = 3000;

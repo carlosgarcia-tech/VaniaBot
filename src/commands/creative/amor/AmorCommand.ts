@@ -23,7 +23,7 @@ export class AmorCommand extends Command {
   name = 'amor';
   description = 'Genera mensajes de amor románticos';
   category = CommandCategory.FUN;
-  aliases = ['love', 'romance', 'romantico', 'enamorar'];
+  aliases = ['romance', 'romantico', 'enamorar'];
   cooldown = 8000;
   contexts = [CommandContext.BOTH];
   usage = '!amor [tipo] [para:nombre]';

@@ -54,7 +54,7 @@ export class TraductorCommand extends Command {
   name = 'traducir';
   description = 'Traductor contextual inteligente — detecta idioma y preserva tono';
   category = CommandCategory.UTILITY;
-  aliases = ['translate', 'trad', 'tr', 'traducir'];
+  aliases = ['translate', 'trad', 'tr'];
   cooldown = 4000;
   contexts = [CommandContext.BOTH];
   usage = '!tr [idioma] [texto] | !tr [origen]>[destino] [texto] | !tr idiomas';

@@ -12,7 +12,7 @@ export class StickerRandomCommand extends Command {
   name = 'stickerrandom';
   description = 'Genera un sticker meme aleatorio';
   category = CommandCategory.FUN;
-  aliases = ['stickerandom', 'randsticker', 'randsticker', 'memesticker'];
+  aliases = ['stickerandom', 'randsticker', 'memesticker'];
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!stickerrandom';

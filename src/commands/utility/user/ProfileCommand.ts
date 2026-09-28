@@ -28,7 +28,7 @@ export class ProfileCommand extends Command {
   description = 'Show user profile';
   category = CommandCategory.UTILITY;
   requiresRegistration = true;
-  aliases = ['perfil', 'me', 'stats'];
+  aliases = ['perfil', 'me'];
   usage = '!profile [@user]';
   examples = ['!profile', '!profile @user', '!me'];
   private static logoBuffer: Buffer | null = null;

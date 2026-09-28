@@ -9,10 +9,10 @@ import {
 } from '@/types/index.js';
 
 export class SpotifySearchCommand extends Command {
-  name = 'spotify';
+  name = 'spotifysrc';
   description = 'Busca canciones en Spotify';
   category = CommandCategory.ANIME;
-  aliases = ['spotify'];
+  aliases = ['spotifysrc'];
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!spotify <busqueda>';
@@ -23,7 +23,7 @@ export class SpotifySearchCommand extends Command {
     const query = ctx.args?.join(' ').trim();
 
     if (!query) {
-      await ctx.reply('✍️ *Uso:* !spotify <busqueda>\n_Ejemplo: !spotify despacito');
+      await ctx.reply('✍️ *Uso:* !spotifysrc <busqueda>\n_Ejemplo: !spotifysrc despacito');
       return;
     }
 

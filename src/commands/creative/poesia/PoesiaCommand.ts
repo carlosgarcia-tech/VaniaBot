@@ -72,7 +72,7 @@ export class FrasesCommand extends Command {
   name = 'frases';
   description = 'Genera 5 frases hermosas sobre un tema';
   category = CommandCategory.FUN;
-  aliases = ['frase', 'cita', 'quote', 'quotes'];
+  aliases = ['frase', 'cita', 'quotes'];
   cooldown = 5000;
   contexts = [CommandContext.BOTH];
   usage = '!frases [tema] [estilo]';
@@ -249,7 +249,7 @@ export class PoesiaMenuCommand extends Command {
   name = 'poesia';
   description = 'Menú del sistema de poesía y contenido creativo';
   category = CommandCategory.FUN;
-  aliases = ['poetry', 'amor', 'love', 'creative'];
+  aliases = ['poetry', 'amor', 'enamorado', 'creative'];
   cooldown = 3000;
   contexts = [CommandContext.BOTH];
   usage = '!poesia';

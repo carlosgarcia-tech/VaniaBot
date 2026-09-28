@@ -14,7 +14,7 @@ export class MetricsCommand extends Command {
   description = 'Muestra métricas y estadísticas del bot';
   category = CommandCategory.OWNER;
   permissions = { user: [PermissionLevel.OWNER] };
-  aliases = ['metricas', 'statsbot', 'botstats'];
+  aliases = ['metricas', 'botstats'];
   usage = '!metrics';
   examples = ['!metrics'];
   cooldown = 15000;

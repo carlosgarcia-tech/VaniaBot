@@ -7,7 +7,7 @@ export class VerCommand extends Command {
   name = 'ver';
   description = 'Envía una imagen del chat como imagen normal';
   category = CommandCategory.UTILITY;
-  aliases = ['imagen', 'img', 'verimagen', 'image', 'reenviar'];
+  aliases = ['img', 'verimagen', 'image', 'reenviar'];
   usage = '!ver (responder a una imagen)';
   examples = ['!ver (responder a una imagen)'];
   cooldown = 5000;

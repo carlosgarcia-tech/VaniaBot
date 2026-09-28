@@ -12,7 +12,7 @@ export class TTSCommand extends Command {
   name = 'tts';
   description = 'Convierte texto a voz';
   category = CommandCategory.FUN;
-  aliases = ['speak', 'say', 'hablar', 'voz'];
+  aliases = ['speak', 'say', 'hablar', 'ttsvoz'];
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!tts <texto>';

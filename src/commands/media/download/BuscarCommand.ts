@@ -15,7 +15,7 @@ export class BuscarCommand extends Command {
   name = 'buscar';
   description = 'Busca en la web';
   category = CommandCategory.MEDIA;
-  aliases = ['search', 'google', 'g'];
+  aliases = ['search', 'buscar', 'g'];
   usage = '!buscar <consulta>';
   examples = ['!buscar Node.js tutorial', '!search whatsapp bot'];
   cooldown = 10000;

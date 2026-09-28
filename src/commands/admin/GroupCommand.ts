@@ -16,7 +16,7 @@ export class GroupCommand extends Command {
   name = 'group';
   description = 'Administrar configuración del grupo';
   category = CommandCategory.ADMIN;
-  aliases = ['grupo', 'chat'];
+  aliases = ['grupo', 'grupoconfig'];
   usage = '.group [lock/unlock/info/settings]';
   examples = ['.group lock', '.group unlock', '.group info', '.group settings'];
   contexts = [CommandContext.GROUP];
@@ -121,28 +121,6 @@ export class GroupCommand extends Command {
     message += `*• .group settings* - Ver configuración actual\n`;
 
     await ctx.reply(message);
-  }
-}
-
-export class LinkCommand extends Command {
-  name = 'link';
-  description = 'Obtener enlace de invitación del grupo';
-  category = CommandCategory.ADMIN;
-  aliases = ['invitelink', 'grouplink'];
-  contexts = [CommandContext.GROUP];
-  permissions = {
-    user: [PermissionLevel.ADMIN],
-  };
-
-  async execute(ctx: MessageContext): Promise<void> {
-    try {
-      const inviteCode = await ctx.sock.groupInviteCode(ctx.chat.jid);
-      const link = `https://chat.whatsapp.com/${inviteCode}`;
-
-      await ctx.reply(`*🔗 Enlace del grupo:*\n\n${link}`);
-    } catch {
-      await ctx.reply('❌ Error al obtener enlace. Verifica que soy admin.');
-    }
   }
 }
 

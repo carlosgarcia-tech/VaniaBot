@@ -12,10 +12,10 @@ interface TranslationResponse {
 }
 
 export class TranslateCommand extends Command {
-  name = 'traducir';
+  name = 'traducirsimple';
   description = 'Traduce texto a cualquier idioma.';
   category = CommandCategory.UTILITY;
-  aliases = ['translate', 'trad', 'tr'];
+  aliases = ['traducir', 'tsimple'];
   usage = '!traducir <idioma> <texto> | responde un mensaje con !traducir <idioma>';
   examples = [
     '!traducir en Hola mundo',

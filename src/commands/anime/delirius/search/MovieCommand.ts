@@ -12,7 +12,7 @@ export class MovieCommand extends Command {
   name = 'movie';
   description = 'Busca información de películas';
   category = CommandCategory.ANIME;
-  aliases = ['movie', 'pelicula'];
+  aliases = ['movies', 'peliculasrc'];
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!movie <pelicula>';

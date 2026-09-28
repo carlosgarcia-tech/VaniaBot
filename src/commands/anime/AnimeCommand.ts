@@ -62,7 +62,7 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
   {
     name: 'hneko',
     description: 'Obtiene una imagen aleatoria de hneko NSFW',
-    aliases: ['hneko', 'hnekonsfw', 'nekonsfw'],
+    aliases: ['hneko', 'hnekonsfw'],
     react: '😺',
     endpoint: 'hneko',
     service: 'animebase',

@@ -8,7 +8,7 @@ export class ImagenCommand extends Command {
   name = 'imagen';
   description = 'Busca imágenes en alta calidad';
   category = CommandCategory.MEDIA;
-  aliases = ['imagen', 'image', 'img', 'foto'];
+  aliases = ['imagen', 'foto'];
   usage = '!imagen <búsqueda>';
   examples = ['!imagen atardecer hermoso', '!imagen gato divertido', '!imagen paisaje montañas'];
   cooldown = 10000;

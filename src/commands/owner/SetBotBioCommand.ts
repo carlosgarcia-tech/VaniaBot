@@ -6,7 +6,7 @@ export class SetBotBioCommand extends Command {
   name = 'setbotbio';
   description = 'Cambia el estado/bio del bot';
   category = CommandCategory.OWNER;
-  aliases = ['botbio', 'setbio', 'botstatus'];
+  aliases = ['botbio', 'setbio', 'biodat'];
   usage = '!setbotbio <texto>';
   examples = ['!setbotbio 🌸 Tu bot favorito', '!setbotbio Online 24/7'];
   permissions = {

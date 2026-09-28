@@ -8,7 +8,7 @@ export class WikipediaCommand extends Command {
   name = 'wikipedia';
   description = 'Buscar en Wikipedia';
   category = CommandCategory.UTILITY;
-  aliases = ['wiki', 'wikipedia'];
+  aliases = ['wikipedia', 'wikipediab'];
   usage = '.wikipedia <tema>';
   examples = ['.wikipedia TypeScript', '.wikipedia WhatsApp'];
   contexts = [CommandContext.BOTH];

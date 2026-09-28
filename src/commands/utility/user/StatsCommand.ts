@@ -29,12 +29,12 @@ interface CacheStats {
 }
 
 export class StatsCommand extends Command {
-  name = 'stats';
+  name = 'botinfo';
   description = 'Displays real-time bot statistics';
   category = CommandCategory.UTILITY;
   requiresRegistration = true;
-  aliases = ['status'];
-  usage = '!stats';
+  aliases = ['infobot'];
+  usage = '!botinfo';
   permissions = {
     user: [PermissionLevel.OWNER],
   };

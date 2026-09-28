@@ -9,17 +9,17 @@ import path from 'path';
 import fs from 'fs';
 
 export class PatCommand extends Command {
-  name = 'pat';
+  name = 'patsticker';
   description = 'Create a Patrick meme sticker';
   category = CommandCategory.MEDIA;
-  aliases = ['patrick'];
-  usage = '!pat <text>';
-  examples = ['!pat Hello 🤣', '!pat This is funny'];
+  aliases = ['patmeme'];
+  usage = '!patsticker <text>';
+  examples = ['!patsticker Hello 🤣', '!patsticker This is funny'];
   cooldown = 5000;
 
   async execute(ctx: MessageContext): Promise<void> {
     if (!ctx.args.length) {
-      await ctx.reply('⚠️ Escribe algo después de .pat\nEjemplo: *!pat Hola 🤣*');
+      await ctx.reply('⚠️ Escribe algo después de !patsticker\nEjemplo: *!patsticker Hola 🤣*');
       return;
     }
 

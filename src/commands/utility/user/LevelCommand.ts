@@ -8,7 +8,7 @@ export class LevelCommand extends Command {
   description = "Check your or someone else's level";
   category = CommandCategory.UTILITY;
   requiresRegistration = true;
-  aliases = ['lvl', 'rank', 'xp'];
+  aliases = ['lvl', 'nivel', 'xp'];
   usage = '!level [@user]';
   examples = ['!level', '!level @user', '!lvl'];
   cooldown = 3000;

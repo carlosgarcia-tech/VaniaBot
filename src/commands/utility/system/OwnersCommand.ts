@@ -8,7 +8,7 @@ export class OwnersCommand extends Command {
   name = 'owners';
   description = 'Muestra la lista de owners del bot';
   category = CommandCategory.UTILITY;
-  aliases = ['propietarios', 'dueños', 'admins'];
+  aliases = ['propietarios', 'dueños', 'adminslist'];
   usage = '!owners';
   examples = ['!owners'];
 

@@ -7,7 +7,7 @@ export class MarketCommand extends Command {
   description = 'Ver el mercado de items';
   category = CommandCategory.RPG;
   requiresRegistration = true;
-  aliases = ['mercado', 'shop'];
+  aliases = ['rpgmarket', 'markets'];
   usage = '!market [pagina] | !market my';
   examples = ['!market', '!market 2', '!market my'];
 

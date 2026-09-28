@@ -9,10 +9,10 @@ import {
 } from '@/types/index.js';
 
 export class PinterestCommand extends Command {
-  name = 'pinterest';
+  name = 'pinterestsrc';
   description = 'Busca imágenes en Pinterest';
   category = CommandCategory.ANIME;
-  aliases = ['pinterest', 'pin'];
+  aliases = ['pinterestsrc'];
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!pinterest <busqueda>';
@@ -23,7 +23,7 @@ export class PinterestCommand extends Command {
     const query = ctx.args?.join(' ').trim();
 
     if (!query) {
-      await ctx.reply('✍️ *Uso:* !pinterest <busqueda>\n_Ejemplo: !pinterest gatos');
+      await ctx.reply('✍️ *Uso:* !pinterestsrc <busqueda>\n_Ejemplo: !pinterestsrc gatos');
       return;
     }
 

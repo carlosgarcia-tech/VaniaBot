@@ -132,7 +132,7 @@ export class TranscribeCommand extends Command {
   name = 'transcribe';
   description = 'Transcribe audio/notas de voz a texto con IA, compresión y resumen';
   category = CommandCategory.UTILITY;
-  aliases = ['voz', 'voice', 'stt', 'texto', 'audio'];
+  aliases = ['voz', 'voice', 'stt', 'texto'];
   usage = '!transcribe [resumen|completo|idioma]';
   examples = [
     '!transcribe  (enviando una nota de voz)',

@@ -8,7 +8,7 @@ export class QuestCommand extends Command {
   description = 'Muestra las misiones disponibles';
   category = CommandCategory.RPG;
   requiresRegistration = true;
-  aliases = ['quests', 'mision', 'misiones', 'missions'];
+  aliases = ['quest', 'misionrpg', 'missions'];
   usage = '!quest [info | daily | main | side]';
   examples = ['!quest', '!quest daily', '!quest main', '!quest info nombre'];
 

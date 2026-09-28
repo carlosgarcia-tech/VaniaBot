@@ -9,7 +9,7 @@ import {
 } from '@/types/index.js';
 
 export class ShipCommand extends Command {
-  name = 'ship';
+  name = 'shipsrc';
   description = 'Genera imagen de ship';
   category = CommandCategory.CREATIVE;
   aliases = [];

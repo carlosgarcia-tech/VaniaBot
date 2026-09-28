@@ -10,12 +10,12 @@ import { logger } from '@/utils/logger.js';
 const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-gitclone');
 
 export class GitCloneCommand extends Command {
-  name = 'gitclone';
+  name = 'gitclon';
   description = 'Clonar repositorio de GitHub';
   category = CommandCategory.MEDIA;
-  aliases = ['gitclone', 'clone'];
-  usage = '!gitclone <URL>';
-  examples = ['!gitclone https://github.com/username/repo'];
+  aliases = ['clone', 'clonar'];
+  usage = '!gitclon <URL>';
+  examples = ['!gitclon https://github.com/username/repo'];
   cooldown = 60_000;
 
   async execute(ctx: MessageContext): Promise<void> {
@@ -24,8 +24,8 @@ export class GitCloneCommand extends Command {
     if (!url) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *falta la URL* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!gitclone* <URL de GitHub>\n` +
-          `✩ ejemplo: *!gitclone https://github.com/username/repo* ✩`,
+          `✿ *!gitclon* <URL de GitHub>\n` +
+          `✩ ejemplo: *!gitclon https://github.com/username/repo* ✩`,
       );
       return;
     }

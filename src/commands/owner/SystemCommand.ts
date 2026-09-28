@@ -141,7 +141,7 @@ export class SystemStatsCommand extends Command {
   name = 'sysstats';
   description = 'Ver estadísticas del sistema';
   category = CommandCategory.OWNER;
-  aliases = ['systemstats', 'sysinfo'];
+  aliases = ['systemstats', 'sysstatsinfo'];
   permissions = {
     user: [PermissionLevel.OWNER],
   };

@@ -16,7 +16,7 @@ export class PromoteCommand extends Command {
   name = 'promote';
   description = 'Promote a user to admin';
   category = CommandCategory.MODERATION;
-  aliases = ['promover', 'admin'];
+  aliases = ['promover', 'daradmin'];
   usage = '!promote @user';
   examples = ['!promote @user'];
   contexts = [CommandContext.GROUP];

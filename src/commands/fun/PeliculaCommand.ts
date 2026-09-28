@@ -14,7 +14,7 @@ export class PeliculaCommand extends Command {
   name = 'pelicula';
   description = 'Recomienda una película';
   category = CommandCategory.FUN;
-  aliases = ['pelirecomend', 'pelis', 'cine', 'movie'];
+  aliases = ['pelirecomend', 'pelis', 'cine'];
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!pelicula [género]';

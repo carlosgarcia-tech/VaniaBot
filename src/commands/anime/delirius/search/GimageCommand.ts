@@ -12,7 +12,7 @@ export class GimageCommand extends Command {
   name = 'gimage';
   description = 'Busca imágenes en Google';
   category = CommandCategory.ANIME;
-  aliases = ['gimage', 'imagen'];
+  aliases = ['gimage', 'gimg'];
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!gimage <busqueda>';

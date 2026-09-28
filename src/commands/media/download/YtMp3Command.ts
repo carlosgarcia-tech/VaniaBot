@@ -30,7 +30,7 @@ export class YtMp3Command extends Command {
   name = 'ytmp3';
   description = 'Download YouTube audio as MP3';
   category = CommandCategory.MEDIA;
-  aliases = ['yta', 'ytaudio', 'play', 'audio'];
+  aliases = ['yta', 'ytaudio', 'play', 'playmp3'];
   usage = '!ytmp3 <search or URL>';
   examples = ['!ytmp3 bad bunny', '!ytmp3 https://youtu.be/dQw4w9WgXcQ'];
   cooldown = 30000;

@@ -12,7 +12,7 @@ export class WikiCommand extends Command {
   name = 'wiki';
   description = 'Busca en Wikipedia';
   category = CommandCategory.ANIME;
-  aliases = ['wiki', 'wikipedia'];
+  aliases = ['wiki', 'wikisrc'];
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!wiki <busqueda>';

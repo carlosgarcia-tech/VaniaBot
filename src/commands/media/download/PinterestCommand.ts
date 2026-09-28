@@ -15,7 +15,7 @@ export class PinterestCommand extends Command {
   name = 'pinterest';
   description = 'Descarga imágenes/videos de Pinterest';
   category = CommandCategory.MEDIA;
-  aliases = ['pin', 'pinterestdl'];
+  aliases = ['pin', 'pindl', 'pinterestdl'];
   usage = '!pin <url de pinterest>';
   examples = ['!pin https://pin.it/...'];
   cooldown = 60000;

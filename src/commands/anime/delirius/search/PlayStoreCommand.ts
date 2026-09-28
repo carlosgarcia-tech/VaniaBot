@@ -12,7 +12,7 @@ export class PlayStoreCommand extends Command {
   name = 'playstore';
   description = 'Busca aplicaciones en Google Play Store';
   category = CommandCategory.ANIME;
-  aliases = ['playstore', 'app'];
+  aliases = ['playstore'];
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!playstore <app>';
