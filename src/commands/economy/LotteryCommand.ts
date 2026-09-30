@@ -1,4 +1,5 @@
 import path from 'path';
+import { randomBytes } from 'crypto';
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -79,7 +80,8 @@ function persistLotteryState(): void {
 }
 
 function generateTicketNumber(): string {
-  return Math.random().toString().substring(2, 7).toUpperCase();
+  // 5 caracteres hexadecimales (16^5 combinaciones) generados con CSPRNG
+  return randomBytes(3).toString('hex').toUpperCase().slice(0, 5);
 }
 
 export class LotteryCommand extends Command {

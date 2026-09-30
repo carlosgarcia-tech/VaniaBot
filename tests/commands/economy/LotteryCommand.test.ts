@@ -403,4 +403,19 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('0/100');
     expect(lastReply(ctx)).toContain('No tienes tickets');
   });
+
+  it('los números de ticket se generan con crypto: 5 hexadecimales en mayúsculas', async () => {
+    (await mockUserService.getUser(USER)).money = 10_000;
+
+    const ctx = makeCtx({ args: ['comprar', '10'] });
+    await command.execute(ctx);
+
+    const tickets = rawState()['tickets'] as Array<{ number: string }>;
+    expect(tickets).toHaveLength(10);
+    const numbers = new Set(tickets.map(t => t.number));
+    expect(numbers.size).toBe(10); // sin colisiones
+    for (const number of numbers) {
+      expect(number).toMatch(/^[0-9A-F]{5}$/);
+    }
+  });
 });
