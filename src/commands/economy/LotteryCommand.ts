@@ -91,7 +91,7 @@ export class LotteryCommand extends Command {
   requiresRegistration = true;
   aliases = ['lottery', 'ticket', 'sorteo'];
   usage = '!loteria [comprar|estado|resultado|reiniciar]';
-  examples = ['!loteria comprar 5', '!loteria estado'];
+  examples = ['!loteria comprar 5', '!loteria estado', '!loteria reiniciar'];
   cooldown = 5000;
 
   async execute(ctx: MessageContext): Promise<void> {
@@ -131,7 +131,8 @@ export class LotteryCommand extends Command {
             `💰 *Premio:* 80% del pozo total\n\n` +
             `🎮 *Comandos:*\n\n` +
             `• !loteria comprar [cantidad]\n` +
-            `• !loteria estado\n\n` +
+            `• !loteria estado\n` +
+            `• !loteria reiniciar (owner)\n\n` +
             `💵 *Precio por ticket:* $${LOTTERY_CONFIG.ticketPrice.toLocaleString()}`,
         );
     }

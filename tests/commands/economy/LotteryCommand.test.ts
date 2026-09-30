@@ -174,6 +174,7 @@ describe('LotteryCommand', () => {
 
     expect(lastReply(ctx)).toContain('LOTERÍA VANIA');
     expect(lastReply(ctx)).toContain('Cómo funciona');
+    expect(lastReply(ctx)).toContain('!loteria reiniciar (owner)');
   });
 
   it('compra válida: cobra, emite tickets, suma al pozo y persiste', async () => {
