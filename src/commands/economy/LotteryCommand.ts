@@ -47,12 +47,13 @@ export class LotteryCommand extends Command {
 
   async execute(ctx: MessageContext): Promise<void> {
     const action = ctx.args[0]?.toLowerCase() || 'estado';
-    const amount = parseInt(ctx.args[1]) || 1;
+    // Solo el valor omitido defaultea a 1: un '0' explícito se rechaza abajo
+    const parsedAmount = parseInt(ctx.args[1]);
+    const amount = Number.isNaN(parsedAmount) ? 1 : parsedAmount;
 
     switch (action) {
       case 'comprar':
       case 'buy':
-      case 'comprar':
         await this.buyTickets(ctx, amount);
         break;
       case 'estado':
@@ -114,7 +115,10 @@ export class LotteryCommand extends Command {
       );
     }
 
-    await serviceManager.userService.removeMoney(ctx.sender.jid, totalCost);
+    // Solo se cobra lo efectivamente comprado: si quedaban menos slots
+    // libres que tickets pedidos, cobrar el total perdería dinero del usuario.
+    const actualCost = ticketsToBuy * LOTTERY_CONFIG.ticketPrice;
+    await serviceManager.userService.removeMoney(ctx.sender.jid, actualCost);
 
     const purchasedTickets: string[] = [];
     for (let i = 0; i < ticketsToBuy; i++) {
@@ -132,13 +136,13 @@ export class LotteryCommand extends Command {
       purchasedTickets.push(ticketNumber);
     }
 
-    lotteryState.prizePool += totalCost * LOTTERY_CONFIG.prizeMultiplier;
+    lotteryState.prizePool += actualCost * LOTTERY_CONFIG.prizeMultiplier;
 
     const timeUntilDraw = this.getTimeUntilDraw();
     await ctx.reply(
       `🎫 *TICKETS COMPRADOS* 🎫\n\n` +
         `✨ *Tickets:* ${purchasedTickets.map(t => `\`${t}\``).join(', ')}\n\n` +
-        `💰 *Costo:* $${formatNumber(totalCost)}\n` +
+        `💰 *Costo:* $${formatNumber(actualCost)}\n` +
         `💎 *Pozo:* $${formatNumber(lotteryState.prizePool)}\n\n` +
         `⏰ *Sorteo en:* ${timeUntilDraw}\n\n` +
         `📊 *Tiquetes vendidos:* ${lotteryState.tickets.length}/${LOTTERY_CONFIG.maxTickets}`,
