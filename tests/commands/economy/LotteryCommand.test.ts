@@ -4,9 +4,10 @@
  * Unit tests for the lottery command: default action, buying tickets
  * (valid, invalid amount, insufficient funds, sold out, partial purchase
  * when slots run out mid-buy), status view with/without tickets and the
- * owner-only draw that pays the winner and resets the pool. Also covers
- * the persistence layer: state survives a "restart" (reload from the
- * mocked store) and corrupt files fall back to defaults.
+ * owner-only draw that pays the winner and resets the pool, plus the
+ * owner-only reset that discards tickets and pool without paying anyone.
+ * Also covers the persistence layer: state survives a "restart" (reload
+ * from the mocked store) and corrupt files fall back to defaults.
  *
  * JsonFileStore is mocked in-memory so no real data/ files are touched.
  *
@@ -127,6 +128,16 @@ async function drawAsOwner(): Promise<void> {
       sender: { jid: 'owner@test.com', pushName: 'Owner', isOwner: true, isAdmin: true },
     } as Partial<MessageContext>),
   );
+}
+
+/** Runs the owner-only reset and returns the ctx so tests can inspect the reply. */
+async function resetAsOwner(action: 'reiniciar' | 'reset' = 'reiniciar'): Promise<MessageContext> {
+  const ctx = makeCtx({
+    args: [action],
+    sender: { jid: 'owner@test.com', pushName: 'Owner', isOwner: true, isAdmin: true },
+  } as Partial<MessageContext>);
+  await new LotteryCommand().execute(ctx);
+  return ctx;
 }
 
 // --- Tests -----------------------------------------------------------------
@@ -339,5 +350,57 @@ describe('LotteryCommand', () => {
 
     expect(lastReply(ctx)).toContain('0/100');
     expect(lastReply(ctx)).toContain('$0'); // pozo saneado a 0
+  });
+
+  it('reiniciar del owner vacía tickets y pozo sin pagar a nadie', async () => {
+    (await mockUserService.getUser(USER)).money = 10_000;
+    await command.execute(makeCtx({ args: ['comprar', '3'] }));
+    mockUserService.addMoney.mockClear();
+
+    const ctx = await resetAsOwner();
+
+    expect(lastReply(ctx)).toContain('SORTEO REINICIADO');
+    expect(lastReply(ctx)).toContain('3'); // 3 tickets eliminados
+    expect(mockUserService.addMoney).not.toHaveBeenCalled();
+
+    // Estado reseteado y persistido
+    expect(rawState()['tickets']).toHaveLength(0);
+    expect(rawState()['prizePool']).toBe(0);
+    expect(rawState()['lastDraw']).toBeGreaterThan(0);
+  });
+
+  it('reiniciar por no-owner es ignorado', async () => {
+    (await mockUserService.getUser(USER)).money = 10_000;
+    await command.execute(makeCtx({ args: ['comprar', '2'] }));
+
+    const ctx = makeCtx({ args: ['reiniciar'] });
+    await command.execute(ctx);
+
+    expect(ctx.reply).not.toHaveBeenCalled();
+    expect(rawState()['tickets']).toHaveLength(2);
+    expect(rawState()['prizePool']).toBe(1600);
+  });
+
+  it('reiniciar acepta el alias reset y funciona con la lotería vacía', async () => {
+    const ctx = await resetAsOwner('reset');
+
+    expect(lastReply(ctx)).toContain('SORTEO REINICIADO');
+    expect(rawState()['lastDraw']).toBeGreaterThan(0);
+  });
+
+  it('el reinicio persiste: un módulo recién cargado arranca limpio', async () => {
+    (await mockUserService.getUser(USER)).money = 10_000;
+    await command.execute(makeCtx({ args: ['comprar', '2'] }));
+
+    await resetAsOwner();
+
+    // Simula un reinicio del proceso: el nuevo lotteryState debe leer el
+    // estado ya reseteado desde el store persistido.
+    const fresh = await importCommandModule();
+    const ctx = makeCtx({ args: ['estado'] });
+    await new fresh.LotteryCommand().execute(ctx);
+
+    expect(lastReply(ctx)).toContain('0/100');
+    expect(lastReply(ctx)).toContain('No tienes tickets');
   });
 });

@@ -88,7 +88,7 @@ export class LotteryCommand extends Command {
   category = CommandCategory.ECONOMY;
   requiresRegistration = true;
   aliases = ['lottery', 'ticket', 'sorteo'];
-  usage = '!loteria [comprar|estado|resultado]';
+  usage = '!loteria [comprar|estado|resultado|reiniciar]';
   examples = ['!loteria comprar 5', '!loteria estado'];
   cooldown = 5000;
 
@@ -112,6 +112,12 @@ export class LotteryCommand extends Command {
       case 'draw':
         if (ctx.sender.isOwner) {
           await this.drawLottery(ctx);
+        }
+        break;
+      case 'reiniciar':
+      case 'reset':
+        if (ctx.sender.isOwner) {
+          await this.resetLottery(ctx);
         }
         break;
       default:
@@ -244,6 +250,24 @@ export class LotteryCommand extends Command {
     lotteryState.prizePool = 0;
     lotteryState.lastDraw = Date.now();
     persistLotteryState();
+  }
+
+  /** Owner-only: descarta tickets y pozo sin pagar y reinicia el ciclo del sorteo. */
+  private async resetLottery(ctx: MessageContext): Promise<void> {
+    const removedTickets = lotteryState.tickets.length;
+    const discardedPool = lotteryState.prizePool;
+
+    lotteryState.tickets = [];
+    lotteryState.prizePool = 0;
+    lotteryState.lastDraw = Date.now();
+    persistLotteryState();
+
+    await ctx.reply(
+      `🔄 *SORTEO REINICIADO* 🔄\n\n` +
+        `🗑️ *Tickets eliminados:* ${removedTickets}\n` +
+        `💎 *Pozo descartado:* $${formatNumber(discardedPool)}\n\n` +
+        `✿ *La lotería comienza de nuevo*`,
+    );
   }
 
   private getTimeUntilDraw(): string {
