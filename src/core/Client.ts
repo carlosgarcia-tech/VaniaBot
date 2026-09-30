@@ -143,7 +143,11 @@ export class WhatsAppClient {
             oldSock.ws.close(),
             new Promise(resolve => setTimeout(resolve, 1000)),
           ]);
-        } catch {}
+        } catch (error) {
+          // Cerrar el socket viejo es best-effort: si falla seguimos recreando,
+          // pero queda constancia en el log para diagnosticar conexiones zombi.
+          logger.warn('Failed to close old socket during recreate:', error);
+        }
       }
       const newSock = await this.authManager.createSocket();
       this.sock = newSock;

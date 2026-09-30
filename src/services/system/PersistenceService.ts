@@ -155,7 +155,13 @@ export class PersistenceService {
     for (const [id, reminder] of this.reminders) {
       data[id] = reminder;
     }
-    await this.db.set(this.DB_REMINDERS_KEY, 'data', data);
+    try {
+      await this.db.set(this.DB_REMINDERS_KEY, 'data', data);
+    } catch (error) {
+      // La mayoría de los call sites son fire-and-forget (`void`): capturar
+      // aquí evita unhandled rejections y deja rastro del fallo de disco.
+      logError('PersistenceService.saveReminders', error);
+    }
   }
 
   private async savePolls(): Promise<void> {
@@ -164,7 +170,11 @@ export class PersistenceService {
     for (const [chatJid, poll] of this.polls) {
       data[chatJid] = poll;
     }
-    await this.db.set(this.DB_POLLS_KEY, 'data', data);
+    try {
+      await this.db.set(this.DB_POLLS_KEY, 'data', data);
+    } catch (error) {
+      logError('PersistenceService.savePolls', error);
+    }
   }
 
   async saveLista(messageId: string, lista: ListaPersistida): Promise<void> {
@@ -198,7 +208,11 @@ export class PersistenceService {
     for (const [messageId, lista] of this.listas) {
       data[messageId] = lista;
     }
-    await this.db.set(this.DB_LISTAS_KEY, 'data', data);
+    try {
+      await this.db.set(this.DB_LISTAS_KEY, 'data', data);
+    } catch (error) {
+      logError('PersistenceService.persistListas', error);
+    }
   }
 
   private rescheduleReminders(): void {
@@ -298,7 +312,11 @@ export class PersistenceService {
               mentions: [reminder.userJid],
             });
           }
-        } catch {}
+        } catch (error) {
+          // El recordatorio se pierde si el envío falla, pero debe quedar
+          // registro: sin esto era un fallo 100% silencioso.
+          logError(`PersistenceService.sendReminder ${reminder.id}`, error);
+        }
         this.reminders.delete(reminder.id);
         this.reminderTimers.delete(reminder.id);
         void this.saveReminders();
