@@ -88,8 +88,10 @@ export class AntiArabService {
 
   addPrefix(groupId: string, prefix: string): void {
     const config = this.getOrCreateConfig(groupId);
-    const cleanPrefix = prefix.replace(/[^\d+]/g, '');
-    if (!config.prefixes.includes(cleanPrefix)) {
+    // Solo dígitos: shouldBlockNumber compara contra números normalizados sin '+',
+    // conservar el '+' haría el prefijo imposible de matchear
+    const cleanPrefix = prefix.replace(/[^\d]/g, '');
+    if (cleanPrefix && !config.prefixes.includes(cleanPrefix)) {
       config.prefixes.push(cleanPrefix);
       this.saveConfig(groupId, config);
     }
@@ -97,7 +99,7 @@ export class AntiArabService {
 
   removePrefix(groupId: string, prefix: string): boolean {
     const config = this.getOrCreateConfig(groupId);
-    const cleanPrefix = prefix.replace(/[^\d+]/g, '');
+    const cleanPrefix = prefix.replace(/[^\d]/g, '');
     const index = config.prefixes.indexOf(cleanPrefix);
     if (index !== -1) {
       config.prefixes.splice(index, 1);
