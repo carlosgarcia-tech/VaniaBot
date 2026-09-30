@@ -9,7 +9,7 @@ export class BlackMarketCommand extends Command {
   description = 'Mercado negro de items';
   category = CommandCategory.ECONOMY;
   requiresRegistration = true;
-  aliases = ['bm', 'mercado', 'tiendaoscura', 'blackmarket'];
+  aliases = ['bm', 'mercado', 'tiendaoscura'];
   usage = '!blackmarket [listar|comprar|cancelar]';
   examples = ['!blackmarket', '!blackmarket comprar id', '!blackmarket listar diamond 500'];
 
