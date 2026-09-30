@@ -222,7 +222,12 @@ export class StickerService {
     return new Promise(resolve => {
       const ffmpeg = spawn('ffmpeg', ['-version']);
       ffmpeg.on('close', code => resolve(code === 0));
-      ffmpeg.on('error', () => resolve(false));
+      ffmpeg.on('error', error => {
+        // checkFFmpeg devuelve false por diseño, pero el motivo (no existe,
+        // sin permisos) quedaba totalmente invisible.
+        logger.debug(`[StickerService] ffmpeg probe failed: ${error.message}`);
+        resolve(false);
+      });
     });
   }
 }

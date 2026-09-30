@@ -19,7 +19,7 @@ import { downloadMediaMessage } from 'baileys';
 import { cacheManager } from '@/core/CacheManager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { getContextInfo } from '@/utils/getContextInfo.js';
-import { logError } from '@/utils/logger.js';
+import { logError, logger } from '@/utils/logger.js';
 
 /** Timeout for downloading media (10 seconds) */
 const DOWNLOAD_TIMEOUT = 10000;
@@ -78,7 +78,8 @@ export class NotifyCommand extends Command {
         ),
       ]);
       return buffer as Buffer;
-    } catch {
+    } catch (error) {
+      logger.debug('[NotifyCommand] Media download failed/timed out:', error);
       return null;
     }
   }

@@ -10,7 +10,7 @@
  */
 
 import type { WASocket, proto } from 'baileys';
-import { logError } from '@/utils/logger.js';
+import { logError, logger } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
 interface AudioTrigger {
@@ -113,7 +113,10 @@ export async function handleAudioResponse(
     let groupSettings;
     try {
       groupSettings = await serviceManager.groupService.getGroup(chatJid);
-    } catch {
+    } catch (error) {
+      // Sin settings, la función de audios del grupo se desactiva para este
+      // mensaje sin ningún rastro: dejar constancia para diagnosticarlo.
+      logger.debug(`[AudioResponseHandler] getGroup(${chatJid}) failed, audios skipped:`, error);
       return;
     }
 

@@ -1,7 +1,7 @@
 import { Command } from '../../Command.js';
 import { quizService } from '@/services/study/QuizService.js';
 import { isRight } from '@/utils/either.js';
-import { logError } from '@/utils/logger.js';
+import { logError, logger } from '@/utils/logger.js';
 import { difficultyEngine } from '@/services/study/DifficultyEngine.js';
 import { QuizCategory, type UserQuizStats } from '@/services/study/QuizTypes.js';
 import {
@@ -130,7 +130,8 @@ export class QuizCommand extends Command {
       try {
         const user = (await serviceManager.userService.getUser(jid)) as UserWithQuizStats | null;
         return user?.quizStats ?? null;
-      } catch {
+      } catch (error) {
+        logger.debug(`[QuizCommand] getUserStats(${jid}) failed:`, error);
         return null;
       }
     };

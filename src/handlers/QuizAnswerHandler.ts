@@ -15,7 +15,7 @@
 import { quizService } from '@/services/study/QuizService.js';
 import { difficultyEngine } from '@/services/study/DifficultyEngine.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
-import { logError } from '@/utils/logger.js';
+import { logError, logger } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 import type { UserQuizStats } from '@/services/study/QuizTypes.js';
 import { QuizDifficulty } from '@/services/study/QuizTypes.js';
@@ -74,7 +74,10 @@ class QuizAnswerHandler {
       try {
         const user = (await serviceManager.userService.getUser(jid)) as UserWithQuizStats | null;
         return user?.quizStats ?? null;
-      } catch {
+      } catch (error) {
+        // El caller trata null como "sin stats previas": una lectura fallida
+        // degrada silenciosamente la respuesta. Debug, no ruido.
+        logger.debug(`[QuizAnswerHandler] getUserStats(${jid}) failed:`, error);
         return null;
       }
     };
