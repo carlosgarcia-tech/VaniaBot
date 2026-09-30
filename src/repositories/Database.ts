@@ -623,7 +623,9 @@ class DatabaseManager {
       writeFileSync(tmpPath, buffer);
       try {
         rmSync(dbPath, { force: true });
-      } catch {}
+      } catch (error) {
+        logger.debug(`[Database] Could not remove old db file before rename:`, error);
+      }
       renameSync(tmpPath, dbPath);
       this.dirty = false;
       logger.debug('💾 Database saved to disk');
@@ -632,7 +634,9 @@ class DatabaseManager {
       // Clean up the orphaned temp file if rename did not happen.
       try {
         if (existsSync(tmpPath)) rmSync(tmpPath, { force: true });
-      } catch {}
+      } catch (cleanupError) {
+        logger.debug(`[Database] Orphaned tmp cleanup failed:`, cleanupError);
+      }
     }
   }
 

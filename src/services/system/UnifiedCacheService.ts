@@ -64,7 +64,11 @@ export class UnifiedCacheService {
         if (result !== null) {
           return result;
         }
-      } catch {}
+      } catch (error) {
+        // Redis caído con redisReady=true: sin este log el fallo de capa
+        // era invisible (todo caía al fallback de memoria en silencio).
+        logger.warn(`[UnifiedCache] Redis GET failed for ${fullKey}:`, error);
+      }
     }
 
     return this.memoryCache.get(fullKey) as T | null;
@@ -78,7 +82,9 @@ export class UnifiedCacheService {
     if (this.redisReady) {
       try {
         await redisCache.set(fullKey, value, ttl);
-      } catch {}
+      } catch (error) {
+        logger.warn(`[UnifiedCache] Redis SET failed for ${fullKey}:`, error);
+      }
     }
   }
 
@@ -90,7 +96,9 @@ export class UnifiedCacheService {
     if (this.redisReady) {
       try {
         await redisCache.delete(fullKey);
-      } catch {}
+      } catch (error) {
+        logger.warn(`[UnifiedCache] Redis DELETE failed for ${fullKey}:`, error);
+      }
     }
   }
 
@@ -120,7 +128,9 @@ export class UnifiedCacheService {
     if (this.redisReady) {
       try {
         await redisCache.clear(fullPattern);
-      } catch {}
+      } catch (error) {
+        logger.warn(`[UnifiedCache] Redis CLEAR failed:`, error);
+      }
     }
   }
 

@@ -62,7 +62,8 @@ async function getRandomFact(): Promise<string> {
                 return data.text?.trim();
               });
               return res;
-            } catch {
+            } catch (error) {
+              logger.debug('[WelcomeService] Fact source failed:', error);
               return null;
             }
           }),
@@ -71,7 +72,10 @@ async function getRandomFact(): Promise<string> {
       const validFacts = results.filter((f): f is string => f !== null);
       cachedFacts.push(...validFacts);
       lastFactCacheTime = now;
-    } catch {}
+    } catch (error) {
+      // Sin facts remotos se cae a la lista local: registrar, no romper.
+      logger.debug('[WelcomeService] Fact refresh failed:', error);
+    }
   }
 
   const roll = Math.random();

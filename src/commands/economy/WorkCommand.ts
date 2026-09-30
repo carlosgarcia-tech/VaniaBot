@@ -4,6 +4,7 @@ import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 import { achievementService } from '@/services/rpg/AchievementService.js';
+import { logError } from '@/utils/logger.js';
 
 export class WorkCommand extends Command {
   name = 'work';
@@ -39,7 +40,10 @@ export class WorkCommand extends Command {
     try {
       await achievementService.trackWork(ctx.sender.jid);
       await achievementService.checkLevelAchievements(ctx.sender.jid);
-    } catch {}
+    } catch (error) {
+      // El pago del trabajo ya se hizo: los logros son secundarios.
+      logError(`[WorkCommand] Achievement tracking failed for ${ctx.sender.jid}`, error);
+    }
 
     const xpBuff = user.activeBuffs?.find(b => b.buffId === 'xp_boost' && b.expiresAt > Date.now());
     const xpMultiplier = xpBuff ? 1 + xpBuff.value / 100 : 1;

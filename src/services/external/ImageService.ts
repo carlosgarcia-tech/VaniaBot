@@ -236,7 +236,10 @@ export class ImageService {
             height: 800,
           });
         }
-      } catch {}
+      } catch (error) {
+        // Fuente de imágenes caída: se devuelve lo acumulado con fallbacks.
+        logger.debug(`[ImageService] Unsplash query failed for "${query}":`, error);
+      }
     }
 
     return results;

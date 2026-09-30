@@ -71,7 +71,10 @@ export class StickerRandomCommand extends Command {
             imageUrl = randomMeme?.url || null;
           }
         }
-      } catch {}
+      } catch (error) {
+        // La API de imgflip es opcional: hay lista local de memes de respaldo.
+        logError('[StickerRandomCommand] imgflip API failed, using local memes', error);
+      }
 
       if (!imageUrl) {
         imageUrl = this.MEME_IMAGES[Math.floor(Math.random() * this.MEME_IMAGES.length)];

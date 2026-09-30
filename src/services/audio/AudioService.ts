@@ -179,10 +179,14 @@ class AudioService {
     } finally {
       try {
         fs.unlinkSync(tmpIn);
-      } catch {}
+      } catch (error) {
+        logger.debug(`[AudioService] Temp input cleanup failed (${tmpIn}):`, error);
+      }
       try {
         fs.unlinkSync(tmpOut);
-      } catch {}
+      } catch (error) {
+        logger.debug(`[AudioService] Temp output cleanup failed (${tmpOut}):`, error);
+      }
     }
   }
 

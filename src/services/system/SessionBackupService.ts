@@ -236,7 +236,9 @@ export class SessionBackupService {
           size += stats.size;
         }
       }
-    } catch {}
+    } catch (error) {
+      logger.debug(`[SessionBackup] Could not measure size of ${dirPath}:`, error);
+    }
 
     return size;
   }

@@ -3,6 +3,7 @@ import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
+import { logError } from '@/utils/logger.js';
 
 export class PayRandomCommand extends Command {
   name = 'payrandom';
@@ -67,6 +68,9 @@ export class PayRandomCommand extends Command {
           `🎉 *¡Felicidades!*\n\n` +
           `> _*VaniaBot💝*_`,
       });
-    } catch {}
+    } catch (error) {
+      // El pago ya se hizo: solo falla el aviso al receptor. Queda registrado.
+      logError(`[PayRandomCommand] Could not notify winner ${randomUser.jid}`, error);
+    }
   }
 }

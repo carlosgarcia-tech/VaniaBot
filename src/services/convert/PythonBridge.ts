@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { logError } from '@/utils/logger.js';
+import { logError, logger } from '@/utils/logger.js';
 import type { ConversionAction, ImageFormat } from './types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -151,7 +151,9 @@ export class PythonBridge {
         if (existsSync(file)) {
           unlinkSync(file);
         }
-      } catch {}
+      } catch (error) {
+        logger.debug(`[PythonBridge] No se pudo eliminar el temporal ${file}:`, error);
+      }
     }
   }
 }

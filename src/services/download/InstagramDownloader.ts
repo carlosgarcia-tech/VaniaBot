@@ -28,7 +28,9 @@ export class InstagramDownloader extends DownloadService {
       const files = fs.readdirSync(dir);
       const match = files.find(f => f.startsWith(base));
       if (match) return `${dir}/${match}`;
-    } catch {}
+    } catch (error) {
+      logError('[InstagramDownloader] Could not list download dir for output resolution', error);
+    }
 
     return null;
   }

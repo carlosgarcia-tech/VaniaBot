@@ -212,7 +212,9 @@ export class StickerService {
     files.forEach(file => {
       try {
         if (existsSync(file)) unlinkSync(file);
-      } catch {}
+      } catch (error) {
+        logger.debug(`[StickerService] No se pudo eliminar el temporal ${file}:`, error);
+      }
     });
   }
 

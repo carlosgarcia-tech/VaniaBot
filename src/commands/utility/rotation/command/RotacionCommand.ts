@@ -3,6 +3,7 @@ import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { aiService } from '@/services/external/AIService.js';
 import { isRight } from '@/utils/either.js';
+import { logger } from '@/utils/logger.js';
 
 import {
   parseCoord,
@@ -145,7 +146,9 @@ export class RotacionCommand extends Command {
 
     try {
       await ctx.react('🗺️');
-    } catch {}
+    } catch (error) {
+      logger.debug('[RotacionCommand] React failed:', error);
+    }
 
     const myZone = inferZone(start.nodeId);
 

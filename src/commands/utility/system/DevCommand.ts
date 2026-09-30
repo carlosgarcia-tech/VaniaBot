@@ -1,6 +1,7 @@
 import { Command } from '../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
+import { logger } from '@/utils/logger.js';
 
 const charset: Record<string, string> = {
   a: 'ᴀ',
@@ -45,7 +46,9 @@ export class DevCommand extends Command {
   async execute(ctx: MessageContext): Promise<void> {
     try {
       await ctx.react('👑');
-    } catch {}
+    } catch (error) {
+      logger.debug('[DevCommand] React failed:', error);
+    }
 
     const devText =
       `⧼⋆꙳• *CREADOR* ⋆꙳•⧽\n\n` +

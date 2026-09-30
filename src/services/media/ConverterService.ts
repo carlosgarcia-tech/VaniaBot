@@ -866,7 +866,9 @@ export class ConverterService {
         if (existsSync(file)) {
           unlinkSync(file);
         }
-      } catch {}
+      } catch (error) {
+        logger.debug(`[ConverterService] No se pudo eliminar el temporal ${file}:`, error);
+      }
     });
   }
 }

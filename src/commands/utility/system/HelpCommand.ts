@@ -5,7 +5,7 @@ import { commandRegistry } from '@/core/CommandRegistry.js';
 import { pluginLoader } from '@/core/PluginLoader.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
-import { logError } from '@/utils/logger.js';
+import { logError, logger } from '@/utils/logger.js';
 import { findAssetFile } from '@/utils/assetHelper.js';
 import axios from 'axios';
 
@@ -52,7 +52,9 @@ export class HelpCommand extends Command {
   async execute(ctx: MessageContext): Promise<void> {
     try {
       await ctx.react('💝');
-    } catch {}
+    } catch (error) {
+      logger.debug('[HelpCommand] React failed:', error);
+    }
 
     if (ctx.args.length > 0) {
       await this.showCommandHelp(ctx, ctx.args[0]);

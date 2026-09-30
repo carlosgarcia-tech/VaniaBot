@@ -198,7 +198,9 @@ export class ProfileCommand extends Command {
         ProfileCommand.logoLoaded = true;
         return ProfileCommand.logoBuffer;
       }
-    } catch {}
+    } catch (error) {
+      logError('[ProfileCommand] Could not load default profile logo', error);
+    }
 
     ProfileCommand.logoLoaded = true;
     return null;

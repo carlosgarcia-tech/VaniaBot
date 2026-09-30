@@ -15,6 +15,7 @@
 import { quizService } from '@/services/study/QuizService.js';
 import { difficultyEngine } from '@/services/study/DifficultyEngine.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
+import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 import type { UserQuizStats } from '@/services/study/QuizTypes.js';
 import { QuizDifficulty } from '@/services/study/QuizTypes.js';
@@ -95,19 +96,25 @@ class QuizAnswerHandler {
         await serviceManager.userService.updateUser(jid, {
           quizStats: updated,
         } as Parameters<typeof serviceManager.userService.updateUser>[1]);
-      } catch {}
+      } catch (error) {
+        logError(`[QuizAnswerHandler] updateStats failed for ${jid}`, error);
+      }
     };
 
     const awardCoins = async (jid: string, amount: number): Promise<void> => {
       try {
         await serviceManager.userService.addMoney(jid, amount);
-      } catch {}
+      } catch (error) {
+        logError(`[QuizAnswerHandler] awardCoins(${amount}) failed for ${jid}`, error);
+      }
     };
 
     const awardXP = async (jid: string, amount: number): Promise<void> => {
       try {
         await serviceManager.userService.addXP(jid, amount);
-      } catch {}
+      } catch (error) {
+        logError(`[QuizAnswerHandler] awardXP(${amount}) failed for ${jid}`, error);
+      }
     };
 
     const result = await quizService.processAnswer(
