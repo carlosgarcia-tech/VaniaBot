@@ -5,48 +5,36 @@
  * to JsonFileStore: atomic persistence round-trips, corrupt-file
  * recovery, and validation of hand-edited config files.
  *
+ * The config path is injected per-instance, so every test runs against
+ * its own temp directory — the real data/ files are never touched.
+ *
  * @author **Carlos G** ⭐
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { tmpdir } from 'os';
 import { AntiCallService } from '../../src/services/system/AntiCallService.js';
-
-const CONFIG_PATH = join(process.cwd(), 'data', 'anticall.json');
-const DATA_DIR = join(process.cwd(), 'data');
 
 describe('AntiCallService config', () => {
   let service: AntiCallService;
-  let backup: string | null = null;
-
-  /**
-   * The runtime uses the `antiCallService` singleton, whose in-memory
-   * config survives file edits — tests must build fresh instances so
-   * each one actually reads the config file from disk.
-   */
-  const freshService = (): AntiCallService => new AntiCallService();
-
-  beforeAll(() => {
-    // The config path is process.cwd()-relative and points at the real
-    // runtime file, so back it up and restore it around the suite.
-    if (existsSync(CONFIG_PATH)) {
-      backup = readFileSync(CONFIG_PATH, 'utf-8');
-    }
-  });
-
-  afterAll(() => {
-    if (backup !== null) {
-      writeFileSync(CONFIG_PATH, backup, 'utf-8');
-    } else {
-      rmSync(CONFIG_PATH, { force: true });
-    }
-  });
+  let dataDir: string;
+  let configPath: string;
 
   beforeEach(() => {
-    rmSync(CONFIG_PATH, { force: true });
-    service = freshService();
+    // Config path inyectado: aislado del data/ real del bot.
+    dataDir = join(tmpdir(), `vania-anticall-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    configPath = join(dataDir, 'anticall.json');
+    service = new AntiCallService(configPath);
   });
+
+  afterEach(() => {
+    rmSync(dataDir, { recursive: true, force: true });
+  });
+
+  /** Creates an instance against the same temp config path. */
+  const freshService = (): AntiCallService => new AntiCallService(configPath);
 
   it('falls back to defaults when the config file does not exist', () => {
     expect(service.isEnabled()).toBe(false);
@@ -54,9 +42,9 @@ describe('AntiCallService config', () => {
   });
 
   it('loads an existing valid config file', () => {
-    mkdirSync(DATA_DIR, { recursive: true });
+    mkdirSync(dataDir, { recursive: true });
     writeFileSync(
-      CONFIG_PATH,
+      configPath,
       JSON.stringify({ enabled: true, blockedUsers: ['123@s.whatsapp.net'] }),
       'utf-8',
     );
@@ -70,7 +58,7 @@ describe('AntiCallService config', () => {
   it('persists blockUser() to disk in the documented shape', () => {
     service.blockUser('123@s.whatsapp.net');
 
-    const raw = JSON.parse(readFileSync(CONFIG_PATH, 'utf-8')) as unknown;
+    const raw = JSON.parse(readFileSync(configPath, 'utf-8')) as unknown;
     expect(raw).toEqual({ enabled: false, blockedUsers: ['123@s.whatsapp.net'] });
   });
 
@@ -89,10 +77,10 @@ describe('AntiCallService config', () => {
 
   it('ignores duplicate blockUser calls without rewriting the file', () => {
     service.blockUser('123@s.whatsapp.net');
-    const afterFirst = readFileSync(CONFIG_PATH, 'utf-8');
+    const afterFirst = readFileSync(configPath, 'utf-8');
 
     service.blockUser('123@s.whatsapp.net');
-    const afterSecond = readFileSync(CONFIG_PATH, 'utf-8');
+    const afterSecond = readFileSync(configPath, 'utf-8');
 
     expect(afterSecond).toBe(afterFirst);
   });
@@ -103,8 +91,8 @@ describe('AntiCallService config', () => {
   });
 
   it('recovers with defaults when the file contains corrupt JSON', () => {
-    mkdirSync(DATA_DIR, { recursive: true });
-    writeFileSync(CONFIG_PATH, '{not valid json', 'utf-8');
+    mkdirSync(dataDir, { recursive: true });
+    writeFileSync(configPath, '{not valid json', 'utf-8');
 
     expect(() => freshService()).not.toThrow();
     expect(freshService().isEnabled()).toBe(false);
@@ -113,9 +101,9 @@ describe('AntiCallService config', () => {
 
   describe('validation of hand-edited configs', () => {
     it('coerces a non-boolean enabled flag to false', () => {
-      mkdirSync(DATA_DIR, { recursive: true });
+      mkdirSync(dataDir, { recursive: true });
       writeFileSync(
-        CONFIG_PATH,
+        configPath,
         JSON.stringify({ enabled: 'on', blockedUsers: ['123@s.whatsapp.net'] }),
         'utf-8',
       );
@@ -126,9 +114,9 @@ describe('AntiCallService config', () => {
     });
 
     it('filters non-string entries out of blockedUsers', () => {
-      mkdirSync(DATA_DIR, { recursive: true });
+      mkdirSync(dataDir, { recursive: true });
       writeFileSync(
-        CONFIG_PATH,
+        configPath,
         JSON.stringify({ enabled: true, blockedUsers: ['ok@s.whatsapp.net', 42, null, {}] }),
         'utf-8',
       );
@@ -138,8 +126,8 @@ describe('AntiCallService config', () => {
     });
 
     it('replaces a malformed blockedUsers array with an empty list', () => {
-      mkdirSync(DATA_DIR, { recursive: true });
-      writeFileSync(CONFIG_PATH, JSON.stringify({ enabled: true, blockedUsers: '123' }), 'utf-8');
+      mkdirSync(dataDir, { recursive: true });
+      writeFileSync(configPath, JSON.stringify({ enabled: true, blockedUsers: '123' }), 'utf-8');
 
       const loaded = freshService();
       // enabled: true is a valid boolean and survives; only the
@@ -148,14 +136,14 @@ describe('AntiCallService config', () => {
     });
 
     it('rejects arrays and primitives as the whole config', () => {
-      mkdirSync(DATA_DIR, { recursive: true });
-      writeFileSync(CONFIG_PATH, JSON.stringify(['blocked']), 'utf-8');
+      mkdirSync(dataDir, { recursive: true });
+      writeFileSync(configPath, JSON.stringify(['blocked']), 'utf-8');
       expect(freshService().getConfig()).toEqual({
         enabled: false,
         blockedUsers: [],
       });
 
-      writeFileSync(CONFIG_PATH, JSON.stringify(7), 'utf-8');
+      writeFileSync(configPath, JSON.stringify(7), 'utf-8');
       expect(freshService().getConfig()).toEqual({
         enabled: false,
         blockedUsers: [],
@@ -168,9 +156,10 @@ describe('AntiCallService config', () => {
     service.blockUser('123@s.whatsapp.net');
     service.unblockUser('123@s.whatsapp.net');
 
-    const tmpFiles = existsSync(DATA_DIR)
-      ? readdirSync(DATA_DIR).filter(f => f.startsWith('.anticall.json.tmp'))
+    const tmpFiles = existsSync(dataDir)
+      ? readdirSync(dataDir).filter(f => f.startsWith('.anticall.json.tmp'))
       : [];
     expect(tmpFiles).toEqual([]);
+    expect(existsSync(configPath)).toBe(true);
   });
 });

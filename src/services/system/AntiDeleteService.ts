@@ -41,7 +41,7 @@ export class AntiDeleteService {
   private messageStore = new Map<string, StoredMessage>();
   private config: AntiDeleteConfig;
   private cleanupTimer: NodeJS.Timeout | null = null;
-  private readonly TMP_DIR = path.join(process.cwd(), 'tmp', 'antidelete');
+  private readonly TMP_DIR: string;
   private readonly MAX_MESSAGE_AGE = 24 * 60 * 60 * 1000;
   /** Hard cap on stored entries to prevent unbounded RAM growth. */
   private readonly MAX_STORED_MESSAGES = 500;
@@ -52,13 +52,21 @@ export class AntiDeleteService {
    * previous plain writeFileSync, which could corrupt the file on a
    * crash mid-write.
    */
-  private readonly configStore = new JsonFileStore<AntiDeleteConfig>({
-    filePath: path.join(process.cwd(), 'data', 'antidelete.json'),
-    defaults: () => ({ enabled: false, groups: {} }),
-    validate: validateAntiDeleteConfig,
-  });
+  private readonly configStore: JsonFileStore<AntiDeleteConfig>;
 
-  constructor() {
+  /**
+   * @param configPath overrides the config file location (defaults to
+   *   `<cwd>/data/antidelete.json`). Used by tests to isolate tmp dirs.
+   * @param tmpDir overrides the directory for downloaded media temp files
+   *   (defaults to `<cwd>/tmp/antidelete`).
+   */
+  constructor(configPath?: string, tmpDir?: string) {
+    this.configStore = new JsonFileStore<AntiDeleteConfig>({
+      filePath: configPath ?? path.join(process.cwd(), 'data', 'antidelete.json'),
+      defaults: () => ({ enabled: false, groups: {} }),
+      validate: validateAntiDeleteConfig,
+    });
+    this.TMP_DIR = tmpDir ?? path.join(process.cwd(), 'tmp', 'antidelete');
     this.ensureTmpDir();
     this.config = this.configStore.load();
     this.startCleanupTimer();

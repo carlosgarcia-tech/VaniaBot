@@ -24,13 +24,18 @@ export class AntiCallService {
    * previous plain writeFileSync, which could corrupt the file on a
    * crash mid-write.
    */
-  private readonly configStore = new JsonFileStore<AntiCallConfig>({
-    filePath: path.join(process.cwd(), 'data', 'anticall.json'),
-    defaults: () => ({ enabled: false, blockedUsers: [] }),
-    validate: validateAntiCallConfig,
-  });
+  private readonly configStore: JsonFileStore<AntiCallConfig>;
 
-  constructor() {
+  /**
+   * @param configPath overrides the config file location (defaults to
+   *   `<cwd>/data/anticall.json`). Used by tests to isolate tmp dirs.
+   */
+  constructor(configPath?: string) {
+    this.configStore = new JsonFileStore<AntiCallConfig>({
+      filePath: configPath ?? path.join(process.cwd(), 'data', 'anticall.json'),
+      defaults: () => ({ enabled: false, blockedUsers: [] }),
+      validate: validateAntiCallConfig,
+    });
     this.config = this.configStore.load();
   }
 
