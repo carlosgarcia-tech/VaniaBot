@@ -19,25 +19,13 @@
  */
 
 import { randomBytes } from 'crypto';
-import {
-  rmSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  writeFileSync,
-  renameSync,
-} from 'fs';
+import { rmSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { EventEmitter } from 'events';
 import type { WAMessage, WASocket, BaileysEventMap } from 'baileys';
-import type {
-  SubBotConfig,
-  SubBotSlot,
-  BotRuntimeState,
-  ContactCacheEntry,
-} from '@/types/subbot.js';
+import type { SubBotConfig, SubBotSlot, BotRuntimeState } from '@/types/subbot.js';
 import { SUBBOT_CONFIG } from '@/config/subbot.js';
 import { SubBotInstance } from './SubBotInstance.js';
+import { SubBotRuntimeStore } from './SubBotRuntimeStore.js';
 import { subBotDatabase } from './SubBotDatabase.js';
 import { logger, logError } from '@/utils/logger.js';
 import { config } from '@/config/index.js';
@@ -59,6 +47,7 @@ export class SubBotManager extends EventEmitter {
   private middlewaresPerInstance = new Map<string, MiddlewareConfig[]>();
   private antiSpamPerInstance = new Map<string, AntiSpamService>();
   private runtimeStates = new Map<string, BotRuntimeState>();
+  private runtimeStore = new SubBotRuntimeStore();
   private mainSock?: WASocket;
   private healthCheckInterval?: ReturnType<typeof setInterval>;
   private settingsSyncInterval?: ReturnType<typeof setInterval>;
@@ -333,7 +322,7 @@ export class SubBotManager extends EventEmitter {
   private getOrCreateRuntimeState(subBotId: string): BotRuntimeState {
     let state = this.runtimeStates.get(subBotId);
     if (!state) {
-      state = this.loadRuntimeState(subBotId) || {
+      state = this.runtimeStore.load(subBotId) || {
         id: subBotId,
         recentMessageIds: new Map(),
         contactNameCache: new Map(),
@@ -345,55 +334,8 @@ export class SubBotManager extends EventEmitter {
     return state;
   }
 
-  private getRuntimeStateFile(botId: string): string {
-    return `${SUBBOT_CONFIG.RUNTIME_STATE_DIR}/${botId}.json`;
-  }
-
-  private loadRuntimeState(botId: string): BotRuntimeState | null {
-    const file = this.getRuntimeStateFile(botId);
-    if (!existsSync(file)) return null;
-
-    try {
-      const data = JSON.parse(readFileSync(file, 'utf-8'));
-      const updatedAt = data?.updatedAt || 0;
-      if (Date.now() - updatedAt > SUBBOT_CONFIG.BOT_RUNTIME_STATE_TTL_MS) {
-        return null;
-      }
-
-      return {
-        id: data.id,
-        recentMessageIds: new Map(data.recentMessageIds || []),
-        contactNameCache: new Map(
-          (data.contactNameCache || []).map(([k, v]: [string, ContactCacheEntry]) => [k, v]),
-        ),
-        lastProfileAppliedAt: data.lastProfileAppliedAt || 0,
-        lastProfileSignature: data.lastProfileSignature || '',
-        pairingPendingAt: data.pairingPendingAt,
-      };
-    } catch {
-      return null;
-    }
-  }
-
   private scheduleRuntimeStateWrite(botState: BotRuntimeState): void {
-    const file = this.getRuntimeStateFile(botState.id);
-    const data = {
-      id: botState.id,
-      recentMessageIds: Array.from(botState.recentMessageIds.entries()),
-      contactNameCache: Array.from(botState.contactNameCache.entries()),
-      lastProfileAppliedAt: botState.lastProfileAppliedAt,
-      lastProfileSignature: botState.lastProfileSignature,
-      pairingPendingAt: botState.pairingPendingAt,
-      updatedAt: Date.now(),
-    };
-
-    try {
-      const tmpFile = `${file}.tmp`;
-      writeFileSync(tmpFile, JSON.stringify(data));
-      renameSync(tmpFile, file);
-    } catch (error) {
-      logger.debug(`Runtime state write failed: ${error}`);
-    }
+    this.runtimeStore.save(botState);
   }
 
   private markAndCheckRecentMessage(subBotId: string, raw: WAMessage): boolean {
@@ -863,14 +805,7 @@ export class SubBotManager extends EventEmitter {
       }
     }
 
-    const runtimeFile = this.getRuntimeStateFile(slot.id);
-    if (existsSync(runtimeFile)) {
-      try {
-        rmSync(runtimeFile, { force: true });
-      } catch (error) {
-        logError('[SubBotManager]', error);
-      }
-    }
+    this.runtimeStore.delete(slot.id);
 
     const botState = this.runtimeStates.get(slot.id);
     if (botState) {
@@ -955,14 +890,7 @@ export class SubBotManager extends EventEmitter {
       logError('[SubBotManager]', error);
     }
 
-    const runtimeFile = this.getRuntimeStateFile(slot.id);
-    if (existsSync(runtimeFile)) {
-      try {
-        rmSync(runtimeFile, { force: true });
-      } catch (error) {
-        logError('[SubBotManager]', error);
-      }
-    }
+    this.runtimeStore.delete(slot.id);
 
     const botState = this.runtimeStates.get(slot.id);
     if (botState) {
