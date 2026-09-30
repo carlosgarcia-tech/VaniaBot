@@ -1,7 +1,9 @@
+import path from 'path';
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
 interface LotteryTicket {
   number: string;
@@ -24,12 +26,57 @@ const LOTTERY_CONFIG = {
   drawInterval: 7 * 24 * 60 * 60 * 1000,
 };
 
-const lotteryState: LotteryState = {
-  tickets: [],
-  prizePool: 0,
-  lastDraw: 0,
-  ticketPrice: LOTTERY_CONFIG.ticketPrice,
-};
+function validateLotteryState(data: unknown): LotteryState {
+  const raw = (data ?? {}) as Partial<LotteryState>;
+  const tickets = Array.isArray(raw.tickets)
+    ? raw.tickets.filter(
+        (t): t is LotteryTicket =>
+          typeof t === 'object' &&
+          t !== null &&
+          typeof (t as LotteryTicket).number === 'string' &&
+          typeof (t as LotteryTicket).buyerJid === 'string' &&
+          typeof (t as LotteryTicket).buyerName === 'string' &&
+          typeof (t as LotteryTicket).purchasedAt === 'number',
+      )
+    : [];
+  return {
+    tickets,
+    prizePool:
+      typeof raw.prizePool === 'number' && Number.isFinite(raw.prizePool) && raw.prizePool >= 0
+        ? raw.prizePool
+        : 0,
+    lastDraw:
+      typeof raw.lastDraw === 'number' && Number.isFinite(raw.lastDraw) && raw.lastDraw >= 0
+        ? raw.lastDraw
+        : 0,
+    ticketPrice:
+      typeof raw.ticketPrice === 'number' && Number.isFinite(raw.ticketPrice) && raw.ticketPrice > 0
+        ? raw.ticketPrice
+        : LOTTERY_CONFIG.ticketPrice,
+  };
+}
+
+const lotteryStore = new JsonFileStore<LotteryState>({
+  filePath: path.join(process.cwd(), 'data', 'lottery.json'),
+  defaults: () => ({
+    tickets: [],
+    prizePool: 0,
+    lastDraw: 0,
+    ticketPrice: LOTTERY_CONFIG.ticketPrice,
+  }),
+  validate: validateLotteryState,
+});
+
+/** Estado persistido: sobrevive reinicios (el sorteo es por wall-clock). */
+const lotteryState: LotteryState = lotteryStore.load();
+
+function persistLotteryState(): void {
+  try {
+    lotteryStore.save(lotteryState);
+  } catch {
+    // JsonFileStore ya logueó el error: el juego continúa con el estado en memoria.
+  }
+}
 
 function generateTicketNumber(): string {
   return Math.random().toString().substring(2, 7).toUpperCase();
@@ -137,6 +184,7 @@ export class LotteryCommand extends Command {
     }
 
     lotteryState.prizePool += actualCost * LOTTERY_CONFIG.prizeMultiplier;
+    persistLotteryState();
 
     const timeUntilDraw = this.getTimeUntilDraw();
     await ctx.reply(
@@ -195,6 +243,7 @@ export class LotteryCommand extends Command {
     lotteryState.tickets = [];
     lotteryState.prizePool = 0;
     lotteryState.lastDraw = Date.now();
+    persistLotteryState();
   }
 
   private getTimeUntilDraw(): string {
