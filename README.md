@@ -239,10 +239,10 @@ VaniaBot/
 ### Quick start (script)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/carlosgarcia-tech/VaniaBot/main/VaniaBot.sh | bash -s v7.1.2
+curl -fsSL https://raw.githubusercontent.com/carlosgarcia-tech/VaniaBot/main/VaniaBot.sh | bash -s v7.1.3
 ```
 
-Installs Node.js, FFmpeg and other system dependencies, clones the repo, installs npm dependencies, applies the `whatsapp-rust-bridge` patch and creates a starter `.env`. Pass a version (`v7.1.2` in the example) to pin the install; without it, the script falls back to the latest published GitHub release. You'll still need to fill in your credentials in `.env` (see Configuration below).
+Installs Node.js, FFmpeg and other system dependencies, clones the repo, installs npm dependencies, applies the `whatsapp-rust-bridge` patch and creates a starter `.env`. Pass a version (`v7.1.3` in the example) to pin the install; without it, the script falls back to the latest published GitHub release. You'll still need to fill in your credentials in `.env` (see Configuration below).
 
 ### Termux (Android)
 
