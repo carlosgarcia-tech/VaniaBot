@@ -77,9 +77,10 @@ export class BroadcastCommand extends Command {
 
 export class BackupCommand extends Command {
   name = 'backup';
-  description = 'Crear respaldo de la sesión';
+  description = 'Crear respaldo de la sesión (sesión del bot, no datos de usuario)';
   category = CommandCategory.OWNER;
-  aliases = ['respaldar'];
+  // Sin alias 'respaldar': es el name de RespaldarDataCommand (datos de usuario).
+  aliases = [];
   permissions = {
     user: [PermissionLevel.OWNER],
   };

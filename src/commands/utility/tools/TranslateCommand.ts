@@ -15,7 +15,8 @@ export class TranslateCommand extends Command {
   name = 'traducirsimple';
   description = 'Traduce texto a cualquier idioma.';
   category = CommandCategory.UTILITY;
-  aliases = ['traducir', 'tsimple'];
+  // Sin alias 'traducir': es el name de TraductorCommand (traduccion contextual).
+  aliases = ['tsimple'];
   usage = '!traducir <idioma> <texto> | responde un mensaje con !traducir <idioma>';
   examples = [
     '!traducir en Hola mundo',

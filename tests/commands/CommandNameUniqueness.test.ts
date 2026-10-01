@@ -141,26 +141,11 @@ describe('Unicidad de nombres y aliases de comandos', () => {
     // comando documentado inalcanzable (caso real ya corregido: alias 'ping'
     // de HealthCommand ensombrecia a PingCommand).
     //
-    // Deuda pre-existente congelada: estas colisiones ya existian y decidir
-    // que comando conserva cada alias es una decision de producto. El test
-    // falla si se introduce una colision DISTINTA a esta lista; la lista solo
-    // debe encogerse, nunca crecer.
-    const DEUDA_CONOCIDA = new Set([
-      'kick: patear(anime/AnimeCommand) vs kick(admin/moderation/KickCommand)',
-      'poesia: poema(creative/poesia/PoesiaCommand) vs poesia(creative/poesia/PoesiaCommand)',
-      'flirt: piropo(creative/poesia/PoesiaCommand) vs flirt(fun/FlirtCommand)',
-      'amor: poesia(creative/poesia/PoesiaCommand) vs amor(creative/amor/AmorCommand)',
-      'top: ranking(economy/RankingCommand) vs top(utility/user/TopCommand)',
-      'verdad: truth(fun/TruthCommand) vs verdad(fun/VerdadRetoCommand)',
-      'search: buscar(media/download/BuscarCommand) vs search(economy/SearchCommand)',
-      'quote: qc(media/sticker/QcCommand) vs quote(creative/canvas/QuoteCommand)',
-      'backup: respaldar(owner/RespaldarDataCommand) vs backup(owner/SystemCommand)',
-      'respaldar: backup(owner/SystemCommand) vs respaldar(owner/RespaldarDataCommand)',
-      'subbots: listbots(owner/subbot/ListBotsCommand) vs subbots(owner/subbot/SubBotCommand)',
-      'health: status(utility/system/StatusCommand) vs health(utility/system/StatusCommand)',
-      'votar: encuesta(utility/tools/PollCommand) vs votar(creative/poesia/PoesiaCommand)',
-      'traducir: traducirsimple(utility/tools/TranslateCommand) vs traducir(utility/traductor/TraductorCommand)',
-    ]);
+    // La deuda pre-existente (kick, top, verdad, search, quote, backup,
+    // subbots, health, votar, traducir, ...) fue resuelta asignando cada
+    // alias a su comando correcto. La lista debe permanecer VACIA: si este
+    // test falla, se esta introduciendo una colision nueva.
+    const DEUDA_CONOCIDA = new Set<string>([]);
 
     const { byName, byAlias } = buildCommandMap();
     const clashes: string[] = [];

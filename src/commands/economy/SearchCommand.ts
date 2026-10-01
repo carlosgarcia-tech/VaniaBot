@@ -6,7 +6,9 @@ const searchCooldowns = new Map<string, number>();
 const SEARCH_COOLDOWN = 60 * 1000;
 
 export class SearchCommand extends Command {
-  name = 'search';
+  // Sin name 'search' (chocaba con la busqueda web de BuscarCommand):
+  // el juego se ejecuta ahora como !encontrar.
+  name = 'encontrar';
   description = 'Encontrar dinero en la calle';
   category = CommandCategory.ECONOMY;
   requiresRegistration = true;

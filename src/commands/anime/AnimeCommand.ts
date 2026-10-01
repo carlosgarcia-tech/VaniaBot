@@ -421,7 +421,9 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
   {
     name: 'patear',
     description: 'Muestra una imagen de anime pateando',
-    aliases: ['patear', 'kick'],
+    // Sin alias 'kick': es el name de KickCommand (moderación) y el registro
+    // lo remapeaba, dejando la expulsion inalcanzable por su nombre propio.
+    aliases: [],
     react: '🦶',
     endpoint: 'kick',
     service: 'reactions',

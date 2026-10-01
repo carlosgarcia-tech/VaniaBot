@@ -13,7 +13,8 @@ export class RespaldarDataCommand extends Command {
   description = 'Genera un respaldo de tus datos';
   category = CommandCategory.OWNER;
   permissions = { user: [PermissionLevel.OWNER] };
-  aliases = ['backup', 'export', 'misdatos'];
+  // Sin alias 'backup': es el name de BackupCommand (respaldo de sesion).
+  aliases = ['export', 'misdatos'];
   usage = '!respaldar';
   examples = ['!respaldar'];
   cooldown = 30000;

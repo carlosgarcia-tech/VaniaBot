@@ -55,7 +55,8 @@ export class TruthCommand extends Command {
   name = 'truth';
   description = 'Obtiene una pregunta de verdad aleatoria';
   category = CommandCategory.FUN;
-  aliases = ['verdad', 'verdad_o_reto'];
+  // Sin alias 'verdad': es el name de VerdadRetoCommand (juego completo).
+  aliases = ['verdad_o_reto'];
   cooldown = 8000;
   contexts = [CommandContext.BOTH];
   usage = '!truth';

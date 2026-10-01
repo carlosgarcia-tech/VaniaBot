@@ -5,7 +5,8 @@ import { healthCheckService } from '@/services/system/HealthCheckService.js';
 export class StatusCommand extends Command {
   name = 'status';
   description = 'Ver estado y salud del sistema';
-  aliases = ['health', 'sysinfo'];
+  // Sin alias 'health': es el name de HealthCommand.
+  aliases = ['sysinfo'];
   category = CommandCategory.UTILITY;
   cooldown = 5000;
   permissions = {

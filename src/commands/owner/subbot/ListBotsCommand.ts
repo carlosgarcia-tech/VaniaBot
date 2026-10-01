@@ -11,7 +11,8 @@ export class ListBotsCommand extends Command {
   name = 'listbots';
   description = 'Lista todas las subbots (solo owner)';
   category = CommandCategory.SUBBOT;
-  aliases = ['subbots', 'allbots'];
+  // Sin alias 'subbots': es el name de SubBotsCommand (estado de slots).
+  aliases = ['allbots'];
   usage = '.listbots';
   examples = ['.listbots'];
   contexts = [CommandContext.BOTH];

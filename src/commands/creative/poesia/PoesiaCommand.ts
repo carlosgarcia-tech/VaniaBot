@@ -57,7 +57,8 @@ export class PoemaCommand extends Command {
   name = 'poema';
   description = 'Genera un poema sobre cualquier tema';
   category = CommandCategory.FUN;
-  aliases = ['poem', 'poesia', 'poesía', 'verso'];
+  // Sin alias 'poesia': es el name del menu PoesiaMenuCommand.
+  aliases = ['poem', 'poesía', 'verso'];
   cooldown = 5000;
   contexts = [CommandContext.BOTH];
   usage = '!poema [tema] [estilo] [para:nombre]';
@@ -88,7 +89,8 @@ export class PiropopCommand extends Command {
   name = 'piropo';
   description = 'Genera piropos creativos y originales';
   category = CommandCategory.FUN;
-  aliases = ['piropos', 'flirt', 'ligar', 'requiebro'];
+  // Sin alias 'flirt': es el name de FlirtCommand.
+  aliases = ['piropos', 'ligar', 'requiebro'];
   cooldown = 5000;
   contexts = [CommandContext.BOTH];
   usage = '!piropo [estilo] [para:nombre]';
@@ -249,7 +251,8 @@ export class PoesiaMenuCommand extends Command {
   name = 'poesia';
   description = 'Menú del sistema de poesía y contenido creativo';
   category = CommandCategory.FUN;
-  aliases = ['poetry', 'amor', 'enamorado', 'creative'];
+  // Sin alias 'amor': es el name de AmorCommand.
+  aliases = ['poetry', 'enamorado', 'creative'];
   cooldown = 3000;
   contexts = [CommandContext.BOTH];
   usage = '!poesia';

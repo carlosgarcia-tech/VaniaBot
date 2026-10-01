@@ -8,7 +8,8 @@ export class PollCommand extends Command {
   name = 'encuesta';
   description = 'Crea y gestiona encuestas con múltiples opciones.';
   category = CommandCategory.UTILITY;
-  aliases = ['poll', 'votacion', 'votar'];
+  // Sin alias 'votar': es el name de VotarPoesiaCommand (votar poemas).
+  aliases = ['poll', 'votacion'];
   usage = '!encuesta "Pregunta" "Op1" "Op2" "Op3..."';
   examples = [
     '!encuesta "¿Cuál es tu color favorito?" "Rojo" "Azul" "Verde" "Amarillo"',

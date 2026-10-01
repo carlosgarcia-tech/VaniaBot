@@ -12,7 +12,8 @@ export class QcCommand extends Command {
   name = 'qc';
   description = 'Create a quote sticker with text and profile picture';
   category = CommandCategory.MEDIA;
-  aliases = ['quote'];
+  // Sin alias 'quote': es el name de QuoteCommand.
+  aliases = [];
   usage = '!qc <text>';
   examples = ['!qc Hello World', '!qc @user Your text here'];
   cooldown = 5000;
