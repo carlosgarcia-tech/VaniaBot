@@ -2,6 +2,8 @@
 
 A production-grade WhatsApp automation system built with TypeScript — featuring 300+ commands across 15 categories, 20 service modules, a middleware pipeline that every message traverses, multi-instance SubBot orchestration, and a test suite of ~1000 unit and end-to-end tests that run in CI.
 
+[![CI](https://github.com/carlosgarcia-tech/VaniaBot/actions/workflows/ci.yml/badge.svg)](https://github.com/carlosgarcia-tech/VaniaBot/actions/workflows/ci.yml)
+[![Code coverage](https://codecov.io/gh/carlosgarcia-tech/VaniaBot/branch/main/graph/badge.svg)](https://codecov.io/gh/carlosgarcia-tech/VaniaBot)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-43853D?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2DD4BF?style=flat-square)](LICENSE)
