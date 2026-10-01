@@ -220,12 +220,16 @@ install_system_deps() {
         fi
 
         log "Instalando pdf2docx y python-pptx..."
-        pip install pdf2docx >> "$LOG_FILE" 2>&1 \
-            && success "pdf2docx instalado (pdf -> docx)" \
-            || warn "pdf2docx no se pudo instalar - pdf->docx deshabilitado"
-        pip install python-pptx >> "$LOG_FILE" 2>&1 \
-            && success "python-pptx instalado (pdf -> pptx)" \
-            || warn "python-pptx no se pudo instalar - pdf->pptx deshabilitado"
+        if pip install pdf2docx >> "$LOG_FILE" 2>&1; then
+            success "pdf2docx instalado (pdf -> docx)"
+        else
+            warn "pdf2docx no se pudo instalar - pdf->docx deshabilitado"
+        fi
+        if pip install python-pptx >> "$LOG_FILE" 2>&1; then
+            success "python-pptx instalado (pdf -> pptx)"
+        else
+            warn "python-pptx no se pudo instalar - pdf->pptx deshabilitado"
+        fi
 
         # LibreOffice no existe en Termux
         warn "LibreOffice no está disponible en Termux: docx->pdf y ppt->pdf no funcionarán en Android"
