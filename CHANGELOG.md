@@ -5,6 +5,20 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el versionado sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [7.1.3] - 2026-10-01
+
+### Changed
+
+- Convención de tags de la imagen Docker unificada sin prefijo `v` entre ambos pipelines: `ci.yml` (push a main) y `release.yml` (tags de Git) publican ahora los mismos formatos `X.Y.Z`, `X.Y`, `X` y `latest`, siguiendo la convención habitual de los registros Docker.
+
+### Fixed
+
+- El patrón `{{minor}}` de `metadata-action` producía solo el dígito minor (tags basura `1`, `6`, `12`... en ghcr.io) en lugar del minor flotante; ahora usa `{{major}}.{{minor}}` y cada release publica el tag `X.Y`.
+
+### Removed
+
+- El tag crudo de Git (`vX.Y.Z`) ya no se publica en la imagen Docker del release: los patrones semver cubren la versión completa y el crudo solo duplicaba el release con otra convención.
+
 ## [7.1.2] - 2026-10-01
 
 ### Added
