@@ -429,6 +429,58 @@ MONGODB_URI=mongodb://localhost:27017/vaniabot
 
 </details>
 
+<details>
+<summary>Termux: the bot stops when the phone sleeps or Termux closes</summary>
+
+1. Run `termux-wake-lock` before starting the bot (the installer prints this step).
+2. Disable battery optimization for Termux: Android **Settings → Apps → Termux → Battery → Unrestricted**.
+3. Keep the bot supervised with PM2: `npm install -g pm2 && pm2 start vania.ts --interpreter tsx --name vaniabot && pm2 save`.
+
+</details>
+
+<details>
+<summary>Termux: npm install fails, freezes or gets killed (OOM)</summary>
+
+1. Close other apps — Android kills processes under memory pressure mid-install.
+2. Retry with the minimal mode: `bash install-termux.sh --minimal`.
+3. If the device runs out of space, free at least 1 GB (the full install needs it).
+
+</details>
+
+<details>
+<summary>Termux: the bot doesn't start after install (module not found / bridge errors)</summary>
+
+1. Re-apply the `whatsapp-rust-bridge` patch: `npm run postinstall`.
+2. If it persists, reinstall cleanly: `rm -rf node_modules && npm install && npm run postinstall`.
+3. Check the full log from the installer: `cat install-termux.log`.
+
+</details>
+
+<details>
+<summary>Termux: Node.js version errors</summary>
+
+The project requires Node.js 20+. Check with `node -v` and upgrade with:
+
+```bash
+pkg update -y && pkg upgrade -y nodejs
+```
+
+</details>
+
+<details>
+<summary>Termux: storage permission errors</summary>
+
+Run `termux-setup-storage` and accept the Android permission dialog, then re-run the installer.
+
+</details>
+
+<details>
+<summary>Termux: `docx→pdf` and `ppt→pdf` always fail</summary>
+
+LibreOffice does not exist on Android, so those two conversions are unavailable in Termux (they work in the Docker/Linux deployment). `pdf→img`, `pdf→docx` and `pdf→pptx` do work when PyMuPDF installed successfully — verify with `python3 -c "import fitz"`.
+
+</details>
+
 ---
 
 ## License
