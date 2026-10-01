@@ -309,7 +309,9 @@ export class SubBotManager extends EventEmitter {
       { middleware: new AutoRegisterMiddleware(), priority: 1, canRunParallel: false },
       { middleware: new MuteMiddleware(), priority: 3, canRunParallel: false },
       { middleware: new LoggerMiddleware(), priority: 4, canRunParallel: true },
-      { middleware: new ValidationMiddleware(commandRegistry), priority: 5, canRunParallel: true },
+      // Un rechazo de ValidationMiddleware debe cortar la cadena, y en el lote
+      // paralelo no puede hacerlo.
+      { middleware: new ValidationMiddleware(commandRegistry), priority: 5, canRunParallel: false },
       { middleware: new PermissionMiddleware(commandRegistry), priority: 6, canRunParallel: false },
       { middleware: new AntiSpamMiddleware(), priority: 7, canRunParallel: false },
       { middleware: new CooldownMiddleware(commandRegistry), priority: 8, canRunParallel: false },

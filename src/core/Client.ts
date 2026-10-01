@@ -128,7 +128,9 @@ export class WhatsAppClient {
         priority: 3,
         canRunParallel: true,
       },
-      { middleware: new ValidationMiddleware(commandRegistry), priority: 4, canRunParallel: true },
+      // ValidationMiddleware rechaza el comando si el contexto no aplica: si
+      // fuera paralelo su `return` no impediría que el comando se ejecutara.
+      { middleware: new ValidationMiddleware(commandRegistry), priority: 4, canRunParallel: false },
       { middleware: new PermissionMiddleware(commandRegistry), priority: 5, canRunParallel: false },
       { middleware: new AntiSpamMiddleware(), priority: 6, canRunParallel: false },
       { middleware: new CooldownMiddleware(commandRegistry), priority: 7, canRunParallel: false },

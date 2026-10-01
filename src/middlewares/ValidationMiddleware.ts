@@ -19,12 +19,16 @@ export class ValidationMiddleware extends Middleware {
     }
 
     if (!this.validateContext(command, ctx)) {
-      const contextName = ctx.chat.isGroup ? 'grupos' : 'chats privados';
-      await ctx.reply(`❌ Este comando solo funciona en ${contextName}`);
+      await ctx.reply(`❌ Este comando solo funciona en ${this.getRequiredContextName(command)}`);
       return;
     }
 
     await next();
+  }
+
+  /** Nombre del contexto donde el comando sí está disponible. */
+  private getRequiredContextName(command: ICommand): string {
+    return command.contexts?.includes(CommandContext.GROUP) ? 'grupos' : 'chats privados';
   }
 
   private validateContext(command: ICommand, ctx: MessageContext): boolean {
