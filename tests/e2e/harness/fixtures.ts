@@ -52,8 +52,19 @@ export function dmTextMessage(text: string, sender: string = SENDER_JID): WAMess
   return { ...msg, message: { conversation: text } };
 }
 
-/** Mensaje de texto entrante en un grupo. */
-export function groupTextMessage(text: string, groupJid = '120363019999999999@g.us'): WAMessage {
+/**
+ * Mensaje de texto entrante en un grupo. El remitente (participant) es
+ * configurable para aislar cooldowns y anti-spam entre tests.
+ */
+export function groupTextMessage(
+  text: string,
+  groupJid = '120363019999999999@g.us',
+  sender: string = SENDER_JID,
+): WAMessage {
   const msg = baseMessage(groupJid);
-  return { ...msg, message: { conversation: text } };
+  return {
+    ...msg,
+    key: { ...msg.key, participant: sender },
+    message: { conversation: text },
+  };
 }
