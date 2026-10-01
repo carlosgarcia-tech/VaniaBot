@@ -33,10 +33,23 @@ export class ServiceManager {
   public nsfwToggleService!: NsfwToggleService;
   public primeService!: PrimeService;
   public licenseService = licenseService;
-  public healthCheckService = healthCheckService;
-  public autoRestartService = AutoRestartService.getInstance();
   public sessionBackupService = sessionBackupService;
   public persistenceService = persistenceService;
+
+  /**
+   * HealthCheckService imports this module (it reads serviceManager.db), so
+   * these are lazy getters instead of field initialisers: an eager
+   * initialiser would evaluate AutoRestartService.getInstance() while that
+   * module is still mid-import and crash with "Cannot read properties of
+   * undefined".
+   */
+  public get healthCheckService(): typeof healthCheckService {
+    return healthCheckService;
+  }
+
+  public get autoRestartService(): AutoRestartService {
+    return AutoRestartService.getInstance();
+  }
 
   private constructor() {}
 

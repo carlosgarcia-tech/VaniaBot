@@ -1,14 +1,20 @@
 import { describe, it, expect } from 'vitest';
 
-describe.skip('HealthCheckService - Module Structure (SKIPPED: Circular Dependency)', () => {
+describe('HealthCheckService - Module Structure', () => {
   it('should export HealthCheckService class', async () => {
-    const module = await import('../../src/services/system/HealthCheckService.js');
+    const module = await import('@/services/system/HealthCheckService.js');
     expect(module.HealthCheckService).toBeDefined();
   });
 
   it('should export AutoRestartService class', async () => {
-    const module = await import('../../src/services/system/HealthCheckService.js');
+    const module = await import('@/services/system/HealthCheckService.js');
     expect(module.AutoRestartService).toBeDefined();
+  });
+
+  it('ServiceManager expone el health check y el auto-restart sin ciclo de imports', async () => {
+    const { serviceManager } = await import('@/services/system/Servicemanager.js');
+    expect(serviceManager.healthCheckService).toBeDefined();
+    expect(serviceManager.autoRestartService).toBeDefined();
   });
 });
 
@@ -71,30 +77,31 @@ describe('HealthCheckService - Type Definitions', () => {
 });
 
 describe('HealthCheckService - Constants', () => {
-  it('should have MEM_WARN_PCT = 40', () => {
-    expect(40).toBe(40);
+  it('MEM_WARN_PCT vale 40', async () => {
+    const { MEM_WARN_PCT } = await import('@/services/system/HealthCheckService.js');
+    expect(MEM_WARN_PCT).toBe(40);
   });
 
-  it('should have MEM_CRITICAL_PCT = 60', () => {
-    expect(60).toBe(60);
+  it('MEM_CRITICAL_PCT vale 60', async () => {
+    const { MEM_CRITICAL_PCT } = await import('@/services/system/HealthCheckService.js');
+    expect(MEM_CRITICAL_PCT).toBe(60);
   });
 });
 
 describe('AutoRestartService - Configuration', () => {
-  it('should have default config values', () => {
-    const defaultConfig = {
-      enabled: true,
-      checkIntervalMs: 60000,
-      restartThreshold: {
-        consecutiveFailures: 5,
-        memoryPercentage: 70,
-        errorRate: 20,
-      },
-    };
+  it('expone la configuración por defecto real', async () => {
+    const { DEFAULT_RESTART_CONFIG } = await import('@/services/system/HealthCheckService.js');
 
-    expect(defaultConfig.enabled).toBe(true);
-    expect(defaultConfig.checkIntervalMs).toBe(60000);
-    expect(defaultConfig.restartThreshold.consecutiveFailures).toBe(5);
-    expect(defaultConfig.restartThreshold.memoryPercentage).toBe(70);
+    expect(DEFAULT_RESTART_CONFIG.enabled).toBe(true);
+    expect(DEFAULT_RESTART_CONFIG.checkIntervalMs).toBe(60000);
+    expect(DEFAULT_RESTART_CONFIG.restartThreshold.consecutiveFailures).toBe(5);
+    expect(DEFAULT_RESTART_CONFIG.restartThreshold.memoryPercentage).toBe(70);
+    expect(DEFAULT_RESTART_CONFIG.restartThreshold.errorRate).toBe(20);
+  });
+
+  it('getInstance devuelve siempre la misma instancia', async () => {
+    const { AutoRestartService } = await import('@/services/system/HealthCheckService.js');
+
+    expect(AutoRestartService.getInstance()).toBe(AutoRestartService.getInstance());
   });
 });

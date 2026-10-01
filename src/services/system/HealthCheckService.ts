@@ -68,8 +68,10 @@ export interface SystemMetrics {
 
 const START_TIME = Date.now();
 
-const MEM_WARN_PCT = 40;
-const MEM_CRITICAL_PCT = 60;
+/** % de RAM del sistema a partir del cual el health check degrada. */
+export const MEM_WARN_PCT = 40;
+/** % de RAM del sistema a partir del cual el health check falla. */
+export const MEM_CRITICAL_PCT = 60;
 
 export class HealthCheckService {
   private static instance: HealthCheckService;
@@ -462,7 +464,7 @@ export interface AutoRestartConfig {
   };
 }
 
-const DEFAULT_RESTART_CONFIG: AutoRestartConfig = {
+export const DEFAULT_RESTART_CONFIG: AutoRestartConfig = {
   enabled: true,
   checkIntervalMs: 60_000,
   restartThreshold: {
