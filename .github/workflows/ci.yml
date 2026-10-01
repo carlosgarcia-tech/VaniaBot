@@ -122,7 +122,7 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
           shellcheck --version
-          shellcheck -S warning deploy.sh entrypoint.sh install-termux.sh stop.sh
+          shellcheck -S warning deploy.sh entrypoint.sh install-termux.sh stop.sh VaniaBot.sh
 
   docker:
     runs-on: ubuntu-latest
