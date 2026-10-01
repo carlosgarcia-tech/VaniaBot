@@ -143,8 +143,8 @@ jobs:
           MAJOR=$(echo $VERSION | cut -d. -f1)
           MINOR=$(echo $VERSION | cut -d. -f1,2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "major=v$MAJOR" >> $GITHUB_OUTPUT
-          echo "minor=v$MINOR" >> $GITHUB_OUTPUT
+          echo "major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "minor=$MINOR" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
