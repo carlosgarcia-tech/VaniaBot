@@ -5,6 +5,24 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el versionado sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [7.1.1] - 2026-10-01
+
+### Added
+
+- Job `shellcheck` en el pipeline de CI que valida los scripts `.sh` del repositorio (`deploy.sh`, `entrypoint.sh`, `install-termux.sh`, `stop.sh`) en cada push y PR, y bloquea la publicación de la imagen Docker si falla.
+- Sección "Termux (Android)" en el README con la instalación en un solo comando y una sección de solución de problemas con los errores típicos de Termux (bot detenido al dormir el teléfono, `npm install` con OOM, arranque tras instalar, versión de Node, permisos de almacenamiento y conversiones sin LibreOffice).
+
+### Changed
+
+- `install-termux.sh` adaptado a la serie 7.x: requisito de Node.js 20+ con verificación explícita, instalación de PyMuPDF, pdf2docx y python-pptx para el puente de conversión de documentos, symlink `python3` para `PythonBridge`, `.env` inicial con `PHONE_NUMBER` y `USE_PAIRING_CODE` (pareo en lugar de QR), creación de los directorios `data/assets` y `data/backups`, y aviso de la limitación de LibreOffice en Android.
+- Limpieza de formato en LICENSE (sin líneas decorativas) y tablas del README alineadas.
+
+### Fixed
+
+- `install-termux.sh`: el modo `--minimal` no aplicaba el parche de `whatsapp-rust-bridge` porque `--ignore-scripts` se salta el `postinstall` y el bot no arrancaba; ahora el parche se aplica siempre. Patrones `A && B || C` reemplazados por `if/else` explícitos (ShellCheck SC2015).
+- `entrypoint.sh`: el shebang estaba en la segunda línea, por lo que ejecutar el entrypoint de Docker directamente fallaba al no encontrar el intérprete (ShellCheck SC1128).
+- `deploy.sh`: variables sin uso eliminadas (`STEEL`, `DB_AFTER`, `mnt`) y declaraciones `local` separadas de sus asignaciones para no enmascarar códigos de salida (ShellCheck SC2034/SC2155).
+
 ## [7.1.0] - 2026-10-01
 
 ### Added
