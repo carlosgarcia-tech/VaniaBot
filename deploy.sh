@@ -11,7 +11,6 @@ NEON_YELLOW='\033[38;5;226m'
 LIME='\033[38;5;154m'
 WHITE='\033[38;5;231m'
 GHOST='\033[38;5;240m'
-STEEL='\033[38;5;248m'
 RED='\033[38;5;196m'
 CRIMSON='\033[38;5;160m'
 DIM='\033[2m'
@@ -271,7 +270,8 @@ boot_screen() {
 check_persistence() {
   local vol_name="$1"
   local check_path="$2"
-  local file_count=$(docker run --rm -v "${vol_name}:/check" alpine sh -c "ls -1 /check${check_path} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
+  local file_count
+  file_count=$(docker run --rm -v "${vol_name}:/check" alpine sh -c "ls -1 /check${check_path} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
   echo "$file_count"
 }
 
@@ -280,8 +280,10 @@ migrate_subbot_sessions() {
   local OLD_PATH="/app/data/subbot-sessions"
   local NEW_PATH="/app/subbot-sessions"
 
-  local old_count=$(docker run --rm -v vaniabot_database:/check alpine sh -c "ls -1 /check${OLD_PATH} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
-  local new_count=$(docker run --rm -v vaniabot_subbot_sessions:/check alpine sh -c "ls -1 /check${NEW_PATH} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
+  local old_count
+  old_count=$(docker run --rm -v vaniabot_database:/check alpine sh -c "ls -1 /check${OLD_PATH} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
+  local new_count
+  new_count=$(docker run --rm -v vaniabot_subbot_sessions:/check alpine sh -c "ls -1 /check${NEW_PATH} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
 
   if [ "$old_count" -gt 2 ] && [ "$new_count" -le 2 ]; then
     info "${NEON_YELLOW}Migrando sesiones de ${OLD_PATH} → ${NEW_PATH}${NC}"
@@ -481,7 +483,6 @@ if $UPDATE_MODE; then
 
   sleep 6
   SESSION_AFTER=$(docker exec vaniabot ls -la /app/vaniasession/ 2>/dev/null | wc -l)
-  DB_AFTER=$(docker exec vaniabot ls -la /app/data/ 2>/dev/null | wc -l)
   STORAGE_AFTER=$(docker exec vaniabot find /app/storage -name "*.db" 2>/dev/null | wc -l)
   SUBBOT_AFTER=$(docker exec vaniabot ls -la /app/subbot-sessions/ 2>/dev/null | wc -l)
   REDIS_AFTER=$(docker exec vania-redis redis-cli DBSIZE 2>/dev/null || echo "0")
@@ -552,7 +553,6 @@ else
     "vaniabot_temp:/app/temp"
   do
     vol="${vol_mount%%:*}"
-    mnt="${vol_mount##*:}"
     docker run --rm -v "${vol}:/data" alpine sh -c "mkdir -p /data && chown -R 1001:1001 /data && chmod -R 755 /data" 2>/dev/null
     ok "Permisos configurados para ${NEON_GREEN}${BOLD}${vol}${NC}"
   done
