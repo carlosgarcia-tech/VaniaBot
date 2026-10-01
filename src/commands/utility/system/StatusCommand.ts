@@ -81,7 +81,9 @@ export class StatusCommand extends Command {
 export class HealthCommand extends Command {
   name = 'health';
   description = 'Verificar salud del bot';
-  aliases = ['ping', 'pong'];
+  // Sin alias 'ping': es el name de PingCommand y el registro remapeaba
+  // !ping hacia este comando, sabotenado el ping de latencia real.
+  aliases = ['pong'];
   category = CommandCategory.UTILITY;
   cooldown = 3000;
 

@@ -134,6 +134,50 @@ describe('Unicidad de nombres y aliases de comandos', () => {
     expect(duplicates(byAlias)).toEqual([]);
   });
 
+  it('ningun alias NUEVO colisiona con el name de otro comando (escaneo estatico)', () => {
+    // El registro resuelve nombres y aliases en maps separados: un alias que
+    // coincida con el name de otro comando no se detecta como duplicado, pero
+    // el registro en tiempo real remapea silenciosamente el alias y deja el
+    // comando documentado inalcanzable (caso real ya corregido: alias 'ping'
+    // de HealthCommand ensombrecia a PingCommand).
+    //
+    // Deuda pre-existente congelada: estas colisiones ya existian y decidir
+    // que comando conserva cada alias es una decision de producto. El test
+    // falla si se introduce una colision DISTINTA a esta lista; la lista solo
+    // debe encogerse, nunca crecer.
+    const DEUDA_CONOCIDA = new Set([
+      'kick: patear(anime/AnimeCommand) vs kick(admin/moderation/KickCommand)',
+      'poesia: poema(creative/poesia/PoesiaCommand) vs poesia(creative/poesia/PoesiaCommand)',
+      'flirt: piropo(creative/poesia/PoesiaCommand) vs flirt(fun/FlirtCommand)',
+      'amor: poesia(creative/poesia/PoesiaCommand) vs amor(creative/amor/AmorCommand)',
+      'top: ranking(economy/RankingCommand) vs top(utility/user/TopCommand)',
+      'verdad: truth(fun/TruthCommand) vs verdad(fun/VerdadRetoCommand)',
+      'search: buscar(media/download/BuscarCommand) vs search(economy/SearchCommand)',
+      'quote: qc(media/sticker/QcCommand) vs quote(creative/canvas/QuoteCommand)',
+      'backup: respaldar(owner/RespaldarDataCommand) vs backup(owner/SystemCommand)',
+      'respaldar: backup(owner/SystemCommand) vs respaldar(owner/RespaldarDataCommand)',
+      'subbots: listbots(owner/subbot/ListBotsCommand) vs subbots(owner/subbot/SubBotCommand)',
+      'health: status(utility/system/StatusCommand) vs health(utility/system/StatusCommand)',
+      'votar: encuesta(utility/tools/PollCommand) vs votar(creative/poesia/PoesiaCommand)',
+      'traducir: traducirsimple(utility/tools/TranslateCommand) vs traducir(utility/traductor/TraductorCommand)',
+    ]);
+
+    const { byName, byAlias } = buildCommandMap();
+    const clashes: string[] = [];
+    for (const [alias, aliasOwners] of byAlias) {
+      for (const nameOwner of byName.get(alias) ?? []) {
+        for (const aliasOwner of aliasOwners) {
+          if (aliasOwner.name === nameOwner.name) continue; // auto-alias inofensivo
+          const key = `${alias}: ${aliasOwner.name}(${relativeFile(aliasOwner.file).replace('src/commands/', '').replace('.ts', '')}) vs ${nameOwner.name}(${relativeFile(nameOwner.file).replace('src/commands/', '').replace('.ts', '')})`;
+          if (!DEUDA_CONOCIDA.has(key)) {
+            clashes.push(key);
+          }
+        }
+      }
+    }
+    expect(clashes).toEqual([]);
+  });
+
   it('cada comando tiene un name válido y sin aliases repetidos en su propio array', () => {
     for (const file of collectCommandFiles(COMMANDS_DIR)) {
       const source = readFileSync(file, 'utf-8');
