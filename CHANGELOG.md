@@ -5,6 +5,21 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el versionado sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [7.1.2] - 2026-10-01
+
+### Added
+
+- Script de instalación rápida `VaniaBot.sh` versionado en el repositorio, que reemplaza al gist externo del quick start: resuelve la versión a instalar del argumento (con o sin `v`), del `package.json` local o del último release publicado en GitHub, detecta apt/dnf/pacman, exige Node.js 20+, aplica el parche de `whatsapp-rust-bridge` y crea un `.env` inicial con autenticación por código de pareo.
+- `VaniaBot.sh` incluido en el job de `shellcheck` del CI.
+
+### Changed
+
+- `install-termux.sh` muestra la versión del proyecto leída dinámicamente de `package.json` (header, ayuda, log y banner) en lugar de una versión fija que quedaba desactualizada en cada release, con el mismo mecanismo sin dependencias (`sed`) y fallback si el archivo no existe.
+
+### Fixed
+
+- La URL del quick start del README apuntaba a un gist inexistente (404); ahora sirve el script desde `raw.githubusercontent.com` y el ejemplo va fijado a la versión del release.
+
 ## [7.1.1] - 2026-10-01
 
 ### Added
