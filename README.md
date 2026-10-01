@@ -155,25 +155,25 @@ An optional Express 5 panel (`PanelServer`) exposes health metrics and webhook r
 
 ## Tech Stack
 
-| Layer              | Technology                       | Why                                            |
-| ------------------ | -------------------------------- | ---------------------------------------------- |
-| Language           | TypeScript 5 (ESM)               | Type safety across the whole codebase          |
-| Runtime            | Node.js 20+                      |                                                |
-| WhatsApp           | Baileys v7                       | Low-level WA Web multi-device protocol         |
-| AI                 | Groq SDK (LLaMA 3)               | Circuit-breaker protected provider             |
-| Primary DB         | SQLite (sql.js)                  | Zero-config repositories layer                 |
-| Alternative DB     | JSON stores / MongoDB            | `DB_TYPE` switchable adapters                  |
-| Cache              | In-memory LRU · Redis (optional) | Rate limiting, dedupe, AI response cache       |
-| Panel / webhooks   | Express 5 + helmet + cors        | Metrics and integration endpoints              |
-| Document rendering | PyMuPDF (fitz)                   | PDF page rendering, text extraction            |
-| Office conversion  | LibreOffice headless             | DOCX/PPTX ↔ PDF fidelity                       |
-| PDF → DOCX         | `pdf2docx`                       | Editable text/table reconstruction             |
-| PDF → PPTX         | `python-pptx`                    | Slide generation from rendered pages           |
-| Image → PDF        | pdf-lib + ffmpeg                 | Lightweight, no subprocess for common formats  |
-| Logging            | Pino                             | Structured, low-overhead logging               |
-| Validation         | Zod                              | Runtime schema validation of env + config      |
-| Testing            | Vitest                           | ~1000 unit + end-to-end tests                  |
-| Containers         | Docker + Compose                 | Multi-stage builds, CI-published images        |
+| Layer              | Technology                       | Why                                           |
+| ------------------ | -------------------------------- | --------------------------------------------- |
+| Language           | TypeScript 5 (ESM)               | Type safety across the whole codebase         |
+| Runtime            | Node.js 20+                      |                                               |
+| WhatsApp           | Baileys v7                       | Low-level WA Web multi-device protocol        |
+| AI                 | Groq SDK (LLaMA 3)               | Circuit-breaker protected provider            |
+| Primary DB         | SQLite (sql.js)                  | Zero-config repositories layer                |
+| Alternative DB     | JSON stores / MongoDB            | `DB_TYPE` switchable adapters                 |
+| Cache              | In-memory LRU · Redis (optional) | Rate limiting, dedupe, AI response cache      |
+| Panel / webhooks   | Express 5 + helmet + cors        | Metrics and integration endpoints             |
+| Document rendering | PyMuPDF (fitz)                   | PDF page rendering, text extraction           |
+| Office conversion  | LibreOffice headless             | DOCX/PPTX ↔ PDF fidelity                      |
+| PDF → DOCX         | `pdf2docx`                       | Editable text/table reconstruction            |
+| PDF → PPTX         | `python-pptx`                    | Slide generation from rendered pages          |
+| Image → PDF        | pdf-lib + ffmpeg                 | Lightweight, no subprocess for common formats |
+| Logging            | Pino                             | Structured, low-overhead logging              |
+| Validation         | Zod                              | Runtime schema validation of env + config     |
+| Testing            | Vitest                           | ~1000 unit + end-to-end tests                 |
+| Containers         | Docker + Compose                 | Multi-stage builds, CI-published images       |
 
 ---
 
@@ -275,14 +275,14 @@ npm run dev    # hot-reload
 
 Useful scripts:
 
-| Script                 | What it does                                  |
-| ---------------------- | --------------------------------------------- |
-| `npm start`            | Supervisor + bot (interactive auth menu)      |
-| `npm run qr` / `npm run code` | start with QR or pairing code          |
-| `npm run dev`          | tsx watch, hot-reload                         |
-| `npm run check`        | typecheck + lint + format check               |
-| `npm test`             | full Vitest suite (~1000 tests)               |
-| `npm run test:coverage`| coverage report                               |
+| Script                        | What it does                             |
+| ----------------------------- | ---------------------------------------- |
+| `npm start`                   | Supervisor + bot (interactive auth menu) |
+| `npm run qr` / `npm run code` | start with QR or pairing code            |
+| `npm run dev`                 | tsx watch, hot-reload                    |
+| `npm run check`               | typecheck + lint + format check          |
+| `npm test`                    | full Vitest suite (~1000 tests)          |
+| `npm run test:coverage`       | coverage report                          |
 
 Auth on first run: scan the QR, or use `USE_PAIRING_CODE=true` with `PHONE_NUMBER` to get a linking code. The session persists in `SESSION_PATH` (default `./vaniasession`).
 
@@ -292,41 +292,41 @@ Auth on first run: scan the QR, or use `USE_PAIRING_CODE=true` with `PHONE_NUMBE
 
 ### Required
 
-| Variable        | Description                                        | Example               |
-| --------------- | -------------------------------------------------- | --------------------- |
-| `OWNERS` / `OWNER_JIDS` | Your WhatsApp number or JID (bot owner)     | `5215512345678`       |
-| `PHONE_NUMBER`  | Bot number (needed for pairing-code auth)          | `+5215512345678`      |
+| Variable                | Description                               | Example          |
+| ----------------------- | ----------------------------------------- | ---------------- |
+| `OWNERS` / `OWNER_JIDS` | Your WhatsApp number or JID (bot owner)   | `5215512345678`  |
+| `PHONE_NUMBER`          | Bot number (needed for pairing-code auth) | `+5215512345678` |
 
 ### AI
 
-| Variable       | Description        | Default |
-| -------------- | ------------------ | ------- |
-| `GROQ_API_KEY` | Groq API key (`gsk_...`) | — |
-| `GEMINI_API_KEY` | Optional fallback provider | — |
+| Variable         | Description                | Default |
+| ---------------- | -------------------------- | ------- |
+| `GROQ_API_KEY`   | Groq API key (`gsk_...`)   | —       |
+| `GEMINI_API_KEY` | Optional fallback provider | —       |
 
 ### Storage & infra
 
-| Variable       | Description                              | Default                  |
-| -------------- | ---------------------------------------- | ------------------------ |
-| `DB_TYPE`      | `sqlite`, `json` or `mongodb`            | `sqlite`                 |
-| `MONGODB_URI`  | MongoDB connection string (if mongodb)   | —                        |
-| `SESSION_PATH` | WhatsApp session directory               | `./vaniasession`         |
-| `CACHE_ENABLED`| In-memory cache layer                    | `true`                   |
-| `REDIS_URL`    | Redis (optional, Docker setups)          | `redis://localhost:6379` |
+| Variable        | Description                            | Default                  |
+| --------------- | -------------------------------------- | ------------------------ |
+| `DB_TYPE`       | `sqlite`, `json` or `mongodb`          | `sqlite`                 |
+| `MONGODB_URI`   | MongoDB connection string (if mongodb) | —                        |
+| `SESSION_PATH`  | WhatsApp session directory             | `./vaniasession`         |
+| `CACHE_ENABLED` | In-memory cache layer                  | `true`                   |
+| `REDIS_URL`     | Redis (optional, Docker setups)        | `redis://localhost:6379` |
 
 ### Behavior
 
-| Variable            | Description                          | Default     |
-| ------------------- | ------------------------------------ | ----------- |
-| `BOT_NAME`          | Bot display name                     | `VaniaBot`  |
-| `BOT_PREFIX`        | Command prefix (`.` and `!` also work) | `.`       |
-| `USE_PAIRING_CODE`  | Pairing code instead of QR           | `true`      |
-| `PANEL_DISABLED`    | Disable the web panel                | `false`     |
-| `PANEL_PORT`        | Panel HTTP port                      | `3000`      |
-| `ANTI_SPAM`         | Anti-spam/anti-flood enforcement     | `true`      |
-| `MAX_COMMANDS_PER_MINUTE` | Per-user command rate          | `10`        |
-| `LOG_LEVEL`         | `error` / `warn` / `info` / `debug`  | `info`      |
-| `NODE_ENV`          | `development` / `production`         | `production`|
+| Variable                  | Description                            | Default      |
+| ------------------------- | -------------------------------------- | ------------ |
+| `BOT_NAME`                | Bot display name                       | `VaniaBot`   |
+| `BOT_PREFIX`              | Command prefix (`.` and `!` also work) | `.`          |
+| `USE_PAIRING_CODE`        | Pairing code instead of QR             | `true`       |
+| `PANEL_DISABLED`          | Disable the web panel                  | `false`      |
+| `PANEL_PORT`              | Panel HTTP port                        | `3000`       |
+| `ANTI_SPAM`               | Anti-spam/anti-flood enforcement       | `true`       |
+| `MAX_COMMANDS_PER_MINUTE` | Per-user command rate                  | `10`         |
+| `LOG_LEVEL`               | `error` / `warn` / `info` / `debug`    | `info`       |
+| `NODE_ENV`                | `development` / `production`           | `production` |
 
 See [.env.example](.env.example) for the complete annotated list.
 
@@ -336,21 +336,21 @@ See [.env.example](.env.example) for the complete annotated list.
 
 VaniaBot has 300+ commands in 15 categories. Every command declares `name`, `aliases`, `usage`, `examples`, `cooldown` and permissions in its own file. A static test enforces that names and aliases are globally unique in both directions, so what `.help` shows is what runs.
 
-| Domain             | Examples                                                        |
-| ------------------ | --------------------------------------------------------------- |
-| System             | `.ping`, `.status`, `.health`, `.sysstats`, `.clearcache`       |
-| AI & Chat          | AI mention replies, audio transcription, translation            |
-| Moderation         | `.kick` (`.expulsar`), `.warn`, `.mutelist`, antilink, anti-arab|
-| Economy            | `.loteria` (buy/status/draw/`reiniciar`), loans, black market, `.shop` |
-| Rankings           | `.top` (leaderboards), `.ranking`                               |
-| Games & fun        | `.verdad` (truth-or-dare), `.ship`, `.flirt`, coinflip, RPG     |
-| Anime reactions    | `.patear`, `.neko`, `.megumin`, `.waifu`... (~70 commands)      |
-| Creative           | `.poema`, `.poesia` menu, `.haiku`, quote cards (`.qc`)         |
-| Media              | `.sticker`, `.qc`, downloads                                    |
+| Domain             | Examples                                                                 |
+| ------------------ | ------------------------------------------------------------------------ |
+| System             | `.ping`, `.status`, `.health`, `.sysstats`, `.clearcache`                |
+| AI & Chat          | AI mention replies, audio transcription, translation                     |
+| Moderation         | `.kick` (`.expulsar`), `.warn`, `.mutelist`, antilink, anti-arab         |
+| Economy            | `.loteria` (buy/status/draw/`reiniciar`), loans, black market, `.shop`   |
+| Rankings           | `.top` (leaderboards), `.ranking`                                        |
+| Games & fun        | `.verdad` (truth-or-dare), `.ship`, `.flirt`, coinflip, RPG              |
+| Anime reactions    | `.patear`, `.neko`, `.megumin`, `.waifu`... (~70 commands)               |
+| Creative           | `.poema`, `.poesia` menu, `.haiku`, quote cards (`.qc`)                  |
+| Media              | `.sticker`, `.qc`, downloads                                             |
 | Document converter | `.img2pdf`, `.pdf2img`, `.docx2pdf`, `.ppt2pdf`, `.pdf2docx`, `.pdf2ppt` |
-| Utilities          | `.traducir`, `.traducirsimple`, `.encuesta`, `.buscar`          |
-| SubBots            | `.subbot` (request/manage), `.subbots` (slots), `.listbots`     |
-| Owner              | `.broadcast`, `.backup`, `.respaldar`, `.reiniciar`-style admin |
+| Utilities          | `.traducir`, `.traducirsimple`, `.encuesta`, `.buscar`                   |
+| SubBots            | `.subbot` (request/manage), `.subbots` (slots), `.listbots`              |
+| Owner              | `.broadcast`, `.backup`, `.respaldar`, `.reiniciar`-style admin          |
 
 Prefix: the configured `BOT_PREFIX` plus `.` and `!` are always accepted (longest match wins).
 
@@ -385,6 +385,7 @@ CI (GitHub Actions) runs build, lint, typecheck, unit+coverage and a dedicated e
 <summary>"Session not found" error</summary>
 
 Delete the `vaniasession/` folder and restart to re-scan the pairing QR.
+
 </details>
 
 <details>
@@ -424,4 +425,4 @@ MIT — see [LICENSE](LICENSE) (bilingual English/Spanish) for details.
 
 ---
 
-Built by [Carlos Garcia](https://github.com/CARLOSGRCIAGRCIA)
+Built by [Carlos Garcia](https://github.com/carlosgarcia-tech)
