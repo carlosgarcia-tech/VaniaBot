@@ -244,6 +244,18 @@ curl -fsSL https://gist.githubusercontent.com/CARLOSGRCIAGRCIA/f94438ffa4dbdca20
 
 Installs Node.js, FFmpeg, clones the repo, installs dependencies, and starts the bot with a pairing code. You'll need to create a `.env` file with your credentials (see Configuration below).
 
+### Termux (Android)
+
+One command from a fresh Termux install (F-Droid or GitHub build):
+
+```bash
+pkg install -y git && git clone https://github.com/carlosgarcia-tech/VaniaBot.git && cd VaniaBot && bash install-termux.sh
+```
+
+The script installs system dependencies (Node.js 20+, Python 3, FFmpeg, yt-dlp), the npm dependencies, applies the `whatsapp-rust-bridge` patch, creates a starter `.env` (pairing-code auth ready) and verifies the whole installation. Flags: `--minimal` for low-resource devices, `--skip-npm`, `--help`.
+
+Termux caveats: LibreOffice does not exist on Android, so `docx→pdf` and `ppt→pdf` conversions are unavailable there (`pdf→img`, `pdf→docx` and `pdf→pptx` work when PyMuPDF installs successfully). To keep the bot alive 24/7 use `termux-wake-lock` plus PM2 — the installer prints the exact commands when it finishes.
+
 ### Docker (recommended for production)
 
 ```bash
