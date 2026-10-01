@@ -18,64 +18,7 @@ import type { MessageContext } from '@/types/index.js';
 import { getContextInfo } from '@/utils/getContextInfo.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { PermissionService } from '@/services/PermissionService.js';
-
-const BLOCKED_PROMPT_PATTERNS = [
-  /ignore\s+(all\s+)?(previous|prior|above)\s+(instructions?|orders?|commands?|directions?)/i,
-  /disregard\s+(all\s+)?(your\s+)?(system\s+)?(prompt|instructions?|constraints?)/i,
-  /forget\s+(your\s+)?(previous|prior|system)\s+(instructions?|prompt)/i,
-  /\b(you\s+are\s+now|act\s+as|pretend\s+you\s+are)\b/i,
-  /\b(jailbreak|bypass|unfilter|devmode|developer\s+mode)\b/i,
-  /\b(DAN|STAN|Jailbreak)\b/i,
-  /\{(system\s*prompt|base64|decode|exec|eval)\}/i,
-  /<\|(system|version|end)\|>/i,
-  /\[\s*(\*|system)\s*\]/i,
-  /new\s+system:\s*/i,
-  /end\s+(of\s+)?(your\s+)?(system\s+)?(prompt|instructions?)/i,
-  /override\s+(your\s+)?(safety|content\s+policy)/i,
-  /ignore\s+all\s+previous\s+rules?/i,
-  /you\s+have\s+no\s+(restrictions?|limitations?|safety)/i,
-  /\$system\$|\$user\$|\$assistant\$/i,
-  /@(?:sudo|admin|root|exec|shell)/i,
-  /\x00|\x1b|\u200b|\u202e/,
-];
-
-const BLOCKED_CONTENT_PATTERNS = [
-  /<\?php|\$\w+\s*=/i,
-  /import\s+(os|sys|subprocess)/i,
-  /require\s*\(|exec\s*\(|eval\s*\(/i,
-  /SELECT\s+.+\s+FROM\s+/i,
-  /DROP\s+TABLE/i,
-  /DELETE\s+FROM\s+/i,
-  /<\s*script/i,
-  /javascript:/i,
-  /data:text\/html/i,
-];
-
-function detectPromptInjection(text: string): { blocked: boolean; reason?: string } {
-  for (const pattern of BLOCKED_PROMPT_PATTERNS) {
-    if (pattern.test(text)) {
-      return { blocked: true, reason: 'prompt_injection' };
-    }
-  }
-
-  for (const pattern of BLOCKED_CONTENT_PATTERNS) {
-    if (pattern.test(text)) {
-      return { blocked: true, reason: 'malicious_content' };
-    }
-  }
-
-  const nullBytes = (text.match(/\x00/g) || []).length;
-  if (nullBytes > 0) {
-    return { blocked: true, reason: 'null_byte_injection' };
-  }
-
-  const unicodeOverloads = (text.match(/[\u200b-\u200f\u2028-\u202f]/g) || []).length;
-  if (unicodeOverloads > 50) {
-    return { blocked: true, reason: 'unicode_overload' };
-  }
-
-  return { blocked: false };
-}
+import { detectPromptInjection } from '@/utils/promptInjection.js';
 
 /**
  * Handles mention events for AI chat.
