@@ -5,7 +5,7 @@
 #                Optimizado para Android/Termux
 #
 # Autor: Carlos G (@CARLOSGRCIAGRCIA)
-# Versión: 7.1.0
+# Versión: leída dinámicamente de package.json
 # Compatibilidad: Termux (Android 7.0+), Node.js 20+
 #
 # Instalación en un solo comando (Termux recién instalado):
@@ -38,6 +38,11 @@ TERMUX_SHARE="/data/data/com.termux/files/usr"
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="$CURRENT_DIR/install-termux.log"
 NODE_MAJOR_MIN=20
+
+# Versión del bot, leída de package.json (sin depender de node/jq,
+# que pueden no estar instalados todavía al iniciar el instalador)
+BOT_VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$CURRENT_DIR/package.json" 2>/dev/null | head -n1)"
+BOT_VERSION="${BOT_VERSION:-desconocida}"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Funciones de utilidad
@@ -85,7 +90,7 @@ ${BOLD}Opciones:${NC}
     --help      Mostrar esta ayuda
 
 ${BOLD}Descripción:${NC}
-    Instala VaniaBot (v7.1.0) en Termux con todas las dependencias
+    Instala VaniaBot (v$BOT_VERSION) en Termux con todas las dependencias
     necesarias para funcionar correctamente en Android.
 
     Modo completo instala además:
@@ -541,9 +546,9 @@ main() {
     done
 
     # Iniciar log
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] === Iniciando instalación de VaniaBot v7.1.0 ===" > "$LOG_FILE"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] === Iniciando instalación de VaniaBot v$BOT_VERSION ===" > "$LOG_FILE"
 
-    header "VaniaBot v7.1.0 - Instalación para Termux"
+    header "VaniaBot v$BOT_VERSION - Instalación para Termux"
 
     echo -e "${BOLD}Modo de instalación:${NC} ${CYAN}$INSTALL_MODE${NC}"
     echo ""
