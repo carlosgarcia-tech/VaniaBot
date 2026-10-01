@@ -12,6 +12,12 @@
  * afirmen sobre ellos; `receive()` inyecta un messages.upsert como el
  * que Baileys emitiría con un mensaje entrante real, y emit() permite
  * disparar cualquier otro evento del bus (connection.update, etc.).
+ *
+ * Los participantes de grupo son configurables por test (`setGroup`) para
+ * poder afirmar sobre permisos, antilink en modo kick y silencios: sin eso,
+ * `participants: []` hace que el bot nunca sea admin. Cada cambio de
+ * participantes debe ir acompañado de una invalidación de caches
+ * (ver harness/groups.ts).
  */
 
 import type { AnyMessageContent, WAMessage } from 'baileys';
@@ -22,6 +28,25 @@ export interface SentMessage {
   opts?: Record<string, unknown>;
 }
 
+export interface FakeParticipant {
+  id: string;
+  admin?: 'admin' | 'superadmin' | 'member' | null;
+  name?: string;
+}
+
+export interface ParticipantUpdate {
+  jid: string;
+  participants: string[];
+  action: string;
+}
+
+export interface FakeGroup {
+  subject: string;
+  participants: FakeParticipant[];
+}
+
+export type UpsertType = 'notify' | 'append';
+
 type EventHandler = (payload: unknown) => void;
 
 export class FakeWASocket {
@@ -30,7 +55,11 @@ export class FakeWASocket {
   /** Mensajes enviados por el bot, en orden de llegada. */
   readonly sent: SentMessage[] = [];
 
+  /** Llamadas a groupParticipantsUpdate (kick/remove, add, etc.). */
+  readonly participantUpdates: ParticipantUpdate[] = [];
+
   private readonly handlers = new Map<string, Set<EventHandler>>();
+  private readonly groups = new Map<string, FakeGroup>();
   private messageIdCounter = 0;
 
   readonly ev = {
@@ -50,9 +79,20 @@ export class FakeWASocket {
     }
   }
 
-  /** Inyecta un messages.upsert (type notify) con el mensaje dado. */
-  receive(message: WAMessage): void {
-    this.emit('messages.upsert', { messages: [message], type: 'notify' });
+/**
+   * Inyecta un messages.upsert con el mensaje dado. `append` reproduce la
+   * sincronización de historial: el pipeline solo procesa `notify`.
+   */
+  receive(message: WAMessage, type: UpsertType = 'notify'): void {
+    this.emit('messages.upsert', { messages: [message], type });
+  }
+
+  /**
+   * Inyecta varios mensajes en un solo upsert (como el burst que emite
+   * Baileys al reconectar con historial pendiente).
+   */
+  receiveMany(messages: WAMessage[], type: UpsertType = 'notify'): void {
+    this.emit('messages.upsert', { messages, type });
   }
 
   async sendMessage(
@@ -74,11 +114,29 @@ export class FakeWASocket {
     throw new Error('FakeWASocket: sin foto de perfil');
   }
 
-  async groupMetadata(jid: string): Promise<unknown> {
-    return { id: jid, subject: 'Grupo de prueba', participants: [] };
+  /**
+   * Define la metadata de un grupo (participantes y admin flags). Sustituye
+   * la respuesta por defecto de participants: [].
+   */
+  setGroup(jid: string, group: Partial<FakeGroup> = {}): void {
+    const current = this.groups.get(jid);
+    this.groups.set(jid, {
+      subject: group.subject ?? current?.subject ?? 'Grupo de prueba',
+      participants: group.participants ?? current?.participants ?? [],
+    });
   }
 
-  async groupParticipantsUpdate(): Promise<unknown> {
+  async groupMetadata(jid: string): Promise<unknown> {
+    const group = this.groups.get(jid) ?? { subject: 'Grupo de prueba', participants: [] };
+    return { id: jid, subject: group.subject, participants: group.participants };
+  }
+
+  async groupParticipantsUpdate(
+    jid: string,
+    participants: string[],
+    action: string,
+  ): Promise<unknown> {
+    this.participantUpdates.push({ jid, participants, action });
     return [];
   }
 
@@ -94,7 +152,22 @@ export class FakeWASocket {
       .filter(t => t.length > 0);
   }
 
+  /** Claves de los mensajes que el bot intentó borrar (delete). */
+  deletions(): string[] {
+    return this.sent
+      .map(s => (s.content as { delete?: { id?: string } }).delete?.id)
+      .filter((id): id is string => typeof id === 'string');
+  }
+
+  /** Reacciones enviadas por el bot (ctx.react). */
+  reactions(): string[] {
+    return this.sent
+      .map(s => (s.content as { react?: { text?: string } }).react?.text)
+      .filter((emoji): emoji is string => typeof emoji === 'string');
+  }
+
   reset(): void {
     this.sent.length = 0;
+    this.participantUpdates.length = 0;
   }
 }
