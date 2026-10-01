@@ -12,7 +12,8 @@
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 import { bootBot, type BootState } from './harness/boot.js';
-import { dmTextMessage, senderJid } from './harness/fixtures.js';
+import { dmTextMessage, groupTextMessage, senderJid } from './harness/fixtures.js';
+import { member, setParticipants } from './harness/groups.js';
 
 vi.mock('@/services/external/AIService.js', () => ({
   aiService: {
@@ -60,6 +61,45 @@ describe('e2e: puerta de permisos', () => {
       await wait();
 
       expect(socket.texts()).toContain('❌ No tienes permiso para usar este comando');
+    },
+    TIMEOUT,
+  );
+
+  it(
+    'un owner de configuración sí puede usar el comando OWNER-only',
+    async () => {
+      const { config } = await import('@/config/index.js');
+      const ownerPhone = config.owners.find(owner => !owner.includes('@lid'));
+      const ownerJid = `${ownerPhone}@s.whatsapp.net`;
+
+      socket.receive(dmTextMessage('!metrics', ownerJid));
+      await wait();
+
+      // La puerta deja pasar y el comando se ejecuta de verdad.
+      expect(socket.texts().some(t => t.includes('Métricas de VaniaBot'))).toBe(true);
+      expect(socket.texts()).not.toContain('❌ No tienes permiso para usar este comando');
+    },
+    TIMEOUT,
+  );
+
+  it(
+    'un owner es tratado como admin en grupo y pasa un comando ADMIN-only',
+    async () => {
+      const group = `1203630355555555${String(Date.now() % 100).padStart(2, '0')}@g.us`;
+      const { config } = await import('@/config/index.js');
+      const ownerPhone = config.owners.find(owner => !owner.includes('@lid'));
+      const ownerJid = `${ownerPhone}@s.whatsapp.net`;
+
+      const { serviceManager } = await import('@/services/system/Servicemanager.js');
+      await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+      // Ni el owner ni el bot figuran como admin: el owner debe suplirlo.
+      await setParticipants(socket, group, [{ id: ownerJid }, member(senderJid(3))]);
+
+      // !mutelist es GROUP + ADMIN-only.
+      socket.receive(groupTextMessage('!mutelist', group, ownerJid));
+      await wait();
+
+      expect(socket.texts()).not.toContain('❌ No tienes permiso para usar este comando');
     },
     TIMEOUT,
   );
