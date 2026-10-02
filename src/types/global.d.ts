@@ -1,3 +1,7 @@
+/**
+ * Global type declarations for VaniaBot.
+ * Provides TypeScript types for global variables.
+ */
 declare global {
   var db: {
     data: {

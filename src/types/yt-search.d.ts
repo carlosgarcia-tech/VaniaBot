@@ -1,3 +1,7 @@
+/**
+ * Type declarations for 'yt-search' module.
+ * Provides TypeScript types for YouTube search results.
+ */
 declare module 'yt-search' {
   export interface VideoSearchResult {
     videoId: string;
