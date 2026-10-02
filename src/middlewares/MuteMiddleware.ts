@@ -3,9 +3,20 @@ import type { MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 import { middlewareCache } from './MiddlewareCache.js';
 
+/**
+ * Middleware that handles muted users in group chats.
+ * Deletes messages from muted users if the bot is an admin.
+ */
 export class MuteMiddleware extends Middleware {
   name = 'mute';
 
+  /**
+   * Executes the mute check.
+   *
+   * @param ctx - The message context.
+   * @param next - The next middleware in the chain.
+   * @returns A promise that resolves when the check completes.
+   */
   async execute(ctx: MessageContext, next: () => Promise<void>): Promise<void> {
     if (!ctx.chat.isGroup) {
       await next();
@@ -24,7 +35,7 @@ export class MuteMiddleware extends Middleware {
             delete: ctx.message.key,
           });
         } catch (error) {
-          logError('[MUTE] Error al eliminar mensaje', error);
+          logError('[MUTE] Error deleting message', error);
         }
       }
 

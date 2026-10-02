@@ -3,12 +3,6 @@
  *
  * Middleware for checking user and bot permissions before command execution.
  * Includes support for admin-only mode and owner exceptions.
- *
- * @author **Carlos G** ⭐
- * @github CARLOSGRCIAGRCIA
- * @tiktok carlos.grcia0
- * @instagram carlos.gxv
- * @created 2026-03-16
  */
 
 import { Middleware } from './Middleware.js';
@@ -41,7 +35,7 @@ export class PermissionMiddleware extends Middleware {
    *
    * @param ctx - The message context
    * @param next - The next middleware in the chain
-   * @returns Promise<void>
+   * @returns Promise that resolves when permission checks complete
    */
   async execute(ctx: MessageContext, next: () => Promise<void>): Promise<void> {
     const command = this.registry.get(ctx.command);
@@ -75,12 +69,12 @@ export class PermissionMiddleware extends Middleware {
     }
 
     if (!(await this.checkUserPermissions(command, ctx))) {
-      await ctx.reply('❌ No tienes permiso para usar este comando');
+      await ctx.reply('You do not have permission to use this command');
       return;
     }
 
     if (ctx.chat.isGroup && !this.checkBotPermissions(command, ctx)) {
-      await ctx.reply('❌ El bot necesita ser admin para ejecutar este comando');
+      await ctx.reply('The bot needs to be admin to execute this command');
       return;
     }
 

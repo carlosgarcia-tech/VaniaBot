@@ -12,8 +12,6 @@
  * continue through the FULL middleware chain (validation, permissions,
  * cooldown, gates), closing the previous bypass that executed the command
  * directly. Commands outside PIN_ALLOWED_COMMANDS are never confirmed.
- *
- * @author **Carlos G** ⭐
  */
 
 import { Middleware } from './Middleware.js';
@@ -21,9 +19,20 @@ import type { MessageContext } from '@/types/index.js';
 import { pinVerificationService } from '@/services/system/PinVerificationService.js';
 import { logger } from '@/utils/logger.js';
 
+/**
+ * Middleware that verifies PIN codes for owner-only commands.
+ * Runs as a guard in the message pipeline to intercept PIN replies.
+ */
 export class PinVerificationMiddleware extends Middleware {
   name = 'pin-verification';
 
+  /**
+   * Executes the PIN verification.
+   *
+   * @param ctx - The message context.
+   * @param next - The next middleware in the chain.
+   * @returns A promise that resolves when verification completes.
+   */
   async execute(ctx: MessageContext, next: () => Promise<void>): Promise<void> {
     if (!ctx.chat.isGroup && ctx.sender.isOwner) {
       // A bare reply has command:'' and args:[], so the code lives in text;
@@ -42,7 +51,7 @@ export class PinVerificationMiddleware extends Middleware {
           if (!pending) {
             logger.warn(`[PinVerification] Refusing non-whitelisted command '${result.command}'`);
             await ctx.react('❌');
-            await ctx.reply('⚠️ Comando no permitido para confirmación por PIN.');
+            await ctx.reply('Command not allowed for PIN confirmation.');
             return;
           }
 
@@ -58,7 +67,7 @@ export class PinVerificationMiddleware extends Middleware {
           await next();
         } else {
           await ctx.react('❌');
-          await ctx.reply('⚠️ PIN inválido o expirado. Necesitas ejecutar el comando de nuevo.');
+          await ctx.reply('Invalid or expired PIN. You need to run the command again.');
         }
         return;
       }

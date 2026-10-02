@@ -9,6 +9,10 @@ interface UserMessageTracker {
   lastWarningAt: number;
 }
 
+/**
+ * Middleware that detects and prevents spam in group chats.
+ * Tracks message frequency per user and issues warnings/kicks based on configuration.
+ */
 export class AntiSpamMiddleware extends Middleware {
   name = 'anti-spam';
 
@@ -21,6 +25,13 @@ export class AntiSpamMiddleware extends Middleware {
     this.cleanupTimer = setInterval(() => this.cleanup(), this.CLEANUP_INTERVAL);
   }
 
+  /**
+   * Executes the anti-spam check.
+   *
+   * @param ctx - The message context.
+   * @param next - The next middleware in the chain.
+   * @returns A promise that resolves when the check completes.
+   */
   async execute(ctx: MessageContext, next: () => Promise<void>): Promise<void> {
     if (!ctx.chat.isGroup) {
       await next();
@@ -55,12 +66,12 @@ export class AntiSpamMiddleware extends Middleware {
       tracker.lastWarningAt = now;
 
       if (tracker.warnings === 1) {
-        await ctx.reply('⚠️ *Advertencia:* No hagas spam');
+        await ctx.reply('Warning: Do not spam');
         return;
       }
 
       if (tracker.warnings === 2) {
-        await ctx.reply('⚠️ *Última advertencia:* Deja de hacer spam o serás expulsado');
+        await ctx.reply('Final warning: Stop spamming or you will be removed');
         return;
       }
 
@@ -68,10 +79,10 @@ export class AntiSpamMiddleware extends Middleware {
         try {
           await ctx.sock.groupParticipantsUpdate(ctx.chat.jid, [ctx.sender.jid], 'remove');
           await ctx.sock.sendMessage(ctx.chat.jid, {
-            text: `❌ ${ctx.sender.pushName} fue expulsado por spam`,
+            text: `${ctx.sender.pushName} was removed for spam`,
           });
         } catch (_err) {
-          await ctx.reply('❌ No pude expulsar al usuario (falta permisos)');
+          await ctx.reply('Could not remove user (missing permissions)');
         } finally {
           this.userMessages.delete(key);
         }
@@ -79,7 +90,7 @@ export class AntiSpamMiddleware extends Middleware {
       }
 
       if (tracker.warnings >= 3) {
-        await ctx.reply('❌ Spam detectado. Serías expulsado si el bot fuera administrador.');
+        await ctx.reply('Spam detected. Would be removed if bot were admin.');
         return;
       }
     }
@@ -99,7 +110,7 @@ export class AntiSpamMiddleware extends Middleware {
   }
 
   /**
-   * Reset a user's accumulated warnings if they behaved for a while.
+   * Resets a user's accumulated warnings if they behaved for a while.
    * Uses lastWarningAt as the reference: the messages array is already
    * filtered to the current window, so deriving activity from its newest
    * entry would make the decay almost never fire.
@@ -113,6 +124,10 @@ export class AntiSpamMiddleware extends Middleware {
     }
   }
 
+  /**
+   * Stops the cleanup timer.
+   * Should be called on application shutdown.
+   */
   stop(): void {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
