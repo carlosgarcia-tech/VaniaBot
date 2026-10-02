@@ -9,6 +9,10 @@ interface BufferedItem {
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+/**
+ * Buffers media group messages to handle album-style messages as a single unit.
+ * Implements singleton pattern for global access.
+ */
 export class MediaGroupBuffer {
   private static instance: MediaGroupBuffer;
   private buffers = new Map<string, BufferedItem[]>();
@@ -20,6 +24,11 @@ export class MediaGroupBuffer {
     this.cleanupInterval.unref();
   }
 
+  /**
+   * Gets the singleton instance of MediaGroupBuffer.
+   *
+   * @returns The MediaGroupBuffer instance.
+   */
   static getInstance(): MediaGroupBuffer {
     if (!MediaGroupBuffer.instance) {
       MediaGroupBuffer.instance = new MediaGroupBuffer();
@@ -27,10 +36,24 @@ export class MediaGroupBuffer {
     return MediaGroupBuffer.instance;
   }
 
+  /**
+   * Generates a unique key for a chat/sender combination.
+   *
+   * @param chatJid - The chat JID.
+   * @param senderJid - The sender JID.
+   * @returns A unique key string.
+   */
   private key(chatJid: string, senderJid: string): string {
     return `${chatJid}:${senderJid}`;
   }
 
+  /**
+   * Adds a message to the buffer.
+   *
+   * @param chatJid - The chat JID.
+   * @param senderJid - The sender JID.
+   * @param message - The WhatsApp message to buffer.
+   */
   add(chatJid: string, senderJid: string, message: WAMessage): void {
     if (!chatJid || !senderJid) return;
     const k = this.key(chatJid, senderJid);
@@ -39,11 +62,26 @@ export class MediaGroupBuffer {
     this.buffers.set(k, list);
   }
 
+  /**
+   * Checks if there are any buffered messages for a chat/sender.
+   *
+   * @param chatJid - The chat JID.
+   * @param senderJid - The sender JID.
+   * @returns True if there are buffered messages.
+   */
   hasAny(chatJid: string, senderJid: string): boolean {
     const list = this.buffers.get(this.key(chatJid, senderJid));
     return !!list && list.length > 0;
   }
 
+  /**
+   * Consumes and removes all buffered messages for a chat/sender.
+   * Deduplicates by message ID and sorts by timestamp.
+   *
+   * @param chatJid - The chat JID.
+   * @param senderJid - The sender JID.
+   * @returns An array of consumed messages.
+   */
   private consume(chatJid: string, senderJid: string): WAMessage[] {
     const k = this.key(chatJid, senderJid);
     const list = this.buffers.get(k) ?? [];
@@ -61,6 +99,16 @@ export class MediaGroupBuffer {
       .map(item => item.message);
   }
 
+  /**
+   * Waits for media group to settle, then consumes all messages.
+   * Waits until no new messages arrive for settleMs, up to maxWaitMs.
+   *
+   * @param chatJid - The chat JID.
+   * @param senderJid - The sender JID.
+   * @param settleMs - Time to wait after last message (default: 1200ms).
+   * @param maxWaitMs - Maximum total wait time (default: 6000ms).
+   * @returns A promise that resolves to the consumed messages.
+   */
   async waitAndConsume(
     chatJid: string,
     senderJid: string,
@@ -86,6 +134,9 @@ export class MediaGroupBuffer {
     return this.consume(chatJid, senderJid);
   }
 
+  /**
+   * Removes expired buffers based on TTL.
+   */
   private cleanup(): void {
     const now = Date.now();
     for (const [key, list] of this.buffers.entries()) {
@@ -98,6 +149,10 @@ export class MediaGroupBuffer {
     }
   }
 
+  /**
+   * Stops the cleanup interval.
+   * Should be called on application shutdown.
+   */
   stop(): void {
     clearInterval(this.cleanupInterval);
   }

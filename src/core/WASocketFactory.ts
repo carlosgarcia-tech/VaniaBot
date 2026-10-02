@@ -46,6 +46,8 @@ export interface ErrorWithStatus {
  * Resolves the WA version to use: the forced version, cached after the first
  * call. Used instead of fetchLatestBaileysVersion(), which currently returns
  * stale data and causes 405 "Connection Failure" rejections.
+ *
+ * @returns The forced WhatsApp Web version tuple.
  */
 export function getWAVersion(): [number, number, number] {
   if (_cachedVersion) return _cachedVersion;
@@ -67,6 +69,9 @@ export interface BuildWASocketOptionsArgs {
  * Builds the Baileys socket options shared by main bot and subbots.
  * Per-caller differences (browser identity, keep-alive, retry delay, ...)
  * are passed via `overrides` so each site keeps its exact behavior.
+ *
+ * @param args - The build options including auth and optional overrides.
+ * @returns The complete Baileys socket configuration.
  */
 export function buildWASocketOptions(args: BuildWASocketOptionsArgs): WASocketConfig {
   return {
@@ -89,12 +94,22 @@ export function buildWASocketOptions(args: BuildWASocketOptionsArgs): WASocketCo
   };
 }
 
-/** Creates a cacheable signal key store using the shared silent logger. */
+/**
+ * Creates a cacheable signal key store using the shared silent logger.
+ *
+ * @param keys - The signal key store to wrap.
+ * @returns A cacheable signal key store.
+ */
 export function createCacheableKeyStore(keys: SignalKeyStore): SignalKeyStore {
   return makeCacheableSignalKeyStore(keys, SILENT_WA_LOGGER);
 }
 
-/** Thin wrapper so callers get the socket from the shared factory. */
+/**
+ * Thin wrapper so callers get the socket from the shared factory.
+ *
+ * @param options - The Baileys socket options.
+ * @returns The created WASocket instance.
+ */
 export function createWASocket(options: WASocketConfig): ReturnType<typeof makeWASocket> {
   return makeWASocket(options);
 }

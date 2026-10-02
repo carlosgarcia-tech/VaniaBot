@@ -34,7 +34,12 @@ export interface DisconnectInfo {
   message?: string;
 }
 
-/** Extracts statusCode/message from a Baileys `lastDisconnect` payload. */
+/**
+ * Extracts statusCode/message from a Baileys `lastDisconnect` payload.
+ *
+ * @param lastDisconnect - The last disconnect payload from Baileys.
+ * @returns An object with statusCode and message.
+ */
 export function extractDisconnectInfo(lastDisconnect: unknown): DisconnectInfo {
   const error = lastDisconnect as
     { error?: { output?: { statusCode?: number }; message?: string } } | undefined;
@@ -49,6 +54,9 @@ export function extractDisconnectInfo(lastDisconnect: unknown): DisconnectInfo {
  * Maps a raw disconnect status code to its semantic category.
  * Uses DisconnectReason members (not literals) so it stays consistent with
  * the installed Baileys version.
+ *
+ * @param statusCode - The disconnect status code.
+ * @returns The semantic disconnect category.
  */
 export function classifyDisconnect(statusCode?: number): DisconnectCategory {
   if (statusCode === undefined) return 'unknown';
@@ -75,7 +83,15 @@ export function classifyDisconnect(statusCode?: number): DisconnectCategory {
   return 'unknown';
 }
 
-/** Exponential backoff (factor 1.5) capped at maxDelayMs. */
+/**
+ * Computes exponential backoff delay for reconnection attempts.
+ *
+ * @param attempt - The attempt number (1-based).
+ * @param baseDelayMs - The base delay in milliseconds.
+ * @param maxDelayMs - The maximum delay cap in milliseconds.
+ * @param factor - The exponential factor (default: 1.5).
+ * @returns The computed delay in milliseconds.
+ */
 export function computeReconnectDelayMs(
   attempt: number,
   baseDelayMs: number,
@@ -85,12 +101,24 @@ export function computeReconnectDelayMs(
   return Math.min(baseDelayMs * Math.pow(factor, Math.max(0, attempt - 1)), maxDelayMs);
 }
 
-/** Next backoff step given the current delay (used by sequential backoff). */
+/**
+ * Computes the next backoff step given the current delay (used by sequential backoff).
+ *
+ * @param currentDelayMs - The current delay in milliseconds.
+ * @param maxDelayMs - The maximum delay cap in milliseconds.
+ * @param factor - The exponential factor (default: 1.5).
+ * @returns The next delay in milliseconds.
+ */
 export function nextBackoff(currentDelayMs: number, maxDelayMs: number, factor = 1.5): number {
   return Math.min(currentDelayMs * factor, maxDelayMs);
 }
 
-/** Low-level transport snapshot of a Baileys socket (avoids `any` casts everywhere). */
+/**
+ * Low-level transport snapshot of a Baileys socket (avoids `any` casts everywhere).
+ *
+ * @param sock - The socket instance.
+ * @returns An object with readyState and hasUser properties.
+ */
 export function socketTransportState(sock: unknown): {
   readyState?: number;
   hasUser: boolean;
@@ -110,6 +138,10 @@ export function socketTransportState(sock: unknown): {
  * Deletes every file inside a session directory. Returns the number of files
  * removed (0 when the directory does not exist). Errors are logged, not
  * thrown, so callers can keep their reconnect flow running.
+ *
+ * @param sessionPath - The path to the session directory.
+ * @param logTag - Optional tag for logging (default: '[WADisconnect]').
+ * @returns The number of files removed.
  */
 export function clearSessionFiles(sessionPath: string, logTag = '[WADisconnect]'): number {
   try {

@@ -6,6 +6,10 @@ interface QueuedMessage {
   parallel?: boolean;
 }
 
+/**
+ * Processes messages with configurable parallel and sequential queues.
+ * Extends EventEmitter to emit 'processed' and 'error' events.
+ */
 export class RealTimeMessageProcessor extends EventEmitter {
   private processing = new Set<string>();
   private sequentialQueue: QueuedMessage[] = [];
@@ -14,6 +18,14 @@ export class RealTimeMessageProcessor extends EventEmitter {
   private maxParallel = 3;
   private activeParallel = 0;
 
+  /**
+   * Queues a message for processing.
+   *
+   * @param messageId - Unique identifier for the message.
+   * @param handler - Async function to process the message.
+   * @param parallel - Whether to process in parallel queue (default: false).
+   * @returns True if queued, false if messageId is already being processed.
+   */
   async process(
     messageId: string,
     handler: () => Promise<void>,
@@ -39,6 +51,12 @@ export class RealTimeMessageProcessor extends EventEmitter {
     return true;
   }
 
+  /**
+   * Processes the next item in the parallel queue.
+   * Maintains concurrency limit via activeParallel counter.
+   *
+   * @returns A promise that resolves when the item is processed.
+   */
   private async processParallelQueue(): Promise<void> {
     // One item per call: the finally block re-invokes this when a slot frees
     // up, so the concurrency cap can never be exceeded.
@@ -61,6 +79,12 @@ export class RealTimeMessageProcessor extends EventEmitter {
     }
   }
 
+  /**
+   * Processes the sequential queue one item at a time.
+   * Ensures FIFO order for sequential messages.
+   *
+   * @returns A promise that resolves when the queue is empty.
+   */
   private async processSequentialQueue(): Promise<void> {
     if (this.isProcessingSequential) return;
     if (this.sequentialQueue.length === 0) return;
@@ -84,6 +108,11 @@ export class RealTimeMessageProcessor extends EventEmitter {
     }
   }
 
+  /**
+   * Gets current queue statistics.
+   *
+   * @returns An object with queue sizes and processing counts.
+   */
   getStats() {
     return {
       processing: this.processing.size,

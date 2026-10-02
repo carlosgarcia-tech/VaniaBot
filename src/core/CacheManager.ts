@@ -3,12 +3,6 @@
  *
  * Unified caching system for permissions, group metadata, users, and message deduplication.
  * Uses LRU cache with TTL support for optimal performance.
- *
- * @author **Carlos G** ⭐
- * @github CARLOSGRCIAGRCIA
- * @tiktok carlos.grcia0
- * @instagram carlos.gxv
- * @created 2026-03-16
  */
 
 import { LRUCache } from 'lru-cache';
@@ -92,6 +86,13 @@ export class UnifiedCacheManager {
     );
   }
 
+  /**
+   * Gets cached permissions for a user in a group.
+   *
+   * @param groupJid - The group JID.
+   * @param userJid - The user JID.
+   * @returns The cached permissions, or null if not found.
+   */
   getPermissions(groupJid: string, userJid: string): PermissionData | null {
     const key = `${groupJid}:${userJid}`;
     const cached = this.permissionsCache.get(key);
@@ -103,11 +104,23 @@ export class UnifiedCacheManager {
     return null;
   }
 
+  /**
+   * Sets permissions for a user in a group.
+   *
+   * @param groupJid - The group JID.
+   * @param userJid - The user JID.
+   * @param perms - The permissions to cache.
+   */
   setPermissions(groupJid: string, userJid: string, perms: PermissionData): void {
     const key = `${groupJid}:${userJid}`;
     this.permissionsCache.set(key, perms);
   }
 
+  /**
+   * Invalidates permissions cache for a group or all groups.
+   *
+   * @param groupJid - Optional group JID. If not provided, clears all permissions.
+   */
   invalidatePermissions(groupJid?: string): void {
     if (groupJid) {
       for (const key of this.permissionsCache.keys()) {
@@ -120,6 +133,12 @@ export class UnifiedCacheManager {
     }
   }
 
+  /**
+   * Gets cached group metadata.
+   *
+   * @param groupJid - The group JID.
+   * @returns The cached group metadata, or null if not found.
+   */
   getGroupMetadata(groupJid: string): GroupMetadata | null {
     const cached = this.groupMetadataCache.get(groupJid);
     if (cached) {
@@ -130,12 +149,25 @@ export class UnifiedCacheManager {
     return null;
   }
 
+  /**
+   * Sets group metadata in cache.
+   *
+   * @param groupJid - The group JID.
+   * @param metadata - The group metadata to cache.
+   */
   setGroupMetadata(groupJid: string, metadata: GroupMetadata): void {
     this.groupMetadataCache.set(groupJid, metadata);
     const participants = metadata.participants.map(p => p.id);
     this.participantsCache.set(groupJid, participants);
   }
 
+  /**
+   * Gets group metadata from cache or fetches from WhatsApp.
+   *
+   * @param sock - The WhatsApp socket.
+   * @param groupJid - The group JID.
+   * @returns A promise that resolves to the group metadata.
+   */
   async getGroupMetadataSafe(sock: WASocket, groupJid: string): Promise<GroupMetadata> {
     const cached = this.getGroupMetadata(groupJid);
     if (cached) return cached;
@@ -145,12 +177,23 @@ export class UnifiedCacheManager {
     return metadata;
   }
 
+  /**
+   * Invalidates group metadata and related caches.
+   *
+   * @param groupJid - The group JID.
+   */
   invalidateGroupMetadata(groupJid: string): void {
     this.groupMetadataCache.delete(groupJid);
     this.participantsCache.delete(groupJid);
     this.invalidatePermissions(groupJid);
   }
 
+  /**
+   * Gets cached group participants.
+   *
+   * @param groupJid - The group JID.
+   * @returns The cached participants array, or null if not found.
+   */
   getGroupParticipants(groupJid: string): string[] | null {
     const cached = this.participantsCache.get(groupJid);
     if (cached) {
@@ -161,10 +204,22 @@ export class UnifiedCacheManager {
     return null;
   }
 
+  /**
+   * Sets group participants in cache.
+   *
+   * @param groupJid - The group JID.
+   * @param participants - The participants array to cache.
+   */
   setGroupParticipants(groupJid: string, participants: string[]): void {
     this.participantsCache.set(groupJid, participants);
   }
 
+  /**
+   * Gets cached user data.
+   *
+   * @param jid - The user JID.
+   * @returns The cached user data, or null if not found.
+   */
   getUser(jid: string): CachedUser | null {
     const cached = this.userCache.get(jid);
     if (cached) {
@@ -175,22 +230,49 @@ export class UnifiedCacheManager {
     return null;
   }
 
+  /**
+   * Sets user data in cache.
+   *
+   * @param jid - The user JID.
+   * @param user - The user data to cache.
+   */
   setUser(jid: string, user: CachedUser): void {
     this.userCache.set(jid, user);
   }
 
+  /**
+   * Invalidates a user from cache.
+   *
+   * @param jid - The user JID.
+   */
   invalidateUser(jid: string): void {
     this.userCache.delete(jid);
   }
 
+  /**
+   * Checks if a message ID has been processed.
+   *
+   * @param messageId - The message ID.
+   * @returns True if the message has been processed.
+   */
   hasProcessedMessage(messageId: string): boolean {
     return this.messageIdCache.has(messageId);
   }
 
+  /**
+   * Marks a message as processed.
+   *
+   * @param messageId - The message ID.
+   */
   markMessageProcessed(messageId: string): void {
     this.messageIdCache.add(messageId);
   }
 
+  /**
+   * Gets cache statistics.
+   *
+   * @returns An object with hits, misses, hit rate, and cache sizes.
+   */
   getStats() {
     const total = this.stats.hits + this.stats.misses;
     return {
@@ -206,6 +288,9 @@ export class UnifiedCacheManager {
     };
   }
 
+  /**
+   * Stops the cache manager and clears all caches.
+   */
   stop(): void {
     if (this.messageIdCacheTimer) {
       clearInterval(this.messageIdCacheTimer);
@@ -214,6 +299,9 @@ export class UnifiedCacheManager {
     this.clear();
   }
 
+  /**
+   * Clears all caches.
+   */
   clear(): void {
     this.permissionsCache.clear();
     this.groupMetadataCache.clear();
