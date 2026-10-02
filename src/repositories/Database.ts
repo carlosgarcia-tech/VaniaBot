@@ -6,6 +6,9 @@
  *
  * NO Redis dependency - SQLite as single source of truth.
  * Uses sql.js (WebAssembly) for cross-platform compatibility (Termux/Docker/Linux).
+ *
+ * @author Carlos G
+ * @created 2026-04-07
  */
 
 import initSqlJs from 'sql.js';
@@ -498,10 +501,6 @@ export interface QueryOptions {
   params?: unknown[];
 }
 
-/**
- * DatabaseManager handles SQLite database operations with sql.js.
- * Provides singleton access, automatic migrations, and periodic persistence.
- */
 class DatabaseManager {
   private static _instance: DatabaseManager;
   private db: SqlJsDatabase | null = null;
@@ -518,12 +517,6 @@ class DatabaseManager {
     };
   }
 
-  /**
-   * Gets the singleton DatabaseManager instance.
-   *
-   * @param config - Optional database configuration.
-   * @returns The DatabaseManager instance.
-   */
   static getInstance(config?: DatabaseConfig): DatabaseManager {
     if (!DatabaseManager._instance) {
       DatabaseManager._instance = new DatabaseManager(config);
@@ -531,11 +524,6 @@ class DatabaseManager {
     return DatabaseManager._instance;
   }
 
-  /**
-   * Initializes the database connection and runs migrations.
-   *
-   * @returns A promise that resolves when initialization is complete.
-   */
   async initialize(): Promise<void> {
     if (this._initialized) return;
 
@@ -550,27 +538,22 @@ class DatabaseManager {
       if (existsSync(dbPath)) {
         const buffer = readFileSync(dbPath);
         this.db = new SQL.Database(buffer);
-        logger.debug('Database loaded from disk');
+        logger.debug('📂 Database loaded from disk');
       } else {
         this.db = new SQL.Database();
-        logger.debug('New database created');
+        logger.debug('🆕 New database created');
       }
 
       await this.runMigrations();
       this.startAutoSave();
       this._initialized = true;
-      logger.debug('Database initialized');
+      logger.debug('✅ Database initialized');
     } catch (error) {
       logError('[Database] Initialization failed', error);
       throw error;
     }
   }
 
-  /**
-   * Runs pending database migrations.
-   *
-   * @returns A promise that resolves when migrations are complete.
-   */
   private async runMigrations(): Promise<void> {
     if (!this.db) return;
 
@@ -591,7 +574,7 @@ class DatabaseManager {
 
       for (const migration of MIGRATIONS) {
         if (!appliedVersions.includes(migration.version)) {
-          logger.debug(`Running migration v${migration.version}: ${migration.name}`);
+          logger.debug(`🔄 Running migration v${migration.version}: ${migration.name}`);
           if (migration.custom) {
             migration.custom(this.db);
           } else {
@@ -603,7 +586,7 @@ class DatabaseManager {
             new Date().toISOString(),
           ]);
           this.markDirty();
-          logger.debug(`Migration v${migration.version} applied successfully`);
+          logger.debug(`✅ Migration v${migration.version} applied successfully`);
         }
       }
     } catch (error) {
@@ -612,9 +595,6 @@ class DatabaseManager {
     }
   }
 
-  /**
-   * Starts the automatic save interval.
-   */
   private startAutoSave(): void {
     this.saveInterval = setInterval(() => {
       if (this.dirty) {
@@ -623,24 +603,14 @@ class DatabaseManager {
     }, 30000);
   }
 
-  /**
-   * Marks the database as dirty (needs saving).
-   */
   private markDirty(): void {
     this.dirty = true;
   }
 
-  /**
-   * Forces an immediate save to disk.
-   */
   forceSave(): void {
     this.saveToFile();
   }
 
-  /**
-   * Saves the database to disk atomically.
-   * Writes to a temp file then renames to prevent corruption on crash.
-   */
   private saveToFile(): void {
     if (!this.db) return;
     const dbPath = this.config.path ?? DB_PATH;
@@ -654,29 +624,22 @@ class DatabaseManager {
       try {
         rmSync(dbPath, { force: true });
       } catch (error) {
-        logger.debug('[Database] Could not remove old db file before rename:', error);
+        logger.debug(`[Database] Could not remove old db file before rename:`, error);
       }
       renameSync(tmpPath, dbPath);
       this.dirty = false;
-      logger.debug('Database saved to disk');
+      logger.debug('💾 Database saved to disk');
     } catch (error) {
       logError('[Database] Save to file failed', error);
       // Clean up the orphaned temp file if rename did not happen.
       try {
         if (existsSync(tmpPath)) rmSync(tmpPath, { force: true });
       } catch (cleanupError) {
-        logger.debug('[Database] Orphaned tmp cleanup failed:', cleanupError);
+        logger.debug(`[Database] Orphaned tmp cleanup failed:`, cleanupError);
       }
     }
   }
 
-  /**
-   * Executes a SQL query (INSERT, UPDATE, DELETE).
-   *
-   * @param sql - The SQL query string.
-   * @param options - Query options with parameters.
-   * @returns The query result with changes and last insert row ID.
-   */
   query(sql: string, options: QueryOptions = {}): QueryResult {
     if (!this.db) throw new Error('Database not initialized');
 
@@ -696,13 +659,6 @@ class DatabaseManager {
     }
   }
 
-  /**
-   * Fetches a single row from the database.
-   *
-   * @param sql - The SQL query string.
-   * @param options - Query options with parameters.
-   * @returns The row as an object, or null if not found.
-   */
   fetchOne<T>(sql: string, options: QueryOptions = {}): T | null {
     if (!this.db) throw new Error('Database not initialized');
 
@@ -727,13 +683,6 @@ class DatabaseManager {
     }
   }
 
-  /**
-   * Fetches all rows matching a query.
-   *
-   * @param sql - The SQL query string.
-   * @param options - Query options with parameters.
-   * @returns An array of row objects.
-   */
   fetchAll<T>(sql: string, options: QueryOptions = {}): T[] {
     if (!this.db) throw new Error('Database not initialized');
 
@@ -757,9 +706,6 @@ class DatabaseManager {
     }
   }
 
-  /**
-   * Closes the database connection and saves any pending changes.
-   */
   close(): void {
     if (this.saveInterval) {
       clearInterval(this.saveInterval);
@@ -772,32 +718,17 @@ class DatabaseManager {
       this.db = null;
     }
     this._initialized = false;
-    logger.info('Database closed');
+    logger.info('🔒 Database closed');
   }
 
-  /**
-   * Checks if the database is initialized.
-   *
-   * @returns True if initialized.
-   */
   isInitialized(): boolean {
     return this._initialized;
   }
 
-  /**
-   * Checks if using SQLite.
-   *
-   * @returns Always true (SQLite only).
-   */
   isSQLite(): boolean {
     return true;
   }
 
-  /**
-   * Gets the raw sql.js database instance.
-   *
-   * @returns The sql.js Database instance.
-   */
   getDb(): SqlJsDatabase {
     if (!this.db) throw new Error('Database not initialized');
     return this.db;
@@ -806,12 +737,6 @@ class DatabaseManager {
 
 let _dbManager: DatabaseManager;
 
-/**
- * Initializes the database with optional configuration.
- *
- * @param config - Optional database configuration.
- * @returns A promise that resolves when initialization is complete.
- */
 export async function initializeDatabase(config?: DatabaseConfig): Promise<void> {
   _dbManager = DatabaseManager.getInstance(config);
   await _dbManager.initialize();
@@ -824,21 +749,12 @@ export async function initializeDatabase(config?: DatabaseConfig): Promise<void>
  * consume the engine from there); this helper lets ServiceManager reuse
  * the same instance without re-running the bootstrap, while staying
  * usable standalone (tests, panel tooling).
- *
- * @param config - Optional database configuration.
- * @returns A promise that resolves when the database is ready.
  */
 export async function ensureDatabaseInitialized(config?: DatabaseConfig): Promise<void> {
   if (_dbManager?.isInitialized()) return;
   await initializeDatabase(config);
 }
 
-/**
- * Gets the DatabaseManager instance.
- * Throws if database is not initialized.
- *
- * @returns The DatabaseManager instance.
- */
 export function getDatabase(): DatabaseManager {
   if (!_dbManager) {
     throw new Error('Database not initialized. Call initializeDatabase() first.');
@@ -846,11 +762,6 @@ export function getDatabase(): DatabaseManager {
   return _dbManager;
 }
 
-/**
- * Gets the DatabaseManager instance if initialized, undefined otherwise.
- *
- * @returns The DatabaseManager instance or undefined.
- */
 export function getDbManager(): DatabaseManager | undefined {
   return _dbManager;
 }

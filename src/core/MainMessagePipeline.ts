@@ -52,10 +52,6 @@ enum GuardResult {
   Stop,
 }
 
-/**
- * Main message processing pipeline that handles incoming WhatsApp messages.
- * Manages middleware execution, command resolution, rate limiting, and statistics.
- */
 export class MainMessagePipeline {
   /**
    * Owner PIN confirmation. Runs as a guard (not a chain middleware)
@@ -77,9 +73,6 @@ export class MainMessagePipeline {
     private logStats: () => void,
   ) {}
 
-  /**
-   * Registers all socket event listeners for message processing.
-   */
   registerListeners(): void {
     this.sock.ev.on('messages.upsert', ({ messages, type }) => {
       if (type !== 'notify') return;
@@ -131,8 +124,6 @@ export class MainMessagePipeline {
    * Entry point for every message. Cheap synchronous filters run inline;
    * the rest is dispatched through the message processor (dedupe +
    * sequential/parallel scheduling) inside a microtask.
-   *
-   * @param message - The WhatsApp message to process.
    */
   private handleMessage(message: WAMessage): void {
     if (!this.isProcessableMessage(message)) return;
@@ -218,10 +209,6 @@ export class MainMessagePipeline {
   /**
    * Sequential guard chain run before command resolution. Each guard can
    * short-circuit processing (mute, vania toggle, quiz/mention interception).
-   *
-   * @param ctx - The message context.
-   * @param messageId - The message ID.
-   * @returns GuardResult.Stop if processing should stop, Continue otherwise.
    */
   private async runGuards(ctx: MessageContext, messageId: string): Promise<GuardResult> {
     if (ctx.chat.isGroup) {
@@ -264,9 +251,6 @@ export class MainMessagePipeline {
   /**
    * Delegates to the PIN guard; true when the guard called next(), which
    * only happens after a successful verification and command injection.
-   *
-   * @param ctx - The message context.
-   * @returns True if PIN was confirmed.
    */
   private async confirmPin(ctx: MessageContext): Promise<boolean> {
     let confirmed = false;
@@ -287,10 +271,6 @@ export class MainMessagePipeline {
    * AntilinkMiddleware that was never registered in any pipeline. Owners
    * and group admins are exempt; commands go through the permission
    * chain anyway, so only their text is inspected here.
-   *
-   * @param ctx - The message context.
-   * @param messageId - The message ID.
-   * @returns True if the message was handled (should stop processing).
    */
   private async handleAntilink(ctx: MessageContext, messageId: string): Promise<boolean> {
     if (!ctx.text || typeof ctx.text !== 'string') return false;
@@ -310,14 +290,14 @@ export class MainMessagePipeline {
         if (senderJid) {
           await ctx.sock.groupParticipantsUpdate(ctx.chat.jid, [senderJid], 'remove');
           await ctx.reply(
-            `Blocked link: *${checkResult.link?.domain || checkResult.link?.raw}*\nAutomatically removed.`,
+            `Enlace bloqueado: *${checkResult.link?.domain || checkResult.link?.raw}*\nExpulsado automáticamente.`,
           );
           cacheManager.markMessageProcessed(messageId);
           return true;
         }
       }
       await ctx.sock.sendMessage(ctx.chat.jid, { delete: ctx.message.key });
-      await ctx.reply(`Blocked link: *${checkResult.link?.domain || checkResult.link?.raw}*`);
+      await ctx.reply(`Enlace bloqueado: *${checkResult.link?.domain || checkResult.link?.raw}*`);
     } catch (error) {
       logError('[Antilink]', error);
     }
@@ -337,7 +317,7 @@ export class MainMessagePipeline {
       try {
         await ctx.sock.sendMessage(ctx.chat.jid, { delete: ctx.message.key });
       } catch (err) {
-        logError('[MUTE] Error deleting normal message', err);
+        logError('[MUTE] Error eliminando mensaje normal', err);
       }
     }
     cacheManager.markMessageProcessed(messageId);
@@ -351,10 +331,6 @@ export class MainMessagePipeline {
    * here (the subbot instance handles them via its own socket) and
    * everything else in a disabled chat is dropped. Returns true when the
    * message was handled (stop processing).
-   *
-   * @param ctx - The message context.
-   * @param messageId - The message ID.
-   * @returns True if the message was handled.
    */
   private async handleVaniaToggle(ctx: MessageContext, messageId: string): Promise<boolean> {
     const allowed = await serviceManager.vaniaToggleService.isAllowedForMain(
@@ -388,7 +364,7 @@ export class MainMessagePipeline {
     if (!rateLimit.allowed) {
       this.stats.spamBlocked++;
       void ctx
-        .reply(rateLimit.reason ?? 'Too many messages')
+        .reply(rateLimit.reason ?? '⚠️ Demasiados mensajes')
         .catch((error: unknown) => logError('[MainMessagePipeline]', error));
       return false;
     }
@@ -398,7 +374,7 @@ export class MainMessagePipeline {
       if (!floodCheck.allowed) {
         this.stats.spamBlocked++;
         void ctx
-          .reply(floodCheck.reason ?? 'You are sending messages too fast')
+          .reply(floodCheck.reason ?? '⚠️ Estás escribiendo muy rápido')
           .catch((error: unknown) => logError('[MainMessagePipeline]', error));
         return false;
       }
@@ -406,7 +382,7 @@ export class MainMessagePipeline {
       if (!groupRateLimit.allowed) {
         this.stats.spamBlocked++;
         void ctx
-          .reply(groupRateLimit.reason ?? 'The group is very active')
+          .reply(groupRateLimit.reason ?? '⚠️ El grupo está muy activo')
           .catch((error: unknown) => logError('[MainMessagePipeline]', error));
         return false;
       }
@@ -415,7 +391,7 @@ export class MainMessagePipeline {
     return true;
   }
 
-  /** Resolves the command (registry -> lazy plugin) and runs the full chain. */
+  /** Resolves the command (registry → lazy plugin) and runs the full chain. */
   private async resolveAndExecute(
     ctx: MessageContext,
     messageId: string,
@@ -434,7 +410,7 @@ export class MainMessagePipeline {
     }
 
     if (!command) {
-      logger.warn(`Command not found in registry: ${ctx.command}`);
+      logger.warn(`❌ Command not found in registry: ${ctx.command}`);
       cacheManager.markMessageProcessed(messageId);
       return;
     }
@@ -460,7 +436,7 @@ export class MainMessagePipeline {
     cacheManager.markMessageProcessed(messageId);
     const processingTime = Date.now() - startTime;
     this.stats.totalProcessingTime += processingTime;
-    if (processingTime > 500) logger.warn(`${ctx.command}: ${processingTime}ms`);
+    if (processingTime > 500) logger.warn(`⚠️ ${ctx.command}: ${processingTime}ms`);
   }
 
   /** Enabled/NSFW gates. False when the command must not run. */
@@ -470,7 +446,7 @@ export class MainMessagePipeline {
   ): Promise<boolean> {
     if (command.enabled === false) {
       await ctx
-        .reply('This command is disabled.')
+        .reply('❌ Este comando está deshabilitado.')
         .catch((error: unknown) => logError('[MainMessagePipeline]', error));
       return false;
     }
@@ -484,7 +460,7 @@ export class MainMessagePipeline {
         });
       if (!nsfwAllowed) {
         await ctx
-          .reply('NSFW commands are disabled.\nUse !nsfw on to enable.')
+          .reply('🔞 Los comandos NSFW están deshabilitados.\nUsa !nsfw on para habilitar.')
           .catch((error: unknown) => logError('[MainMessagePipeline]', error));
         return false;
       }
@@ -510,14 +486,14 @@ export class MainMessagePipeline {
       this.stats.errorsCount++;
       this.trackCommandMetric(command.name, Date.now() - cmdStartTime, true);
       if (error instanceof Error && error.message.includes('timed out')) {
-        logger.error(`Command ${command.name} timed out`);
+        logger.error(`⏱️ Command ${command.name} timed out`);
         await ctx
-          .reply('The command took too long. Please try again.')
+          .reply('⏱️ El comando tardó demasiado. Intenta de nuevo.')
           .catch((err: unknown) => logError('[MainMessagePipeline]', err));
       } else {
         logError('Command', new CommandExecutionError(ctx.command, error));
         await ctx
-          .reply('Error executing command.')
+          .reply('Error al ejecutar el comando.')
           .catch((err: unknown) => logError('[MainMessagePipeline]', err));
       }
     }
@@ -568,11 +544,6 @@ export class MainMessagePipeline {
     });
   }
 
-  /**
-   * Gets command execution metrics.
-   *
-   * @returns An array of command metrics with count, average time, and errors.
-   */
   getCommandMetrics(): Array<{ command: string; count: number; avgTime: number; errors: number }> {
     return Array.from(this.commandMetrics.entries()).map(([command, data]) => ({
       command,

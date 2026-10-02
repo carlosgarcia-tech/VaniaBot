@@ -15,10 +15,8 @@ import type { proto } from 'baileys';
  *  - audio (reply)            -> audioMessage.contextInfo
  *  - viewOnce (reply)         -> viewOnceMessage.message.extendedTextMessage.contextInfo
  *  - ephemeral (reply)        -> ephemeralMessage.message.extendedTextMessage.contextInfo
- *
- * @param msg - The WhatsApp message proto.
- * @returns The context info if found, undefined otherwise.
  */
+
 export function getContextInfo(
   msg: proto.IMessage | null | undefined,
 ): proto.IContextInfo | undefined {

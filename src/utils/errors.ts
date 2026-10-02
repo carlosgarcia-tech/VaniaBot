@@ -1,6 +1,3 @@
-/**
- * Base error class for bot errors with optional code and details.
- */
 export class BotError extends Error {
   constructor(
     message: string,
@@ -14,9 +11,6 @@ export class BotError extends Error {
   }
 }
 
-/**
- * Standard error codes used throughout the application.
- */
 export enum ErrorCode {
   NETWORK_ERROR = 'NETWORK_ERROR',
   TIMEOUT = 'TIMEOUT',
@@ -45,9 +39,6 @@ export enum ErrorCode {
   USER_BANNED = 'USER_BANNED',
 }
 
-/**
- * Extended bot error with error code, recoverability flag, and details.
- */
 export class VBotError extends Error {
   constructor(
     message: string,
@@ -61,9 +52,6 @@ export class VBotError extends Error {
   }
 }
 
-/**
- * Error thrown when a permission check fails.
- */
 export class PermissionError extends BotError {
   constructor(message: string, details?: unknown) {
     super(message, 'PERMISSION_DENIED', details);
@@ -71,9 +59,6 @@ export class PermissionError extends BotError {
   }
 }
 
-/**
- * Error thrown when input validation fails.
- */
 export class ValidationError extends BotError {
   constructor(message: string, details?: unknown) {
     super(message, 'VALIDATION_ERROR', details);
@@ -81,9 +66,6 @@ export class ValidationError extends BotError {
   }
 }
 
-/**
- * Error thrown when command execution fails.
- */
 export class CommandExecutionError extends BotError {
   constructor(
     public commandName: string,
@@ -91,14 +73,11 @@ export class CommandExecutionError extends BotError {
   ) {
     const message = originalError instanceof Error ? originalError.message : String(originalError);
 
-    super(`Error executing command '${commandName}': ${message}`, 'COMMAND_ERROR', originalError);
+    super(`Error ejecutando comando '${commandName}': ${message}`, 'COMMAND_ERROR', originalError);
     this.name = 'CommandExecutionError';
   }
 }
 
-/**
- * Error thrown when a plugin fails to load.
- */
 export class PluginLoadError extends BotError {
   constructor(
     public pluginPath: string,
@@ -106,54 +85,39 @@ export class PluginLoadError extends BotError {
   ) {
     const message = originalError instanceof Error ? originalError.message : String(originalError);
 
-    super(`Error loading plugin '${pluginPath}': ${message}`, 'PLUGIN_LOAD_ERROR', originalError);
+    super(`Error cargando plugin '${pluginPath}': ${message}`, 'PLUGIN_LOAD_ERROR', originalError);
     this.name = 'PluginLoadError';
   }
 }
 
-/**
- * Error thrown when a resource is not found.
- */
 export class NotFoundError extends VBotError {
   constructor(resource: string) {
-    super(`${resource} not found`, ErrorCode.NOT_FOUND, true);
+    super(`${resource} no encontrado`, ErrorCode.NOT_FOUND, true);
     this.name = 'NotFoundError';
   }
 }
 
-/**
- * Error thrown when a user is not found.
- */
 export class UserNotFoundError extends VBotError {
   constructor(userJid: string) {
-    super(`User ${userJid} not found`, ErrorCode.USER_NOT_FOUND, true, { userJid });
+    super(`Usuario ${userJid} no encontrado`, ErrorCode.USER_NOT_FOUND, true, { userJid });
     this.name = 'UserNotFoundError';
   }
 }
 
-/**
- * Error thrown when a group is not found.
- */
 export class GroupNotFoundError extends VBotError {
   constructor(groupJid: string) {
-    super(`Group ${groupJid} not found`, ErrorCode.GROUP_NOT_FOUND, true, { groupJid });
+    super(`Grupo ${groupJid} no encontrado`, ErrorCode.GROUP_NOT_FOUND, true, { groupJid });
     this.name = 'GroupNotFoundError';
   }
 }
 
-/**
- * Error thrown when an item is not found.
- */
 export class ItemNotFoundError extends VBotError {
   constructor(itemId: string) {
-    super(`Item ${itemId} not found`, ErrorCode.ITEM_NOT_FOUND, true, { itemId });
+    super(`Item ${itemId} no encontrado`, ErrorCode.ITEM_NOT_FOUND, true, { itemId });
     this.name = 'ItemNotFoundError';
   }
 }
 
-/**
- * Error thrown when rate limit is exceeded.
- */
 export class RateLimitError extends VBotError {
   constructor(message: string, waitTime?: number) {
     super(message, ErrorCode.RATE_LIMITED, true, { waitTime });
@@ -161,12 +125,9 @@ export class RateLimitError extends VBotError {
   }
 }
 
-/**
- * Error thrown when user has insufficient funds.
- */
 export class InsufficientFundsError extends VBotError {
   constructor(needed: number, has: number) {
-    super(`Need $${needed}, have $${has}`, ErrorCode.INSUFFICIENT_FUNDS, true, {
+    super(`Necesitas $${needed}, tienes $${has}`, ErrorCode.INSUFFICIENT_FUNDS, true, {
       needed,
       has,
     });
@@ -174,9 +135,6 @@ export class InsufficientFundsError extends VBotError {
   }
 }
 
-/**
- * Error thrown for network-related issues.
- */
 export class NetworkError extends VBotError {
   constructor(message: string, details?: unknown) {
     super(message, ErrorCode.NETWORK_ERROR, true, details);
@@ -184,9 +142,6 @@ export class NetworkError extends VBotError {
   }
 }
 
-/**
- * Error thrown when an operation times out.
- */
 export class TimeoutError extends VBotError {
   constructor(message: string = 'Operation timed out') {
     super(message, ErrorCode.TIMEOUT, true);
@@ -194,19 +149,13 @@ export class TimeoutError extends VBotError {
   }
 }
 
-/**
- * Error thrown when a service is unavailable.
- */
 export class ServiceUnavailableError extends VBotError {
   constructor(service: string) {
-    super(`${service} unavailable`, ErrorCode.SERVICE_UNAVAILABLE, true, { service });
+    super(`${service} no disponible`, ErrorCode.SERVICE_UNAVAILABLE, true, { service });
     this.name = 'ServiceUnavailableError';
   }
 }
 
-/**
- * Error thrown when permission is denied (non-recoverable).
- */
 export class PermissionDeniedError extends VBotError {
   constructor(message: string = 'Permission denied') {
     super(message, ErrorCode.PERMISSION_DENIED, false);
@@ -214,32 +163,23 @@ export class PermissionDeniedError extends VBotError {
   }
 }
 
-/**
- * Error thrown when owner-only command is used by non-owner.
- */
 export class NotOwnerError extends VBotError {
   constructor() {
-    super('Only the owner can use this command', ErrorCode.NOT_OWNER, false);
+    super('Solo el owner puede usar este comando', ErrorCode.NOT_OWNER, false);
     this.name = 'NotOwnerError';
   }
 }
 
-/**
- * Error thrown when admin-only command is used by non-admin.
- */
 export class NotAdminError extends VBotError {
   constructor() {
-    super('Only admins can use this command', ErrorCode.NOT_ADMIN, false);
+    super('Solo los admins pueden usar este comando', ErrorCode.NOT_ADMIN, false);
     this.name = 'NotAdminError';
   }
 }
 
-/**
- * Error thrown when a URL is invalid.
- */
 export class InvalidURLError extends VBotError {
   constructor(url: string, reason?: string) {
-    super(`Invalid URL: ${url}${reason ? ` - ${reason}` : ''}`, ErrorCode.INVALID_URL, true, {
+    super(`URL inválida: ${url}${reason ? ` - ${reason}` : ''}`, ErrorCode.INVALID_URL, true, {
       url,
       reason,
     });
@@ -247,12 +187,9 @@ export class InvalidURLError extends VBotError {
   }
 }
 
-/**
- * Error thrown when input is invalid.
- */
 export class InvalidInputError extends VBotError {
   constructor(input: string, expected: string) {
-    super(`Invalid input: '${input}' - expected: ${expected}`, ErrorCode.INVALID_INPUT, true, {
+    super(`Input inválido: '${input}' - esperado: ${expected}`, ErrorCode.INVALID_INPUT, true, {
       input,
       expected,
     });
@@ -260,19 +197,13 @@ export class InvalidInputError extends VBotError {
   }
 }
 
-/**
- * Error thrown when a resource already exists.
- */
 export class AlreadyExistsError extends VBotError {
   constructor(resource: string) {
-    super(`${resource} already exists`, ErrorCode.ALREADY_EXISTS, true);
+    super(`${resource} ya existe`, ErrorCode.ALREADY_EXISTS, true);
     this.name = 'AlreadyExistsError';
   }
 }
 
-/**
- * Error thrown for authentication failures.
- */
 export class AuthError extends VBotError {
   constructor(message: string, details?: unknown) {
     super(message, ErrorCode.AUTH_ERROR, true, details);
@@ -280,23 +211,17 @@ export class AuthError extends VBotError {
   }
 }
 
-/**
- * Error thrown when session has expired.
- */
 export class SessionExpiredError extends AuthError {
   constructor() {
-    super('Session expired', { requiresReauth: true });
+    super('Sesión expirada', { requiresReauth: true });
     this.name = 'SessionExpiredError';
   }
 }
 
 /**
  * Safely extracts a human-readable message from an unknown thrown value.
- * Replaces repeated `error instanceof Error ? error.message : '...'` ternaries.
- *
- * @param error - The error value.
- * @param fallback - Fallback message if error cannot be extracted.
- * @returns A human-readable error message.
+ * Replaces the repeated `error instanceof Error ? error.message : '...'
+ * ternaries scattered across commands and services.
  */
 export function errorMessage(error: unknown, fallback = 'Unknown error'): string {
   if (error instanceof Error) return error.message;

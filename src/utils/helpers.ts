@@ -1,19 +1,7 @@
-/**
- * Formats a number with commas as thousands separators.
- *
- * @param num - The number to format.
- * @returns The formatted number string with commas.
- */
 export function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-/**
- * Formats a duration in milliseconds to a human-readable string.
- *
- * @param ms - The duration in milliseconds.
- * @returns A formatted string (e.g., "2d 5h", "3h 30m", "45m 30s", "120s").
- */
 export function formatTime(ms: number): string {
   const seconds = Math.floor(ms / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -32,44 +20,23 @@ export function formatTime(ms: number): string {
   return `${seconds}s`;
 }
 
-/**
- * Capitalizes the first letter of a string and lowercases the rest.
- *
- * @param str - The string to capitalize.
- * @returns The capitalized string.
- */
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-/**
- * Truncates a string to a maximum length, appending a suffix if truncated.
- *
- * @param str - The string to truncate.
- * @param maxLength - The maximum length of the result.
- * @param suffix - The suffix to append when truncating (default: '...').
- * @returns The truncated string with suffix, or the original string if within length.
- */
 export function truncate(str: string, maxLength: number, suffix: string = '...'): string {
   if (str.length <= maxLength) return str;
   return str.substring(0, maxLength - suffix.length) + suffix;
 }
 
-/**
- * Formats a remaining time duration into a human-readable string.
- *
- * @param ms - The remaining time in milliseconds.
- * @param locale - The locale for formatting ('es' for Spanish, 'en' for English).
- * @returns A human-readable time string (e.g., "2 days", "3 hours").
- */
 export function formatTimeRemaining(ms: number, locale: 'es' | 'en' = 'es'): string {
-  if (ms <= 0) return locale === 'es' ? 'Expires immediately' : 'Expires immediately';
+  if (ms <= 0) return locale === 'es' ? 'Expira inmediatamente' : 'Expires immediately';
 
   const l =
     locale === 'es'
-      ? { day: 'day', hour: 'hour', minute: 'minute', second: 'second' }
+      ? { day: 'día', hour: 'hora', minute: 'minuto', second: 'segundo' }
       : { day: 'day', hour: 'hour', minute: 'minute', second: 'second' };
-  const plural = (n: number, s: string) => `${n} ${s}${n > 1 ? 's' : ''}`;
+  const plural = (n: number, s: string) => `${n} ${s}${n > 1 ? (locale === 'es' ? 's' : 's') : ''}`;
 
   const seconds = Math.floor(ms / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -82,44 +49,18 @@ export function formatTimeRemaining(ms: number, locale: 'es' | 'en' = 'es'): str
   return plural(seconds, l.second);
 }
 
-/**
- * Creates a promise that resolves after a specified delay.
- *
- * @param ms - The delay in milliseconds.
- * @returns A promise that resolves after the delay.
- */
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/**
- * Returns a random element from an array.
- *
- * @param array - The array to pick from.
- * @returns A randomly selected element from the array.
- * @throws Error if the array is empty.
- */
 export function randomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-/**
- * Generates a random integer between min and max (inclusive).
- *
- * @param min - The minimum value (inclusive).
- * @param max - The maximum value (inclusive).
- * @returns A random integer between min and max.
- */
 export function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/**
- * Returns a shuffled copy of an array using the Fisher-Yates algorithm.
- *
- * @param array - The array to shuffle.
- * @returns A new array with elements in random order.
- */
 export function shuffle<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -129,13 +70,6 @@ export function shuffle<T>(array: T[]): T[] {
   return shuffled;
 }
 
-/**
- * Groups array elements by a key property.
- *
- * @param array - The array to group.
- * @param key - The property key to group by.
- * @returns An object mapping key values to arrays of elements.
- */
 export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
   return array.reduce(
     (result, item) => {
@@ -150,23 +84,10 @@ export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
   );
 }
 
-/**
- * Removes duplicate elements from an array.
- *
- * @param array - The array to deduplicate.
- * @returns A new array with unique elements.
- */
 export function unique<T>(array: T[]): T[] {
   return [...new Set(array)];
 }
 
-/**
- * Splits an array into chunks of a specified size.
- *
- * @param array - The array to chunk.
- * @param size - The size of each chunk.
- * @returns An array of chunk arrays.
- */
 export function chunk<T>(array: T[], size: number): T[][] {
   const chunks: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -175,33 +96,15 @@ export function chunk<T>(array: T[], size: number): T[][] {
   return chunks;
 }
 
-/**
- * Extracts WhatsApp user mentions from text.
- *
- * @param text - The text to extract mentions from.
- * @returns An array of WhatsApp user IDs in the format "number@s.whatsapp.net".
- */
 export function extractMentions(text: string): string[] {
   const mentions = text.match(/@(\d+)/g);
   return mentions ? mentions.map(m => m.substring(1) + '@s.whatsapp.net') : [];
 }
 
-/**
- * Sanitizes a string by removing non-alphanumeric characters except spaces.
- *
- * @param str - The string to sanitize.
- * @returns The sanitized string.
- */
 export function sanitize(str: string): string {
   return str.replace(/[^\w\s]/gi, '');
 }
 
-/**
- * Parses key-value arguments from an array of strings.
- *
- * @param args - An array of strings in the format "key=value".
- * @returns An object mapping keys to values.
- */
 export function parseKeyValueArgs(args: string[]): Record<string, string> {
   const result: Record<string, string> = {};
 
@@ -215,13 +118,6 @@ export function parseKeyValueArgs(args: string[]): Record<string, string> {
   return result;
 }
 
-/**
- * Formats a byte count into a human-readable string with appropriate units.
- *
- * @param bytes - The number of bytes.
- * @param decimals - The number of decimal places (default: 2).
- * @returns A formatted string (e.g., "1.5 MB", "500 KB").
- */
 export function formatBytes(bytes: number, decimals: number = 2): string {
   if (bytes === 0) return '0 Bytes';
 
@@ -235,12 +131,6 @@ export function formatBytes(bytes: number, decimals: number = 2): string {
 
 export { isValidUrl } from './validators.js';
 
-/**
- * Strips Markdown formatting from text.
- *
- * @param text - The text to strip Markdown from.
- * @returns The plain text without Markdown formatting.
- */
 export function stripMarkdown(text: string): string {
   return text
     .replace(/\*\*(.+?)\*\*/g, '$1')
@@ -252,16 +142,6 @@ export function stripMarkdown(text: string): string {
     .replace(/\[(.+?)\]\(.+?\)/g, '$1');
 }
 
-/**
- * Creates a visual progress bar string.
- *
- * @param current - The current progress value.
- * @param total - The total (maximum) value.
- * @param length - The length of the progress bar in characters (default: 10).
- * @param filledChar - The character for filled portion (default: '█').
- * @param emptyChar - The character for empty portion (default: '░').
- * @returns A string representing the progress bar.
- */
 export function createProgressBar(
   current: number,
   total: number,
@@ -276,12 +156,6 @@ export function createProgressBar(
   return filledChar.repeat(filled) + emptyChar.repeat(empty);
 }
 
-/**
- * Converts seconds to HH:MM:SS format.
- *
- * @param seconds - The total seconds.
- * @returns A string in HH:MM:SS format with zero-padding.
- */
 export function secondsToHMS(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -290,28 +164,15 @@ export function secondsToHMS(seconds: number): string {
   return [h, m, s].map(v => (v < 10 ? '0' + v : v)).join(':');
 }
 
-/**
- * Escapes special XML characters in a string.
- *
- * @param text - The text to escape.
- * @returns The XML-escaped string.
- */
 export function escapeXml(text: string): string {
   return text
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
 }
 
-/**
- * Wraps text into lines of a maximum character length.
- *
- * @param text - The text to wrap.
- * @param maxChars - The maximum characters per line.
- * @returns An array of wrapped lines.
- */
 export function wrapText(text: string, maxChars: number): string[] {
   const words = text.split(' ');
   const lines: string[] = [];
@@ -330,12 +191,6 @@ export function wrapText(text: string, maxChars: number): string[] {
   return lines.length > 0 ? lines : [text];
 }
 
-/**
- * Uploads a buffer to tmpfiles.org and returns a direct download URL.
- *
- * @param buffer - The image buffer to upload.
- * @returns A promise that resolves to the download URL, or null on failure.
- */
 export async function uploadToTmpfiles(buffer: Buffer): Promise<string | null> {
   try {
     const boundary = `----FormBoundary${Date.now()}`;
@@ -373,12 +228,6 @@ export async function uploadToTmpfiles(buffer: Buffer): Promise<string | null> {
   }
 }
 
-/**
- * Parses a duration string (e.g., "5m", "2h", "1d") into milliseconds.
- *
- * @param str - The duration string with unit suffix (s, m, h, d).
- * @returns The duration in milliseconds, or 0 if invalid format.
- */
 export function parseDuration(str: string): number {
   const match = str.match(/^(\d+)([smhd])$/);
 

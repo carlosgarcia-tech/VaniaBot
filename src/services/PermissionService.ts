@@ -19,91 +19,30 @@ export interface GroupMetadataLike {
   desc?: string;
 }
 
-/**
- * Central permission service providing unified access to permission checking utilities.
- */
 export const PermissionService = {
-  /**
-   * Checks if a JID belongs to the bot owner.
-   *
-   * @param jid - The JID to check.
-   * @returns True if the JID is an owner.
-   */
   isOwner: (jid: string) => UserPermissionChecker.isOwner(jid),
 
-  /**
-   * Checks if a JID belongs to the bot owner (async version for LID resolution).
-   *
-   * @param sock - The WhatsApp socket.
-   * @param jid - The JID to check.
-   * @returns A promise that resolves to true if the JID is an owner.
-   */
   isOwnerAsync: (sock: WASocket, jid: string) => UserPermissionChecker.isOwnerAsync(sock, jid),
 
-  /**
-   * Invalidates the group metadata cache for a specific group.
-   *
-   * @param groupJid - The group JID.
-   */
   invalidateCache: (groupJid: string) => GroupMetadataCache.invalidate(groupJid),
 
-  /**
-   * Clears all permission caches.
-   */
   clearCache: () => {
     GroupMetadataCache.clear();
     LidResolver.clearCache();
   },
 
-  /**
-   * Gets user permissions for a group.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param groupJid - The group JID (optional for private chats).
-   * @param userJid - The user JID.
-   * @returns A promise that resolves to the user permissions.
-   */
   getUserPermissions: (sock: WASocket, groupJid: string | undefined, userJid: string) =>
     UserPermissionChecker.getPermissions(sock, groupJid, userJid),
 
-  /**
-   * Gets bot permissions for a group.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param groupJid - The group JID.
-   * @returns A promise that resolves to the bot permissions.
-   */
   getBotPermissions: (sock: WASocket, groupJid: string) =>
     BotPermissionChecker.getPermissions(sock, groupJid),
 
-  /**
-   * Checks if the bot can moderate in a group.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param groupJid - The group JID.
-   * @returns A promise that resolves to true if the bot can moderate.
-   */
   canBotModerate: (sock: WASocket, groupJid: string) =>
     BotPermissionChecker.canModerate(sock, groupJid),
 
-  /**
-   * Checks if a user can moderate in a group.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param groupJid - The group JID.
-   * @param userJid - The user JID.
-   * @returns A promise that resolves to true if the user can moderate.
-   */
   canUserModerate: (sock: WASocket, groupJid: string, userJid: string) =>
     UserPermissionChecker.canModerate(sock, groupJid, userJid),
 
-  /**
-   * Gets the list of group admin JIDs.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param groupJid - The group JID.
-   * @returns A promise that resolves to an array of admin JIDs.
-   */
   getGroupAdmins: async (sock: WASocket, groupJid: string): Promise<string[]> => {
     const metadata = await GroupMetadataCache.fetch(sock, groupJid);
     if (!metadata) return [];
@@ -112,14 +51,6 @@ export const PermissionService = {
       .map(p => p.id);
   },
 
-  /**
-   * Checks if a user is a member of a group.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param groupJid - The group JID.
-   * @param userJid - The user JID.
-   * @returns A promise that resolves to true if the user is in the group.
-   */
   isUserInGroup: async (sock: WASocket, groupJid: string, userJid: string): Promise<boolean> => {
     const metadata = await GroupMetadataCache.fetch(sock, groupJid);
     if (!metadata) return false;

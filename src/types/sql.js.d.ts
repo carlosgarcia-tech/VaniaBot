@@ -1,7 +1,3 @@
-/**
- * Type declarations for 'sql.js' module.
- * Provides TypeScript types for SQLite WebAssembly.
- */
 declare module 'sql.js' {
   export interface Database {
     run(sql: string, params?: (string | number | Uint8Array | null)[]): void;

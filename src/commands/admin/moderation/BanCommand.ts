@@ -11,10 +11,6 @@ import { logError } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 
-/**
- * Ban command - bans a user from the group.
- * Requires admin permissions for both user and bot.
- */
 export class BanCommand extends Command {
   name = 'ban';
   description = 'Ban a user from the group';
@@ -28,35 +24,29 @@ export class BanCommand extends Command {
     bot: [BotPermission.ADMIN],
   };
 
-  /**
-   * Executes the ban command.
-   *
-   * @param ctx - The message context.
-   * @returns A promise that resolves when the command completes.
-   */
   async execute(ctx: MessageContext): Promise<void> {
     const target = getTargetUser(ctx);
 
     if (!target) {
-      await ctx.reply(getErrorMessage('ban'));
+      await ctx.reply(getErrorMessage('banear'));
       return;
     }
 
     const { jid: mentionedJid } = target;
 
     if (mentionedJid === ctx.sender.jid) {
-      await ctx.reply('You cannot ban yourself');
+      await ctx.reply('❌ You cannot ban yourself');
       return;
     }
 
     if (mentionedJid === ctx.sock.user?.id.split(':')[0] + '@s.whatsapp.net') {
-      await ctx.reply('You cannot ban the bot');
+      await ctx.reply('❌ You cannot ban the bot');
       return;
     }
 
     const targetUser = await serviceManager.userService.getUser(mentionedJid);
     if (targetUser.isOwner) {
-      await ctx.reply('You cannot ban an owner');
+      await ctx.reply('❌ You cannot ban an owner');
       return;
     }
 
@@ -66,17 +56,17 @@ export class BanCommand extends Command {
       await ctx.sock.groupParticipantsUpdate(ctx.chat.jid, [mentionedJid], 'remove');
 
       await ctx.reply(
-        `User Banned\n\n` +
-          `Target: ${targetUser.name}\n` +
-          `Banned by: ${ctx.sender.pushName}\n` +
-          `Time: ${new Date().toLocaleString()}`,
+        `˚₊· ͟͟͞͞➳ *baneadito* ˚₊· ͟͟͞͞➳\n\n` +
+          `✩ *quién:* ${targetUser.name}\n` +
+          `✩ *quién lo hizo:* ${ctx.sender.pushName}\n` +
+          `✩ *cuándo:* ${new Date().toLocaleString()}`,
       );
 
       await ctx.react('✅');
     } catch (error: unknown) {
       logError('[BanCommand] Error', error);
       const message = errorMessage(error);
-      await ctx.reply(`Error banning user: ${message}`);
+      await ctx.reply(`❌ Error banning user: ${message}`);
       await ctx.react('❌');
     }
   }

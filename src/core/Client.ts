@@ -33,14 +33,6 @@ interface MiddlewareConfig {
   canRunParallel: boolean;
 }
 
-/**
- * Resolves a profile picture URL for a WhatsApp JID.
- * Tries multiple candidate JIDs (lid, phone, etc.) to find a valid profile picture.
- *
- * @param sock - The WhatsApp socket instance.
- * @param jid - The WhatsApp JID to resolve.
- * @returns A promise that resolves to the profile picture URL, or null if not found.
- */
 async function resolveProfilePicture(sock: WASocket, jid: string): Promise<string | null> {
   const candidates: string[] = [jid];
 
@@ -65,10 +57,6 @@ async function resolveProfilePicture(sock: WASocket, jid: string): Promise<strin
   return null;
 }
 
-/**
- * Main WhatsApp client class that manages the bot connection,
- * middleware pipeline, message processing, and service coordination.
- */
 export class WhatsAppClient {
   private sock!: WASocket;
   private readonly middlewares: MiddlewareConfig[] = [];
@@ -101,12 +89,6 @@ export class WhatsAppClient {
     });
   }
 
-  /**
-   * Initializes the WhatsApp client.
-   * Sets up services, loads commands, creates the socket, and starts the message pipeline.
-   *
-   * @returns A promise that resolves when initialization is complete.
-   */
   async initialize(): Promise<void> {
     const startTime = Date.now();
     await Promise.all([
@@ -124,8 +106,8 @@ export class WhatsAppClient {
     await listaManager.initialize();
 
     if (process.env.NODE_ENV !== 'production') {
-      logger.info(`Services: ${Date.now() - startTime}ms`);
-      logger.info(`Commands: ${commandRegistry.size}`);
+      logger.info(`Servicios: ${Date.now() - startTime}ms`);
+      logger.info(`Comandos: ${commandRegistry.size}`);
     }
 
     try {
@@ -146,8 +128,8 @@ export class WhatsAppClient {
         priority: 3,
         canRunParallel: true,
       },
-      // ValidationMiddleware rejects the command if context doesn't apply:
-      // if it were parallel, its `return` wouldn't prevent command execution.
+      // ValidationMiddleware rechaza el comando si el contexto no aplica: si
+      // fuera paralelo su `return` no impediría que el comando se ejecutara.
       { middleware: new ValidationMiddleware(commandRegistry), priority: 4, canRunParallel: false },
       { middleware: new PermissionMiddleware(commandRegistry), priority: 5, canRunParallel: false },
       { middleware: new AntiSpamMiddleware(), priority: 6, canRunParallel: false },
@@ -156,7 +138,7 @@ export class WhatsAppClient {
     this.middlewares.sort((a, b) => a.priority - b.priority);
 
     this.authManager.setOnSocketRecreate(async oldSock => {
-      logger.info('Recreating socket...');
+      logger.info('🔄 Recreating socket...');
       if (oldSock) {
         try {
           await Promise.race([
@@ -164,8 +146,8 @@ export class WhatsAppClient {
             new Promise(resolve => setTimeout(resolve, 1000)),
           ]);
         } catch (error) {
-          // Closing the old socket is best-effort: if it fails we continue recreating,
-          // but log it for diagnosing zombie connections.
+          // Cerrar el socket viejo es best-effort: si falla seguimos recreando,
+          // pero queda constancia en el log para diagnosticar conexiones zombi.
           logger.warn('Failed to close old socket during recreate:', error);
         }
       }
@@ -173,7 +155,7 @@ export class WhatsAppClient {
       this.sock = newSock;
       subBotManager.setMainSocket(newSock);
       this.setupPipeline(newSock);
-      logger.info('Socket recreated successfully');
+      logger.info('✅ Socket recreated successfully');
       return newSock;
     });
 
@@ -187,11 +169,6 @@ export class WhatsAppClient {
     logger.debug(`WhatsAppClient initialized in ${Date.now() - startTime}ms`);
   }
 
-  /**
-   * Sets up the message processing pipeline for a socket.
-   *
-   * @param sock - The WhatsApp socket to set up the pipeline for.
-   */
   private setupPipeline(sock: WASocket): void {
     this.pipeline = new MainMessagePipeline(
       sock,
@@ -218,9 +195,6 @@ export class WhatsAppClient {
     });
   }
 
-  /**
-   * Starts the periodic maintenance task that logs queue statistics.
-   */
   private startMaintenance(): void {
     this.maintenanceTimer = setInterval(
       () => {
@@ -228,16 +202,13 @@ export class WhatsAppClient {
         const totalQueued = queueStats.sequentialQueued + queueStats.parallelQueued;
         if (totalQueued > 20)
           logger.warn(
-            `Queue: ${totalQueued} pending messages (seq: ${queueStats.sequentialQueued}, par: ${queueStats.parallelQueued})`,
+            `⚠️ Cola: ${totalQueued} mensajes pendientes (seq: ${queueStats.sequentialQueued}, par: ${queueStats.parallelQueued})`,
           );
       },
       5 * 60 * 1000,
     );
   }
 
-  /**
-   * Logs periodic statistics about message processing.
-   */
   private logStats(): void {
     if (this.stats.messagesReceived === 0) return;
     const avgTime =
@@ -250,19 +221,13 @@ export class WhatsAppClient {
     logger.info(
       `${this.stats.messagesReceived} recv | ` +
         `${this.stats.commandsExecuted} cmds | ` +
-        `${this.stats.spamBlocked} blocked | ` +
+        `${this.stats.spamBlocked}⛔ | ` +
         `${avgTime.toFixed(0)}ms avg | ` +
         `queue ${totalQueued} | ` +
         `cache ${cacheStats.hitRate}`,
     );
   }
 
-  /**
-   * Gracefully shuts down the client.
-   * Stops all services, clears intervals, and closes connections.
-   *
-   * @returns A promise that resolves when shutdown is complete.
-   */
   async shutdown(): Promise<void> {
     this.isReady = false;
     try {
@@ -294,38 +259,18 @@ export class WhatsAppClient {
     this.logStats();
   }
 
-  /**
-   * Gets the command registry instance.
-   *
-   * @returns The command registry.
-   */
   getRegistry() {
     return commandRegistry;
   }
 
-  /**
-   * Gets the current WhatsApp socket.
-   *
-   * @returns The WASocket instance.
-   */
   getSocket(): WASocket {
     return this.sock;
   }
 
-  /**
-   * Checks if the client is ready.
-   *
-   * @returns True if the client is initialized and connected.
-   */
   isClientReady(): boolean {
     return this.isReady;
   }
 
-  /**
-   * Gets comprehensive statistics about the client.
-   *
-   * @returns An object containing various statistics.
-   */
   getStats() {
     return {
       ...this.stats,

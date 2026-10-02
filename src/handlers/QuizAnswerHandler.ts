@@ -4,6 +4,12 @@
  * Handles quiz game answer processing in groups.
  * Manages answer validation, scoring, streaks, and rewards.
  * Part of the interactive quiz system with adaptive difficulty.
+ *
+ * @author **Carlos G** ⭐
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
  */
 
 import { quizService } from '@/services/study/QuizService.js';
@@ -134,18 +140,18 @@ class QuizAnswerHandler {
 
     const streakMsg =
       newStreak >= 3
-        ? `\nStreak of ${newStreak}!* +${difficultyEngine.calculateCoins(QuizDifficulty.MEDIUM, newStreak) - 35} bonus`
+        ? `\n🔥 *Streak of ${newStreak}!* +${difficultyEngine.calculateCoins(QuizDifficulty.MEDIUM, newStreak) - 35} bonus`
         : '';
 
     const hintPenalty = player.usedHint ? '\n_(reduced reward for using hint)_' : '';
 
     await ctx.reply(
-      `Correct, ${player.pushName}!\n\n` +
-        `+${coinsAwarded} coins\n` +
-        `+${xpAwarded} XP` +
+      `˚₊· ͟͟͞͞➳ *muy bien, ${player.pushName}!* ˚₊· ͟͟͞͞➳\n\n` +
+        `✿ +${coinsAwarded} moneditas\n` +
+        `✩ +${xpAwarded} XP ✩` +
         streakMsg +
         hintPenalty +
-        (sessionEnded ? '' : '\n\n_next question coming up..._'),
+        (sessionEnded ? '' : '\n\n_la siguiente viene en 4 segunditos..._'),
     );
     return true;
   }
@@ -155,14 +161,14 @@ class QuizAnswerHandler {
    * Provides a hint to the current question with a penalty.
    *
    * @param ctx - The message context
-   * @returns A promise that resolves when the hint is sent.
+   * @returns Promise<void>
    */
   private async _handleHint(ctx: MessageContext): Promise<void> {
     const hint = quizService.getHint(ctx.chat.jid, ctx.sender.jid);
     if (!hint) return;
 
     await ctx.reply(
-      `Hint: ${hint}\n\n` + `_(If answered correctly, you will earn 50% less coins)_`,
+      `💡 *Hint:* ${hint}\n\n` + `_(If answered correctly, you will earn 50% less coins)_`,
     );
   }
 }

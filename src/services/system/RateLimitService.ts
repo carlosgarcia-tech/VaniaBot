@@ -3,6 +3,8 @@
  *
  * Global rate limiting service for group messages and flood protection.
  * Tracks message rates per group and user, with configurable whitelist.
+ *
+ * @author **Carlos G** ⭐
  */
 
 import { config } from '@/config/index.js';
@@ -26,9 +28,6 @@ interface UserTracker {
   lastWarningTime: number;
 }
 
-/**
- * Service for global rate limiting and flood protection.
- */
 export class RateLimitService {
   /** Quiet time before a group's accumulated warnings are reset. */
   private static readonly WARNING_DECAY_MS = 10 * 60 * 1000;
@@ -43,12 +42,6 @@ export class RateLimitService {
     logger.debug('[RateLimit] Service initialized');
   }
 
-  /**
-   * Checks if a group is within rate limits.
-   *
-   * @param groupJid - The group JID.
-   * @returns The rate limit result.
-   */
   checkGroupRateLimit(groupJid: string): RateLimitResult {
     if (this.isGroupWhitelisted(groupJid)) {
       return { allowed: true };
@@ -76,7 +69,7 @@ export class RateLimitService {
       if (tracker.warnings === 1) {
         return {
           allowed: false,
-          reason: 'The group is sending too many messages. Slow down.',
+          reason: '⚠️ El grupo está enviando muchos mensajes. Reduce la velocidad.',
           waitTime: windowMs,
         };
       }
@@ -84,14 +77,14 @@ export class RateLimitService {
       if (tracker.warnings >= 3) {
         return {
           allowed: false,
-          reason: 'Group temporarily blocked for spam',
+          reason: '⛔ Grupo bloqueado temporalmente por spam',
           waitTime: windowMs * 2,
         };
       }
 
       return {
         allowed: false,
-        reason: 'Too many messages from the group',
+        reason: '⚠️ Demasiados mensajes del grupo',
         waitTime: Math.ceil(windowMs / 2),
       };
     }
@@ -99,12 +92,6 @@ export class RateLimitService {
     return { allowed: true };
   }
 
-  /**
-   * Checks if a user is flooding (sending messages too quickly).
-   *
-   * @param userJid - The user JID.
-   * @returns The rate limit result.
-   */
   checkFlood(userJid: string): RateLimitResult {
     if (this.isUserWhitelisted(userJid)) {
       return { allowed: true };
@@ -133,7 +120,7 @@ export class RateLimitService {
         allowed: false,
         ...(shouldWarn
           ? {
-              reason: 'You are sending messages too fast. Wait a moment.',
+              reason: '⚠️ Estás escribiendo muy rápido. Espera un momento.',
               waitTime: 2000,
             }
           : {}),
@@ -147,7 +134,7 @@ export class RateLimitService {
   /**
    * Resets a group's accumulated warnings after WARNING_DECAY_MS of quiet
    * time since the last warning. Mirrors the decay in AntiSpamMiddleware:
-   * without it a once-active group could stay at "blocked" forever,
+   * without it a once-active group could stay at "⛔ bloqueado" forever,
    * because the cleanup pass kept the tracker alive while warnings > 0.
    */
   private decayWarnings(groupJid: string): void {
@@ -161,31 +148,14 @@ export class RateLimitService {
     }
   }
 
-  /**
-   * Checks if a group is whitelisted.
-   *
-   * @param groupJid - The group JID.
-   * @returns True if whitelisted.
-   */
   isGroupWhitelisted(groupJid: string): boolean {
     return this.config.whitelistGroups.some(whitelisted => whitelisted === groupJid);
   }
 
-  /**
-   * Checks if a user is whitelisted.
-   *
-   * @param userJid - The user JID.
-   * @returns True if whitelisted.
-   */
   isUserWhitelisted(userJid: string): boolean {
     return this.config.whitelistUsers.some(whitelisted => whitelisted === userJid);
   }
 
-  /**
-   * Adds a group to the whitelist.
-   *
-   * @param groupJid - The group JID.
-   */
   addGroupToWhitelist(groupJid: string): void {
     if (!this.isGroupWhitelisted(groupJid)) {
       this.config.whitelistGroups.push(groupJid);
@@ -193,11 +163,6 @@ export class RateLimitService {
     }
   }
 
-  /**
-   * Removes a group from the whitelist.
-   *
-   * @param groupJid - The group JID.
-   */
   removeGroupFromWhitelist(groupJid: string): void {
     const index = this.config.whitelistGroups.findIndex(g => g === groupJid);
     if (index !== -1) {
@@ -206,11 +171,6 @@ export class RateLimitService {
     }
   }
 
-  /**
-   * Adds a user to the whitelist.
-   *
-   * @param userJid - The user JID.
-   */
   addUserToWhitelist(userJid: string): void {
     if (!this.isUserWhitelisted(userJid)) {
       this.config.whitelistUsers.push(userJid);
@@ -218,11 +178,6 @@ export class RateLimitService {
     }
   }
 
-  /**
-   * Removes a user from the whitelist.
-   *
-   * @param userJid - The user JID.
-   */
   removeUserFromWhitelist(userJid: string): void {
     const index = this.config.whitelistUsers.findIndex(u => u === userJid);
     if (index !== -1) {
@@ -231,12 +186,6 @@ export class RateLimitService {
     }
   }
 
-  /**
-   * Gets statistics for a specific group.
-   *
-   * @param groupJid - The group JID.
-   * @returns The group statistics.
-   */
   getGroupStats(groupJid: string): { messageCount: number; warnings: number } {
     const tracker = this.groupTrackers.get(groupJid);
     if (!tracker) {
@@ -252,11 +201,6 @@ export class RateLimitService {
     };
   }
 
-  /**
-   * Gets overall service statistics.
-   *
-   * @returns An object with tracking and whitelist counts.
-   */
   getStats(): {
     trackedGroups: number;
     trackedUsers: number;
@@ -271,29 +215,16 @@ export class RateLimitService {
     };
   }
 
-  /**
-   * Resets a group's tracking data.
-   *
-   * @param groupJid - The group JID.
-   */
   resetGroup(groupJid: string): void {
     this.groupTrackers.delete(groupJid);
     logger.info(`[RateLimit] Group ${groupJid} stats reset`);
   }
 
-  /**
-   * Resets a user's tracking data.
-   *
-   * @param userJid - The user JID.
-   */
   resetUser(userJid: string): void {
     this.userTrackers.delete(userJid);
     logger.info(`[RateLimit] User ${userJid} stats reset`);
   }
 
-  /**
-   * Stops the cleanup timer.
-   */
   stop(): void {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
@@ -301,9 +232,6 @@ export class RateLimitService {
     }
   }
 
-  /**
-   * Starts the periodic cleanup of old tracking data.
-   */
   private startCleanup(): void {
     this.cleanupTimer = setInterval(() => {
       const now = Date.now();

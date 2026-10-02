@@ -4,16 +4,6 @@ import type { WASocket } from 'baileys';
 
 export const PIN_PROTECTED_COMMANDS = ['eval', 'exec', 'grant', 'setowner', 'restart'];
 
-/**
- * Checks if a command requires PIN verification for the owner.
- * Sends a PIN via DM if verification is needed.
- *
- * @param ctx - The message context.
- * @param commandName - The name of the command to check.
- * @param commandArgs - The command arguments.
- * @param sock - Optional socket instance (defaults to ctx.sock).
- * @returns An object indicating if PIN is required and if execution can proceed.
- */
 export async function checkPinVerification(
   ctx: MessageContext,
   commandName: string,
@@ -46,9 +36,9 @@ export async function checkPinVerification(
   await pinVerificationService.sendPinDm(ctx.sender.jid, pin, commandName, socket);
 
   await ctx.reply(
-    `PIN Verification Required\n\n` +
-      `A PIN was sent to your DM. Reply with the 6-digit code to confirm.\n\n` +
-      `The PIN expires in 60 seconds.`,
+    `🔐 *Verificación requerida*\n\n` +
+      `Te envié un PIN a tu DM. Responde con el código de 6 dígitos para confirmar.\n\n` +
+      `*El PIN expira en 60 segundos.*`,
   );
 
   return { requiresPin: true, canExecute: false };

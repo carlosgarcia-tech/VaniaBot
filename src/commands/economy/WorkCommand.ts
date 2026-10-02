@@ -6,9 +6,6 @@ import { formatNumber } from '@/utils/helpers.js';
 import { achievementService } from '@/services/rpg/AchievementService.js';
 import { logError } from '@/utils/logger.js';
 
-/**
- * Work command - work to earn money and XP.
- */
 export class WorkCommand extends Command {
   name = 'work';
   description = 'Work to earn money';
@@ -26,12 +23,6 @@ export class WorkCommand extends Command {
     { name: 'Musician', min: 250, max: 900, emoji: '🎸' },
   ];
 
-  /**
-   * Executes the work command.
-   *
-   * @param ctx - The message context.
-   * @returns A promise that resolves when the command completes.
-   */
   async execute(ctx: MessageContext): Promise<void> {
     const user = await serviceManager.userService.getUser(ctx.sender.jid);
 
@@ -50,7 +41,7 @@ export class WorkCommand extends Command {
       await achievementService.trackWork(ctx.sender.jid);
       await achievementService.checkLevelAchievements(ctx.sender.jid);
     } catch (error) {
-      // The work payment was already made: achievements are secondary.
+      // El pago del trabajo ya se hizo: los logros son secundarios.
       logError(`[WorkCommand] Achievement tracking failed for ${ctx.sender.jid}`, error);
     }
 
@@ -64,18 +55,18 @@ export class WorkCommand extends Command {
 
     let bonusText = '';
     if (incomeBuff) {
-      bonusText = `\nIncome Bonus: +${incomeBuff.value}%`;
+      bonusText = `\n💰 *BONUS INGRESO:* +${incomeBuff.value}%`;
     }
     if (xpBuff) {
-      bonusText += `\nXP Bonus: +${xpBuff.value}%`;
+      bonusText += `\n✨ *BONUS XP:* +${xpBuff.value}%`;
     }
 
     await ctx.reply(
-      `Work Complete!\n\n` +
-        `${job.emoji} ${job.name} 💼\n` +
-        `Earned: $${formatNumber(earned)}${bonusText}\n` +
-        `+${xpGained} XP\n\n` +
-        `Balance: $${formatNumber(updatedUser.money)}`,
+      `˚₊· ͟͟͞͞➳ *bien ahí!* ˚₊· ͟͟͞͞➳\n\n` +
+        `${job.emoji} *${job.name}* 💼\n` +
+        `✿ ganaste: *$${formatNumber(earned)}* moneditas${bonusText}\n` +
+        `✿ +${xpGained} XP\n\n` +
+        `♡ tu bolsita: *$${formatNumber(updatedUser.money)}* ♡`,
     );
   }
 }

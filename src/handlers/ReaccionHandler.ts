@@ -4,6 +4,12 @@
  * Handles emoji reactions to messages in group lists/games.
  * Routes reactions to the ListaManager for game logic processing.
  * This handler is always active regardless of admin-only mode.
+ *
+ * @author **Carlos G** ⭐
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
  */
 
 import type { WASocket, proto } from 'baileys';
@@ -19,7 +25,12 @@ import { logError } from '@/utils/logger.js';
  *
  * @param sock - The Baileys socket
  * @param message - The message containing the reaction
- * @returns A promise that resolves when handling is complete.
+ * @returns Promise<void>
+ *
+ * @example
+ * ```typescript
+ * await handleReaccion(sock, message);
+ * ```
  */
 export async function handleReaccion(
   sock: WASocket,
@@ -61,7 +72,6 @@ export async function handleReaccion(
     });
 
     if (!result.success) {
-      // No action needed on failure
     }
   } catch (error) {
     logError('[REACCION ERROR]', error);

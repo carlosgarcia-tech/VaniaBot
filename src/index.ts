@@ -20,34 +20,25 @@ console.error = function (...args: unknown[]) {
 
 let client: WhatsAppClient;
 
-/**
- * Main entry point for the WhatsApp bot application.
- * Initializes databases, creates the WhatsApp client, and starts the webhook panel server.
- *
- * @returns A promise that resolves when the bot has been initialized.
- */
 async function main(): Promise<void> {
   const isDocker = process.env.DOCKER_MODE === 'true' || process.env.DOCKER === 'true';
   const startupProgress = isDocker ? createStartupProgress() : null;
 
   if (!isDocker) {
-    logger.info('Starting WhatsApp Bot...');
+    logger.info('Iniciando WhatsApp Bot...');
   }
 
   try {
-    if (startupProgress) startupProgress.begin('Database');
+    if (startupProgress) startupProgress.begin('Base de datos');
     await databaseSwitcher.initialize();
     await initializeDatabase();
     await subBotDatabase.initialize();
-    if (startupProgress) startupProgress.done('Database');
+    if (startupProgress) startupProgress.done('Base de datos');
   } catch (error) {
     if (startupProgress) {
-      startupProgress.fail(
-        'Database',
-        error instanceof Error ? error.message : String(error),
-      );
+      startupProgress.fail('Base de datos', error instanceof Error ? error.message : String(error));
     }
-    logger.warn('Warning: Database initialization failed, continuing without it:', error);
+    logger.warn('⚠️ Error inicializando base de datos, continuando sin ella:', error);
   }
 
   if (startupProgress) {
@@ -60,7 +51,7 @@ async function main(): Promise<void> {
   await client.initialize();
 
   if (!isDocker) {
-    logger.info('Bot started successfully');
+    logger.info('Bot iniciado correctamente');
   }
 
   const disablePanel = process.env.PANEL_DISABLED === 'true';
@@ -69,15 +60,8 @@ async function main(): Promise<void> {
   }
 }
 
-/**
- * Gracefully shuts down the bot application.
- * Closes the WhatsApp client, stops the panel server, and flushes logs.
- *
- * @param reason - The reason for shutdown (e.g., 'SIGINT', 'SIGTERM').
- * @returns A promise that resolves when shutdown is complete.
- */
 async function shutdown(reason: string): Promise<void> {
-  logger.info(`Stopping bot (${reason})...`);
+  logger.info(`Deteniendo bot (${reason})...`);
   try {
     if (client) {
       await client.shutdown();

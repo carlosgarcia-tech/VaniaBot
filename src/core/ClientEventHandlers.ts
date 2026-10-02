@@ -14,19 +14,7 @@ import { formatTimeRemaining } from '@/utils/helpers.js';
 
 type GroupParticipantsUpdate = BaileysEventMap['group-participants.update'];
 
-/**
- * Handles various WhatsApp client events such as incoming calls,
- * message deletions, and group participant updates.
- */
 export class ClientEventHandlers {
-  /**
-   * Handles incoming WhatsApp calls.
-   * Rejects calls if anti-call service is enabled and the caller should be blocked.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param calls - Array of incoming call events.
-   * @returns A promise that resolves when all calls are handled.
-   */
   async handleIncomingCalls(sock: WASocket, calls: BaileysEventMap['call']): Promise<void> {
     if (!antiCallService.isEnabled()) return;
     for (const call of calls) {
@@ -42,11 +30,11 @@ export class ClientEventHandlers {
         await sock.rejectCall(callId, caller);
         const callerName = caller.split('@')[0];
         const ownerMsg =
-          `Call Rejected\n\n` +
-          `From: @${callerName}\n` +
-          `Type: ${isVideo ? 'Video' : 'Voice'}\n` +
-          `Group: ${isGroup ? 'Yes' : 'No'}\n` +
-          `Time: ${new Date().toLocaleString()}`;
+          `📵 *LLAMADA RECHAZADA*\n\n` +
+          `👤 De: @${callerName}\n` +
+          `🎥 Tipo: ${isVideo ? 'Video' : 'Voz'}\n` +
+          `👥 Grupo: ${isGroup ? 'Sí' : 'No'}\n` +
+          `🕐 Hora: ${new Date().toLocaleString()}`;
         try {
           await sock.sendMessage(env.OWNER_JID, {
             text: ownerMsg,
@@ -61,15 +49,6 @@ export class ClientEventHandlers {
     }
   }
 
-  /**
-   * Handles message deletion events.
-   * Notifies the owner when a message is deleted by someone else,
-   * and sends the deleted message content if available.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param update - The message deletion event.
-   * @returns A promise that resolves when handling is complete.
-   */
   async handleMessageDeletion(
     sock: WASocket,
     update: BaileysEventMap['messages.delete'],
@@ -97,7 +76,7 @@ export class ClientEventHandlers {
           });
           if (original.mediaBuffer && original.mediaType) {
             const mediaOptions: Record<string, unknown> = {
-              caption: `Deleted media: ${original.mediaType}\nFrom: @${original.sender.split('@')[0]}`,
+              caption: `📎 *Medio eliminado:* ${original.mediaType}\nDe: @${original.sender.split('@')[0]}`,
               mentions: [original.sender],
             };
             if (original.mediaType === 'image') {
@@ -134,14 +113,6 @@ export class ClientEventHandlers {
     }
   }
 
-  /**
-   * Handles group participant updates (add/remove).
-   * Invalidates cache, handles welcome messages, and runs anti-arab checks.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param update - The group participants update event.
-   * @returns A promise that resolves when handling is complete.
-   */
   async handleGroupUpdate(sock: WASocket, update: GroupParticipantsUpdate): Promise<void> {
     const { id: groupJid, participants, action } = update;
     if (!groupJid || !participants) return;
@@ -194,14 +165,9 @@ export class ClientEventHandlers {
   }
 
   /**
-   * Handles anti-arab moderation for newly added participants.
-   * Kicks users with blocked country prefixes from the group.
-   *
-   * @param sock - The WhatsApp socket.
-   * @param groupJid - The group JID.
-   * @param action - The participant action ('add' or 'remove').
-   * @param participants - The array of participants.
-   * @returns A promise that resolves when handling is complete.
+   * Kicks newly added participants matching the per-group blocked country
+   * prefixes (AntiArab). Replaces the dead AntiArabMiddleware.onGroupParticipantUpdate
+   * that was never invoked from any pipeline.
    */
   private async handleAntiArab(
     sock: WASocket,
@@ -224,20 +190,14 @@ export class ClientEventHandlers {
       if (antiArabService.shouldBlockNumber(number)) {
         try {
           await sock.groupParticipantsUpdate(groupJid, [participantId], 'remove');
-          logger.info(`AntiArab: User ${number} removed from group ${groupJid}`);
+          logger.info(`AntiArab: Usuario ${number} removido del grupo ${groupJid}`);
         } catch (error) {
-          logger.error(`AntiArab: Error removing user ${number}`, error);
+          logger.error(`AntiArab: Error al remover usuario ${number}`, error);
         }
       }
     }
   }
 
-  /**
-   * Notifies group admins when a muted user attempts to send a message.
-   *
-   * @param ctx - The message context.
-   * @returns A promise that resolves when notifications are sent.
-   */
   async notifyAdminsMute(ctx: MessageContext): Promise<void> {
     try {
       const admins = await PermissionService.getGroupAdmins(ctx.sock, ctx.chat.jid);
@@ -258,15 +218,15 @@ export class ClientEventHandlers {
           ctx.sock
             .sendMessage(adminJid, {
               text:
-                `Mute Alert\n\n` +
-                `User *${ctx.sender.pushName || 'Unknown'}* is muted but attempted to send a message.\n\n` +
-                `Reason: ${muteInfo?.reason || 'Not specified'}\n` +
-                `Time remaining: ${timeText}\n` +
-                `Message: ${ctx.text.slice(0, 100)}${ctx.text.length > 100 ? '...' : ''}\n\n` +
-                `Note: Bot needs to be admin to auto-delete muted messages.`,
+                `🔇 *Aviso de Mute*\n\n` +
+                `El usuario *${ctx.sender.pushName || 'Desconocido'}* está muteado pero intentó enviar un mensaje.\n\n` +
+                `📝 Razón: ${muteInfo?.reason || 'No especificada'}\n` +
+                `⏱️ Tiempo restante: ${timeText}\n` +
+                `💬 Mensaje: ${ctx.text.slice(0, 100)}${ctx.text.length > 100 ? '...' : ''}\n\n` +
+                `⚠️ El bot necesita ser admin para eliminar automáticamente los mensajes muteados.`,
             })
             .catch(error => {
-              logger.debug(`[MUTE] Error notifying admin ${adminJid}:`, error);
+              logger.debug(`[MUTE] Error notificando admin ${adminJid}:`, error);
             }),
         ),
       );

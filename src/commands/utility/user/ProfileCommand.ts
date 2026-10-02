@@ -13,7 +13,6 @@ interface LevelProgress {
   requiredXP: number;
   percentage: number;
 }
-
 interface ClientStats {
   messagesReceived: number;
   commandsExecuted: number;
@@ -24,10 +23,6 @@ interface ClientStats {
     processing: number;
   };
 }
-
-/**
- * Profile command - shows user profile with stats, level, and economy info.
- */
 export class ProfileCommand extends Command {
   name = 'profile';
   description = 'Show user profile';
@@ -38,54 +33,35 @@ export class ProfileCommand extends Command {
   examples = ['!profile', '!profile @user', '!me'];
   private static logoBuffer: Buffer | null = null;
   private static logoLoaded = false;
-
-  /**
-   * Executes the profile command.
-   *
-   * @param ctx - The message context.
-   * @returns A promise that resolves when the command completes.
-   */
   async execute(ctx: MessageContext): Promise<void> {
     const mentionedJid = ctx.mentionedJid;
     const targetJid = mentionedJid || ctx.sender.jid;
     const isSelf = targetJid === ctx.sender.jid;
-
     try {
       const botJid = ctx.sock.user?.id;
       const isBotProfile = this.isBotJid(targetJid, botJid);
-
       if (isBotProfile) {
         await this.sendBotProfile(ctx);
         return;
       }
-
       const [userData, progress] = await Promise.all([
         serviceManager.userService.getUser(targetJid),
         serviceManager.levelService.getLevelProgress(targetJid),
       ]);
-
       const displayData = this.prepareDisplayData(userData);
       const message = this.buildProfileCard(userData, displayData, progress, isSelf);
       await this.sendProfileWithImage(ctx, targetJid, message, displayData, progress);
     } catch (error) {
       logError('[ProfileCommand] Error', error);
-      await ctx.reply('Error retrieving profile');
+      await ctx.reply('❌ Error retrieving profile');
     }
   }
-
-  /**
-   * Checks if the target JID is the bot's own JID.
-   */
   private isBotJid(targetJid: string, botJid?: string): boolean {
     if (!botJid) return false;
     const targetNumber = targetJid.split('@')[0].split(':')[0];
     const botNumber = botJid.split('@')[0].split(':')[0];
     return targetNumber === botNumber;
   }
-
-  /**
-   * Sends the bot's own profile.
-   */
   private async sendBotProfile(ctx: MessageContext): Promise<void> {
     const uptime = this.formatUptime(process.uptime() * 1000);
     const client = (global as { client?: { getStats: () => ClientStats } }).client;
@@ -97,34 +73,33 @@ export class ProfileCommand extends Command {
 
     const message = `
 ┌───────────────────┐
-│   VANIA BOT        │
+│   ✦ VANIA BOT ✦    │
 └───────────────────┘
 
-INFO
-  • name: ${ctx.sock.user?.name || 'VaniaBot'}
-  • status: online
-  • uptime: ${uptime}
+◈ INFO
+   • name: ${ctx.sock.user?.name || 'VaniaBot'}
+   • status: online
+   • uptime: ${uptime}
 
-STATISTICS
-  • messages: ${formatNumber(stats.messagesReceived)}
-  • commands: ${formatNumber(stats.commandsExecuted)}
-  • processed: ${formatNumber(stats.messagesProcessed)}
+◈ STATISTICS
+   • messages: ${formatNumber(stats.messagesReceived)}
+   • commands: ${formatNumber(stats.commandsExecuted)}
+   • processed: ${formatNumber(stats.messagesProcessed)}
 
-PERFORMANCE
-  • avg time: ${stats.avgProcessingTime?.toFixed(0) || 0}ms
-  • queue: ${stats.queue?.queued || 0}
+◈ PERFORMANCE
+   • avg time: ${stats.avgProcessingTime?.toFixed(0) || 0}ms
+   • queue: ${stats.queue?.queued || 0}
 
-FEATURES
-  • economy
-  • games
-  • moderation
-  • levels
+◈ FEATURES
+   • economy
+   • games
+   • moderation
+   • levels
 
 ┌─────────────────────┐
 │   !help for commands │
 └─────────────────────┘
 `.trim();
-
     const logoBuffer = this.getDefaultProfile();
     if (logoBuffer) {
       await ctx.sock.sendMessage(ctx.chat.jid, {
@@ -136,9 +111,6 @@ FEATURES
     }
   }
 
-  /**
-   * Formats uptime in milliseconds to a human-readable string.
-   */
   private formatUptime(ms: number): string {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
     const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
@@ -216,9 +188,6 @@ FEATURES
     }
   }
 
-  /**
-   * Gets the default profile image buffer.
-   */
   private getDefaultProfile(): Buffer | null {
     if (ProfileCommand.logoLoaded) return ProfileCommand.logoBuffer;
 
@@ -237,9 +206,6 @@ FEATURES
     return null;
   }
 
-  /**
-   * Prepares display data (modifies owner stats for display).
-   */
   private prepareDisplayData(userData: User): User {
     if (userData.isOwner) {
       return {
@@ -253,9 +219,6 @@ FEATURES
     return userData;
   }
 
-  /**
-   * Builds the profile card text message.
-   */
   private buildProfileCard(
     userData: User,
     displayData: User,
@@ -286,7 +249,7 @@ FEATURES
     const userBadges = this.getUserBadges(userData);
 
     let card = `┌───────────┐
-│      PROFILE              │
+│      ✦ PROFILE ✦              │
 └───────────┘
 
 ◈ ${userData.name}${userBadges}`;
@@ -321,7 +284,6 @@ FEATURES
    commands: ${formatNumber(displayData.totalCommands)}
    warns: ${displayData.warnings}/3
    active: ${this.getTimeSince(userData.updatedAt)}`;
-
     if (userData.isOwner) {
       card += `
 ◈ REWARDS
@@ -329,7 +291,7 @@ FEATURES
    weekly: unlimited
    monthly: unlimited
 ┌────────┐
-│   OWNER │
+│   ✦ OWNER ✦       │
 └────────┘`;
     } else {
       card += `
@@ -347,10 +309,6 @@ FEATURES
     }
     return card.trim();
   }
-
-  /**
-   * Creates a visual progress bar.
-   */
   private createProgressBar(current: number, total: number, length: number = 10): string {
     if (total <= 0 || current < 0) return '▰'.repeat(length);
     const percentage = Math.min(Math.max(current / total, 0), 1);
@@ -358,10 +316,6 @@ FEATURES
     const empty = Math.max(0, length - filled);
     return '▰'.repeat(filled) + '▱'.repeat(empty);
   }
-
-  /**
-   * Gets the user role based on level.
-   */
   private getUserRole(user: User): string {
     if (user.isOwner) return 'owner';
     if (user.isBanned) return 'banned';
@@ -371,10 +325,6 @@ FEATURES
     if (user.level >= 10) return 'intermediate';
     return 'novice';
   }
-
-  /**
-   * Gets time since a timestamp.
-   */
   private getTimeSince(timestamp: number): string {
     const now = Date.now();
     const diff = now - timestamp;
@@ -388,30 +338,22 @@ FEATURES
     if (hours > 0) return `${hours}h`;
     return 'now';
   }
-
-  /**
-   * Gets user badges.
-   */
   private getUserBadges(user: User): string {
     const badges: string[] = [];
-    if (user.isOwner) badges.push('Owner');
+    if (user.isOwner) badges.push('👑 Owner');
     const allBuffs = user.activeBuffs || [];
     const activeBuffs = allBuffs.filter(b => b.expiresAt === 0 || b.expiresAt > Date.now());
-    if (activeBuffs.some(b => b.buffId === 'vip_role')) badges.push('VIP');
-    if (activeBuffs.some(b => b.buffId === 'legend_role')) badges.push('Legend');
-    if (activeBuffs.some(b => b.buffId === 'premium_pass')) badges.push('VIP Pass');
-    if (activeBuffs.some(b => b.buffId === 'badge_rich')) badges.push('Rich');
-    if (activeBuffs.some(b => b.buffId === 'badge_lucky')) badges.push('Lucky');
-    if (activeBuffs.some(b => b.buffId === 'badge_pro')) badges.push('Pro');
-    if (user.level >= 100) badges.push('Legend');
-    else if (user.level >= 50) badges.push('Veteran');
+    if (activeBuffs.some(b => b.buffId === 'vip_role')) badges.push('👑 VIP');
+    if (activeBuffs.some(b => b.buffId === 'legend_role')) badges.push('💎 Legend');
+    if (activeBuffs.some(b => b.buffId === 'premium_pass')) badges.push('💎 VIP Pass');
+    if (activeBuffs.some(b => b.buffId === 'badge_rich')) badges.push('🤑 Rich');
+    if (activeBuffs.some(b => b.buffId === 'badge_lucky')) badges.push('🍀 Lucky');
+    if (activeBuffs.some(b => b.buffId === 'badge_pro')) badges.push('🏆 Pro');
+    if (user.level >= 100) badges.push('⭐ Leyenda');
+    else if (user.level >= 50) badges.push('🔥 Veterano');
     if (badges.length === 0) return '';
     return '\n   ' + badges.join(' • ');
   }
-
-  /**
-   * Formats active buffs for display.
-   */
   private formatActiveBuffs(user: User): string {
     const buffs = user.activeBuffs?.filter(b => b.expiresAt > Date.now()) || [];
     if (buffs.length === 0) {

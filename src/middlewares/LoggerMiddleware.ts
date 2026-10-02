@@ -3,21 +3,9 @@ import type { MessageContext } from '@/types/index.js';
 import { logger } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
-/**
- * Middleware that logs command execution and tracks command statistics.
- * Logs command details before execution and duration after completion.
- * Increments user and group command counters.
- */
 export class LoggerMiddleware extends Middleware {
   name = 'logger';
 
-  /**
-   * Executes the logging middleware.
-   *
-   * @param ctx - The message context.
-   * @param next - The next middleware in the chain.
-   * @returns A promise that resolves when logging completes.
-   */
   async execute(ctx: MessageContext, next: () => Promise<void>): Promise<void> {
     const startTime = Date.now();
 
@@ -41,11 +29,11 @@ export class LoggerMiddleware extends Middleware {
       }
 
       const duration = Date.now() - startTime;
-      logger.debug(`Command ${ctx.command} executed in ${duration}ms`);
+      logger.debug(`Comando ${ctx.command} ejecutado en ${duration}ms`);
     } catch (error) {
       const duration = Date.now() - startTime;
       logger.error({
-        message: `Error executing ${ctx.command}`,
+        message: `Error ejecutando ${ctx.command}`,
         error,
         duration,
       });

@@ -9,11 +9,6 @@ const SALT_LENGTH = 32;
 
 let encryptionKey: Buffer | null = null;
 
-/**
- * Derives and caches the encryption key from environment variables.
- *
- * @returns The 32-byte encryption key.
- */
 function getEncryptionKey(): Buffer {
   if (encryptionKey) return encryptionKey;
 
@@ -29,12 +24,6 @@ function getEncryptionKey(): Buffer {
   return encryptionKey;
 }
 
-/**
- * Encrypts a string using AES-256-GCM.
- *
- * @param data - The string to encrypt.
- * @returns The encrypted data as a colon-separated string (iv:authTag:ciphertext).
- */
 export function encrypt(data: string): string {
   const key = getEncryptionKey();
   const iv = randomBytes(IV_LENGTH);
@@ -48,13 +37,6 @@ export function encrypt(data: string): string {
   return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
 }
 
-/**
- * Decrypts a string encrypted with the encrypt function.
- *
- * @param encryptedData - The encrypted data string (iv:authTag:ciphertext).
- * @returns The decrypted string.
- * @throws Error if the encrypted data format is invalid.
- */
 export function decrypt(encryptedData: string): string {
   const key = getEncryptionKey();
   const [ivHex, authTagHex, encrypted] = encryptedData.split(':');
@@ -77,12 +59,6 @@ export function decrypt(encryptedData: string): string {
   return decrypted;
 }
 
-/**
- * Encrypts data and writes it to a file atomically.
- *
- * @param filePath - The path to the file.
- * @param data - The string data to encrypt and write.
- */
 export function encryptFile(filePath: string, data: string): void {
   const encrypted = encrypt(data);
   const dir = dirname(filePath);
@@ -92,12 +68,6 @@ export function encryptFile(filePath: string, data: string): void {
   writeFileSync(filePath, encrypted, 'utf8');
 }
 
-/**
- * Reads and decrypts a file.
- *
- * @param filePath - The path to the encrypted file.
- * @returns The decrypted string, or null if file doesn't exist or decryption fails.
- */
 export function decryptFile(filePath: string): string | null {
   if (!existsSync(filePath)) {
     return null;
@@ -116,11 +86,6 @@ export function decryptFile(filePath: string): string | null {
   }
 }
 
-/**
- * Checks if session encryption is enabled.
- *
- * @returns True if SESSION_ENCRYPTION_KEY is set.
- */
 export function isEncryptionEnabled(): boolean {
   return !!process.env.SESSION_ENCRYPTION_KEY;
 }

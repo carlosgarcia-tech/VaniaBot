@@ -4,6 +4,12 @@
  * Dynamically loads command plugins from the commands directory.
  * Supports both instantiated command objects and command classes.
  * Implements lazy loading for improved performance.
+ *
+ * @author **Carlos G**
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
  */
 
 import { readdir, stat } from 'fs/promises';
@@ -33,17 +39,13 @@ type CommandConstructor = new () => MaybeCommand;
 function isCommandClass(value: unknown): value is CommandConstructor {
   return (
     typeof value === 'function' &&
-    // Classes with required constructor parameters (e.g. ListaCommand)
-    // cannot be instantiated without config: the loader only uses parameterless classes.
+    // Clases con parámetros obligatorios en el constructor (p. ej. ListaCommand)
+    // no pueden instanciarse sin config: el loader solo usa clases sin args.
     (value as CommandConstructor).length === 0 &&
     typeof (value as CommandConstructor).prototype?.execute === 'function'
   );
 }
 
-/**
- * Dynamically loads command plugins from the filesystem.
- * Implements singleton pattern with lazy loading support for performance.
- */
 export class PluginLoader {
   private static instance: PluginLoader;
   private loadedCommands: Map<string, ICommand> = new Map();
@@ -60,11 +62,6 @@ export class PluginLoader {
     });
   }
 
-  /**
-   * Gets the singleton instance of PluginLoader.
-   *
-   * @returns The PluginLoader instance.
-   */
   static getInstance(): PluginLoader {
     if (!PluginLoader.instance) {
       PluginLoader.instance = new PluginLoader();
@@ -72,17 +69,11 @@ export class PluginLoader {
     return PluginLoader.instance;
   }
 
-  /**
-   * Loads commands from the commands directory.
-   *
-   * @param preload - Array of category names to preload eagerly.
-   * @returns A promise that resolves to an array of loaded commands.
-   */
   async loadCommands(preload: string[] = []): Promise<ICommand[]> {
     const commands: ICommand[] = [];
     const commandsPath = join(__dirname, '../commands');
 
-    logger.debug(`Searching for commands in: ${commandsPath}`);
+    logger.debug(`Buscando comandos en: ${commandsPath}`);
 
     for (const category of preload) {
       this.preloadCategories.add(category);
@@ -103,8 +94,8 @@ export class PluginLoader {
       }
 
       if (commands.length > 0) {
-        logger.info(`Commands loaded: ${commands.length}`);
-        logger.debug(`Preloaded categories: ${[...this.preloadCategories].join(', ')}`);
+        logger.info(` Comandos cargados: ${commands.length}`);
+        logger.debug(`Categorías pre-cargadas: ${[...this.preloadCategories].join(', ')}`);
       }
     } catch (error) {
       logError('PluginLoader.loadCommands', error);
@@ -113,14 +104,6 @@ export class PluginLoader {
     return commands;
   }
 
-  /**
-   * Recursively loads commands from a directory.
-   *
-   * @param dir - The directory to scan.
-   * @param commands - The array to push loaded commands to.
-   * @param parentCategory - The parent category name (for nested directories).
-   * @returns A promise that resolves when loading is complete.
-   */
   private async loadFromDirectory(
     dir: string,
     commands: ICommand[],
@@ -169,12 +152,6 @@ export class PluginLoader {
     );
   }
 
-  /**
-   * Scans a directory for command files and registers them for lazy loading.
-   *
-   * @param dir - The directory to scan.
-   * @returns A promise that resolves when scanning is complete.
-   */
   private async scanDirectory(dir: string): Promise<void> {
     try {
       const files = await readdir(dir);
@@ -190,12 +167,6 @@ export class PluginLoader {
     }
   }
 
-  /**
-   * Gets a command by name, loading it lazily if necessary.
-   *
-   * @param name - The command name or alias.
-   * @returns A promise that resolves to the command, or null if not found.
-   */
   async getCommand(name: string): Promise<ICommand | null> {
     if (this.loadedCommands.has(name)) {
       const cmd = this.loadedCommands.get(name);
@@ -241,12 +212,6 @@ export class PluginLoader {
     return null;
   }
 
-  /**
-   * Loads a single command file and extracts commands from it.
-   *
-   * @param filePath - The path to the command file.
-   * @returns A promise that resolves to an array of commands.
-   */
   private async loadCommandFile(filePath: string): Promise<ICommand[]> {
     const results: ICommand[] = [];
 
@@ -264,14 +229,7 @@ export class PluginLoader {
     return results;
   }
 
-  /**
-   * Extracts valid commands from a loaded module.
-   *
-   * @param module - The loaded module exports.
-   * @param filename - The source filename (for error logging).
-   * @returns An array of valid commands.
-   */
-  private extractCommands(module: Record<string, unknown>, filename: string): ICommand[] {
+  private extractCommands(module: Record<string, unknown>, __filename: string): ICommand[] {
     const results: ICommand[] = [];
 
     for (const [, value] of Object.entries(module)) {
@@ -289,7 +247,7 @@ export class PluginLoader {
             results.push(instance);
           }
         } catch (error) {
-          logError(`[PluginLoader] ${filename}`, error);
+          logError(`[PluginLoader] ${__filename}`, error);
         }
       }
     }
@@ -297,30 +255,14 @@ export class PluginLoader {
     return results;
   }
 
-  /**
-   * Checks if a command is available (loaded or pending lazy load).
-   *
-   * @param name - The command name or alias.
-   * @returns True if the command exists.
-   */
   hasCommand(name: string): boolean {
     return this.loadedCommands.has(name) || this.commandFiles.has(name) || this.lazyCache.has(name);
   }
 
-  /**
-   * Gets all currently loaded commands.
-   *
-   * @returns An array of loaded commands.
-   */
   getLoadedCommands(): ICommand[] {
     return Array.from(this.loadedCommands.values());
   }
 
-  /**
-   * Gets all commands, loading lazy ones if necessary.
-   *
-   * @returns A promise that resolves to an array of all commands.
-   */
   async getAllCommands(): Promise<ICommand[]> {
     if (this.commandFiles.size > 0) {
       const filePaths = [...new Set(this.commandFiles.values())];
@@ -343,11 +285,6 @@ export class PluginLoader {
     return Array.from(this.loadedCommands.values());
   }
 
-  /**
-   * Gets statistics about loaded and pending commands.
-   *
-   * @returns An object with loaded, lazy, and total counts.
-   */
   getCommandCount(): { loaded: number; lazy: number; total: number } {
     return {
       loaded: this.loadedCommands.size,
@@ -356,11 +293,6 @@ export class PluginLoader {
     };
   }
 
-  /**
-   * Gets detailed statistics including cache info.
-   *
-   * @returns An object with loaded count, lazy count, and cache stats.
-   */
   getStats(): {
     loaded: number;
     lazy: number;
@@ -373,34 +305,18 @@ export class PluginLoader {
     };
   }
 
-  /**
-   * Enables lazy loading of commands.
-   */
   enableLazyLoading(): void {
     this.lazyLoadingEnabled = true;
   }
 
-  /**
-   * Disables lazy loading of commands.
-   */
   disableLazyLoading(): void {
     this.lazyLoadingEnabled = false;
   }
 
-  /**
-   * Adds a category to the preload set.
-   *
-   * @param category - The category name to preload.
-   */
   preloadCategory(category: string): void {
     this.preloadCategories.add(category);
   }
 
-  /**
-   * Preloads all commands from the commands directory.
-   *
-   * @returns A promise that resolves when all commands are loaded.
-   */
   async preloadAll(): Promise<void> {
     const commandsPath = join(__dirname, '../commands');
     const commands: ICommand[] = [];
@@ -413,7 +329,7 @@ export class PluginLoader {
     }
 
     this.commandFiles.clear();
-    logger.info(`All commands preloaded: ${this.loadedCommands.size}`);
+    logger.info(`Todos los comandos precargados: ${this.loadedCommands.size}`);
   }
 }
 

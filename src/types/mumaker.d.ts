@@ -1,7 +1,3 @@
-/**
- * Type declarations for 'mumaker' module.
- * Provides TypeScript types for image generation functions.
- */
 declare module 'mumaker' {
   interface EphotoResult {
     image?: string;

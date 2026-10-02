@@ -3,20 +3,9 @@ import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { logger, logError } from '@/utils/logger.js';
 
-/**
- * Middleware that automatically registers users and groups on first interaction.
- * Creates user/group entries in the database if they don't exist.
- */
 export class AutoRegisterMiddleware extends Middleware {
   name = 'auto-register';
 
-  /**
-   * Executes the auto-registration logic.
-   *
-   * @param ctx - The message context.
-   * @param next - The next middleware in the chain.
-   * @returns A promise that resolves when registration completes.
-   */
   async execute(ctx: MessageContext, next: () => Promise<void>): Promise<void> {
     try {
       const userExists = await serviceManager.db.has('users', ctx.sender.jid);
@@ -28,7 +17,7 @@ export class AutoRegisterMiddleware extends Middleware {
           name: ctx.sender.pushName,
         });
 
-        logger.debug(`User auto-registered: ${ctx.sender.pushName}`);
+        logger.debug(`Usuario auto-registrado: ${ctx.sender.pushName}`);
       } else {
         await serviceManager.userService.updateUser(ctx.sender.jid, {
           updatedAt: Date.now(),
@@ -41,13 +30,13 @@ export class AutoRegisterMiddleware extends Middleware {
 
         if (!groupExists) {
           await serviceManager.groupService.getGroup(ctx.chat.jid);
-          logger.debug(`Group auto-registered: ${ctx.chat.jid}`);
+          logger.debug(`Grupo auto-registrado: ${ctx.chat.jid}`);
         }
       }
 
       await next();
     } catch (error) {
-      logError('Error in AutoRegisterMiddleware:', error);
+      logError('Error en AutoRegisterMiddleware:', error);
       await next();
     }
   }

@@ -20,10 +20,6 @@ import { persistenceService } from './PersistenceService.js';
 import { antiDeleteService } from './AntiDeleteService.js';
 import { ensureDatabaseInitialized } from '@/repositories/Database.js';
 
-/**
- * Central service manager that initializes and coordinates all services.
- * Implements singleton pattern for global access.
- */
 export class ServiceManager {
   private static instance: ServiceManager;
 
@@ -57,11 +53,6 @@ export class ServiceManager {
 
   private constructor() {}
 
-  /**
-   * Gets the singleton instance.
-   *
-   * @returns The ServiceManager instance.
-   */
   static getInstance(): ServiceManager {
     if (!ServiceManager.instance) {
       ServiceManager.instance = new ServiceManager();
@@ -69,14 +60,9 @@ export class ServiceManager {
     return ServiceManager.instance;
   }
 
-  /**
-   * Initializes all services.
-   *
-   * @returns A promise that resolves when initialization is complete.
-   */
   async initialize(): Promise<void> {
     try {
-      logger.debug('Initializing services...');
+      logger.debug('🔧 Inicializando servicios...');
 
       await this.initializeDatabase();
 
@@ -100,43 +86,38 @@ export class ServiceManager {
       cleanupService.start();
 
       this.autoRestartService.setOnRestartCallback(() => {
-        logger.warn('Auto-restart triggered but disabled - bot continues running');
+        logger.warn('⚠️ Auto-restart triggered but disabled - bot continues running');
       });
       this.autoRestartService.start();
 
       await this.sessionBackupService.start();
 
-      logger.debug('Services initialized successfully');
+      logger.debug('Servicios inicializados correctamente');
     } catch (error) {
       logError('ServiceManager.initialize', error);
       throw error;
     }
   }
 
-  /**
-   * Initializes the database based on configuration.
-   *
-   * @returns A promise that resolves when the database is connected.
-   */
   private async initializeDatabase(): Promise<void> {
     const dbType = config.database.type;
 
     switch (dbType) {
       case 'json':
-        logger.info('Using JSON database (legacy)');
+        logger.info('Usando base de datos JSON (legacy)');
         this.db = new JsonDatabase(config.database.path);
         break;
 
       case 'mongodb':
         if (!config.database.uri) {
-          throw new Error('MongoDB URI not configured');
+          throw new Error('MongoDB URI no configurada');
         }
-        logger.debug('Using MongoDB database');
+        logger.debug('Usando base de datos MongoDB');
         this.db = new MongoDatabase(config.database.uri);
         break;
 
       case 'sqlite':
-        logger.debug('Using SQLite database');
+        logger.debug('Usando base de datos SQLite');
         // index.ts already bootstrapped the engine at startup; reuse it
         // (ensureDatabaseInitialized is a no-op when the engine is live).
         await ensureDatabaseInitialized();
@@ -144,7 +125,7 @@ export class ServiceManager {
         break;
 
       default:
-        logger.warn(`Unknown database type: ${dbType}, using SQLite by default`);
+        logger.warn(`Tipo de base de datos no reconocido: ${dbType}, usando SQLite por defecto`);
         await ensureDatabaseInitialized();
         this.db = new SQLiteAdapter();
     }
@@ -152,14 +133,9 @@ export class ServiceManager {
     await this.db.connect();
   }
 
-  /**
-   * Gracefully shuts down all services.
-   *
-   * @returns A promise that resolves when shutdown is complete.
-   */
   async shutdown(): Promise<void> {
     try {
-      logger.info('Shutting down services...');
+      logger.info('Cerrando servicios...');
       cleanupService.stop();
       this.sessionBackupService.stop();
       this.autoRestartService.stop();
@@ -169,17 +145,12 @@ export class ServiceManager {
         await this.db.disconnect();
       }
 
-      logger.info('Services shut down successfully');
+      logger.info('Servicios cerrados correctamente');
     } catch (error) {
       logError('ServiceManager.shutdown', error);
     }
   }
 
-  /**
-   * Checks if the service manager is ready.
-   *
-   * @returns True if the database is connected.
-   */
   isReady(): boolean {
     return this.db && this.db.isConnected();
   }

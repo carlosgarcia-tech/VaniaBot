@@ -3,6 +3,9 @@
  *
  * Repository for bot runtime state persistence.
  * Tracks heartbeat, connection status, and health metrics per bot.
+ *
+ * @author Carlos G
+ * @created 2026-04-07
  */
 
 import { getDatabase } from './Database.js';
@@ -48,20 +51,11 @@ export interface CreateRuntimeStateInput {
 export type ConnectionState =
   'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'quarantined' | 'error';
 
-/**
- * Repository for managing bot runtime state in the database.
- * Implements singleton pattern for global access.
- */
 export class RuntimeStateRepository {
   private static instance: RuntimeStateRepository;
 
   private constructor() {}
 
-  /**
-   * Gets the singleton instance.
-   *
-   * @returns The RuntimeStateRepository instance.
-   */
   static getInstance(): RuntimeStateRepository {
     if (!RuntimeStateRepository.instance) {
       RuntimeStateRepository.instance = new RuntimeStateRepository();
@@ -69,12 +63,6 @@ export class RuntimeStateRepository {
     return RuntimeStateRepository.instance;
   }
 
-  /**
-   * Creates a new runtime state record for a bot.
-   *
-   * @param input - The runtime state data to create.
-   * @returns The created record.
-   */
   create(input: CreateRuntimeStateInput): BotRuntimeStateRecord {
     const now = new Date().toISOString();
 
@@ -110,12 +98,6 @@ export class RuntimeStateRepository {
     return record;
   }
 
-  /**
-   * Finds a runtime state record by bot ID.
-   *
-   * @param botId - The bot ID to search for.
-   * @returns The record if found, null otherwise.
-   */
   findByBotId(botId: string): BotRuntimeStateRecord | null {
     return getDatabase().fetchOne<BotRuntimeStateRecord>(
       'SELECT * FROM bot_runtime_state WHERE bot_id = ?',
@@ -123,43 +105,22 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Finds all runtime state records.
-   *
-   * @returns An array of all runtime state records.
-   */
   findAll(): BotRuntimeStateRecord[] {
     return getDatabase().fetchAll<BotRuntimeStateRecord>('SELECT * FROM bot_runtime_state');
   }
 
-  /**
-   * Finds all connected bots.
-   *
-   * @returns An array of connected bot records.
-   */
   findConnected(): BotRuntimeStateRecord[] {
     return getDatabase().fetchAll<BotRuntimeStateRecord>(
       'SELECT * FROM bot_runtime_state WHERE is_connected = 1',
     );
   }
 
-  /**
-   * Finds all disconnected bots.
-   *
-   * @returns An array of disconnected bot records.
-   */
   findDisconnected(): BotRuntimeStateRecord[] {
     return getDatabase().fetchAll<BotRuntimeStateRecord>(
       'SELECT * FROM bot_runtime_state WHERE is_connected = 0',
     );
   }
 
-  /**
-   * Finds bots with stale heartbeats (potential connection issues).
-   *
-   * @param maxAgeMs - Maximum age of heartbeat in milliseconds.
-   * @returns An array of bot records with stale heartbeats.
-   */
   findStaleHeartbeat(maxAgeMs: number): BotRuntimeStateRecord[] {
     const cutoff = new Date(Date.now() - maxAgeMs).toISOString();
     return getDatabase().fetchAll<BotRuntimeStateRecord>(
@@ -168,11 +129,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Updates the heartbeat timestamp for a bot.
-   *
-   * @param botId - The bot ID.
-   */
   updateHeartbeat(botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -181,11 +137,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Updates the last message processed timestamp for a bot.
-   *
-   * @param botId - The bot ID.
-   */
   updateMessageProcessed(botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -194,12 +145,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Updates the last connection event timestamp for a bot.
-   *
-   * @param botId - The bot ID.
-   * @param eventType - The type of connection event.
-   */
   updateConnectionEvent(botId: string, _eventType: 'connect' | 'disconnect'): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -208,12 +153,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Updates the connection state for a bot.
-   *
-   * @param botId - The bot ID.
-   * @param state - The connection state.
-   */
   updateConnectionState(botId: string, state: ConnectionState): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -222,13 +161,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Updates the connection status and disconnect reason.
-   *
-   * @param botId - The bot ID.
-   * @param isConnected - Whether the bot is connected (1 or 0).
-   * @param reason - Optional disconnect reason.
-   */
   updateConnection(botId: string, isConnected: number, reason?: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -243,12 +175,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Updates the last error for a bot.
-   *
-   * @param botId - The bot ID.
-   * @param error - The error message.
-   */
   updateError(botId: string, error: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -257,11 +183,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Increments the restart count for a bot.
-   *
-   * @param botId - The bot ID.
-   */
   incrementRestartCount(botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -270,11 +191,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Resets the restart and reconnect counts for a bot.
-   *
-   * @param botId - The bot ID.
-   */
   resetRestarts(botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -283,12 +199,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Updates metrics for a bot.
-   *
-   * @param botId - The bot ID.
-   * @param metrics - The metrics to update.
-   */
   updateMetrics(
     botId: string,
     metrics: {
@@ -316,11 +226,6 @@ export class RuntimeStateRepository {
     });
   }
 
-  /**
-   * Resets the reconnect attempts for a bot.
-   *
-   * @param botId - The bot ID.
-   */
   resetReconnectAttempts(botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -329,13 +234,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Sets a bot as quarantined for a specified duration.
-   *
-   * @param botId - The bot ID.
-   * @param cooldownMs - The quarantine duration in milliseconds.
-   * @param reason - The quarantine reason.
-   */
   setQuarantined(botId: string, cooldownMs: number, _reason: string): void {
     const now = new Date();
     const until = new Date(now.getTime() + cooldownMs).toISOString();
@@ -350,11 +248,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Releases a bot from quarantine.
-   *
-   * @param botId - The bot ID.
-   */
   releaseFromQuarantine(botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -363,12 +256,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Checks if a bot is currently quarantined.
-   *
-   * @param botId - The bot ID.
-   * @returns True if the bot is quarantined.
-   */
   isQuarantined(botId: string): boolean {
     const state = this.findByBotId(botId);
     if (!state || !state.quarantined_until) return false;
@@ -377,11 +264,6 @@ export class RuntimeStateRepository {
     return Date.now() < until;
   }
 
-  /**
-   * Gets all quarantined bots.
-   *
-   * @returns An array of quarantined bot records.
-   */
   getQuarantinedBots(): BotRuntimeStateRecord[] {
     return getDatabase().fetchAll<BotRuntimeStateRecord>(
       'SELECT * FROM bot_runtime_state WHERE quarantined_until IS NOT NULL AND quarantined_until > ?',
@@ -389,23 +271,11 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Gets the last startup timestamp for a bot.
-   *
-   * @param botId - The bot ID.
-   * @returns The startup timestamp or null.
-   */
   getLastStartupAt(botId: string): string | null {
     const state = this.findByBotId(botId);
     return state?.last_startup_at ?? null;
   }
 
-  /**
-   * Sets the startup timestamp for a bot.
-   * Creates the record if it doesn't exist.
-   *
-   * @param botId - The bot ID.
-   */
   setStartupTimestamp(botId: string): void {
     const now = new Date().toISOString();
     // Ensure the row exists first: a bare UPDATE would silently no-op for
@@ -422,11 +292,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Increments the error count for a bot.
-   *
-   * @param botId - The bot ID.
-   */
   incrementErrorCount(botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -435,11 +300,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Increments the message count for a bot.
-   *
-   * @param botId - The bot ID.
-   */
   incrementMessageCount(botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -448,12 +308,6 @@ export class RuntimeStateRepository {
     );
   }
 
-  /**
-   * Deletes a bot's runtime state.
-   *
-   * @param botId - The bot ID.
-   * @returns True if the record was deleted.
-   */
   delete(botId: string): boolean {
     const before = this.findByBotId(botId);
     if (!before) return false;
@@ -464,12 +318,6 @@ export class RuntimeStateRepository {
     return true;
   }
 
-  /**
-   * Creates or updates a runtime state record.
-   *
-   * @param input - The runtime state data.
-   * @returns The created or updated record.
-   */
   upsert(input: CreateRuntimeStateInput): BotRuntimeStateRecord {
     const existing = this.findByBotId(input.bot_id);
     if (existing) {

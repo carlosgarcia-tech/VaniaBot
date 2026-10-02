@@ -4,6 +4,12 @@
  * Handles AI chat when the bot is mentioned in a message.
  * Processes mentions and routes them to the AI service for contextual responses.
  * Includes logic for solo-admin mode and permission checking.
+ *
+ * @author **Carlos G** ⭐
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
  */
 
 import { aiService } from '@/services/external/AIService.js';
@@ -17,10 +23,6 @@ import { detectPromptInjection } from '@/utils/promptInjection.js';
 /**
  * Handles mention events for AI chat.
  * Checks if the bot was mentioned and routes to AI service if valid.
- *
- * @param ctx - The message context.
- * @param botJid - The bot's JID.
- * @returns A promise that resolves to true if the mention was handled.
  */
 export async function handleMention(ctx: MessageContext, botJid: string): Promise<boolean> {
   const rawText: string = ctx.text ?? '';
@@ -87,7 +89,7 @@ export async function handleMention(ctx: MessageContext, botJid: string): Promis
   const injectionCheck = detectPromptInjection(cleanText);
   if (injectionCheck.blocked) {
     await ctx.react('🚫');
-    await ctx.reply(`Message blocked for security reasons.`);
+    await ctx.reply(`❌ Message blocked for security reasons.`);
     return true;
   }
 
@@ -97,7 +99,7 @@ export async function handleMention(ctx: MessageContext, botJid: string): Promis
 
   if (!isRight(response)) {
     await ctx.react('❌');
-    await ctx.reply(`Error: ${response.left.message}`);
+    await ctx.reply(`❌ ${response.left.message}`);
     return true;
   }
 

@@ -1,25 +1,19 @@
 import { serviceManager } from './Servicemanager.js';
 import { logger, logError } from '@/utils/logger.js';
 
-/**
- * Service for periodic cleanup of inactive users and expired licenses.
- */
 export class CleanupService {
   private cleanupInterval: NodeJS.Timeout | null = null;
   private initialCleanupTimer: NodeJS.Timeout | null = null;
   private readonly CLEANUP_INTERVAL = 60 * 60 * 1000;
   private readonly INACTIVITY_THRESHOLD = 7 * 24 * 60 * 60 * 1000;
 
-  /**
-   * Starts the cleanup service.
-   */
   start(): void {
     if (this.cleanupInterval) {
-      logger.warn('CleanupService already running');
+      logger.warn('CleanupService ya está corriendo');
       return;
     }
 
-    logger.debug('Cleanup service started');
+    logger.debug('🧹 Servicio de limpieza iniciado');
 
     this.initialCleanupTimer = setTimeout(
       () => {
@@ -39,9 +33,6 @@ export class CleanupService {
     this.cleanupInterval.unref();
   }
 
-  /**
-   * Stops the cleanup service.
-   */
   stop(): void {
     if (this.initialCleanupTimer) {
       clearTimeout(this.initialCleanupTimer);
@@ -50,19 +41,13 @@ export class CleanupService {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
-      logger.info('Cleanup service stopped');
+      logger.info('🧹 Servicio de limpieza detenido');
     }
   }
 
-  /**
-   * Performs the cleanup operation.
-   * Removes inactive users and disables expired licenses.
-   *
-   * @returns A promise that resolves when cleanup is complete.
-   */
   private async cleanup(): Promise<void> {
     try {
-      logger.info('Running cleanup...');
+      logger.info('🧹 Ejecutando limpieza...');
 
       const now = Date.now();
       const users = await serviceManager.userService.getAllUsers();
@@ -75,7 +60,7 @@ export class CleanupService {
         inactiveUsers.map(user =>
           serviceManager.db.delete('users', user.jid).then(() => {
             removedCount++;
-            logger.debug(`Removed inactive user: ${user.name}`);
+            logger.debug(`🗑️ Usuario inactivo eliminado: ${user.name}`);
           }),
         ),
       );
@@ -83,29 +68,24 @@ export class CleanupService {
       try {
         const licensesDisabled = await serviceManager.licenseService.disableExpiredLicenses();
         if (licensesDisabled > 0) {
-          logger.info(`[Cleanup] ${licensesDisabled} expired license(s) disabled`);
+          logger.info(`[Cleanup] ${licensesDisabled} licencia(s) vencida(s) deshabilitada(s)`);
         }
       } catch (licenseError) {
-        logError('[CleanupService] Error checking licenses:', licenseError);
+        logError('[CleanupService] Error verificando licencias:', licenseError);
       }
 
       if (removedCount > 0) {
-        logger.info(`Cleanup completed: ${removedCount} user(s) removed`);
+        logger.info(`🧹 Limpieza completada: ${removedCount} usuario(s) eliminado(s)`);
       } else {
-        logger.info('Cleanup completed: No users to remove');
+        logger.info('🧹 Limpieza completada: Sin usuarios para eliminar');
       }
     } catch (error) {
-      logError('Error during cleanup:', error);
+      logError('Error en limpieza:', error);
     }
   }
 
-  /**
-   * Triggers an immediate manual cleanup.
-   *
-   * @returns A promise that resolves to the number of removed users.
-   */
   async cleanupNow(): Promise<number> {
-    logger.info('Running manual cleanup...');
+    logger.info('🧹 Ejecutando limpieza manual...');
     const now = Date.now();
     const users = await serviceManager.userService.getAllUsers();
     let removedCount = 0;
@@ -121,36 +101,25 @@ export class CleanupService {
       ),
     );
 
-    logger.info(`Manual cleanup completed: ${removedCount} user(s) removed`);
+    logger.info(`🧹 Limpieza manual completada: ${removedCount} usuario(s) eliminado(s)`);
     return removedCount;
   }
 
-  /**
-   * Removes a specific user by JID.
-   *
-   * @param jid - The user JID.
-   * @returns A promise that resolves to true if removed.
-   */
   async removeUser(jid: string): Promise<boolean> {
     try {
       const user = await serviceManager.userService.getUser(jid);
       if (user.isOwner) {
-        logger.warn('Cannot remove an owner');
+        logger.warn('No se puede eliminar a un owner');
         return false;
       }
       await serviceManager.db.delete('users', jid);
-      logger.info(`User removed: ${jid}`);
+      logger.info(`🗑️  Usuario eliminado: ${jid}`);
       return true;
     } catch {
       return false;
     }
   }
 
-  /**
-   * Gets cleanup statistics.
-   *
-   * @returns A promise that resolves to user statistics.
-   */
   async getStats(): Promise<{ total: number; active: number; inactive: number; owners: number }> {
     const users = await serviceManager.userService.getAllUsers();
     const now = Date.now();
