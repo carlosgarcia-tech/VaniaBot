@@ -1,3 +1,6 @@
+/**
+ * Time constants in milliseconds.
+ */
 export const TIME = {
   SECOND: 1_000,
   MINUTE: 60 * 1_000,
@@ -6,6 +9,9 @@ export const TIME = {
   WEEK: 7 * 24 * 60 * 60 * 1_000,
 } as const;
 
+/**
+ * Rate limiting configuration.
+ */
 export const RATE_LIMITS = {
   MAX_MESSAGES_PER_SECOND: 3,
   MAX_MESSAGES_PER_MINUTE: 20,
@@ -14,6 +20,9 @@ export const RATE_LIMITS = {
   ANTI_SPAM_MAX_AGE: 5 * TIME.MINUTE,
 } as const;
 
+/**
+ * Cache TTL configuration.
+ */
 export const CACHE = {
   DEFAULT_TTL: 5 * TIME.MINUTE,
   USER_TTL: 30 * TIME.MINUTE,
@@ -22,6 +31,9 @@ export const CACHE = {
   MESSAGE_DEDUP_CLEANUP: 5 * TIME.MINUTE,
 } as const;
 
+/**
+ * Download size and timeout limits.
+ */
 export const DOWNLOAD = {
   MAX_AUDIO_SIZE_MB: 50,
   MAX_VIDEO_SIZE_MB: 100,
@@ -30,6 +42,9 @@ export const DOWNLOAD = {
   SOCIAL_TIMEOUT: 120 * TIME.SECOND,
 } as const;
 
+/**
+ * Media processing limits.
+ */
 export const MEDIA = {
   STICKER_SIZE: 512,
   MAX_MEDIA_SIZE: 52428800,
@@ -37,6 +52,9 @@ export const MEDIA = {
   MIN_AUDIO_SIZE_BYTES: 1000,
 } as const;
 
+/**
+ * Database batch and cache configuration.
+ */
 export const DATABASE = {
   BATCH_INTERVAL: 3 * TIME.SECOND,
   MAX_BATCH_SIZE: 100,
@@ -45,6 +63,9 @@ export const DATABASE = {
   SAVE_DELAY: 2 * TIME.SECOND,
 } as const;
 
+/**
+ * Authentication and reconnection configuration.
+ */
 export const AUTH = {
   MAX_QR_RETRIES: 10,
   MAX_RECONNECT_ATTEMPTS: 20,
@@ -55,17 +76,24 @@ export const AUTH = {
   PAIRING_CODE_EXPIRY: 3 * TIME.MINUTE,
 } as const;
 
+// Re-exports for backward compatibility
 export const MAX_RECONNECT_ATTEMPTS = 20;
 export const MAX_RECONNECT_DELAY = 5 * 60_000;
 export const FIRST_RECONNECT_DELAY = 15_000;
 export const RECONNECT_BASE_DELAY = 1_000;
 
+/**
+ * Maintenance and cleanup intervals.
+ */
 export const MAINTENANCE = {
   CLEANUP_INTERVAL: TIME.HOUR,
   USER_INACTIVITY_THRESHOLD: 7 * TIME.DAY,
   LISTA_TTL: 12 * TIME.HOUR,
 } as const;
 
+/**
+ * AI service configuration.
+ */
 export const AI = {
   SESSION_TTL: 30 * TIME.MINUTE,
   CLEANUP_INTERVAL: 5 * TIME.MINUTE,

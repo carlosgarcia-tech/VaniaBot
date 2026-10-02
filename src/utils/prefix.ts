@@ -9,8 +9,6 @@
  *
  * Previously duplicated (and drifting) in MessageContext.parseCommand and
  * MainMessagePipeline.handleMessage.
- *
- * @author **Carlos G** ⭐
  */
 
 import { config } from '@/config/index.js';
@@ -23,6 +21,9 @@ export const COMMAND_PREFIXES: readonly string[] = [config.prefix, '.', '!']
 /**
  * Returns the longest prefix that `text` starts with, or undefined when the
  * text is not a command.
+ *
+ * @param text - The text to check for command prefix.
+ * @returns The matching prefix, or undefined if no prefix matches.
  */
 export function matchCommandPrefix(text: string): string | undefined {
   return COMMAND_PREFIXES.find(p => text.startsWith(p));

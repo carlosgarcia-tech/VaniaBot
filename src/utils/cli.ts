@@ -1,61 +1,53 @@
 import { createInterface } from 'readline';
 import chalk from 'chalk';
 
+/**
+ * Interface for tracking startup progress stages.
+ */
 export interface StartupProgress {
+  /**
+   * Begins a new stage.
+   * @param stage - The stage name.
+   */
   begin(stage: string): void;
+  /**
+   * Marks a stage as completed.
+   * @param stage - The stage name.
+   * @param detail - Optional detail message.
+   */
   done(stage: string, detail?: string): void;
+  /**
+   * Marks a stage as failed.
+   * @param stage - The stage name.
+   * @param error - Optional error message.
+   */
   fail(stage: string, error?: string): void;
+  /**
+   * Finalizes the progress display.
+   */
   finalize(): void;
 }
 
 const FRAMES_VANIA = [
   chalk.hex('#FF69B4')(`
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢀⣀⣤⣴⣶⣶⣶⣶⣶⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀
-⠀⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠀⠀⠀⠀⠀
-⠀⣾⣿⣿⣿⡿⠟⠛⠛⠛⠛⠛⠻⢿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀
-⢠⣿⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⡆⠀⠀⠀⠀
-⢸⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡇⠀⠀⠀⠀
-⢸⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇⠀⠀⠀⠀
-⢸⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣿⡇⠀⠀⠀⠀
-⠸⣿⣿⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⡿⠀⠀⠀⠀⠀
-⠀⢻⣿⣿⣿⣦⣄⣀⣀⣀⣀⣀⣠⣴⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀
-⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠈⠛⠿⣿⣿⣿⣿⣿⣿⣿⠿⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀
-
         VANIABOT v1.0
        ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
 `),
   chalk.hex('#FF1493')(`
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⣀⣤⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣤⣀⠀⠀⠀⠀⠀⠀⠀
-⠀⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠀⠀⠀⠀⠀
-⠀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀
-⢀⣿⣿⣿⡿⠛⠋⠉⠉⠉⠉⠉⠛⠻⢿⣿⣿⣿⣿⡀⠀⠀⠀⠀
-⢸⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⡇⠀⠀⠀⠀
-⢸⣿⣿⡇⠀⠀⠀⢀⣀⣀⣀⣀⡀⠀⠀⠀⣿⣿⣿⡇⠀⠀⠀⠀
-⢸⣿⣿⣇⠀⢀⣴⣿⣿⣿⣿⣿⣿⣦⡀⠀⣿⣿⣿⡇⠀⠀⠀⠀
-⠸⣿⣿⣿⡄⢸⣿⣿⣿⣿⣿⣿⣿⣿⡇⢠⣿⣿⣿⠇⠀⠀⠀⠀
-⠀⢻⣿⣿⣿⡄⠻⣿⣿⣿⣿⣿⣿⠟⢠⣿⣿⣿⡟⠀⠀⠀⠀⠀
-⠀⠀⠻⣿⣿⣿⣦⡈⠛⠿⠿⠛⢁⣴⣿⣿⣿⠟⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠈⠛⢿⣿⣿⣷⣶⣶⣾⣿⣿⡿⠛⠁⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠈⠉⠛⠛⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-
-    🦋💖 VANIABOT READY! 💖🦋
+    VANIABOT READY!
     ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
-      ¡Sistema Operativo!
+      System Operational!
 `),
 ];
 
 const LOADING_FRAMES = [
-  '[🦋] Inicializando Vania-Core...',
-  '[✨] Sincronizando módulos inteligentes...',
-  '[🌸] Activando red neuronal adaptativa...',
-  '[💫] Procesando flujos de datos...',
-  '[🧠] Calibrando inteligencia artificial...',
-  '[⚙️] Estabilizando sistema autónomo...',
-  '[✅] VANIABOT LISTA PARA OPERAR.',
+  '[Initializing Vania-Core...]',
+  '[Syncing intelligent modules...]',
+  '[Activating adaptive neural network...]',
+  '[Processing data flows...]',
+  '[Calibrating artificial intelligence...]',
+  '[Stabilizing autonomous system...]',
+  '[VANIABOT READY TO OPERATE.]',
 ];
 
 async function wait(ms: number): Promise<void> {
@@ -65,7 +57,6 @@ async function wait(ms: number): Promise<void> {
 async function playFrames(frames: string[], durationMs: number): Promise<void> {
   const delay = Math.floor(durationMs / frames.length);
   for (const frame of frames) {
-    // eslint-disable-next-line no-console
     console.clear();
     console.info(frame);
     await wait(delay);
@@ -80,17 +71,21 @@ async function playLoadingBar(): Promise<void> {
   console.info('\n');
 }
 
+/**
+ * Displays the VaniaBot startup banner with animation.
+ *
+ * @returns A promise that resolves when the animation completes.
+ */
 export async function mostrarBannerVania(): Promise<void> {
-  // eslint-disable-next-line no-console
   console.clear();
-  console.info(chalk.bold.magentaBright('\n⟦ ✦ ACCESO CONCEDIDO | VANIA-BOT V.1 ✦ ⟧'));
-  console.info(chalk.gray('✦ 𝘾𝙖𝙣𝙖𝙡𝙞𝙯𝙖𝙣𝙙𝙤 𝙖𝙘𝙘𝙚𝙨𝙤 𝙖𝙡 𝙨𝙞𝙨𝙩𝙚𝙢𝙖...'));
+  console.info(chalk.bold.magentaBright('\n⟦ ✦ ACCESS GRANTED | VANIA-BOT V.1 ✦ ⟧'));
+  console.info(chalk.gray('✦ Channeling system access...'));
 
   await wait(400);
   await playFrames(FRAMES_VANIA, 1500);
   await playLoadingBar();
 
-  console.info(chalk.hex('#FF1493')('☰✦☰═☰  𝙑𝘼𝙉𝙄𝘼-𝘽𝙊𝙏  ☰═☰✦☰'));
+  console.info(chalk.hex('#FF1493')('VANIA-BOT'));
   console.info(
     chalk.bold.hex('#FF69B4')(`
 ╔═══════════════════════════════════════════════════════════╗
@@ -102,22 +97,27 @@ export async function mostrarBannerVania(): Promise<void> {
 ║    ╚████╔╝ ██║  ██║██║ ╚████║██║██║  ██║    ██████╔╝      ║
 ║     ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝    ╚═════╝       ║
 ║                                                           ║
-║              ${chalk.cyan('WhatsApp Bot Avanzado v2.0')}                   ║
+║              ${chalk.cyan('Advanced WhatsApp Bot v2.0')}                   ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
-        [ ACCESO CONCEDIDO ]
+        [ ACCESS GRANTED ]
   `),
   );
 
   console.info(chalk.bold.hex('#FF1493')('\n✦═════════════════════════════════✦'));
   console.info(
-    chalk.bold.white('    SISTEMA CREADO POR: ') + chalk.bold.hex('#FFD700')('Carlos G'),
+    chalk.bold.white('    SYSTEM CREATED BY: ') + chalk.bold.hex('#FFD700')('Carlos G'),
   );
   console.info(chalk.bold.hex('#FF1493')('✦═════════════════════════════════✦\n'));
 
   await wait(400);
 }
 
+/**
+ * Prompts the user to select an authentication method.
+ *
+ * @returns A promise that resolves to the selected auth mode ('qr' or 'code').
+ */
 export async function seleccionarMetodoAuth(): Promise<'qr' | 'code'> {
   return new Promise(resolve => {
     const rl = createInterface({
@@ -125,33 +125,33 @@ export async function seleccionarMetodoAuth(): Promise<'qr' | 'code'> {
       output: process.stdout,
     });
 
-    console.info(chalk.bold.cyan('\nSelecciona el método de autenticación:\n'));
+    console.info(chalk.bold.cyan('\nSelect authentication method:\n'));
     console.info(
-      chalk.white('  1) 📱 ') +
-        chalk.bold.green('Código QR') +
-        chalk.gray(' (Escanear con WhatsApp)'),
+      chalk.white('  1) ') +
+        chalk.bold.green('QR Code') +
+        chalk.gray(' (Scan with WhatsApp)'),
     );
     console.info(
-      chalk.white('  2) 🔢 ') +
-        chalk.bold.yellow('Código de Pareamiento') +
-        chalk.gray(' (Vincular número)'),
+      chalk.white('  2) ') +
+        chalk.bold.yellow('Pairing Code') +
+        chalk.gray(' (Link phone number)'),
     );
 
-    rl.question(chalk.yellow('\n➤ Selecciona una opción (1 o 2): '), answer => {
+    rl.question(chalk.yellow('\nSelect an option (1 or 2): '), answer => {
       rl.close();
       const option = answer.trim();
 
       if (option === '1') {
-        console.info(chalk.green('\n✓ Método seleccionado: ') + chalk.bold('Código QR'));
+        console.info(chalk.green('\nSelected: ') + chalk.bold('QR Code'));
         resolve('qr');
       } else if (option === '2') {
         console.info(
-          chalk.green('\n✓ Método seleccionado: ') + chalk.bold('Código de Pareamiento'),
+          chalk.green('\nSelected: ') + chalk.bold('Pairing Code'),
         );
         resolve('code');
       } else {
         console.info(
-          chalk.red('\n❌ Opción inválida. ') + chalk.yellow('Usando Código QR por defecto.'),
+          chalk.red('\nInvalid option. ') + chalk.yellow('Using QR Code by default.'),
         );
         resolve('qr');
       }
@@ -159,6 +159,11 @@ export async function seleccionarMetodoAuth(): Promise<'qr' | 'code'> {
   });
 }
 
+/**
+ * Creates a startup progress tracker for Docker mode.
+ *
+ * @returns A StartupProgress instance.
+ */
 export function createStartupProgress(): StartupProgress {
   const overallStart = Date.now();
   const stageTimes: Record<string, number> = {};
@@ -174,7 +179,7 @@ export function createStartupProgress(): StartupProgress {
     ║   ██╗   ██╗ █████╗ ███╗   ██╗██╗ █████╗
     ║   ██║   ██║██╔══██╗████╗  ██║██║██╔══██╗
     ║   ██║   ██║███████║██╔██╗ ██║██║███████║
-    ║   ╚██╗ ██╔╝██╔══██║██║╚██╗██║██║██╔══██║
+    ║   ╚██╗ ██╔╝██╔══██║██║╚██╗██║██║██║  ██║
     ║    ╚████╔╝ ██║  ██║██║ ╚████║██║██║  ██║
     ║     ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝
     ║                                       ║
@@ -187,19 +192,19 @@ export function createStartupProgress(): StartupProgress {
     begin(stage: string): void {
       if (!started) {
         started = true;
-        console.info(chalk.bold.magentaBright('\n  🦋  VaniaBot — Inicializando  🦋\n'));
+        console.info(chalk.bold.magentaBright('\n  VaniaBot — Initializing\n'));
       }
       stageTimes[stage] = Date.now();
       total++;
-      process.stdout.write(chalk.cyan(`  ⚙️  ${stage.padEnd(22)} `) + chalk.yellow('⋯  '));
+      process.stdout.write(chalk.cyan(`  ${stage.padEnd(22)} `) + chalk.yellow('...  '));
     },
 
     done(stage: string, detail?: string): void {
       const elapsed = ((Date.now() - (stageTimes[stage] ?? overallStart)) / 1000).toFixed(1);
       completed++;
       const line =
-        chalk.cyan(`  ⚙️  ${stage.padEnd(22)} `) +
-        chalk.green('✅') +
+        chalk.cyan(`  ${stage.padEnd(22)} `) +
+        chalk.green('✓') +
         chalk.gray(`  (${elapsed}s)`) +
         (detail ? chalk.gray(`  ${detail}`) : '');
       console.info(line);
@@ -208,8 +213,8 @@ export function createStartupProgress(): StartupProgress {
     fail(stage: string, error?: string): void {
       const elapsed = ((Date.now() - (stageTimes[stage] ?? overallStart)) / 1000).toFixed(1);
       const line =
-        chalk.cyan(`  ⚙️  ${stage.padEnd(22)} `) +
-        chalk.red('❌') +
+        chalk.cyan(`  ${stage.padEnd(22)} `) +
+        chalk.red('✗') +
         chalk.gray(`  (${elapsed}s)`) +
         (error ? chalk.red(`  ${error}`) : '');
       console.info(line);
@@ -219,16 +224,19 @@ export function createStartupProgress(): StartupProgress {
       const totalTime = ((Date.now() - overallStart) / 1000).toFixed(1);
 
       console.info(
-        chalk.magentaBright(`\n  ─── ${completed}/${total} etapas · ${totalTime}s ───\n`),
+        chalk.magentaBright(`\n  ─── ${completed}/${total} stages · ${totalTime}s ───\n`),
       );
 
       printBanner();
 
-      console.info(chalk.bold.hex('#FF69B4')('      🦋  VANIABOT LISTA PARA OPERAR  🦋\n'));
+      console.info(chalk.bold.hex('#FF69B4')('      VANIABOT READY TO OPERATE\n'));
     },
   };
 }
 
+/**
+ * Displays the help message with available commands.
+ */
 export function mostrarAyuda(): void {
   const c = chalk.bold.cyan;
   const w = chalk.bold.white;
@@ -236,20 +244,20 @@ export function mostrarAyuda(): void {
   const g = chalk.gray;
 
   console.info(c('\n╔═══════════════════════════════════════════╗'));
-  console.info(c('║') + '    VANIABOT - COMANDOS DISPONIBLES    ' + c('║'));
+  console.info(c('║') + '    VANIABOT - AVAILABLE COMMANDS    ' + c('║'));
   console.info(c('╚═══════════════════════════════════════════╝\n'));
 
-  console.info(w('Inicio:'));
-  console.info(cy('  npm start') + g('        → Menú interactivo'));
-  console.info(cy('  npm start qr') + g('     → Usar código QR'));
-  console.info(cy('  npm start code') + g('   → Usar código de pareamiento'));
+  console.info(w('Startup:'));
+  console.info(cy('  npm start') + g('        → Interactive menu'));
+  console.info(cy('  npm start qr') + g('     → Use QR code'));
+  console.info(cy('  npm start code') + g('   → Use pairing code'));
 
-  console.info(w('\nDesarrollo:'));
-  console.info(cy('  npm run dev') + g('      → Modo desarrollo (watch)'));
-  console.info(cy('  npm run build') + g('    → Compilar TypeScript'));
-  console.info(cy('  npm run lint') + g('     → Verificar código'));
+  console.info(w('\nDevelopment:'));
+  console.info(cy('  npm run dev') + g('      → Development mode (watch)'));
+  console.info(cy('  npm run build') + g('    → Compile TypeScript'));
+  console.info(cy('  npm run lint') + g('     → Lint code'));
 
-  console.info(w('\nMantenimiento:'));
-  console.info(cy('  npm run clean') + g('    → Limpiar sesión y archivos'));
+  console.info(w('\nMaintenance:'));
+  console.info(cy('  npm run clean') + g('    → Clean session and files'));
   console.info();
 }
