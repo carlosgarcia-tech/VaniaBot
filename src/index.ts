@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the index.ts layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 import { WhatsAppClient } from './core/Client.js';
 import { logger, logError } from './utils/logger.js';
 import { panelServer } from './services/webhook/PanelServer.js';

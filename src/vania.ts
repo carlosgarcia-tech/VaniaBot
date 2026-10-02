@@ -1,3 +1,11 @@
+/**
+ * vania.ts
+ *
+ * VaniaBot vania.ts module (internal helpers).
+ *
+ * @author **Carlos G**
+ */
+
 import { spawn, type ChildProcess } from 'child_process';
 import { existsSync, writeFileSync, unlinkSync } from 'fs';
 import chalk from 'chalk';
