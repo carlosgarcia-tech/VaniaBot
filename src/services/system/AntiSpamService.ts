@@ -20,6 +20,10 @@ const DEFAULT_OPTIONS: Required<AntiSpamOptions> = {
   cleanupIntervalMs: 5 * 60 * 1000,
 };
 
+/**
+ * Service for anti-spam rate limiting.
+ * Tracks message frequency per user and enforces limits.
+ */
 export class AntiSpamService {
   private userMessages = new Map<string, number[]>();
   private bannedUsers = new Set<string>();
@@ -29,6 +33,11 @@ export class AntiSpamService {
   private readonly cleanupIntervalMs: number;
   private cleanupInterval?: ReturnType<typeof setInterval>;
 
+  /**
+   * Creates a new AntiSpamService.
+   *
+   * @param options - Configuration options for rate limiting.
+   */
   constructor(options: AntiSpamOptions = {}) {
     this.maxMessagesPerSecond =
       options.maxMessagesPerSecond ?? DEFAULT_OPTIONS.maxMessagesPerSecond;
@@ -38,11 +47,17 @@ export class AntiSpamService {
     this.cleanupIntervalMs = options.cleanupIntervalMs ?? DEFAULT_OPTIONS.cleanupIntervalMs;
   }
 
+  /**
+   * Checks if a user is within rate limits.
+   *
+   * @param userJid - The user JID to check.
+   * @returns The rate limit result.
+   */
   check(userJid: string): RateLimitResult {
     if (this.bannedUsers.has(userJid)) {
       return {
         allowed: false,
-        reason: '⛔ Bloqueado temporalmente por spam',
+        reason: 'Temporarily blocked for spam',
         waitTime: this.banDurationMs,
       };
     }
@@ -55,14 +70,14 @@ export class AntiSpamService {
       this.banUser(userJid);
       return {
         allowed: false,
-        reason: '⚠️ Demasiados mensajes. Bloqueado temporalmente.',
+        reason: 'Too many messages. Temporarily blocked.',
         waitTime: this.banDurationMs,
       };
     }
 
     const lastSecondMessages = recentMessages.filter(time => now - time < 1000);
     if (lastSecondMessages.length >= this.maxMessagesPerSecond) {
-      return { allowed: false, reason: '⚠️ Estás escribiendo muy rápido', waitTime: 2000 };
+      return { allowed: false, reason: 'You are sending messages too fast', waitTime: 2000 };
     }
 
     recentMessages.push(now);
@@ -70,11 +85,19 @@ export class AntiSpamService {
     return { allowed: true };
   }
 
+  /**
+   * Bans a user temporarily.
+   *
+   * @param userJid - The user JID to ban.
+   */
   private banUser(userJid: string): void {
     this.bannedUsers.add(userJid);
     setTimeout(() => this.bannedUsers.delete(userJid), this.banDurationMs);
   }
 
+  /**
+   * Starts the periodic cleanup of old message records.
+   */
   startCleanup(): void {
     if (this.cleanupInterval) return;
     this.cleanupInterval = setInterval(() => {
@@ -94,6 +117,9 @@ export class AntiSpamService {
     }, this.cleanupIntervalMs);
   }
 
+  /**
+   * Stops the cleanup interval.
+   */
   stopCleanup(): void {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
@@ -101,11 +127,21 @@ export class AntiSpamService {
     }
   }
 
+  /**
+   * Clears all tracking data for a user.
+   *
+   * @param userJid - The user JID to clear.
+   */
   clearUser(userJid: string): void {
     this.userMessages.delete(userJid);
     this.bannedUsers.delete(userJid);
   }
 
+  /**
+   * Gets service statistics.
+   *
+   * @returns An object with tracked and banned user counts.
+   */
   getStats(): { tracked: number; banned: number } {
     return {
       tracked: this.userMessages.size,
