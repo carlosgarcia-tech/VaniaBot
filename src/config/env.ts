@@ -4,7 +4,7 @@
  * Environment configuration for VaniaBot using Zod validation.
  * All configuration values can be set via .env file.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

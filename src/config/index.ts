@@ -4,7 +4,7 @@
  * Central configuration aggregator for VaniaBot.
  * Combines environment variables with application defaults.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

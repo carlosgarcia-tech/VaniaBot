@@ -1,3 +1,22 @@
+/**
+ * ai-prompts.ts
+ *
+ * Central catalogue of system and task prompts handed to the LLM (Groq/Gemini).
+ *
+ * These strings are runtime data sent to the model, not developer documentation,
+ * so they intentionally stay in the bot's own Spanish voice. Only the code around
+ * them is commented in English.
+ *
+ * Design notes:
+ * - Each prompt ends with an explicit "output only, no preamble" instruction so
+ *   the model does not wrap results in conversational filler, which would leak
+ *   straight into the WhatsApp reply.
+ * - The WhatsApp text format rules (plain text, `*bold*`, `_italic_`) are part of
+ *   the system prompt because the model must produce WhatsApp markup, not Markdown.
+ *
+ * @author **Carlos G**
+ */
+
 export const AI_PROMPTS = {
   SYSTEM: `Eres VaniaBot, un bot super dotada de este grupo de WhatsApp.
 
