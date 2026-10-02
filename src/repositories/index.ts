@@ -29,6 +29,12 @@ export type { ProcessedMessageRecord } from './ProcessedMessagesRepository.js';
 
 let _initialized = false;
 
+/**
+ * Initializes all repositories.
+ * Only runs once.
+ *
+ * @returns A promise that resolves when initialization is complete.
+ */
 export async function initAllRepositories(): Promise<void> {
   if (_initialized) return;
   await initializeDatabase();

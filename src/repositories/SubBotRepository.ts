@@ -2,9 +2,6 @@
  * SubBotRepository.ts
  *
  * Repository for subbot data (mirrors subbot_slots for compatibility).
- *
- * @author Carlos G
- * @created 2026-04-07
  */
 
 import { getDatabase } from './Database.js';
@@ -60,11 +57,20 @@ export interface UpdateSubBotInput {
   photo_url?: string;
 }
 
+/**
+ * Repository for managing subbot records in the database.
+ * Implements singleton pattern for global access.
+ */
 export class SubBotRepository {
   private static instance: SubBotRepository;
 
   private constructor() {}
 
+  /**
+   * Gets the singleton instance.
+   *
+   * @returns The SubBotRepository instance.
+   */
   static getInstance(): SubBotRepository {
     if (!SubBotRepository.instance) {
       SubBotRepository.instance = new SubBotRepository();
@@ -72,22 +78,45 @@ export class SubBotRepository {
     return SubBotRepository.instance;
   }
 
+  /**
+   * Finds all subbots ordered by creation date.
+   *
+   * @returns An array of all subbot records.
+   */
   findAll(): SubBotRecord[] {
     return getDatabase().fetchAll<SubBotRecord>('SELECT * FROM subbots ORDER BY created_at DESC');
   }
 
+  /**
+   * Finds a subbot by ID.
+   *
+   * @param id - The subbot ID.
+   * @returns The record if found, null otherwise.
+   */
   findById(id: string): SubBotRecord | null {
     return getDatabase().fetchOne<SubBotRecord>('SELECT * FROM subbots WHERE id = ?', {
       params: [id],
     });
   }
 
+  /**
+   * Finds a subbot by phone number.
+   *
+   * @param phoneNumber - The phone number to search for.
+   * @returns The record if found, null otherwise.
+   */
   findByPhoneNumber(phoneNumber: string): SubBotRecord | null {
     return getDatabase().fetchOne<SubBotRecord>('SELECT * FROM subbots WHERE phone_number = ?', {
       params: [phoneNumber],
     });
   }
 
+  /**
+   * Creates a new subbot record.
+   *
+   * @param input - The subbot data to create.
+   * @returns The created record.
+   */
   create(input: CreateSubBotInput): SubBotRecord {
     const now = new Date().toISOString();
 
@@ -126,6 +155,13 @@ export class SubBotRepository {
     return record;
   }
 
+  /**
+   * Updates a subbot record.
+   *
+   * @param id - The subbot ID.
+   * @param updates - The fields to update.
+   * @returns The updated record, or null if not found.
+   */
   update(id: string, updates: UpdateSubBotInput): SubBotRecord | null {
     const sets: string[] = ['updated_at = ?'];
     const params: (string | number | null)[] = [new Date().toISOString()];
@@ -182,6 +218,12 @@ export class SubBotRepository {
     return this.findById(id);
   }
 
+  /**
+   * Deletes a subbot record.
+   *
+   * @param id - The subbot ID.
+   * @returns True if the record was deleted.
+   */
   delete(id: string): boolean {
     const before = this.findById(id);
     if (!before) return false;
