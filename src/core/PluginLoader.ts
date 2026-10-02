@@ -39,8 +39,8 @@ type CommandConstructor = new () => MaybeCommand;
 function isCommandClass(value: unknown): value is CommandConstructor {
   return (
     typeof value === 'function' &&
-    // Clases con parámetros obligatorios en el constructor (p. ej. ListaCommand)
-    // no pueden instanciarse sin config: el loader solo usa clases sin args.
+    // Classes with mandatory constructor parameters (e.g. ListaCommand)
+    // cannot be instantiated without config: the loader only uses no-arg classes.
     (value as CommandConstructor).length === 0 &&
     typeof (value as CommandConstructor).prototype?.execute === 'function'
   );
@@ -48,10 +48,13 @@ function isCommandClass(value: unknown): value is CommandConstructor {
 
 export class PluginLoader {
   private static instance: PluginLoader;
+  /** Commands whose module has already been imported and instantiated. */
   private loadedCommands: Map<string, ICommand> = new Map();
+  /** Deferred commands: command name -> file that would provide it. */
   private commandFiles: Map<string, string> = new Map();
   private lazyCache: LruMemoryCache<ICommand>;
   private lazyLoadingEnabled = true;
+  /** Categories imported eagerly at startup; everything else loads on demand. */
   private preloadCategories: Set<string> = new Set();
 
   private constructor() {
@@ -69,6 +72,12 @@ export class PluginLoader {
     return PluginLoader.instance;
   }
 
+  /**
+   * Walks the commands tree and eagerly imports every file in a preloaded
+   * category, registering the rest as deferred name -> file entries.
+   *
+   * @param preload Categories to import now; defaults to admin/owner/utility/creative.
+   */
   async loadCommands(preload: string[] = []): Promise<ICommand[]> {
     const commands: ICommand[] = [];
     const commandsPath = join(__dirname, '../commands');
@@ -167,6 +176,13 @@ export class PluginLoader {
     }
   }
 
+  /**
+   * Resolves a command by name or alias, importing its module on first use.
+   *
+   * Lookup order: already-loaded map, LRU lazy cache, deferred file entry, then
+   * a linear alias scan as a last resort. Once a deferred command is imported
+   * its file entries are dropped, so a name never triggers a second import.
+   */
   async getCommand(name: string): Promise<ICommand | null> {
     if (this.loadedCommands.has(name)) {
       const cmd = this.loadedCommands.get(name);
@@ -229,6 +245,12 @@ export class PluginLoader {
     return results;
   }
 
+  /**
+   * Pulls command instances out of an imported module, accepting either a
+   * ready instance or an exported command class that needs instantiation.
+   * A class whose constructor throws is logged and skipped, so one broken
+   * plugin cannot prevent the rest of the module from loading.
+   */
   private extractCommands(module: Record<string, unknown>, __filename: string): ICommand[] {
     const results: ICommand[] = [];
 
@@ -263,6 +285,7 @@ export class PluginLoader {
     return Array.from(this.loadedCommands.values());
   }
 
+  /** Forces every deferred command to load, defeating lazy loading. */
   async getAllCommands(): Promise<ICommand[]> {
     if (this.commandFiles.size > 0) {
       const filePaths = [...new Set(this.commandFiles.values())];

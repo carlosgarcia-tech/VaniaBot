@@ -1,7 +1,30 @@
+/**
+ * MediaGroupBuffer.ts
+ *
+ * Regroups the individual media messages of an album into a single batch.
+ *
+ * WhatsApp delivers a multi-image/media album as several separate messages that
+ * arrive within a short, unpredictable window and carry no album identifier the
+ * bot can rely on. This buffer accumulates them per (chat, sender) pair and
+ * exposes a settle-based drain: wait until the batch stops growing, then hand
+ * back the whole group ordered and de-duplicated.
+ *
+ * Singleton because buffering is process-wide state shared by every command
+ * that consumes albums.
+ *
+ * @author **Carlos G**
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
+ */
+
 import type { WAMessage } from 'baileys';
 
+/** Hard expiry for buffered items, independent of any in-flight drain. */
 const BUFFER_TTL_MS = 25_000;
 
+/** One buffered media message plus its arrival time (used for ordering/TTL). */
 interface BufferedItem {
   message: WAMessage;
   timestamp: number;
@@ -11,6 +34,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class MediaGroupBuffer {
   private static instance: MediaGroupBuffer;
+  /** In-flight batches, keyed by `${chatJid}:${senderJid}`. */
   private buffers = new Map<string, BufferedItem[]>();
   private cleanupInterval: NodeJS.Timeout;
 
@@ -31,6 +55,11 @@ export class MediaGroupBuffer {
     return `${chatJid}:${senderJid}`;
   }
 
+  /**
+   * Appends a media message to its sender's batch.
+   * Missing chat/sender identifiers are ignored because the batch key would be
+   * unusable and would leak a permanently unconsumable entry.
+   */
   add(chatJid: string, senderJid: string, message: WAMessage): void {
     if (!chatJid || !senderJid) return;
     const k = this.key(chatJid, senderJid);
@@ -39,11 +68,16 @@ export class MediaGroupBuffer {
     this.buffers.set(k, list);
   }
 
+  /** True when this sender has buffered media awaiting a drain. */
   hasAny(chatJid: string, senderJid: string): boolean {
     const list = this.buffers.get(this.key(chatJid, senderJid));
     return !!list && list.length > 0;
   }
 
+  /**
+   * Drains and removes the batch, discarding duplicate message IDs (the same
+   * album can be re-delivered after a reconnect) and restoring arrival order.
+   */
   private consume(chatJid: string, senderJid: string): WAMessage[] {
     const k = this.key(chatJid, senderJid);
     const list = this.buffers.get(k) ?? [];
@@ -61,6 +95,17 @@ export class MediaGroupBuffer {
       .map(item => item.message);
   }
 
+  /**
+   * Waits for the batch to settle, then consumes it.
+   *
+   * Polls every `settleMs` and stops as soon as two consecutive observations
+   * report the same size (i.e. no new album item arrived), or after
+   * `maxWaitMs` regardless, so a continuously growing stream cannot stall a
+   * caller indefinitely.
+   *
+   * @param settleMs Delay between size observations.
+   * @param maxWaitMs Absolute ceiling on the total wait.
+   */
   async waitAndConsume(
     chatJid: string,
     senderJid: string,
@@ -86,6 +131,10 @@ export class MediaGroupBuffer {
     return this.consume(chatJid, senderJid);
   }
 
+  /**
+   * Periodic sweep dropping items older than BUFFER_TTL_MS, so batches whose
+   * consumer never ran (abandoned command, crashed handler) do not leak memory.
+   */
   private cleanup(): void {
     const now = Date.now();
     for (const [key, list] of this.buffers.entries()) {
@@ -98,6 +147,7 @@ export class MediaGroupBuffer {
     }
   }
 
+  /** Clears the cleanup timer. Buffered batches are intentionally left to expire. */
   stop(): void {
     clearInterval(this.cleanupInterval);
   }

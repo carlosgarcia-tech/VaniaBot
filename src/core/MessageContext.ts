@@ -4,7 +4,7 @@
  * Provides a structured context for message handling.
  * Parses messages, extracts commands, and provides helper methods.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

@@ -1,6 +1,14 @@
 /**
  * WADisconnectPolicy.ts
  *
+ * VaniaBot core module exposing `DisconnectInfo`, `extractDisconnectInfo`, `classifyDisconnect`, `computeReconnectDelayMs`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
+ * WADisconnectPolicy.ts
+ *
  * Single source of truth for interpreting Baileys disconnect events, shared
  * by the main bot (AuthManager) and subbots (SubBotInstance):
  *

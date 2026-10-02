@@ -4,7 +4,7 @@
  * Manages WhatsApp Web authentication using QR code or pairing code.
  * Handles connection lifecycle, reconnection logic, and session persistence.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv
@@ -37,12 +37,15 @@ import {
 } from '@/utils/constants.js';
 import { mkdirSync } from 'fs';
 
+/** QR codes offered before the session is wiped and re-authentication forced. */
 const MAX_QR_RETRIES = 10;
 const CONNECTION_TIMEOUT = 120_000;
 const PAIRING_CODE_TIMEOUT = 180_000;
 const PING_INTERVAL_MS = 15000;
+/** Interval at which a silently dead socket is detected and recycled. */
 const HEALTH_CHECK_INTERVAL_MS = 60000;
 
+/** WhatsApp 515 (restartRequired) retry budget before forcing a plain reconnect. */
 const ERROR_515_MAX_RETRIES = 3;
 const ERROR_515_WAIT_TIME = 3_000;
 
@@ -50,6 +53,12 @@ interface PatchedStdout extends NodeJS.WriteStream {
   __baileysPatch?: boolean;
 }
 
+/**
+ * Silences Baileys' "Closing session:" stdout chatter, which would otherwise
+ * corrupt a terminal QR/pairing-code display. The write is acknowledged with the
+ * original callback so Baileys' internal flow control still completes, and the
+ * patch is applied at most once (guarded by a flag on the stream).
+ */
 function patchStdout(): void {
   const stdout = process.stdout as PatchedStdout;
   if (stdout.__baileysPatch) return;
@@ -130,6 +139,11 @@ export class AuthManager {
     return this.connectionEstablished && !this.isReconnecting;
   }
 
+  /**
+   * Periodic presence update used as an application-level keepalive.
+   * A slow or failing ping is only logged here; recovery is left to the health
+   * check so this timer stays side-effect free.
+   */
   private startPing(): void {
     if (this.pingInterval) return;
 
@@ -175,6 +189,15 @@ export class AuthManager {
     }, HEALTH_CHECK_INTERVAL_MS);
   }
 
+  /**
+   * Liveness probe for a socket that still looks connected.
+   *
+   * WhatsApp keeps the WebSocket open after the peer has gone away, so
+   * `connectionEstablished` alone is not proof of a usable connection. This
+   * inspects the transport's ready state and user presence, and treats any
+   * inspection failure as "dead" so the caller reconnects rather than trusting
+   * an unverifiable socket.
+   */
   private isSocketReallyConnected(): boolean {
     if (!this.currentSocket || !this.connectionEstablished) return false;
 
@@ -199,6 +222,13 @@ export class AuthManager {
     }
   }
 
+  /**
+   * Builds a fresh socket from persisted credentials.
+   *
+   * Throttling: repeated reconnects inside a 500ms window are delayed with a
+   * linearly growing backoff, because an immediate retry loop is what triggers
+   * WhatsApp's 515 restart-required errors in the first place.
+   */
   async createSocket(): Promise<WASocket> {
     const timeSinceLastDisconnect = Date.now() - this.lastDisconnectTime;
     if (timeSinceLastDisconnect < 500 && this.reconnectAttempts > 0) {
@@ -277,6 +307,14 @@ export class AuthManager {
     }
   }
 
+  /**
+   * Central `connection.update` state machine.
+   *
+   * Branches on the update in priority order: QR emission, one-shot pairing
+   * code request, then the connect/open/close lifecycle. Returning early from
+   * the auth branches matters — a connection that is still emitting a QR must
+   * not be treated as a closing one.
+   */
   private async handleConnection(sock: WASocket, update: Partial<ConnectionState>): Promise<void> {
     const { connection, lastDisconnect, qr, isNewLogin } = update;
 
@@ -383,6 +421,14 @@ export class AuthManager {
     this.startHealthCheck();
   }
 
+  /**
+   * Classifies a closed connection and applies the matching recovery strategy.
+   *
+   * Session-corrupting categories (`badSession`, `loggedOut`) allow only three
+   * attempts before the on-disk credentials are wiped, forcing a genuine
+   * re-authentication instead of an infinite reconnect loop. Transient
+   * categories (network, conflict, unknown) simply schedule a backoff retry.
+   */
   private onConnectionClose(lastDisconnect: Partial<ConnectionState>['lastDisconnect']): void {
     this.isConnecting = false;
     this.stopPing();
@@ -465,6 +511,13 @@ export class AuthManager {
     }
   }
 
+  /**
+   * Schedules a socket recreation after an exponential backoff.
+   *
+   * After MAX_RECONNECT_ATTempts the counter resets and the delay is pinned to
+   * 5s, turning a tight retry loop into a steady long-interval retry so the
+   * process eventually recovers from extended outages.
+   */
   private scheduleReconnectInternal(statusCode?: number): void {
     this.connectionEstablished = false;
     this.isReconnecting = true;
@@ -550,6 +603,10 @@ export class AuthManager {
     }
   }
 
+  /**
+   * Deletes persisted credentials, forcing a fresh pairing/QR authentication.
+   * No-op when the session directory holds no files.
+   */
   private clearSession(): void {
     try {
       const removed = clearSessionFiles(config.sessionPath, '[AuthManager]');

@@ -1,3 +1,21 @@
+/**
+ * ClientEventHandlers.ts
+ *
+ * Reactions to non-message socket events: incoming calls, message deletions and
+ * group participant changes.
+ *
+ * These handlers are deliberately fire-and-forget (wired with `void` in
+ * Client.setupPipeline). They must never throw into the socket's event emitter
+ * and never block message processing, so each one wraps its work in try/catch
+ * and logs failures instead of propagating them.
+ *
+ * @author **Carlos G**
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
+ */
+
 import type { WASocket, BaileysEventMap } from 'baileys';
 import type { MessageContext } from './MessageContext.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -15,6 +33,13 @@ import { formatTimeRemaining } from '@/utils/helpers.js';
 type GroupParticipantsUpdate = BaileysEventMap['group-participants.update'];
 
 export class ClientEventHandlers {
+  /**
+   * Anti-call: rejects every incoming call and reports it to the owner.
+   *
+   * Skipped entirely when the feature is disabled. Per-call failures are logged
+   * at debug level and the loop continues, so one un-rejectable call cannot
+   * abort the remaining ones.
+   */
   async handleIncomingCalls(sock: WASocket, calls: BaileysEventMap['call']): Promise<void> {
     if (!antiCallService.isEnabled()) return;
     for (const call of calls) {
@@ -49,6 +74,15 @@ export class ClientEventHandlers {
     }
   }
 
+  /**
+   * Anti-delete: reports messages deleted by others.
+   *
+   * Looks the message ID up in AntiDeleteService's store, which retains the
+   * original payload (including media) for recently seen messages. Deletions
+   * performed by the bot itself are ignored, since the bot deleting its own
+   * output is not a moderation event. Each stored message is evicted after being
+   * reported, so notifications are sent at most once.
+   */
   async handleMessageDeletion(
     sock: WASocket,
     update: BaileysEventMap['messages.delete'],
@@ -113,6 +147,13 @@ export class ClientEventHandlers {
     }
   }
 
+  /**
+   * Central participant-change handler (join/leave/promote/demote).
+   *
+   * Order matters here: group metadata is invalidated first so the permission
+   * lookups below never read a stale roster; welcome messages are then fired per
+   * participant without awaiting them, so a slow send cannot delay the rest.
+   */
   async handleGroupUpdate(sock: WASocket, update: GroupParticipantsUpdate): Promise<void> {
     const { id: groupJid, participants, action } = update;
     if (!groupJid || !participants) return;
@@ -198,6 +239,11 @@ export class ClientEventHandlers {
     }
   }
 
+  /**
+   * DMs every group admin when a muted user attempts to post, so moderation
+   * stays visible even when the bot lacks the rights to delete the message.
+   * The bot's own JID is filtered out of the admin list.
+   */
   async notifyAdminsMute(ctx: MessageContext): Promise<void> {
     try {
       const admins = await PermissionService.getGroupAdmins(ctx.sock, ctx.chat.jid);

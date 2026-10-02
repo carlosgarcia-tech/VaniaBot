@@ -4,7 +4,7 @@
  * Central registry for managing bot commands and their aliases.
  * Handles command registration, retrieval, and cooldown tracking.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

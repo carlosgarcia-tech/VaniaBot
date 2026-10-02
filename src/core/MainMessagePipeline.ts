@@ -1,3 +1,29 @@
+/**
+ * MainMessagePipeline.ts
+ *
+ * The hot path for every inbound message: listener registration, filtering,
+ * guard checks, command resolution, middleware execution and metrics.
+ *
+ * Processing is split into three stages, cheapest first:
+ *
+ * 1. Synchronous filters inline in the `messages.upsert` handler
+ *    (self-messages, missing payload, already-processed IDs, pre-startup
+ *    offline echoes).
+ * 2. Guards that may short-circuit the whole message (mute, vania toggle,
+ *    antilink, quiz answers, AI mentions, PIN confirmation).
+ * 3. The middleware chain plus command execution, run through
+ *    RealTimeMessageProcessor so concurrency is bounded per message.
+ *
+ * A rebuilt instance is created for every socket (see setupPipeline), so
+ * listeners registered in `registerListeners` are never duplicated.
+ *
+ * @author **Carlos G**
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
+ */
+
 import type { WASocket, WAMessage } from 'baileys';
 import { mediaGroupBuffer } from './MediaGroupBuffer.js';
 import { commandRegistry } from './CommandRegistry.js';
@@ -27,15 +53,22 @@ import { chatSummaryService } from '@/services/chat/ChatSummaryService.js';
 import { PinVerificationMiddleware } from '@/middlewares/PinVerificationMiddleware.js';
 import type { RealTimeMessageProcessor } from './RealTimeMessageProcessor.js';
 
+/** Entry in the middleware chain; see Client.ts for the field semantics. */
 interface MiddlewareConfig {
   middleware: IMiddleware;
   priority: number;
   canRunParallel: boolean;
 }
 
+/** Hard ceiling on a single command's runtime before the user is told to retry. */
 const COMMAND_TIMEOUT_MS = 30000;
+/** Minimum interval between periodic metrics lines. */
 const STATS_LOG_INTERVAL_MS = 300000;
 
+/**
+ * Counters shared by reference with WhatsAppClient, so both the client and the
+ * pipeline observe the same mutable stats object rather than copies.
+ */
 interface PipelineStats {
   messagesReceived: number;
   messagesProcessed: number;
@@ -73,6 +106,14 @@ export class MainMessagePipeline {
     private logStats: () => void,
   ) {}
 
+  /**
+   * Subscribes to the socket events the pipeline owns.
+   *
+   * Side-effect routing happens here (reactions, audio replies, anti-delete
+   * capture, media-group buffering) *before* the message is handed to the
+   * regular processing path, because those concerns are independent of whether
+   * the message turns out to be a command.
+   */
   registerListeners(): void {
     this.sock.ev.on('messages.upsert', ({ messages, type }) => {
       if (type !== 'notify') return;
@@ -391,7 +432,13 @@ export class MainMessagePipeline {
     return true;
   }
 
-  /** Resolves the command (registry → lazy plugin) and runs the full chain. */
+  /**
+   * Resolves the command (registry → lazy plugin) and runs the full chain.
+   *
+   * Two-word commands (`armor set`) are supported: the registry is probed with
+   * `command + firstArg` first, and the consumed argument is removed from
+   * `ctx.args` so the command only sees its real parameters.
+   */
   private async resolveAndExecute(
     ctx: MessageContext,
     messageId: string,
@@ -499,6 +546,7 @@ export class MainMessagePipeline {
     }
   }
 
+  /** Flushes the aggregated metrics line at most once per STATS_LOG_INTERVAL_MS. */
   private maybeLogStats(): void {
     if (Date.now() - this.stats.lastStatsLog > STATS_LOG_INTERVAL_MS) {
       this.logStats();
@@ -506,6 +554,15 @@ export class MainMessagePipeline {
     }
   }
 
+  /**
+   * Middleware chain executor.
+   *
+   * Consecutive `canRunParallel` middlewares are collected and awaited together
+   * as one batch; the first non-parallel one runs alone and is handed `next`.
+   * When the chain is exhausted the real handler runs. The parallel batch
+   * receives a no-op `next` precisely because it is an observer that cannot
+   * influence the rest of the chain.
+   */
   private async executeWithMiddlewares(
     ctx: MessageContext,
     handler: () => Promise<void>,

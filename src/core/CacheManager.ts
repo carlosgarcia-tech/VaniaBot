@@ -4,7 +4,7 @@
  * Unified caching system for permissions, group metadata, users, and message deduplication.
  * Uses LRU cache with TTL support for optimal performance.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

@@ -1,6 +1,14 @@
 /**
  * WASocketFactory.ts
  *
+ * VaniaBot core module exposing `ErrorWithStatus`, `BuildWASocketOptionsArgs`, `getWAVersion`, `buildWASocketOptions`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
+ * WASocketFactory.ts
+ *
  * Single source of truth for WhatsApp Web connection options shared by the
  * main bot (AuthManager) and subbots (SubBotInstance): forced WA version,
  * silent Baileys logger, browser identities and socket options.
