@@ -1,3 +1,11 @@
+/**
+ * DailyMissionService.ts
+ *
+ * VaniaBot services module exposing `DailyMission`, `dailyMissionService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { serviceManager } from '../system/Servicemanager.js';
 import { gameStateService } from './GameStateService.js';
 import { logger } from '@/utils/logger.js';

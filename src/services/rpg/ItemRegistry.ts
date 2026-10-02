@@ -1,3 +1,11 @@
+/**
+ * ItemRegistry.ts
+ *
+ * VaniaBot services module exposing `ItemRegistry`, `RPGItemStats`, `RPGItem`, `itemRegistry`.
+ *
+ * @author **Carlos G**
+ */
+
 import { weapons } from './data/weapons.js';
 import { armor } from './data/armor.js';
 import { consumables } from './data/consumables.js';

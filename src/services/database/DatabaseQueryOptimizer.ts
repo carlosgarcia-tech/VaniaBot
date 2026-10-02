@@ -1,10 +1,34 @@
+/**
+ * database/DatabaseQueryOptimizer.ts
+ *
+ * Read-path optimisation: memoises query results and coalesces concurrent
+ * identical queries into a single database round-trip.
+ *
+ * The batching is the interesting part. Several callers asking for the same key
+ * in the same few milliseconds are queued by `batchKey`; when the window closes,
+ * entries are grouped by key and only the *first* query function is executed,
+ * with its result shared by every waiter. This turns an N-way read storm (very
+ * common when a command touches several services) into one query.
+ *
+ * Invalidate explicitly after any write — the cache has no write-through.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { createCache, type LruMemoryCache } from '../system/MemoryCacheService.js';
 
+/** Per-query cache and batching settings. */
 export interface QueryOptions {
+  /** Set false to always execute the query. */
   cache?: boolean;
+  /** Cache lifetime in milliseconds. */
   cacheTtl?: number;
+  /** Coalesce concurrent identical queries. */
   batch?: boolean;
+  /** Queue this query joins; queries only batch together within one key. */
   batchKey?: string;
+  /** How long to wait collecting queries before flushing. */
   batchTimeout?: number;
 }
 
@@ -15,6 +39,7 @@ export interface QueryStats {
   batchedQueries: number;
 }
 
+/** Cache on, 30s TTL, batching off. */
 const DEFAULT_OPTIONS: Required<QueryOptions> = {
   cache: true,
   cacheTtl: 30000,
@@ -26,6 +51,7 @@ const DEFAULT_OPTIONS: Required<QueryOptions> = {
 export class DatabaseQueryOptimizer {
   private static instance: DatabaseQueryOptimizer;
   private cache: LruMemoryCache<unknown>;
+  /** Queued queries per batch key. */
   private batchQueues: Map<
     string,
     Array<{
@@ -35,6 +61,7 @@ export class DatabaseQueryOptimizer {
       queryFn: () => Promise<unknown>;
     }>
   > = new Map();
+  /** Pending flush timer per batch key. */
   private batchTimeouts: Map<string, NodeJS.Timeout> = new Map();
   private stats: QueryStats = {
     totalQueries: 0,
@@ -43,6 +70,7 @@ export class DatabaseQueryOptimizer {
     batchedQueries: 0,
   };
 
+  /** Private: use the exported `queryOptimizer` singleton. */
   private constructor() {
     this.cache = createCache<unknown>({
       maxSize: 5000,
@@ -58,6 +86,14 @@ export class DatabaseQueryOptimizer {
     return DatabaseQueryOptimizer.instance;
   }
 
+  /**
+   * Runs a query through the cache and (optionally) the batcher.
+   *
+   * Only successful results are cached, so a transient failure is not pinned for
+   * the whole TTL.
+   *
+   * @param key Cache/batch identity; must fully describe the query's inputs.
+   */
   async query<T>(key: string, queryFn: () => Promise<T>, options: QueryOptions = {}): Promise<T> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     this.stats.totalQueries++;
@@ -86,6 +122,11 @@ export class DatabaseQueryOptimizer {
     return result;
   }
 
+  /**
+   * Enqueues a query and returns a promise settled when the batch flushes.
+   * The flush timer is reset on every enqueue, so the window measures inactivity
+   * rather than a fixed deadline.
+   */
   private async batchQuery<T>(
     key: string,
     queryFn: () => Promise<T>,
@@ -120,6 +161,10 @@ export class DatabaseQueryOptimizer {
     });
   }
 
+  /**
+   * Closes a batch window and resolves everything queued in it.
+   * Entries are grouped by key first, so N duplicates collapse to one execution.
+   */
   private async flushBatch(batchKey: string): Promise<void> {
     const queue = this.batchQueues.get(batchKey);
     if (!queue || queue.length === 0) return;
@@ -144,6 +189,13 @@ export class DatabaseQueryOptimizer {
     await Promise.all(promises);
   }
 
+  /**
+   * Executes one key's queued entries.
+   *
+   * Only `entries[0].queryFn` is called and its result is fanned out — callers
+   * must therefore pass an equivalent query function for the same key. A failure
+   * rejects every waiter in the group.
+   */
   private async resolveBatchEntries(
     key: string,
     entries: Array<{
@@ -175,10 +227,12 @@ export class DatabaseQueryOptimizer {
     }
   }
 
+  /** Drops one cached result. Call after writing the underlying data. */
   invalidate(key: string): void {
     this.cache.delete(key);
   }
 
+  /** Drops every cached key containing `pattern` (substring match, not a glob). */
   invalidatePattern(pattern: string): void {
     const entries = this.cache.getEntries();
     for (const entry of entries) {
@@ -188,10 +242,12 @@ export class DatabaseQueryOptimizer {
     }
   }
 
+  /** Empties the cache. Queued batches are left to flush on their own. */
   clearCache(): void {
     this.cache.clear();
   }
 
+  /** Query counters plus the underlying cache's own statistics. */
   getStats(): QueryStats & {
     cacheStats: {
       size: number;

@@ -1,6 +1,28 @@
+/**
+ * database/SQLiteAdapter.ts
+ *
+ * Maps the document-style IDatabase API onto the relational schema in
+ * repositories/Database.ts.
+ *
+ * Two translation layers make this work:
+ * - Collection names are mapped to physical table names (see TABLE_NAME_MAP),
+ *   because a few collections are namespaced (e.g. `system:reminders`).
+ * - Each table's primary-key column is looked up in COLLECTION_KEY_COLUMN, since
+ * it varies (`jid`, `key`, `slot_number`, ...).
+ *
+ * Objects are stored JSON-encoded in TEXT columns and transparently re-parsed on
+ * read. Writes are filtered against the table's real columns, so a field added
+ * to a TypeScript type but not yet migrated is silently ignored instead of
+ * producing invalid SQL.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { Database, type PaginatedResult } from './Database.js';
 import { getDatabase } from '@/repositories/Database.js';
 
+/** Logical collection name -> physical table name. */
 const TABLE_NAME_MAP: Record<string, string> = {
   'system:reminders': 'reminders',
   'system:polls': 'polls',
@@ -10,6 +32,7 @@ const TABLE_NAME_MAP: Record<string, string> = {
   moderation_logs: 'moderation_logs',
 };
 
+/** Collection name -> the column holding its primary key. */
 const COLLECTION_KEY_COLUMN: Record<string, string> = {
   users: 'jid',
   groups: 'jid',
@@ -36,14 +59,20 @@ const COLLECTION_KEY_COLUMN: Record<string, string> = {
 };
 
 export class SQLiteAdapter extends Database {
+  /**
+   * The engine is owned by repositories/Database.ts and opened during startup,
+   * so this adapter never has its own connection state to track.
+   */
   protected connected = true;
 
   private getDb() {
     return getDatabase();
   }
 
+  /** No-op: the shared engine is already open by the time this runs. */
   async connect(): Promise<void> {}
 
+  /** Flushes the in-memory engine to disk, since sql.js is not write-through. */
   async disconnect(): Promise<void> {
     this.getDb().forceSave();
   }
@@ -52,14 +81,24 @@ export class SQLiteAdapter extends Database {
     return true;
   }
 
+  /** Physical table name for a collection, defaulting to the collection name. */
   private getTableName(collection: string): string {
     return TABLE_NAME_MAP[collection] || collection;
   }
 
+  /** Primary-key column for a collection, defaulting to `id`. */
   private getKeyColumn(collection: string): string {
     return COLLECTION_KEY_COLUMN[collection] || 'id';
   }
 
+  /**
+   * Rehydrates JSON-encoded columns on read.
+   *
+   * Only strings that start with `[` or `{` are parsed, so ordinary text columns
+   * are left untouched; unparsable content is returned as-is rather than lost.
+   * Keys that could pollute the prototype chain (`__proto__`, `constructor`,
+   * `prototype`) are dropped, since filter keys come from caller input.
+   */
   private parseJsonFields(obj: Record<string, unknown>): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
@@ -100,6 +139,7 @@ export class SQLiteAdapter extends Database {
     return result;
   }
 
+  /** Reads one row by primary key. */
   async get<T>(collection: string, key: string): Promise<T | null> {
     const table = this.getTableName(collection);
     const keyCol = this.getKeyColumn(collection);
@@ -111,6 +151,7 @@ export class SQLiteAdapter extends Database {
     return this.parseJsonFields(result) as T;
   }
 
+  /** Real column names for a table, via PRAGMA. Empty array when unavailable. */
   private getTableColumns(table: string): string[] {
     try {
       const result = this.getDb().fetchAll<{ name: string }>(`PRAGMA table_info(${table})`);
@@ -120,6 +161,13 @@ export class SQLiteAdapter extends Database {
     }
   }
 
+  /**
+   * Inserts or replaces a row.
+   *
+   * Unknown fields are filtered out against the live schema, timestamps are
+   * maintained automatically, and objects are JSON-encoded. This is a full
+   * replace, not a merge: fields absent from `value` are cleared.
+   */
   async set<T>(collection: string, key: string, value: T): Promise<void> {
     const table = this.getTableName(collection);
     const keyCol = this.getKeyColumn(collection);
@@ -154,6 +202,7 @@ export class SQLiteAdapter extends Database {
     this.getDb().query(sql, { params: values });
   }
 
+  /** Deletes a row. Always reports success (the row may simply not have existed). */
   async delete(collection: string, key: string): Promise<boolean> {
     const table = this.getTableName(collection);
     const keyCol = this.getKeyColumn(collection);
@@ -161,6 +210,7 @@ export class SQLiteAdapter extends Database {
     return true;
   }
 
+  /** Existence check by primary key. */
   async has(collection: string, key: string): Promise<boolean> {
     const table = this.getTableName(collection);
     const keyCol = this.getKeyColumn(collection);
@@ -171,6 +221,10 @@ export class SQLiteAdapter extends Database {
     return (result?.cnt ?? 0) > 0;
   }
 
+  /**
+   * Rows matching a shallow equality filter.
+   * Undefined/null filter values are ignored; an empty filter returns everything.
+   */
   async find<T>(collection: string, filter: Record<string, unknown>): Promise<T[]> {
     const table = this.getTableName(collection);
     const filterKeys = Object.keys(filter).filter(
@@ -194,11 +248,16 @@ export class SQLiteAdapter extends Database {
     return results.map(r => this.parseJsonFields(r) as T);
   }
 
+  /** First row matching the filter, or null. */
   async findOne<T>(collection: string, filter: Record<string, unknown>): Promise<T | null> {
     const results = await this.find<T>(collection, filter);
     return results[0] || null;
   }
 
+  /**
+   * Applies a partial update, refreshing `updatedAt`.
+   * Unlike `set`, fields absent from `updates` are left untouched.
+   */
   async update<T>(collection: string, key: string, updates: Partial<T>): Promise<void> {
     const table = this.getTableName(collection);
     const keyCol = this.getKeyColumn(collection);
@@ -218,12 +277,14 @@ export class SQLiteAdapter extends Database {
     this.getDb().query(sql, { params: [...values, Date.now(), key] });
   }
 
+  /** Every row in the collection. */
   async getAll<T>(collection: string): Promise<T[]> {
     const table = this.getTableName(collection);
     const results = this.getDb().fetchAll<Record<string, unknown>>(`SELECT * FROM ${table}`);
     return results.map(r => this.parseJsonFields(r) as T);
   }
 
+  /** Every primary key in the collection. */
   async keys(collection: string): Promise<string[]> {
     const table = this.getTableName(collection);
     const keyCol = this.getKeyColumn(collection);
@@ -231,6 +292,10 @@ export class SQLiteAdapter extends Database {
     return results.map(r => r.key);
   }
 
+  /**
+   * Paginated, sorted and filtered read.
+   * Issues a separate COUNT so the caller gets the total without a second call.
+   */
   async getPaginated<T>(
     collection: string,
     options?: {
@@ -295,6 +360,7 @@ export class SQLiteAdapter extends Database {
     };
   }
 
+  /** Counts rows, optionally filtered. */
   async count(collection: string, filter?: Record<string, unknown>): Promise<number> {
     const table = this.getTableName(collection);
     const filterObj = filter || {};
@@ -320,11 +386,13 @@ export class SQLiteAdapter extends Database {
     return result?.cnt ?? 0;
   }
 
+  /** Deletes every row in the collection. */
   async clear(collection: string): Promise<void> {
     const table = this.getTableName(collection);
     this.getDb().query(`DELETE FROM ${table}`);
   }
 
+  /** Persists the in-memory database to disk. */
   async flush(): Promise<void> {
     this.getDb().forceSave();
   }

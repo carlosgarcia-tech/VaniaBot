@@ -1,3 +1,11 @@
+/**
+ * TradeService.ts
+ *
+ * VaniaBot services module exposing `TradeService`, `TradeOffer`, `tradeService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { itemRegistry } from './ItemRegistry.js';
 import { itemService } from './ItemService.js';
 import { serviceManager } from '../system/Servicemanager.js';

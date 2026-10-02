@@ -5,7 +5,7 @@
  * Handles welcome messages, goodbye messages, anti-spam, anti-link,
  * moderation settings, and admin-only mode.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

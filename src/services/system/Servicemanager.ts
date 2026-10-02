@@ -1,3 +1,21 @@
+/**
+ * Servicemanager.ts
+ *
+ * Composition root for the service layer: owns every domain service instance
+ * and wires their dependencies together at startup.
+ *
+ * Services are exposed as fields on a singleton so the rest of the codebase can
+ * reach them without importing a dozen modules or managing lifetimes itself.
+ *
+ * Startup order matters and is enforced here: the database is connected first,
+ * then services are constructed in dependency order (LevelService needs
+ * UserService, PrimeService needs GroupService), then background timers start.
+ * Shutdown reverses it.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { Database } from '../database/Database.js';
 import { JsonDatabase } from '../database/JsonDatabase.js';
 import { MongoDatabase } from '../database/MongoDatabase.js';
@@ -23,6 +41,7 @@ import { ensureDatabaseInitialized } from '@/repositories/Database.js';
 export class ServiceManager {
   private static instance: ServiceManager;
 
+  /** Storage backend selected by DB_TYPE; see initializeDatabase(). */
   public db!: Database;
   public userService!: UserService;
   public groupService!: GroupService;
@@ -60,6 +79,10 @@ export class ServiceManager {
     return ServiceManager.instance;
   }
 
+  /**
+   * Boots every service in dependency order, then starts background timers.
+   * @throws Propagates database/initialisation failures so startup can abort.
+   */
   async initialize(): Promise<void> {
     try {
       logger.debug('🔧 Inicializando servicios...');
@@ -99,6 +122,14 @@ export class ServiceManager {
     }
   }
 
+  /**
+   * Instantiates the storage backend selected by DB_TYPE.
+   *
+   * SQLite is the default and reuses the engine index.ts already opened, rather
+   * than bootstrapping a second one. An unrecognised DB_TYPE also falls back to
+   * SQLite rather than failing, so a typo in the environment does not prevent the
+   * bot from starting.
+   */
   private async initializeDatabase(): Promise<void> {
     const dbType = config.database.type;
 
@@ -133,6 +164,11 @@ export class ServiceManager {
     await this.db.connect();
   }
 
+  /**
+   * Stops background timers and closes the database.
+   * Failures are logged rather than thrown so a shutdown problem cannot prevent
+   * the remaining cleanup steps from running.
+   */
   async shutdown(): Promise<void> {
     try {
       logger.info('Cerrando servicios...');
@@ -151,6 +187,7 @@ export class ServiceManager {
     }
   }
 
+  /** True once the database is connected. Used to guard best-effort counter updates. */
   isReady(): boolean {
     return this.db && this.db.isConnected();
   }

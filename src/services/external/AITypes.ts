@@ -1,3 +1,11 @@
+/**
+ * AITypes.ts
+ *
+ * VaniaBot services module exposing `AIMessage`, `ConversationSession`, `GroqError`, `GROQ_MODELS`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { Either } from '@/utils/either.js';
 import type { VBotError, ValidationError, ServiceUnavailableError } from '@/utils/errors.js';
 

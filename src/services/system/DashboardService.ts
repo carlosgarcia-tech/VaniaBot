@@ -1,3 +1,21 @@
+/**
+ * DashboardService.ts
+ *
+ * Read-mostly Express server backing the web panel: system stats, per-command
+ * metrics, slot management, moderation lists and a small in-memory log tail.
+ *
+ * Distinct from the webhook panel (services/webhook): this one serves static UI
+ * plus read/act endpoints for humans, while the webhook service is the
+ * token-authenticated inbound API.
+ *
+ * Endpoints degrade gracefully: each one guards its own dependencies and returns
+ * 501/500 rather than throwing, so a missing subsystem never takes down the
+ * whole dashboard.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import express from 'express';
 import type { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
@@ -19,6 +37,7 @@ export interface DashboardConfig {
   port: number;
 }
 
+/** Connection state of the main bot or one sub-bot slot. */
 export interface BotInfo {
   id: string;
   name: string;
@@ -27,6 +46,7 @@ export interface BotInfo {
   uptime?: number;
 }
 
+/** Aggregate view returned by /api/stats. */
 export interface DashboardSnapshot {
   dashboard: DashboardConfig;
   bots: BotInfo[];
@@ -34,6 +54,7 @@ export interface DashboardSnapshot {
   uptime: number;
 }
 
+/** One sample in the rolling metrics window. */
 interface RealtimeMetrics {
   timestamp: number;
   messagesPerMinute: number;
@@ -45,13 +66,26 @@ interface RealtimeMetrics {
   queueDepth: number;
 }
 
+/**
+ * Rolling metrics sampler backing /api/metrics/realtime.
+ *
+ * Counts are given as process-lifetime totals, so they are differenced against
+ * elapsed time to derive per-minute rates. Both the history and the rate arrays
+ * are capped at 60 entries (one hour of samples).
+ */
 class MetricsCollector {
   private metricsHistory: RealtimeMetrics[] = [];
+  /** Per-minute rates, one entry per sampling minute. */
   private messageCounts: number[] = [];
   private commandCounts: number[] = [];
   private errorCounts: number[] = [];
   private lastCheck = Date.now();
 
+  /**
+   * Samples the current state.
+   * Rate buckets only advance once at least a minute has elapsed, so repeated
+   * calls within the same minute reuse the previous rate.
+   */
   recordMetrics(
     messages: number,
     commands: number,
@@ -99,16 +133,19 @@ class MetricsCollector {
     }
   }
 
+  /** Most recent sample, or null before the first one is recorded. */
   getCurrent(): RealtimeMetrics | null {
     return this.metricsHistory.length > 0
       ? this.metricsHistory[this.metricsHistory.length - 1]
       : null;
   }
 
+  /** Copy of the rolling history, newest last. */
   getHistory(): RealtimeMetrics[] {
     return [...this.metricsHistory];
   }
 
+  /** Mean per-minute rate across the sampling window. */
   getAverages(): { messages: number; commands: number; errors: number } {
     const msgs =
       this.messageCounts.length > 0
@@ -132,6 +169,7 @@ export class DashboardService {
   private app: Express | null = null;
   private server: ReturnType<Express['listen']> | null = null;
   private config: DashboardConfig = { enabled: false, port: 3001 };
+  /** Newest-first ring of panel activity lines, capped at MAX_LOGS. */
   private logs: Array<{ timestamp: number; level: string; message: string }> = [];
   private readonly MAX_LOGS = 100;
 
@@ -139,16 +177,19 @@ export class DashboardService {
     return this.config.enabled;
   }
 
+  /** Copy of the current configuration, so callers cannot mutate it. */
   getConfig(): DashboardConfig {
     return { ...this.config };
   }
 
+  /** Applies a partial configuration change and returns the result. */
   setConfig(patch: Partial<DashboardConfig>): DashboardConfig {
     if (patch.enabled !== undefined) this.config.enabled = patch.enabled;
     if (patch.port !== undefined) this.config.port = patch.port;
     return this.getConfig();
   }
 
+  /** Point-in-time view of bots, memory and uptime. */
   getSnapshot(): DashboardSnapshot {
     const memory = process.memoryUsage();
     const bots = this.getBotsInfo();
@@ -165,6 +206,7 @@ export class DashboardService {
     };
   }
 
+  /** Appends a panel log line, dropping the oldest once MAX_LOGS is reached. */
   addLog(level: string, message: string): void {
     this.logs.unshift({ timestamp: Date.now(), level, message });
     if (this.logs.length > this.MAX_LOGS) {
@@ -172,6 +214,11 @@ export class DashboardService {
     }
   }
 
+  /**
+   * Connection state of the main bot plus every occupied sub-bot slot.
+   * Free and reserved slots are omitted; failures reading the slot list are
+   * logged so the main bot still shows up.
+   */
   private getBotsInfo(): BotInfo[] {
     const bots: BotInfo[] = [];
 
@@ -203,16 +250,20 @@ export class DashboardService {
     }
 
     return bots;
-  }
-
+  } /** Group service accessor that tolerates pre-startup state. */
   private getGroupService() {
     return serviceManager.groupService || null;
   }
 
+  /** Moderation service accessor that tolerates pre-startup state. */
   private getModerationService() {
     return serviceManager.moderationService || null;
   }
 
+  /**
+   * Builds the Express app: static panel assets, the JSON API, a SPA fallback
+   * and a terminal error handler.
+   */
   private createApp(): Express {
     const app = express();
 
@@ -221,6 +272,7 @@ export class DashboardService {
 
     app.use(express.static(path.join(__dirname, '../../../panel')));
 
+    /** Aggregate stats: bots, memory, slots, cache and rolling averages. */
     app.get('/api/stats', (_req: Request, res: Response) => {
       try {
         const snapshot = this.getSnapshot();
@@ -281,6 +333,7 @@ export class DashboardService {
       res.json(this.getBotsInfo());
     });
 
+    /** Runs the standard health check. */
     app.get('/api/health', async (_req: Request, res: Response) => {
       try {
         const health = await healthCheckService.performHealthCheck();
@@ -290,6 +343,7 @@ export class DashboardService {
       }
     });
 
+    /** Health check plus host and process details. */
     app.get('/api/health/detailed', async (_req: Request, res: Response) => {
       try {
         const memory = process.memoryUsage();
@@ -323,6 +377,7 @@ export class DashboardService {
       }
     });
 
+    /** Current sample, rolling history and averages. */
     app.get('/api/metrics/realtime', (_req: Request, res: Response) => {
       const current = metricsCollector.getCurrent();
       const history = metricsCollector.getHistory();
@@ -333,6 +388,11 @@ export class DashboardService {
       });
     });
 
+    /**
+     * Per-command execution metrics from the pipeline.
+     * Returns the top 50 commands plus aggregate totals; the top-10 slice is
+     * provided separately for the dashboard widget.
+     */
     app.get('/api/commands/metrics', (_req: Request, res: Response) => {
       const client = (global as { client?: WhatsAppClient }).client;
       const metrics = client?.getStats()?.commandMetrics || new Map();
@@ -379,6 +439,7 @@ export class DashboardService {
       });
     });
 
+    /** Sub-bot slot inventory and usage counts. */
     app.get('/api/slots', (_req: Request, res: Response) => {
       if (!subBotManager) {
         res.status(501).json({ error: 'SubBotManager not available' });
@@ -396,6 +457,7 @@ export class DashboardService {
       });
     });
 
+    /** Recycles a slot so its sub-bot reconnects. */
     app.post('/api/slot/:slot/reconnect', async (req: Request, res: Response) => {
       const slotParam = req.params.slot;
       const slot = typeof slotParam === 'string' ? parseInt(slotParam, 10) : 0;
@@ -413,6 +475,7 @@ export class DashboardService {
       }
     });
 
+    /** Releases a slot. Currently the same operation as reconnect (see resetSlot). */
     app.post('/api/slot/:slot/release', async (req: Request, res: Response) => {
       const slotParam = req.params.slot;
       const slot = typeof slotParam === 'string' ? parseInt(slotParam, 10) : 0;
@@ -430,6 +493,7 @@ export class DashboardService {
       }
     });
 
+    /** Ban list, capped at the first 100 entries. */
     app.get('/api/moderation/bans', async (req: Request, res: Response) => {
       const modService = this.getModerationService();
       if (!modService) {
@@ -449,6 +513,7 @@ export class DashboardService {
       }
     });
 
+    /** Mutes, filtered to those that have not expired. */
     app.get('/api/moderation/mutes', async (req: Request, res: Response) => {
       const modService = this.getModerationService();
       if (!modService) {
@@ -473,6 +538,7 @@ export class DashboardService {
       }
     });
 
+    /** Moderation log, newest first. `limit` is clamped to 100. */
     app.get('/api/moderation/actions', async (req: Request, res: Response) => {
       try {
         const db = serviceManager.db;
@@ -493,6 +559,7 @@ export class DashboardService {
       }
     });
 
+    /** All configured groups with their feature flags and stats. */
     app.get('/api/groups', async (req: Request, res: Response) => {
       try {
         const groupService = this.getGroupService();
@@ -522,6 +589,7 @@ export class DashboardService {
       }
     });
 
+    /** Full configuration for one group. */
     app.get('/api/groups/:jid', async (req: Request, res: Response) => {
       try {
         const groupService = this.getGroupService();
@@ -541,15 +609,19 @@ export class DashboardService {
       }
     });
 
+    /** Recent panel activity lines, newest first. */
+    /** Recent panel activity lines, newest first. */
     app.get('/api/logs', (req: Request, res: Response) => {
       const limit = parseInt(String(req.query.limit || '50'), 10);
       res.json({ logs: this.logs.slice(0, limit) });
     });
 
+    /** Hit/miss and size statistics from the main cache manager. */
     app.get('/api/cache/stats', (_req: Request, res: Response) => {
       res.json(cacheManager.getStats());
     });
 
+    /** SPA fallback: any unmatched route serves the panel entry point. */
     app.get('*', (_req: Request, res: Response) => {
       res.sendFile(path.join(__dirname, '../../../panel/index.html'));
     });
@@ -562,6 +634,11 @@ export class DashboardService {
     return app;
   }
 
+  /**
+   * Starts the HTTP server.
+   * No-ops when disabled or already listening, so repeated calls are safe.
+   * @rejects If the port cannot be bound.
+   */
   async start(): Promise<void> {
     if (!this.config.enabled) return;
     if (this.server) return;
@@ -591,6 +668,7 @@ export class DashboardService {
     });
   }
 
+  /** Closes the HTTP server and waits for in-flight requests to drain. */
   async stop(): Promise<void> {
     const server = this.server;
     if (server) {

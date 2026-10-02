@@ -12,7 +12,7 @@
  * - 'ready' solo se emite una vez por sesión (no en cada reconexión)
  * - No hay spam de notificaciones al owner durante reconexiones
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  */
 import type { WASocket, ConnectionState } from 'baileys';

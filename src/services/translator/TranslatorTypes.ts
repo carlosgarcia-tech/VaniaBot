@@ -1,3 +1,11 @@
+/**
+ * TranslatorTypes.ts
+ *
+ * VaniaBot services module exposing `TraduccionSuccess`, `TraduccionOpts`, `resolverIdioma`, `idiomasDisponibles`.
+ *
+ * @author **Carlos G**
+ */
+
 export const IDIOMAS: Record<string, { nombre: string; bandera: string; codigo: string }> = {
   es: { nombre: 'Español', bandera: '🇲🇽', codigo: 'es' },
   español: { nombre: 'Español', bandera: '🇲🇽', codigo: 'es' },

@@ -1,3 +1,11 @@
+/**
+ * ModerationService.ts
+ *
+ * VaniaBot services module exposing `ModerationService`, `ModerationAction`, `BanRecord`, `MuteRecord`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { IDatabase } from '../database/Database';
 import { normalizeJid } from '../PermissionService.js';
 

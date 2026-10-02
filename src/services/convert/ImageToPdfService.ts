@@ -1,3 +1,11 @@
+/**
+ * ImageToPdfService.ts
+ *
+ * VaniaBot services module exposing `ImageToPdfService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { spawn } from 'child_process';
 import { PDFDocument } from 'pdf-lib';
 import { logError } from '@/utils/logger.js';

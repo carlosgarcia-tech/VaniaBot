@@ -1,3 +1,11 @@
+/**
+ * QuizService.ts
+ *
+ * VaniaBot services module exposing `QuizService`, `StartQuizSuccess`, `StartQuizOptions`, `quizService`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { Either } from '@/utils/either.js';
 import { right, left } from '@/utils/either.js';
 import { questionGenerator } from './QuestionGenerator.js';

@@ -1,4 +1,12 @@
 /**
+ * PanelServer.ts
+ *
+ * VaniaBot services module exposing `PanelServer`, `PanelConfig`, `panelServer`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview PanelServer.ts - Express server for VaniaBot web dashboard
  */
 

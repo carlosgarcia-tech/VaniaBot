@@ -1,3 +1,11 @@
+/**
+ * PetService.ts
+ *
+ * VaniaBot services module exposing `PetService`, `PetData`, `petService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { serviceManager } from '../system/Servicemanager.js';
 import type { Either } from '@/utils/either.js';
 import { left, right } from '@/utils/either.js';

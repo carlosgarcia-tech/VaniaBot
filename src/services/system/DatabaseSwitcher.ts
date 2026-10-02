@@ -5,7 +5,7 @@
  * - Docker: usa Redis + SQLite (para sesiones)
  * - Normal: usa SQLite solo
  *
- * @author Carlos G
+ * @author **Carlos G**
  * @created 2026-04-11
  */
 

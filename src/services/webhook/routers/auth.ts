@@ -1,3 +1,11 @@
+/**
+ * auth.ts
+ *
+ * VaniaBot services module exposing `extractApiToken`, `isAuthorized`, `requireApiToken`.
+ *
+ * @author **Carlos G**
+ */
+
 import { timingSafeEqual, createHash } from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 

@@ -1,3 +1,11 @@
+/**
+ * DownloadService.ts
+ *
+ * VaniaBot services module exposing `DownloadService`, `downloadService`.
+ *
+ * @author **Carlos G**
+ */
+
 const BASE_URL = 'https://api.delirius.store/download';
 const TIMEOUT_MS = 60000;
 

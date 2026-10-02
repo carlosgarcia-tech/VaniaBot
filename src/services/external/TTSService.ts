@@ -1,3 +1,11 @@
+/**
+ * TTSService.ts
+ *
+ * VaniaBot services module exposing `TTSService`, `ttsService`.
+ *
+ * @author **Carlos G**
+ */
+
 const TIMEOUT_MS = 30000;
 
 export class TTSService {

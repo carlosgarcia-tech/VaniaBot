@@ -1,3 +1,11 @@
+/**
+ * AntilinkService.ts
+ *
+ * VaniaBot services module exposing `AntilinkService`, `AntilinkConfig`, `AntilinkStore`, `ExtractedLink`.
+ *
+ * @author **Carlos G**
+ */
+
 import path from 'path';
 import { JsonFileStore } from '@/utils/JsonFileStore.js';
 import { normalizeJid } from '../PermissionService.js';

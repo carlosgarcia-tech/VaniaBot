@@ -1,3 +1,16 @@
+/**
+ * AntiCallService.ts
+ *
+ * Configuration store for the incoming-call blocker.
+ *
+ * A blocked caller is rejected outright by ClientEventHandlers, and a block
+ * list lets the bot decline specific numbers even when blocking is disabled
+ * globally. State lives in a JSON file so it survives restarts.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import path from 'path';
 import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
@@ -6,6 +19,11 @@ export interface AntiCallConfig {
   blockedUsers: string[];
 }
 
+/**
+ * Coerces arbitrary parsed JSON into a valid config.
+ * Non-boolean `enabled` and non-string list entries are dropped rather than
+ * trusted, so a hand-edited or truncated file cannot crash startup.
+ */
 function validateAntiCallConfig(data: unknown): AntiCallConfig {
   const raw = (data ?? {}) as Record<string, unknown>;
   return {
@@ -18,6 +36,7 @@ function validateAntiCallConfig(data: unknown): AntiCallConfig {
 
 export class AntiCallService {
   private static instance: AntiCallService;
+  /** In-memory mirror of the persisted config, rewritten on every mutation. */
   private config: AntiCallConfig;
   /**
    * Atomic file-backed store for the anti-call config. Replaces the
@@ -50,6 +69,8 @@ export class AntiCallService {
     this.configStore.save(this.config);
   }
 
+  /** True when call rejection is enabled globally. */
+  /** True when call rejection is enabled globally. */
   isEnabled(): boolean {
     return this.config.enabled;
   }
@@ -68,10 +89,13 @@ export class AntiCallService {
     return this.config;
   }
 
+  /** True when this specific caller is on the block list. */
+  /** True when this specific caller is on the block list. */
   shouldBlock(callerJid: string): boolean {
     return this.config.blockedUsers.includes(callerJid);
   }
 
+  /** Adds a caller to the block list. No-op when already present. */
   blockUser(userJid: string): void {
     if (!this.config.blockedUsers.includes(userJid)) {
       this.config.blockedUsers.push(userJid);
@@ -79,6 +103,8 @@ export class AntiCallService {
     }
   }
 
+  /** Removes a caller from the block list. No-op when absent. */
+  /** Removes a caller from the block list. No-op when absent. */
   unblockUser(userJid: string): void {
     const index = this.config.blockedUsers.indexOf(userJid);
     if (index > -1) {
@@ -87,6 +113,14 @@ export class AntiCallService {
     }
   }
 
+  /**
+   * Snapshot of the block list.
+   * Returns the live array, so callers must not mutate it.
+   */
+  /**
+   * Snapshot of the block list.
+   * Returns the live array, so callers must not mutate it.
+   */
   getBlockedUsers(): string[] {
     return this.config.blockedUsers;
   }

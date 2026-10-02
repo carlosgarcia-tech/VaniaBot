@@ -1,3 +1,21 @@
+/**
+ * WelcomeService.ts
+ *
+ * Per-group welcome and farewell messages, triggered from the
+ * group-participants.update event via ClientEventHandlers.
+ *
+ * Messages are templates: `@user`, `@group`, `@desc`, `@count` and `@fact` are
+ * substituted before sending. Each group can override the template or opt into
+ * showing the participant's profile picture.
+ *
+ * Every send is gated twice — the per-chat vania toggle and the group's own
+ * welcome/goodbye setting — and all failures are swallowed: a greeting must
+ * never break the participant-update handler.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { WASocket } from 'baileys';
 import { serviceManager } from './Servicemanager.js';
 import { logger, logError } from '@/utils/logger.js';
@@ -17,10 +35,12 @@ export interface GoodbyeConfig {
   useProfilePic?: boolean;
 }
 
+/** Welcome config with the optional profile-picture flag preserved. */
 interface WelcomeConfigExtended extends WelcomeConfig {
   useProfilePic?: boolean;
 }
 
+/** Fallback facts used when the remote source is unavailable. */
 const VANIABOT_FACTS: string[] = [
   '💌 El nombre VaniaBot nació en un dia cualquiera…',
   '💭 VaniaBot no es solo un bot…',
@@ -31,6 +51,16 @@ const cachedFacts: string[] = [];
 let lastFactCacheTime = 0;
 const FACT_CACHE_DURATION = 60 * 60 * 1000;
 
+/**
+ * Returns a trivia line for the welcome template.
+ *
+ * Remote facts are fetched through a circuit breaker and cached for an hour;
+ * five are requested at once so a couple of failures still leave some. If none
+ * are available, a local fact is used instead — this must never throw, since it
+ * runs inside the participant-join handler.
+ *
+ * Remote facts are used ~15% of the time so the template does not look templated.
+ */
 async function getRandomFact(): Promise<string> {
   const now = Date.now();
 
@@ -73,7 +103,7 @@ async function getRandomFact(): Promise<string> {
       cachedFacts.push(...validFacts);
       lastFactCacheTime = now;
     } catch (error) {
-      // Sin facts remotos se cae a la lista local: registrar, no romper.
+      // Without remote facts fall back to the local list: log it, do not break.
       logger.debug('[WelcomeService] Fact refresh failed:', error);
     }
   }
@@ -86,11 +116,13 @@ async function getRandomFact(): Promise<string> {
   return VANIABOT_FACTS[Math.floor(Math.random() * VANIABOT_FACTS.length)];
 }
 
+/** Wraps a fact in the decorative frame used by the default templates. */
 function formatFact(fact: string): string {
   return `\n.・✦─⋆⋅ 𝘿𝙖𝙩𝙤 𝙘𝙪𝙧𝙞𝙤𝙨𝙤 ⋅⋆─✦・.\n${fact}\n.・✦────────────✦・.`;
 }
 
 export class WelcomeService {
+  /** Asset used when a participant has no profile picture. */
   private readonly DEFAULT_PROFILE_PIC = 'logo.png';
   private readonly DEFAULT_WELCOME = `
 ✧･ﾟ:*  𝙚𝙮, 𝙣𝙪𝙚𝙫𝙖 𝙘𝙖𝙧𝙖  *:･ﾟ✧
@@ -107,7 +139,9 @@ hola @user ♡
   `.trim();
 
   /**
-   * Obtiene el buffer de la imagen por defecto usando assetHelper
+   * Loads the fallback image asset.
+   * Returns null when the asset is missing, which degrades to a text-only
+   * greeting rather than failing the send.
    */
   private getDefaultProfilePicBuffer(): Buffer | null {
     try {
@@ -118,6 +152,12 @@ hola @user ♡
     }
   }
 
+  /**
+   * Sends the welcome message for a joining participant.
+   *
+   * Gated on the vania toggle and the group's welcome setting; sends as text when
+   * no image can be resolved. All errors are logged, never thrown.
+   */
   async handleNewParticipant(sock: WASocket, groupJid: string, userJid: string): Promise<void> {
     try {
       const isVaniaEnabled = await serviceManager.vaniaToggleService.isEnabled(groupJid, 'main');
@@ -168,6 +208,13 @@ hola @user ♡
     }
   }
 
+  /**
+   * Sends the farewell message for a departing participant.
+   *
+   * The bot is usually no longer in the group after leaving, so metadata and
+   * send failures reporting `forbidden`/`not-authorized` are treated as
+   * expected and silently ignored.
+   */
   async handleParticipantLeft(
     sock: WASocket,
     groupJid: string,
@@ -238,6 +285,12 @@ hola @user ♡
     }
   }
 
+  /**
+   * Substitutes `@key` placeholders in a template.
+   *
+   * Keys are applied as whole tokens via a word-boundary regex, so `@user` is not
+   * corrupted by a preceding `@count`-style match.
+   */
   private parseMessage(template: string, vars: Record<string, string>): string {
     let message = template;
     for (const [key, value] of Object.entries(vars)) {
@@ -246,6 +299,7 @@ hola @user ♡
     return message;
   }
 
+  /** Enables the welcome message, optionally with a custom template. */
   async enableWelcome(groupJid: string, message?: string, useProfilePic = true): Promise<void> {
     await serviceManager.groupService.updateGroup(groupJid, {
       welcome: {
@@ -258,6 +312,7 @@ hola @user ♡
     logger.info(`[Welcome] Bienvenida activada para ${groupJid}`);
   }
 
+  /** Disables the welcome message, preserving the stored template. */
   async disableWelcome(groupJid: string): Promise<void> {
     const group = await serviceManager.groupService.getGroup(groupJid);
     await serviceManager.groupService.updateGroup(groupJid, {
@@ -267,6 +322,7 @@ hola @user ♡
     logger.info(`[Welcome] Bienvenida desactivada para ${groupJid}`);
   }
 
+  /** Enables the farewell message, optionally with a custom template. */
   async enableGoodbye(groupJid: string, message?: string): Promise<void> {
     await serviceManager.groupService.updateGroup(groupJid, {
       goodbye: { enabled: true, message: message || this.DEFAULT_GOODBYE },
@@ -275,6 +331,7 @@ hola @user ♡
     logger.info(`[Goodbye] Despedida activada para ${groupJid}`);
   }
 
+  /** Disables the farewell message, preserving the stored template. */
   async disableGoodbye(groupJid: string): Promise<void> {
     const group = await serviceManager.groupService.getGroup(groupJid);
     await serviceManager.groupService.updateGroup(groupJid, {
@@ -284,6 +341,7 @@ hola @user ♡
     logger.info(`[Goodbye] Despedida desactivada para ${groupJid}`);
   }
 
+  /** Replaces the welcome template without changing the enabled flag. */
   async setWelcomeMessage(groupJid: string, message: string): Promise<void> {
     const group = await serviceManager.groupService.getGroup(groupJid);
     await serviceManager.groupService.updateGroup(groupJid, {
@@ -291,6 +349,7 @@ hola @user ♡
     });
   }
 
+  /** Replaces the farewell template without changing the enabled flag. */
   async setGoodbyeMessage(groupJid: string, message: string): Promise<void> {
     const group = await serviceManager.groupService.getGroup(groupJid);
     await serviceManager.groupService.updateGroup(groupJid, {
@@ -298,6 +357,7 @@ hola @user ♡
     });
   }
 
+  /** Restores both templates to the defaults and re-enables them. */
   async resetMessages(groupJid: string): Promise<void> {
     await serviceManager.groupService.updateGroup(groupJid, {
       welcome: { enabled: true, message: this.DEFAULT_WELCOME },
@@ -317,6 +377,10 @@ hola @user ♡
     return this.DEFAULT_PROFILE_PIC;
   }
 
+  /**
+   * Effective configuration for a group, filling in defaults for unset fields.
+   * Note the goodbye branch does not report `useProfilePic`, unlike welcome.
+   */
   async getConfig(groupJid: string): Promise<{ welcome: WelcomeConfig; goodbye: GoodbyeConfig }> {
     const group = await serviceManager.groupService.getGroup(groupJid);
     const welcomeExt = group.welcome as WelcomeConfigExtended;

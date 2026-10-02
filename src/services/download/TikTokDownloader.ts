@@ -1,3 +1,11 @@
+/**
+ * TikTokDownloader.ts
+ *
+ * VaniaBot services module exposing `TikTokDownloader`, `TikTokVideo`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { Either } from '@/utils/either.js';
 import { left, right } from '@/utils/either.js';
 import { DownloadService, type DownloadResult } from './DownloadService.js';

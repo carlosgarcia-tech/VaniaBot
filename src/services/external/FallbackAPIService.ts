@@ -1,3 +1,11 @@
+/**
+ * FallbackAPIService.ts
+ *
+ * VaniaBot services module exposing `FallbackAPIService`, `fallbackAPIService`.
+ *
+ * @author **Carlos G**
+ */
+
 import axios from 'axios';
 import { logError } from '@/utils/logger.js';
 

@@ -1,3 +1,11 @@
+/**
+ * FreeFireService.ts
+ *
+ * VaniaBot services module exposing `FreeFireService`, `freeFireService`.
+ *
+ * @author **Carlos G**
+ */
+
 import path from 'path';
 import { JsonFileStore } from '@/utils/JsonFileStore.js';
 

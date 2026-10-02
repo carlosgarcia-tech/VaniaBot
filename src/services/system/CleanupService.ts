@@ -1,12 +1,32 @@
+/**
+ * CleanupService.ts
+ *
+ * Periodic housekeeping: removes long-inactive user records and disables
+ * expired licences.
+ *
+ * Both timers are unref'd so they never hold the process open, and the first
+ * run is delayed five minutes to keep it off the startup path. Owners are never
+ * removed regardless of activity.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { serviceManager } from './Servicemanager.js';
 import { logger, logError } from '@/utils/logger.js';
 
 export class CleanupService {
   private cleanupInterval: NodeJS.Timeout | null = null;
   private initialCleanupTimer: NodeJS.Timeout | null = null;
+  /** Hourly sweep. */
   private readonly CLEANUP_INTERVAL = 60 * 60 * 1000;
+  /** Users untouched for longer than this are considered inactive. */
   private readonly INACTIVITY_THRESHOLD = 7 * 24 * 60 * 60 * 1000;
 
+  /**
+   * Starts the sweep timers. Idempotent: a second call is logged and ignored so
+   * a double `start()` cannot leave two overlapping intervals running.
+   */
   start(): void {
     if (this.cleanupInterval) {
       logger.warn('CleanupService ya está corriendo');
@@ -33,6 +53,7 @@ export class CleanupService {
     this.cleanupInterval.unref();
   }
 
+  /** Clears both timers. */
   stop(): void {
     if (this.initialCleanupTimer) {
       clearTimeout(this.initialCleanupTimer);
@@ -45,6 +66,12 @@ export class CleanupService {
     }
   }
 
+  /**
+   * Scheduled sweep.
+   *
+   * Licence expiry runs in its own try/catch so a licensing failure cannot abort
+   * the user cleanup that already succeeded.
+   */
   private async cleanup(): Promise<void> {
     try {
       logger.info('🧹 Ejecutando limpieza...');
@@ -84,6 +111,10 @@ export class CleanupService {
     }
   }
 
+  /**
+   * Runs the sweep immediately on demand (owner command / panel action).
+   * @returns Number of users removed.
+   */
   async cleanupNow(): Promise<number> {
     logger.info('🧹 Ejecutando limpieza manual...');
     const now = Date.now();
@@ -105,6 +136,10 @@ export class CleanupService {
     return removedCount;
   }
 
+  /**
+   * Deletes a single user.
+   * Owners are protected: the call returns false rather than deleting them.
+   */
   async removeUser(jid: string): Promise<boolean> {
     try {
       const user = await serviceManager.userService.getUser(jid);
@@ -120,6 +155,10 @@ export class CleanupService {
     }
   }
 
+  /**
+   * User counts split by owner / active / inactive.
+   * Owners are counted separately and never fall into the inactive bucket.
+   */
   async getStats(): Promise<{ total: number; active: number; inactive: number; owners: number }> {
     const users = await serviceManager.userService.getAllUsers();
     const now = Date.now();

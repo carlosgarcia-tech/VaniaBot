@@ -1,3 +1,11 @@
+/**
+ * WebhookRouter.ts
+ *
+ * VaniaBot services module exposing `createWebhookRouter`.
+ *
+ * @author **Carlos G**
+ */
+
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { webhookService } from '../WebhookService.js';

@@ -1,3 +1,11 @@
+/**
+ * LidResolver.ts
+ *
+ * VaniaBot services module exposing `LidResolver`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WASocket } from 'baileys';
 import { extractPhone } from './JidService.js';
 import { logger } from '@/utils/logger.js';

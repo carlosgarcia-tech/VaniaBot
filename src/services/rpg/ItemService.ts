@@ -1,3 +1,11 @@
+/**
+ * ItemService.ts
+ *
+ * VaniaBot services module exposing `ItemService`, `InventoryItem`, `UseItemResult`, `EquipResult`.
+ *
+ * @author **Carlos G**
+ */
+
 import { itemRegistry, type RPGItemStats } from './ItemRegistry.js';
 import { serviceManager } from '../system/Servicemanager.js';
 import type { RPGStats } from '../database/UserService.js';

@@ -1,6 +1,28 @@
+/**
+ * database/UserService.ts
+ *
+ * Central user record: profile, economy (money/bank), progression (XP/level),
+ * inventory, RPG state and claim cooldowns.
+ *
+ * Two conventions are applied consistently and worth knowing before editing:
+ *
+ * - **Owner privilege.** Owners are pinned to sentinel values (OWNER_MONEY,
+ *   OWNER_LEVEL, OWNER_XP) instead of using real balances. Any mutating method
+ *   short-circuits for them, and transfers involving an owner always succeed.
+ *   `isOwnerJid` also matches loose JID forms (with/without domain, LID vs
+ *   phone number) because config.owners may list either.
+ *
+ * - **Auto-creation.** `getUser` creates and persists a default record on first
+ *   access, so callers never need to check existence before reading.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { IDatabase } from './Database.js';
 import { config } from '@/config/index.js';
 
+/** RPG character sheet stored per user. */
 export interface RPGStats {
   hp: number;
   maxHp: number;
@@ -19,6 +41,7 @@ export interface RPGStats {
   dodgeChance: number;
 }
 
+/** One stack in the user's inventory. */
 export interface InventoryItem {
   itemId: string;
   name: string;
@@ -36,6 +59,7 @@ export interface InventoryItem {
   expiresAt?: number;
 }
 
+/** A companion, with its own level, mood and needs. */
 export interface Pet {
   id: string;
   name: string;
@@ -47,6 +71,7 @@ export interface Pet {
   equipped: boolean;
 }
 
+/** Progress toward one quest objective. */
 export interface QuestProgress {
   questId: string;
   objective: string;
@@ -55,6 +80,7 @@ export interface QuestProgress {
   completed: boolean;
 }
 
+/** The full persisted user record. */
 export interface User {
   jid: string;
   name: string;
@@ -89,12 +115,22 @@ export interface User {
 
 export class UserService {
   private readonly COLLECTION = 'users';
+  /**
+   * Sentinel values owners are pinned to.
+   * Deliberately absurd amounts, so an owner balance is visually distinct in
+   * leaderboards and commands.
+   */
   private readonly OWNER_MONEY = 999999999;
   private readonly OWNER_LEVEL = 999;
   private readonly OWNER_XP = 999999;
 
   constructor(private db: IDatabase) {}
 
+  /**
+   * Owner check tolerant of JID form.
+   * Matches the full JID, the bare number, and LID-style identifiers, since
+   * config.owners may contain either form and WhatsApp may report the other.
+   */
   private isOwnerJid(jid: string): boolean {
     if (config.owners.includes(jid)) {
       return true;
@@ -113,6 +149,12 @@ export class UserService {
     return isOwner;
   }
 
+  /**
+   * Reads a user, creating a default record on first access.
+   *
+   * Ownership is the union of the configured owner list and the stored flag, so
+   * a JID added to the environment is recognised without a migration.
+   */
   async getUser(jid: string): Promise<User> {
     const existing = await this.db.get<User>(this.COLLECTION, jid);
 
@@ -233,6 +275,10 @@ export class UserService {
     });
   }
 
+  /**
+   * Adds XP and recomputes the level from the new total.
+   * Owners are pinned to the sentinel level/XP instead of progressing.
+   */
   async addXP(jid: string, amount: number): Promise<User> {
     const user = await this.getUser(jid);
 
@@ -255,6 +301,7 @@ export class UserService {
     return { ...user, xp: newXP, level: newLevel };
   }
 
+  /** Credits cash. Owners are pinned to OWNER_MONEY. */
   async addMoney(jid: string, amount: number): Promise<void> {
     const user = await this.getUser(jid);
 
@@ -270,6 +317,10 @@ export class UserService {
     });
   }
 
+  /**
+   * Debits cash.
+   * @returns False when the balance is insufficient; owners always succeed.
+   */
   async removeMoney(jid: string, amount: number): Promise<boolean> {
     const user = await this.getUser(jid);
 
@@ -291,6 +342,13 @@ export class UserService {
     return true;
   }
 
+  /**
+   * Moves cash between two users.
+   *
+   * Transfers involving an owner always succeed without debiting the owner. Note
+   * this is two independent writes rather than a transaction, so a failure
+   * between them can leave money deducted without a matching credit.
+   */
   async transferMoney(fromJid: string, toJid: string, amount: number): Promise<boolean> {
     const fromUser = await this.getUser(fromJid);
     const toUser = await this.getUser(toJid);
@@ -322,6 +380,7 @@ export class UserService {
     return true;
   }
 
+  /** Credits the bank balance. Owners are pinned to OWNER_MONEY. */
   async addBank(jid: string, amount: number): Promise<void> {
     const user = await this.getUser(jid);
 
@@ -576,10 +635,12 @@ export class UserService {
     return Math.floor(Math.sqrt(xp / 100)) + 1;
   }
 
+  /** XP needed to advance from `level` to the next: a quadratic curve. */
   getRequiredXPForNextLevel(level: number): number {
     return level ** 2 * 100;
   }
 
+  /** Grants or revokes owner status, delegating to the matching promotion path. */
   async setOwner(jid: string, isOwner: boolean): Promise<void> {
     if (isOwner) {
       await this.promoteToOwner(jid);
@@ -620,6 +681,10 @@ export class UserService {
     return true;
   }
 
+  /**
+   * Whether a daily reward is claimable (24h cooldown).
+   * Owners bypass every claim cooldown.
+   */
   canClaimDaily(user: User): boolean {
     if (user.isOwner) return true;
     if (!user.lastDaily) return true;
@@ -627,6 +692,7 @@ export class UserService {
     return Date.now() - user.lastDaily >= oneDayMs;
   }
 
+  /** Whether a weekly reward is claimable (7 day cooldown). Owners bypass it. */
   canClaimWeekly(user: User): boolean {
     if (user.isOwner) return true;
     if (!user.lastWeekly) return true;
@@ -634,6 +700,10 @@ export class UserService {
     return Date.now() - user.lastWeekly >= oneWeekMs;
   }
 
+  /**
+   * Whether a monthly reward is claimable.
+   * Uses a flat 30 days rather than a calendar month.
+   */
   canClaimMonthly(user: User): boolean {
     if (user.isOwner) return true;
     if (!user.lastMonthly) return true;
@@ -648,6 +718,7 @@ export class UserService {
     return Math.max(0, remaining);
   }
 
+  /** The sentinel balances/levels owners are pinned to. */
   getOwnerStats() {
     return {
       money: this.OWNER_MONEY,
@@ -683,6 +754,11 @@ export class UserService {
     });
   }
 
+  /**
+   * Fills in defaults for partial inventory entries.
+   * Used when hydrating stored data written by older versions that lack newer
+   * fields, so a missing property never produces undefined at runtime.
+   */
   normalizeInventory(inventory: Partial<InventoryItem>[]): InventoryItem[] {
     return inventory.map(item => ({
       itemId: item.itemId || '',
@@ -698,6 +774,7 @@ export class UserService {
     }));
   }
 
+  /** Baseline RPG stats for a newly created character. */
   getDefaultStats(): RPGStats {
     return {
       hp: 100,
@@ -726,6 +803,7 @@ export class UserService {
     return Math.max(0, weekInMs - elapsed);
   }
 
+  /** Records a weekly claim and its streak, starting the next cooldown. */
   async updateWeeklyClaim(jid: string, streak: number): Promise<void> {
     await this.db.update<User>(this.COLLECTION, jid, {
       lastWeekly: Date.now(),

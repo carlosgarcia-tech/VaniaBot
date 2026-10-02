@@ -1,3 +1,11 @@
+/**
+ * PythonBridge.ts
+ *
+ * VaniaBot services module exposing `ScannedPdfError`, `TooManyPagesError`, `PythonBridge`, `BridgeResult`.
+ *
+ * @author **Carlos G**
+ */
+
 import { spawn } from 'child_process';
 import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';

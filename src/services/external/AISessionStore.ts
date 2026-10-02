@@ -1,3 +1,11 @@
+/**
+ * AISessionStore.ts
+ *
+ * VaniaBot services module exposing `AISessionStore`.
+ *
+ * @author **Carlos G**
+ */
+
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { logError, logger } from '@/utils/logger.js';
 import type { ConversationSession } from './AITypes.js';

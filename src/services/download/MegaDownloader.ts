@@ -1,4 +1,12 @@
 /**
+ * MegaDownloader.ts
+ *
+ * VaniaBot services module exposing `MegaDownloader`, `MegaFileInfo`, `megaDownloader`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview MegaDownloader.ts - Download files from Mega.nz
  *
  * Downloads files from Mega.nz using the megajs package.

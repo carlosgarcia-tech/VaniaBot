@@ -1,3 +1,11 @@
+/**
+ * ConversionService.ts
+ *
+ * VaniaBot services module exposing `ConversionService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { ImageToPdfService } from './ImageToPdfService.js';
 import { PythonBridge } from './PythonBridge.js';
 import type { ConversionResult, ImageFormat } from './types.js';

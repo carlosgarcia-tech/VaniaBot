@@ -1,3 +1,11 @@
+/**
+ * FacebookDownloader.ts
+ *
+ * VaniaBot services module exposing `FacebookDownloader`, `FacebookVideo`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { Either } from '@/utils/either.js';
 import { left, right } from '@/utils/either.js';
 import { DownloadService, type DownloadResult } from './DownloadService.js';

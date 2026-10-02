@@ -1,3 +1,11 @@
+/**
+ * weapons.ts
+ *
+ * VaniaBot services module exposing `weapons`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { RPGItem } from '../ItemRegistry.js';
 
 export const weapons: RPGItem[] = [

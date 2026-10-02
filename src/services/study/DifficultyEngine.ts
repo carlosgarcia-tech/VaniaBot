@@ -1,4 +1,12 @@
 /**
+ * DifficultyEngine.ts
+ *
+ * VaniaBot services module exposing `DifficultyEngine`, `COIN_REWARDS`, `XP_REWARDS`, `STREAK_BONUS_COINS`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview Adaptive difficulty engine for the Quiz system.
  *
  * Calculates the appropriate difficulty for the next question

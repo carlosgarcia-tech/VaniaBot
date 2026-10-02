@@ -1,3 +1,11 @@
+/**
+ * DeliriusService.ts
+ *
+ * VaniaBot services module exposing `DeliriusService`, `deliriusService`.
+ *
+ * @author **Carlos G**
+ */
+
 type DeliriusCategory =
   'anime' | 'nsfw' | 'canvas' | 'download' | 'random' | 'reactions' | 'search' | 'ia';
 

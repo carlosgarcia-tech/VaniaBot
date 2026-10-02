@@ -1,3 +1,11 @@
+/**
+ * DownloadService.ts
+ *
+ * VaniaBot services module exposing `DownloadService`.
+ *
+ * @author **Carlos G**
+ */
+
 import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';

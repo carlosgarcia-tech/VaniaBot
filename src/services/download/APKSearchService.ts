@@ -1,4 +1,12 @@
 /**
+ * APKSearchService.ts
+ *
+ * VaniaBot services module exposing `APKSearchService`, `APKApp`, `APKSearchResponseInternal`, `apkSearchService`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview APKSearchService.ts - Search Android apps via dvyer-api
  *
  * Searches for Android applications using the dvyer-api service.

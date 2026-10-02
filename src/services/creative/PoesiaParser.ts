@@ -1,3 +1,11 @@
+/**
+ * PoesiaParser.ts
+ *
+ * VaniaBot services module exposing `ParsedArgs`, `parsePoesiaArgs`, `ESTILO_ALIASES`, `TEMA_ALIASES`.
+ *
+ * @author **Carlos G**
+ */
+
 import { ContenidoTipo, EstiloPoema, TemaPoema, type GenerarOpts } from './PoesiaTypes.js';
 
 export const ESTILO_ALIASES: Record<string, EstiloPoema> = {

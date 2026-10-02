@@ -1,3 +1,11 @@
+/**
+ * UserPermissionChecker.ts
+ *
+ * VaniaBot services module exposing `UserPermissionChecker`, `UserPermissions`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WASocket, GroupParticipant } from 'baileys';
 import { config } from '@/config/index.js';
 import { normalizeJid, extractPhone, isLidJid } from './JidService.js';

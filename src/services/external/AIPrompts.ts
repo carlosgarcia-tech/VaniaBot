@@ -1,3 +1,11 @@
+/**
+ * AIPrompts.ts
+ *
+ * VaniaBot services module exposing `getUserTier`, `getSystemPrompt`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WASocket } from 'baileys';
 import { primeService } from '@/services/system/PrimeService.js';
 import { UserTier } from './AITypes.js';

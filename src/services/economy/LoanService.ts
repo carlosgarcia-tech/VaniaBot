@@ -1,3 +1,11 @@
+/**
+ * LoanService.ts
+ *
+ * VaniaBot services module exposing `Loan`, `loanService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { serviceManager } from '../system/Servicemanager.js';
 import { gameStateService } from '../rpg/GameStateService.js';
 import { logger } from '@/utils/logger.js';

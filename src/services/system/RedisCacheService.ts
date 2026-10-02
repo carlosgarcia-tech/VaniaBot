@@ -1,9 +1,26 @@
+/**
+ * RedisCacheService.ts
+ *
+ * Shared cache with a transparent in-memory fallback.
+ *
+ * Every write goes to both Redis and the local map; reads prefer Redis and fall
+ * back to memory. That combination means the bot keeps working (degraded to
+ * single-instance) when Redis is unavailable or drops mid-run, without callers
+ * needing to handle a separate degraded mode — it is also what makes the
+ * PIN-verification and toggle services safe to use when Redis is not configured.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { createClient, type RedisClientType } from 'redis';
 import { logger } from '@/utils/logger.js';
 
 export interface CacheOptions {
   url?: string;
+  /** Default TTL in seconds. */
   ttl: number;
+  /** Namespacing prefix, so one Redis instance can host several bots. */
   prefix: string;
 }
 
@@ -24,6 +41,12 @@ export class RedisCacheService {
   private static instance: RedisCacheService;
   private client: RedisClientType | null = null;
   private options: CacheOptions;
+  /**
+   * Always-written local mirror of the cached data.
+   * Entries store a JSON string (not the raw value) so a fallback read and a
+   * Redis read return identically shaped data.
+   */
+  private memoryCache: Map<string, { value: string; expiry: number }> = new Map();
   private stats: CacheStats = {
     hits: 0,
     misses: 0,
@@ -33,7 +56,6 @@ export class RedisCacheService {
   };
   private isConnected = false;
   private useMemoryFallback = false;
-  private memoryCache: Map<string, { value: string; expiry: number }> = new Map();
 
   private constructor(options: Partial<CacheOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
@@ -46,6 +68,14 @@ export class RedisCacheService {
     return RedisCacheService.instance;
   }
 
+  /**
+   * Attempts a Redis connection.
+   *
+   * Never throws: on failure it enables the memory fallback and returns false, so
+   * a missing or unreachable Redis cannot prevent the bot from starting.
+   *
+   * @returns True when Redis is connected.
+   */
   async connect(url?: string): Promise<boolean> {
     try {
       const redisUrl = url || process.env.REDIS_URL || 'redis://localhost:6379';
@@ -81,6 +111,10 @@ export class RedisCacheService {
     }
   }
 
+  /**
+   * Switches to memory-only mode.
+   * Called on connection error, disconnect, and initial connection failure.
+   */
   private enableMemoryFallback(): void {
     this.useMemoryFallback = true;
     this.isConnected = false;
@@ -99,6 +133,10 @@ export class RedisCacheService {
     return `${this.options.prefix}${key}`;
   }
 
+  /**
+   * Reads a value: Redis first, then the memory mirror.
+   * @returns The deserialised value, or null when absent in both.
+   */
   async get<T>(key: string): Promise<T | null> {
     if (this.useMemoryFallback) {
       return this.memoryGet<T>(key);
@@ -128,6 +166,11 @@ export class RedisCacheService {
     }
   }
 
+  /**
+   * Writes a value to both tiers.
+   * @param ttl Lifetime in seconds.
+   * @returns True even when Redis rejects the write, since the memory copy stands.
+   */
   async set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
     const expiryTime = (ttl || this.options.ttl) * 1000;
 
@@ -155,6 +198,7 @@ export class RedisCacheService {
     }
   }
 
+  /** Removes a key from both tiers. */
   async delete(key: string): Promise<boolean> {
     this.memoryDelete(key);
 
@@ -176,6 +220,7 @@ export class RedisCacheService {
     }
   }
 
+  /** True when the key exists in either tier; the memory mirror is checked first. */
   async exists(key: string): Promise<boolean> {
     if (this.memoryExists(key)) {
       return true;
@@ -193,6 +238,11 @@ export class RedisCacheService {
     }
   }
 
+  /**
+   * Clears the cache.
+   * @param pattern Optional Redis glob; defaults to everything under the prefix.
+   * The memory mirror only drops expired entries.
+   */
   async clear(pattern?: string): Promise<void> {
     this.memoryClear();
 
@@ -210,6 +260,7 @@ export class RedisCacheService {
     }
   }
 
+  /** Memory-tier read; expired entries are deleted and reported as a miss. */
   private memoryGet<T>(key: string): T | null {
     const item = this.memoryCache.get(key);
     if (!item) {
@@ -227,6 +278,7 @@ export class RedisCacheService {
     return JSON.parse(item.value) as T;
   }
 
+  /** Memory-tier write. `ttl` is milliseconds, unlike the Redis API's seconds. */
   private memorySet<T>(key: string, value: T, ttl: number): void {
     const expiry = Date.now() + ttl;
     this.memoryCache.set(key, {
@@ -235,10 +287,12 @@ export class RedisCacheService {
     });
   }
 
+  /** Memory-tier delete. Note this one applies the key prefix, unlike its siblings. */
   private memoryDelete(key: string): void {
     this.memoryCache.delete(this.getKey(key));
   }
 
+  /** Memory-tier existence check; expired entries are deleted and report false. */
   private memoryExists(key: string): boolean {
     const item = this.memoryCache.get(key);
     if (!item) return false;
@@ -249,6 +303,7 @@ export class RedisCacheService {
     return true;
   }
 
+  /** Drops only expired memory entries; live data is kept as the fallback cache. */
   private memoryClear(): void {
     const now = Date.now();
     for (const [key, item] of this.memoryCache.entries()) {
@@ -258,6 +313,7 @@ export class RedisCacheService {
     }
   }
 
+  /** Hit/miss counters plus the current connection and fallback state. */
   getStats(): CacheStats & { hitRate: string; isConnected: boolean; useFallback: boolean } {
     const total = this.stats.hits + this.stats.misses;
     const hitRate = total > 0 ? ((this.stats.hits / total) * 100).toFixed(2) : '0.00';
@@ -270,6 +326,7 @@ export class RedisCacheService {
     };
   }
 
+  /** True when the cache is usable, whether via Redis or the memory fallback. */
   isReady(): boolean {
     return this.isConnected || this.useMemoryFallback;
   }

@@ -1,3 +1,11 @@
+/**
+ * AntiArabService.ts
+ *
+ * VaniaBot services module exposing `AntiArabService`, `AntiArabConfig`, `AntiArabStore`, `antiArabService`.
+ *
+ * @author **Carlos G**
+ */
+
 import path from 'path';
 import { JsonFileStore } from '@/utils/JsonFileStore.js';
 import { normalizeJid } from '../PermissionService.js';

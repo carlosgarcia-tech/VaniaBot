@@ -1,3 +1,11 @@
+/**
+ * GameStateService.ts
+ *
+ * VaniaBot services module exposing `PersistedMarketOffer`, `PersistedUserMissions`, `PersistedActiveCombat`, `PersistedLoan`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { IDatabase } from '../database/Database.js';
 import { logger, logError } from '@/utils/logger.js';
 

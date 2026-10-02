@@ -1,3 +1,11 @@
+/**
+ * ShopService.ts
+ *
+ * VaniaBot services module exposing `ShopService`, `ShopItem`, `shopService`.
+ *
+ * @author **Carlos G**
+ */
+
 export interface ShopItem {
   id: string;
   name: string;

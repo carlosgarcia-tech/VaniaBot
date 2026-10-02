@@ -1,3 +1,11 @@
+/**
+ * MediaCardService.ts
+ *
+ * VaniaBot services module exposing `MediaCardService`, `MediaCardOptions`.
+ *
+ * @author **Carlos G**
+ */
+
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { writeFileSync } from 'fs';
 import path from 'path';

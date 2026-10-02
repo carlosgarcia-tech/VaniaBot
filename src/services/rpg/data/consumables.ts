@@ -1,3 +1,11 @@
+/**
+ * consumables.ts
+ *
+ * VaniaBot services module exposing `consumables`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { RPGItem } from '../ItemRegistry.js';
 
 export const consumables: RPGItem[] = [

@@ -1,4 +1,12 @@
 /**
+ * CuevanaService.ts
+ *
+ * VaniaBot services module exposing `CuevanaService`, `CuevanaSearchResult`, `CuevanaSearchResponseInternal`, `CuevanaDetailInternal`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview CuevanaService.ts - Movie/Series search and download via dvyer-api
  *
  * Searches and downloads movies and series from Cuevana using the dvyer-api service.

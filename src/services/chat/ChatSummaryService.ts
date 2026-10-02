@@ -1,3 +1,11 @@
+/**
+ * ChatSummaryService.ts
+ *
+ * VaniaBot services module exposing `ChatSummaryService`, `ChatMessage`, `ChatSummaryStore`, `TopKeyword`.
+ *
+ * @author **Carlos G**
+ */
+
 import path from 'path';
 import { JsonFileStore } from '@/utils/JsonFileStore.js';
 

@@ -1,3 +1,11 @@
+/**
+ * EncryptedAuthState.ts
+ *
+ * VaniaBot services module (internal helpers).
+ *
+ * @author **Carlos G**
+ */
+
 import {
   useMultiFileAuthState,
   type AuthenticationState,

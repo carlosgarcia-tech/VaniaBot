@@ -1,3 +1,11 @@
+/**
+ * StickerService.ts
+ *
+ * VaniaBot services module exposing `StickerService`, `StickerOptions`.
+ *
+ * @author **Carlos G**
+ */
+
 import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { spawn } from 'child_process';

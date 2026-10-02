@@ -4,7 +4,7 @@
  * Manages subbot creation requests from external panels or services.
  * Handles pairing code generation and delivery via callbacks.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @created 2026-04-03
  * @module services/webhook/WebhookService

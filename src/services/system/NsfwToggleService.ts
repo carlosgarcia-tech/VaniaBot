@@ -1,6 +1,23 @@
+/**
+ * NsfwToggleService.ts
+ *
+ * Persistent NSFW gate state.
+ *
+ * Replaces the previous module-level `let nsfwEnabled = false` in
+ * NsfwToggleCommand, which reset on every bot restart. State is stored in
+ * the shared database under the `nsfw_toggle` collection:
+ *
+ * - key `global`    -> master switch for DMs and as default for groups.
+ * - key `<groupJid>` -> per-group override.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { IDatabase } from '../database/Database';
 import { normalizeJid } from '../PermissionService.js';
 
+/** One stored toggle state, scoped globally or to a single group. */
 export interface NsfwToggleRecord {
   key: string;
   /** 'global' or a group JID. */
@@ -25,14 +42,17 @@ export class NsfwToggleService {
   private readonly COLLECTION = 'nsfw_toggle';
   private readonly GLOBAL_KEY = 'global';
 
+  /** Injected by ServiceManager during startup. */
   setDatabase(db: IDatabase): void {
     this.db = db;
   }
 
+  /** Maps a chat to its storage key, normalising the JID first. */
   private makeKey(groupJid: string | null): string {
     return groupJid ? normalizeJid(groupJid) : this.GLOBAL_KEY;
   }
 
+  /** Reads the record for a scope, or null when absent (or before DB injection). */
   private async getRecord(groupJid: string | null): Promise<NsfwToggleRecord | null> {
     if (!this.db) return null;
     return this.db.get<NsfwToggleRecord>(this.COLLECTION, this.makeKey(groupJid));
@@ -51,6 +71,10 @@ export class NsfwToggleService {
     return globalRecord?.enabled ?? false;
   }
 
+  /**
+   * Writes a toggle state for the global scope or one group, flushing immediately
+   * so the change survives an immediate restart.
+   */
   async setEnabled(
     enabled: boolean,
     changedBy: string,

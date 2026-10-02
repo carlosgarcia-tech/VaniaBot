@@ -1,3 +1,11 @@
+/**
+ * QuestService.ts
+ *
+ * VaniaBot services module exposing `QuestService`, `Quest`, `QuestObjective`, `QuestReward`.
+ *
+ * @author **Carlos G**
+ */
+
 export interface Quest {
   id: string;
   name: string;

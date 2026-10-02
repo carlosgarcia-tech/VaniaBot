@@ -1,3 +1,11 @@
+/**
+ * PermissionService.ts
+ *
+ * VaniaBot services module exposing `GroupMetadataLike`, `PermissionService`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WASocket, GroupParticipant } from 'baileys';
 import {
   normalizeJid,

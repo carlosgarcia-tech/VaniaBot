@@ -1,3 +1,11 @@
+/**
+ * materials.ts
+ *
+ * VaniaBot services module exposing `materials`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { RPGItem } from '../ItemRegistry.js';
 
 export const materials: RPGItem[] = [

@@ -1,4 +1,12 @@
 /**
+ * MediafireDownloader.ts
+ *
+ * VaniaBot services module exposing `MediafireDownloader`, `MediafireInfo`, `mediafireDownloader`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview MediafireDownloader.ts - Download files from Mediafire
  *
  * Downloads files from Mediafire using manual HTML parsing.

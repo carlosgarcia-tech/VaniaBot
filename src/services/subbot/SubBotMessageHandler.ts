@@ -1,3 +1,11 @@
+/**
+ * SubBotMessageHandler.ts
+ *
+ * VaniaBot services module exposing `SubBotMessageHandler`, `MiddlewareConfig`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WAMessage, WASocket } from 'baileys';
 import type { SubBotConfig } from '@/types/subbot.js';
 import { commandRegistry } from '@/core/CommandRegistry.js';

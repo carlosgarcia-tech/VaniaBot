@@ -11,7 +11,7 @@
  * - Profile auto-apply
  * - Robust health check with auto-reconnect
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

@@ -1,3 +1,11 @@
+/**
+ * PoesiaTypes.ts
+ *
+ * VaniaBot services module exposing `ContenidoEntry`, `GenerarOpts`, `GenerarSuccess`, `VotoResult`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { Either } from '@/utils/either.js';
 
 export enum ContenidoTipo {

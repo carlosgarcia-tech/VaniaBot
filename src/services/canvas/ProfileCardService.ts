@@ -1,3 +1,11 @@
+/**
+ * ProfileCardService.ts
+ *
+ * VaniaBot services module exposing `ProfileCardService`, `ProfileCardOptions`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { Canvas, CanvasRenderingContext2D } from 'canvas';
 import { createCanvas, loadImage } from 'canvas';
 

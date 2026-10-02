@@ -1,3 +1,11 @@
+/**
+ * PoesiaService.ts
+ *
+ * VaniaBot services module exposing `PoesiaService`, `TIPO_EMOJI`, `TIPO_LABEL`, `poesiaService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { randomUUID } from 'crypto';
 import { aiService } from '@/services/external/AIService.js';
 import { isRight, left, right } from '@/utils/either.js';

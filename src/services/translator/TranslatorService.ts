@@ -1,3 +1,11 @@
+/**
+ * TranslatorService.ts
+ *
+ * VaniaBot services module exposing `translatorService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { isLeft, left, right } from '@/utils/either.js';
 import { aiService } from '@/services/external/AIService.js';
 import { ValidationError, NetworkError } from '@/utils/errors.js';

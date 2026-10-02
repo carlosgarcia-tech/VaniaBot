@@ -1,8 +1,27 @@
+/**
+ * PersistenceService.ts
+ *
+ * Durable state for timers-driven features: reminders, polls and listas
+ * (roster games).
+ *
+ * All three are kept in memory for fast reads and mirrored to the database so
+ * they survive a restart. On startup only still-relevant entries are loaded —
+ * expired reminders and closed/expired polls are dropped rather than
+ * rescheduled, and listas must still be inside their TTL.
+ *
+ * The socket is injected separately from the database because it only exists
+ * after authentication; reminders are rescheduled once it is set.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { WASocket } from 'baileys';
 import type { Database } from '../database/Database.js';
 import { randomUUID } from 'crypto';
 import { logger, logError } from '@/utils/logger.js';
 
+/** A scheduled one-shot message. */
 export interface Reminder {
   id: string;
   userJid: string;
@@ -12,11 +31,13 @@ export interface Reminder {
   createdAt: number;
 }
 
+/** One choice and the JIDs that voted for it. */
 export interface PollOption {
   label: string;
   votes: string[];
 }
 
+/** A group poll; keyed by chat, so at most one is active per chat. */
 export interface Poll {
   id: string;
   chatJid: string;
@@ -29,6 +50,11 @@ export interface Poll {
   closed: boolean;
 }
 
+/**
+ * Persisted list game (squads, substitutes, capacity).
+ * Field names are the domain's own Spanish, kept for compatibility with
+ * existing stored records.
+ */
 export interface ListaPersistida {
   tipo: string;
   chatJid: string;
@@ -48,6 +74,7 @@ export interface ListaPersistida {
 export class PersistenceService {
   private static instance: PersistenceService;
   private reminders = new Map<string, Reminder>();
+  /** Pending timeout per reminder, cleared on removal so it cannot fire twice. */
   private reminderTimers = new Map<string, NodeJS.Timeout>();
   private polls = new Map<string, Poll>();
   private pollTimers = new Map<string, NodeJS.Timeout>();
@@ -57,6 +84,7 @@ export class PersistenceService {
   private initialized = false;
   private cleanupTimer: NodeJS.Timeout | null = null;
 
+  /** Cap on stored reminders; the soonest-to-fire are evicted first. */
   private readonly MAX_TOTAL_REMINDERS = 1000;
   private readonly DB_REMINDERS_KEY = 'system:reminders';
   private readonly DB_POLLS_KEY = 'system:polls';
@@ -69,14 +97,24 @@ export class PersistenceService {
     return PersistenceService.instance;
   }
 
+  /**
+   * Injects the live socket so pending timers can actually send.
+   * Called once the connection opens; without it timers still expire but the
+   * message is dropped.
+   */
   setSocket(sock: WASocket): void {
     this.sock = sock;
   }
 
+  /** Injects the database used for mirroring state. */
   setDatabase(db: Database): void {
     this.db = db;
   }
 
+  /**
+   * Loads persisted state and starts the hourly sweep.
+   * Idempotent: subsequent calls are ignored so a reconnect cannot double-schedule.
+   */
   async initialize(): Promise<void> {
     if (this.initialized) return;
     this.initialized = true;
@@ -144,6 +182,7 @@ export class PersistenceService {
     }
   }
 
+  /** Lista lifetime in milliseconds, overridable via LISTA_TTL_HOURS. */
   private getListaTTL(): number {
     const envTTL = parseInt(process.env.LISTA_TTL_HOURS || '12', 10);
     return envTTL * 60 * 60 * 1000;
@@ -158,8 +197,8 @@ export class PersistenceService {
     try {
       await this.db.set(this.DB_REMINDERS_KEY, 'data', data);
     } catch (error) {
-      // La mayoría de los call sites son fire-and-forget (`void`): capturar
-      // aquí evita unhandled rejections y deja rastro del fallo de disco.
+      // Most call sites are fire-and-forget (`void`): catching here
+      // avoids unhandled rejections and records disk failures.
       logError('PersistenceService.saveReminders', error);
     }
   }
@@ -187,6 +226,9 @@ export class PersistenceService {
     await this.persistListas();
   }
 
+  /**
+   * Fetches a live lista, dropping and returning undefined when past its TTL.
+   */
   getLista(messageId: string): ListaPersistida | undefined {
     const lista = this.listas.get(messageId);
     if (!lista) return undefined;
@@ -198,6 +240,7 @@ export class PersistenceService {
     return lista;
   }
 
+  /** Snapshot of every stored lista, expired ones included. */
   getAllListas(): ListaPersistida[] {
     return [...this.listas.values()];
   }
@@ -224,6 +267,14 @@ export class PersistenceService {
     }
   }
 
+  /**
+   * Hourly sweep.
+   *
+   * Drops fired/expired reminders and polls (clearing their timers), trims
+   * reminders over MAX_TOTAL_REMINDERS by dropping the soonest-to-fire first,
+   * then persists both collections. The timer is unref'd so it never keeps the
+   * process alive.
+   */
   private startCleanup(): void {
     if (this.cleanupTimer) return;
     this.cleanupTimer = setInterval(
@@ -294,6 +345,13 @@ export class PersistenceService {
     this.pollTimers.clear();
   }
 
+  /**
+   * Arms a reminder timer.
+   *
+   * On fire it sends the message, then removes the reminder and persists. A send
+   * failure is logged but still removes the entry, so one unreachable chat does
+   * not leave a permanently failing timer behind.
+   */
   private scheduleReminder(reminder: Reminder): void {
     const delay = reminder.triggerAt - Date.now();
     if (delay <= 0) return;
@@ -313,8 +371,8 @@ export class PersistenceService {
             });
           }
         } catch (error) {
-          // El recordatorio se pierde si el envío falla, pero debe quedar
-          // registro: sin esto era un fallo 100% silencioso.
+          // The reminder is lost if the send fails, but it must be
+          // logged: without this the failure was completely silent.
           logError(`PersistenceService.sendReminder ${reminder.id}`, error);
         }
         this.reminders.delete(reminder.id);
@@ -350,10 +408,16 @@ export class PersistenceService {
     void this.saveReminders();
   }
 
+  /** Short, human-quotable identifier: the first segment of a UUID, uppercased. */
   generateId(): string {
     return randomUUID().split('-')[0].toUpperCase();
   }
 
+  /**
+   * Fetches the active poll for a chat.
+   * A poll past `endsAt` is marked closed and persisted here, so expiry does not
+   * depend on its timer having fired.
+   */
   getPoll(chatJid: string): Poll | undefined {
     const poll = this.polls.get(chatJid);
     if (!poll) return undefined;
@@ -364,6 +428,10 @@ export class PersistenceService {
     return poll;
   }
 
+  /**
+   * Stores a poll and, when it has an end time in the future, arms the timer that
+   * closes it.
+   */
   addPoll(chatJid: string, poll: Poll): void {
     this.polls.set(chatJid, poll);
     void this.savePolls();
@@ -383,11 +451,13 @@ export class PersistenceService {
     }
   }
 
+  /** Replaces a poll, e.g. after a vote is recorded. */
   updatePoll(chatJid: string, poll: Poll): void {
     this.polls.set(chatJid, poll);
     void this.savePolls();
   }
 
+  /** Removes a poll and cancels any pending close timer. */
   removePoll(chatJid: string): void {
     const timer = this.pollTimers.get(chatJid);
     if (timer) {
@@ -398,6 +468,7 @@ export class PersistenceService {
     void this.savePolls();
   }
 
+  /** Snapshot of every stored poll. */
   getAllPolls(): Poll[] {
     return [...this.polls.values()];
   }

@@ -1,3 +1,11 @@
+/**
+ * AnswerValidator.ts
+ *
+ * VaniaBot services module exposing `AnswerValidator`, `answerValidator`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { AnswerValidation, QuizQuestion } from './QuizTypes.js';
 
 export class AnswerValidator {

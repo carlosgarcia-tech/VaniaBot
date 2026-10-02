@@ -1,4 +1,12 @@
 /**
+ * PinterestDownloader.ts
+ *
+ * VaniaBot services module exposing `PinterestDownloader`, `PinterestMedia`, `pinterestDownloader`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview PinterestDownloader.ts - Download from Pinterest
  *
  * Downloads images and videos from Pinterest.

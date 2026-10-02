@@ -1,3 +1,11 @@
+/**
+ * PoesiaPrompts.ts
+ *
+ * VaniaBot services module exposing `buildPoemaPrompt`, `buildFrasePrompt`, `buildPiropopPrompt`, `buildDedicatoriaPrompt`.
+ *
+ * @author **Carlos G**
+ */
+
 import { ContenidoTipo, EstiloPoema, type GenerarOpts } from './PoesiaTypes.js';
 
 const PERSONALIDAD_BASE = `Eres un poeta y escritor creativo de VaniaBot.

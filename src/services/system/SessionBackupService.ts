@@ -1,3 +1,17 @@
+/**
+ * SessionBackupService.ts
+ *
+ * Periodic, rotating backups of the WhatsApp session directory.
+ *
+ * The session files are what stop the bot from needing a new QR/pairing code
+ * after every restart, so a corrupted session is a serious incident. Backups
+ * are taken on an interval, capped at `maxBackups`, and each snapshot records a
+ * `backup_metadata.json` describing what it contains.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import {
   existsSync,
   mkdirSync,
@@ -14,11 +28,13 @@ import { logger } from '@/utils/logger.js';
 export interface BackupOptions {
   enabled: boolean;
   intervalMinutes: number;
+  /** Number of snapshots retained; older ones are deleted after each backup. */
   maxBackups: number;
   backupPath: string;
   compressBackups: boolean;
 }
 
+/** One snapshot on disk. */
 export interface BackupInfo {
   timestamp: number;
   path: string;
@@ -55,6 +71,11 @@ export class SessionBackupService {
     return SessionBackupService.instance;
   }
 
+  /**
+   * Takes an immediate backup and starts the interval timer.
+   * No-ops when disabled, already running, or when the session directory is
+   * missing (the bot may simply not be authenticated yet).
+   */
   async start(): Promise<void> {
     if (!this.options.enabled) {
       logger.info('Session backup service is disabled');
@@ -104,6 +125,11 @@ export class SessionBackupService {
     logger.info('Session backup service stopped');
   }
 
+  /**
+   * Copies the session files into a timestamped directory, writes metadata,
+   * then prunes old snapshots.
+   * @returns Snapshot info, or null on failure.
+   */
   async performBackup(): Promise<BackupInfo | null> {
     try {
       if (!existsSync(this.sessionDir)) {
@@ -165,6 +191,7 @@ export class SessionBackupService {
     }
   }
 
+  /** Lists the files worth backing up (credentials and the pre-key/session/app-state files). */
   private getSessionFiles(): string[] {
     const files: string[] = [];
 
@@ -191,6 +218,11 @@ export class SessionBackupService {
     return files;
   }
 
+  /**
+   * Deletes snapshots beyond `maxBackups`, newest kept.
+   * Each deletion is individually guarded so one undeletable directory does not
+   * stop the rest from being pruned.
+   */
   private cleanOldBackups(): void {
     try {
       if (!existsSync(this.options.backupPath)) {
@@ -222,6 +254,7 @@ export class SessionBackupService {
     }
   }
 
+  /** Recursive size of a directory in bytes. */
   private getDirectorySize(dirPath: string): number {
     let size = 0;
 
@@ -243,6 +276,15 @@ export class SessionBackupService {
     return size;
   }
 
+  /**
+   * Restores a snapshot into the live session directory.
+   * Defaults to the most recent backup; an unknown name falls back to it too.
+   *
+   * Files are copied over the existing session rather than replacing the
+   * directory wholesale, so a partial restore does not destroy current state.
+   *
+   * @returns True on success.
+   */
   async restoreBackup(backupName?: string): Promise<boolean> {
     try {
       if (!existsSync(this.options.backupPath)) {
@@ -311,6 +353,7 @@ export class SessionBackupService {
     }
   }
 
+  /** Recursively copies a directory, creating subdirectories as needed. */
   private copyDirectory(src: string, dest: string): void {
     const files = readdirSync(src);
     for (const file of files) {
@@ -325,6 +368,11 @@ export class SessionBackupService {
     }
   }
 
+  /**
+   * Lists available snapshots, newest first.
+   * A snapshot missing its metadata falls back to directory mtime for the
+   * timestamp and reports no file list.
+   */
   listBackups(): BackupInfo[] {
     const backups: BackupInfo[] = [];
 
@@ -360,10 +408,12 @@ export class SessionBackupService {
     return backups.sort((a, b) => b.timestamp - a.timestamp);
   }
 
+  /** Timestamp of the last successful backup, or null if none yet. */
   getLastBackupTime(): number | null {
     return this.lastBackupTime;
   }
 
+  /** True while the backup interval is running. */
   isActive(): boolean {
     return this.isRunning;
   }

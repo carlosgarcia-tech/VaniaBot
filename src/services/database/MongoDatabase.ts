@@ -1,3 +1,11 @@
+/**
+ * MongoDatabase.ts
+ *
+ * VaniaBot services module exposing `MongoDatabase`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { Db, Collection, Filter, Document } from 'mongodb';
 import { MongoClient, ObjectId } from 'mongodb';
 import { Database } from './Database.js';

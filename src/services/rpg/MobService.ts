@@ -1,3 +1,11 @@
+/**
+ * MobService.ts
+ *
+ * VaniaBot services module exposing `MobService`, `Mob`, `mobService`.
+ *
+ * @author **Carlos G**
+ */
+
 export interface Mob {
   id: string;
   name: string;

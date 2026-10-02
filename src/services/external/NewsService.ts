@@ -1,3 +1,11 @@
+/**
+ * NewsService.ts
+ *
+ * VaniaBot services module exposing `NewsService`, `newsService`.
+ *
+ * @author **Carlos G**
+ */
+
 import axios from 'axios';
 import { logError } from '@/utils/logger.js';
 import { env } from '@/config/env.js';

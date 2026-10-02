@@ -1,10 +1,30 @@
+/**
+ * UnifiedCacheService.ts
+ *
+ * Two-tier cache facade: an in-process LRU in front of Redis.
+ *
+ * Reads hit memory first and only fall through to Redis on a miss; writes go to
+ * both tiers. That keeps the hot path free of network round-trips while still
+ * sharing state across processes (main bot and sub-bots, or multiple
+ * instances).
+ *
+ * Every Redis call is individually wrapped: if Redis fails while believed to be
+ * ready, the failure is logged and the operation degrades to memory-only rather
+ * than throwing into the caller.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { redisCache, type CacheStats } from './RedisCacheService.js';
 import { createCache, type LruMemoryCache } from './MemoryCacheService.js';
 import { logger } from '@/utils/logger.js';
 
 export interface UnifiedCacheOptions {
+  /** Set false to stay memory-only. */
   useRedis: boolean;
   redisUrl?: string;
+  /** Default TTL in seconds (converted to ms for the memory tier). */
   ttl: number;
   prefix: string;
 }
@@ -18,6 +38,7 @@ const DEFAULT_OPTIONS: UnifiedCacheOptions = {
 export class UnifiedCacheService {
   private static instance: UnifiedCacheService;
   private options: UnifiedCacheOptions;
+  /** Latched at initialize(); a later Redis outage does not clear it. */
   private redisReady = false;
   private memoryCache: LruMemoryCache<unknown>;
 
@@ -37,6 +58,10 @@ export class UnifiedCacheService {
     return UnifiedCacheService.instance;
   }
 
+  /**
+   * Connects Redis when enabled.
+   * Never throws: on failure the service stays usable in memory-only mode.
+   */
   async initialize(): Promise<void> {
     if (this.options.useRedis) {
       try {
@@ -55,6 +80,10 @@ export class UnifiedCacheService {
     return `${this.options.prefix}${key}`;
   }
 
+  /**
+   * Reads a value: memory first, then Redis.
+   * @returns The value, or null when absent in both tiers.
+   */
   async get<T>(key: string): Promise<T | null> {
     const fullKey = this.getKey(key);
 
@@ -74,6 +103,7 @@ export class UnifiedCacheService {
     return this.memoryCache.get(fullKey) as T | null;
   }
 
+  /** Writes to both tiers. @param ttl Lifetime in seconds. */
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     const fullKey = this.getKey(key);
 
@@ -88,6 +118,7 @@ export class UnifiedCacheService {
     }
   }
 
+  /** Removes a key from both tiers. */
   async delete(key: string): Promise<void> {
     const fullKey = this.getKey(key);
 
@@ -102,6 +133,7 @@ export class UnifiedCacheService {
     }
   }
 
+  /** True when the key is present in either tier; memory is checked first. */
   async exists(key: string): Promise<boolean> {
     const fullKey = this.getKey(key);
 
@@ -120,6 +152,11 @@ export class UnifiedCacheService {
     return false;
   }
 
+  /**
+   * Clears the cache.
+   * The memory tier is always emptied in full; a Redis pattern only narrows the
+   * remote side.
+   */
   async clear(pattern?: string): Promise<void> {
     const fullPattern = pattern ? this.getKey(pattern) : undefined;
 
@@ -138,6 +175,7 @@ export class UnifiedCacheService {
     return this.memoryCache.getStats();
   }
 
+  /** Redis stats, or null when Redis is not in use. */
   getRedisStats(): CacheStats | null {
     if (!this.redisReady) return null;
     return redisCache.getStats();

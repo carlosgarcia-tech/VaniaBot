@@ -1,3 +1,11 @@
+/**
+ * ListaManager.ts
+ *
+ * VaniaBot services module exposing `ListaManager`, `listaManager`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WASocket, AnyMessageContent } from 'baileys';
 import { logger, logError } from '@/utils/logger.js';
 import { persistenceService } from '@/services/system/PersistenceService.js';

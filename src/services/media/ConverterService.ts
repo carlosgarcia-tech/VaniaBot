@@ -1,3 +1,11 @@
+/**
+ * ConverterService.ts
+ *
+ * VaniaBot services module exposing `ConverterService`, `normalizeFormat`, `getFormatMime`, `getFormatExt`.
+ *
+ * @author **Carlos G**
+ */
+
 import { Jimp } from 'jimp';
 import { exec, spawn } from 'child_process';
 import { promisify } from 'util';

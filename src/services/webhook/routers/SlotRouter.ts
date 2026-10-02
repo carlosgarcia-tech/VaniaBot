@@ -1,3 +1,11 @@
+/**
+ * SlotRouter.ts
+ *
+ * VaniaBot services module exposing `createSlotRouter`.
+ *
+ * @author **Carlos G**
+ */
+
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { subBotDatabase } from '@/services/subbot/SubBotDatabase.js';

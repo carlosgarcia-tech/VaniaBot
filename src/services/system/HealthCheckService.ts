@@ -1,3 +1,21 @@
+/**
+ * HealthCheckService.ts
+ *
+ * Liveness diagnostics for the bot, exposed through the dashboard and panel.
+ *
+ * Two services live here:
+ * - HealthCheckService runs independent probes (database, session, temp storage,
+ *   circuit breakers, memory, AI configuration) in parallel and aggregates them.
+ * - AutoRestartService watches the same metrics and asks for a restart when the
+ *   process is genuinely unhealthy.
+ *
+ * Probes never throw: each returns a pass/warn/fail record, so one broken check
+ * cannot hide the others.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { circuitBreakerManager } from './CircuitBreakerService.js';
 import { serviceManager } from './Servicemanager.js';
 import { existsSync, statSync } from 'fs';
@@ -5,6 +23,7 @@ import { join } from 'path';
 import { totalmem } from 'os';
 import { logger, logError } from '@/utils/logger.js';
 
+/** Aggregate verdict: healthy only when no probe failed. */
 export interface HealthCheckResult {
   healthy: boolean;
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -20,6 +39,7 @@ export interface HealthCheckResult {
   alerts: HealthAlert[];
 }
 
+/** One probe result. */
 export interface HealthCheck {
   name: string;
   status: 'pass' | 'warn' | 'fail';
@@ -28,6 +48,7 @@ export interface HealthCheck {
   details?: Record<string, unknown>;
 }
 
+/** Derived alert, created from failing/warning probes and metric thresholds. */
 export interface HealthAlert {
   severity: 'info' | 'warning' | 'critical';
   source: string;
@@ -40,11 +61,11 @@ export interface SystemMetrics {
     used: number;
     total: number;
     percentage: number;
-    /** rss del proceso en bytes */
+    /** Process RSS in bytes. */
     rss: number;
-    /** RAM total del sistema en bytes */
+    /** Total system RAM in bytes. */
     systemTotal: number;
-    /** % de RAM del sistema consumida por este proceso */
+    /** % of total system RAM consumed by this process. */
     systemPercentage: number;
   };
   cpu: {
@@ -68,9 +89,9 @@ export interface SystemMetrics {
 
 const START_TIME = Date.now();
 
-/** % de RAM del sistema a partir del cual el health check degrada. */
+/** System RAM percentage above which the health check degrades. */
 export const MEM_WARN_PCT = 40;
-/** % de RAM del sistema a partir del cual el health check falla. */
+/** System RAM percentage above which the health check fails. */
 export const MEM_CRITICAL_PCT = 60;
 
 export class HealthCheckService {
@@ -85,6 +106,12 @@ export class HealthCheckService {
     return HealthCheckService.instance;
   }
 
+  /**
+   * Runs every probe concurrently and aggregates the verdict.
+   *
+   * A warning yields `degraded` rather than `unhealthy`: only a failed probe
+   * makes the whole service unhealthy.
+   */
   async performHealthCheck(): Promise<HealthCheckResult> {
     const checkPromises: Promise<HealthCheck>[] = [
       this.checkDatabase(),
@@ -120,6 +147,11 @@ export class HealthCheckService {
     };
   }
 
+  /**
+   * Turns probe results and raw metrics into alerts.
+   * Also logs each alert, so a failing health check is visible without opening
+   * the dashboard.
+   */
   private generateAlerts(checks: HealthCheck[], metrics: SystemMetrics): HealthAlert[] {
     const alerts: HealthAlert[] = [];
     const timestamp = new Date().toISOString();
@@ -165,6 +197,7 @@ export class HealthCheckService {
     return alerts;
   }
 
+  /** Database reachability. Failing here makes the bot `unhealthy`. */
   private async checkDatabase(): Promise<HealthCheck> {
     const start = Date.now();
     try {
@@ -196,6 +229,11 @@ export class HealthCheckService {
     }
   }
 
+  /**
+   * Checks that the credentials file exists and is recent.
+   * A missing session is a failure (re-authentication needed); an old one is
+   * only a warning, since long-lived sessions are normal.
+   */
   private checkSession(): HealthCheck {
     const start = Date.now();
     try {
@@ -240,6 +278,7 @@ export class HealthCheckService {
     }
   }
 
+  /** Temp directory accessibility. Absent is only a warning until something writes. */
   private checkTempStorage(): HealthCheck {
     const start = Date.now();
     try {
@@ -268,6 +307,10 @@ export class HealthCheckService {
     }
   }
 
+  /**
+   * Reports on circuit breakers; any OPEN circuit is a warning naming the
+   * affected dependencies, so an external outage is diagnosable at a glance.
+   */
   private checkCircuitBreakers(): HealthCheck {
     const start = Date.now();
     try {
@@ -311,10 +354,12 @@ export class HealthCheckService {
   }
 
   /**
-   * Mide la RAM real del proceso (rss) contra la RAM total del sistema.
+   * Measures real process memory (RSS) against total system RAM.
    *
-   * NO usa heapUsed/heapTotal porque V8 mantiene su heap casi lleno por diseño
-   * (85-95% es completamente normal) y genera falsos positivos constantemente.
+   * Deliberately does NOT use heapUsed/heapTotal: V8 keeps its heap nearly full
+   * by design (85-95% is perfectly normal), which would produce constant false
+   * positives. Heap figures are still reported in `details` for diagnostics but
+   * never drive the verdict.
    */
   private checkMemory(): HealthCheck {
     const start = Date.now();
@@ -366,6 +411,11 @@ export class HealthCheckService {
     };
   }
 
+  /**
+   * Reports whether the AI feature is configured.
+   * env is imported lazily so this module does not pull the whole config chain
+   * into the health path.
+   */
   private async checkAIService(): Promise<HealthCheck> {
     const start = Date.now();
     try {
@@ -394,6 +444,11 @@ export class HealthCheckService {
     }
   }
 
+  /**
+   * Snapshot of memory, CPU and process metrics, plus message statistics when the
+   * global client is available. A failure reading the client stats is logged and
+   * omitted rather than failing the whole snapshot.
+   */
   getSystemMetrics(): SystemMetrics {
     const memUsage = process.memoryUsage();
     const systemTot = totalmem();
@@ -439,6 +494,7 @@ export class HealthCheckService {
     return metrics;
   }
 
+  /** Full status bundle for the dashboard: health, metrics and circuits. */
   async getDetailedStatus(): Promise<{
     health: HealthCheckResult;
     metrics: SystemMetrics;
@@ -458,7 +514,7 @@ export interface AutoRestartConfig {
   checkIntervalMs: number;
   restartThreshold: {
     consecutiveFailures: number;
-    /** % de RAM del SISTEMA (rss/totalmem), no del heap de V8 */
+    /** % of SYSTEM RAM (rss/totalmem), not of the V8 heap. */
     memoryPercentage: number;
     errorRate: number;
   };
@@ -478,6 +534,7 @@ export class AutoRestartService {
   private static instance: AutoRestartService;
   private config: AutoRestartConfig;
   private consecutiveFailures = 0;
+  /** Errors and checks are only compared in windows of 10 (see checkAndRestart). */
   private errorCount = 0;
   private checkCount = 0;
   private restartTimer: ReturnType<typeof setInterval> | null = null;
@@ -527,6 +584,16 @@ export class AutoRestartService {
     this.errorCount++;
   }
 
+  /**
+   * Decides whether a restart is warranted.
+   *
+   * Triggers on critical system RAM, too many consecutive failures, or a high
+   * error rate over a 10-check window. The last trigger wins, so `reason` always
+   * reflects the most recent condition that fired.
+   *
+   * A restart is only advisory: without a callback the service logs and leaves
+   * the bot running, since the in-process restart is disabled.
+   */
   private async checkAndRestart(): Promise<void> {
     this.checkCount++;
     const metrics = healthCheckService.getSystemMetrics();

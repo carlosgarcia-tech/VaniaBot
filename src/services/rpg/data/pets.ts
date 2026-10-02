@@ -1,3 +1,11 @@
+/**
+ * pets.ts
+ *
+ * VaniaBot services module exposing `pets`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { RPGItem } from '../ItemRegistry.js';
 
 export const pets: RPGItem[] = [

@@ -1,3 +1,11 @@
+/**
+ * BlackMarketService.ts
+ *
+ * VaniaBot services module exposing `BlackMarketListing`, `blackMarketService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { serviceManager } from '../system/Servicemanager.js';
 import { itemRegistry } from '../rpg/ItemRegistry.js';
 

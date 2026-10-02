@@ -1,13 +1,40 @@
+/**
+ * MemoryCacheService.ts
+ *
+ * Generic in-process LRU+TTL cache.
+ *
+ * Distinct from core/CacheManager (WhatsApp permissions and group metadata) and
+ * system/UnifiedCacheService (Redis or in-memory tiering): this is the small,
+ * dependency-free building block used wherever a local cache with an explicit
+ * TTL is enough.
+ *
+ * Expiry is lazy — checked on read — plus a periodic sweep that also enforces
+ * the size bound, so abandoned entries cannot leak.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
+import { logError } from '@/utils/logger.js';
+
+/** One stored value plus its expiry and access metadata. */
 export interface CacheEntry<T> {
   value: T;
+  /** Absolute expiry timestamp in epoch milliseconds. */
   expiry: number;
+  /** Access count, used for eviction ordering. */
   hits: number;
+  /** Last read/write timestamp, used for LRU eviction. */
   lastAccessed: number;
 }
 
+/** Size bound, default TTL and sweep interval. */
 export interface MemoryCacheOptions {
+  /** Maximum entries before the least recently used is evicted. */
   maxSize: number;
+  /** Default entry lifetime in milliseconds. */
   ttl: number;
+  /** How often expired entries are swept. */
   cleanupInterval: number;
 }
 
@@ -17,9 +44,8 @@ const DEFAULT_OPTIONS: MemoryCacheOptions = {
   cleanupInterval: 60000,
 };
 
-import { logError } from '@/utils/logger.js';
-
 export class LruMemoryCache<T> {
+  /** Insertion order is not access order: get() re-inserts to refresh recency. */
   private cache: Map<string, CacheEntry<T>> = new Map();
   private options: MemoryCacheOptions;
   private cleanupTimer: NodeJS.Timeout | null = null;
@@ -36,6 +62,10 @@ export class LruMemoryCache<T> {
     this.startCleanup();
   }
 
+  /**
+   * Stores a value, evicting the least recently used entry when full.
+   * @param ttl Optional per-entry lifetime override, in milliseconds.
+   */
   set(key: string, value: T, ttl?: number): void {
     const expiry = Date.now() + (ttl || this.options.ttl);
 
@@ -57,6 +87,13 @@ export class LruMemoryCache<T> {
     this.stats.sets++;
   }
 
+  /**
+   * Reads a value, treating expired entries as absent (and deleting them).
+   * A hit refreshes recency by re-inserting, which is what makes the eviction
+   * order least-recently-used rather than first-in-first-out.
+   *
+   * @returns The value, or null when missing or expired.
+   */
   get(key: string): T | null {
     const entry = this.cache.get(key);
 
@@ -101,6 +138,7 @@ export class LruMemoryCache<T> {
     this.cache.clear();
   }
 
+  /** Evicts the entry with the oldest `lastAccessed` timestamp. */
   private evictOldest(): void {
     let oldestKey: string | null = null;
     let oldestTime = Date.now();
@@ -118,6 +156,11 @@ export class LruMemoryCache<T> {
     }
   }
 
+  /**
+   * Starts the periodic sweep. The timer is unref'd so it never keeps the process
+   * alive on its own, and cleanup failures are logged rather than thrown: a bad
+   * sweep must not crash the process.
+   */
   private startCleanup(): void {
     this.cleanupTimer = setInterval(() => {
       try {
@@ -130,6 +173,7 @@ export class LruMemoryCache<T> {
     this.cleanupTimer.unref();
   }
 
+  /** Removes expired entries, then trims any excess over the size bound. */
   private cleanup(): void {
     const now = Date.now();
     let cleaned = 0;
@@ -153,6 +197,11 @@ export class LruMemoryCache<T> {
     }
   }
 
+  /**
+   * Cache-aside helper accepting a sync or async factory.
+   * Note there is no in-flight de-duplication: concurrent misses all invoke the
+   * factory. Use getOrSetAsync when that matters.
+   */
   getOrSet(key: string, factory: () => T | Promise<T>, ttl?: number): T | Promise<T> {
     const cached = this.get(key);
     if (cached !== null) {
@@ -171,6 +220,7 @@ export class LruMemoryCache<T> {
     return value;
   }
 
+  /** Async-only cache-aside helper; resolves to the cached or freshly built value. */
   async getOrSetAsync(key: string, factory: () => Promise<T>, ttl?: number): Promise<T> {
     const cached = this.get(key);
     if (cached !== null) {
@@ -182,6 +232,7 @@ export class LruMemoryCache<T> {
     return value;
   }
 
+  /** Clears the sweep timer. Cached values are intentionally retained. */
   stop(): void {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
@@ -214,6 +265,10 @@ export class LruMemoryCache<T> {
     };
   }
 
+  /**
+   * Snapshot of every entry sorted by hit count, for the dashboard.
+   * `size` is the JSON length, an approximation for non-serialisable values.
+   */
   getEntries(): Array<{ key: string; hits: number; lastAccessed: number; size: number }> {
     const entries: Array<{ key: string; hits: number; lastAccessed: number; size: number }> = [];
 
@@ -230,12 +285,14 @@ export class LruMemoryCache<T> {
   }
 }
 
+/** Shared cache for general-purpose use; create scoped caches with createCache. */
 export const globalCache = new LruMemoryCache<unknown>({
   maxSize: 5000,
   ttl: 300000,
   cleanupInterval: 60000,
 });
 
+/** Factory for a typed cache with custom limits. */
 export function createCache<T>(options?: Partial<MemoryCacheOptions>): LruMemoryCache<T> {
   return new LruMemoryCache<T>(options);
 }

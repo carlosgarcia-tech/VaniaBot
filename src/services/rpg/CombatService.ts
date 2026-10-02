@@ -1,3 +1,11 @@
+/**
+ * CombatService.ts
+ *
+ * VaniaBot services module exposing `CombatService`, `CombatResult`, `CombatLog`, `combatService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { mobService, type Mob } from './MobService.js';
 import { itemService } from './ItemService.js';
 import { serviceManager } from '../system/Servicemanager.js';

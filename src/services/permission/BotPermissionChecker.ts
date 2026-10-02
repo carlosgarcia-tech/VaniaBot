@@ -1,3 +1,11 @@
+/**
+ * BotPermissionChecker.ts
+ *
+ * VaniaBot services module exposing `BotPermissionChecker`, `BotPermissions`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WASocket, GroupParticipant } from 'baileys';
 import { logError } from '@/utils/logger.js';
 import { normalizeJid, getBotPhone, getBotLid, extractPhone } from './JidService.js';

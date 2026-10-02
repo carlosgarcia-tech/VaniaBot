@@ -1,3 +1,11 @@
+/**
+ * AchievementService.ts
+ *
+ * VaniaBot services module exposing `Achievement`, `achievementService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { serviceManager } from '../system/Servicemanager.js';
 
 export interface Achievement {

@@ -1,3 +1,21 @@
+/**
+ * database/BatchWriter.ts
+ *
+ * Write-behind batching for the JSON/SQLite backends.
+ *
+ * Frequent small writes (counters, timestamps, session state) are coalesced into
+ * one flush instead of hitting storage per mutation.
+ *
+ * Durability is handled with a write-ahead log: every scheduled write is first
+ * persisted to a WAL file, and only cleared once the real write succeeds. A
+ * crash therefore loses at most the in-flight batch, and the constructor replays
+ * whatever was pending. The WAL itself is written atomically (temp file +
+ * rename) so it can never be observed half-written.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import {
   existsSync,
   readFileSync,
@@ -11,6 +29,7 @@ import { dirname } from 'path';
 import path from 'path';
 import { logError, logger } from '@/utils/logger.js';
 
+/** One queued mutation, keyed by `${collection}:${key}` so repeats coalesce. */
 interface PendingWrite<T = unknown> {
   collection: string;
   key: string;
@@ -18,6 +37,7 @@ interface PendingWrite<T = unknown> {
   timestamp: number;
 }
 
+/** On-disk WAL payload. */
 interface WALEntry {
   id: string;
   writes: PendingWrite[];
@@ -25,17 +45,24 @@ interface WALEntry {
 }
 
 export class BatchWriter {
+  /** Pending mutations; a Map so repeated writes to one key replace, not append. */
   private pendingWrites = new Map<string, PendingWrite>();
   private writeTimer: NodeJS.Timeout | null = null;
+  /** Guards against re-entrant flushes. */
   private isWriting = false;
   private walPath: string;
   private currentWalId: string = '';
+  /** Collections that must flush almost immediately (e.g. economy). */
   private criticalWrites = new Set<string>();
 
   private readonly BATCH_INTERVAL = 2000;
   private readonly MAX_BATCH_SIZE = 50;
   private readonly WAL_DIR = './data/wal';
 
+  /**
+   * @param writeCallback Performs the actual batched write.
+   * @param dbPath Database file path; the WAL is placed in its directory.
+   */
   constructor(
     private writeCallback: (writes: PendingWrite[]) => Promise<void>,
     dbPath?: string,
@@ -45,6 +72,11 @@ export class BatchWriter {
     this.initializeWAL();
   }
 
+  /**
+   * Recovers pending writes from a previous run.
+   * Removes orphaned temp files left by a crash mid-write, and discards a
+   * corrupt WAL rather than refusing to start.
+   */
   private initializeWAL(): void {
     try {
       const walDir = dirname(this.walPath);
@@ -81,6 +113,7 @@ export class BatchWriter {
     }
   }
 
+  /** Atomically rewrites the WAL (temp file + rename). */
   private persistWAL(): void {
     try {
       const wal: WALEntry = {
@@ -98,6 +131,7 @@ export class BatchWriter {
     }
   }
 
+  /** Deletes the WAL after a successful flush. */
   private clearWAL(): void {
     try {
       if (existsSync(this.walPath)) {
@@ -109,6 +143,13 @@ export class BatchWriter {
     }
   }
 
+  /**
+   * Queues a write and arms the flush timer.
+   *
+   * The WAL is persisted on every schedule call, so a crash before the flush
+   * still replays the mutation. Critical collections flush straight away; a full
+   * batch does too.
+   */
   schedule(collection: string, key: string, value: unknown): void {
     const writeKey = `${collection}:${key}`;
     const isCritical = this.criticalWrites.has(collection);
@@ -135,14 +176,23 @@ export class BatchWriter {
     }
   }
 
+  /** Marks a collection as critical: its writes bypass batching delays. */
   markCritical(collection: string): void {
     this.criticalWrites.add(collection);
   }
 
+  /** Returns a collection to normal batched behaviour. */
   unmarkCritical(collection: string): void {
     this.criticalWrites.delete(collection);
   }
 
+  /**
+   * Flushes the pending batch.
+   *
+   * On failure the batch is put back and the WAL rewritten, so the data is
+   * retried rather than lost. Concurrent calls are ignored by the `isWriting`
+   * guard, and the caller is responsible for retrying if that happens.
+   */
   async flushNow(): Promise<void> {
     if (this.isWriting || this.pendingWrites.size === 0) {
       return;
@@ -172,6 +222,7 @@ export class BatchWriter {
     }
   }
 
+  /** Flushes unconditionally, awaiting the in-flight flush if one is running. */
   async forceFlushNow(): Promise<void> {
     if (this.pendingWrites.size === 0) {
       return;
@@ -179,14 +230,20 @@ export class BatchWriter {
     await this.flushNow();
   }
 
+  /** Number of queued mutations. */
+  /** Number of queued mutations. */
   getPendingCount(): number {
     return this.pendingWrites.size;
   }
 
+  /** Whether anything is queued. Used by the shutdown path. */
+  /** Whether anything is queued. Used by the shutdown path. */
   hasPendingWrites(): boolean {
     return this.pendingWrites.size > 0;
   }
 
+  /** Drops all queued writes and the WAL. Test helper only. */
+  /** Drops all queued writes and the WAL. Test helper only. */
   resetForTesting(): void {
     this.pendingWrites.clear();
     this.clearWAL();

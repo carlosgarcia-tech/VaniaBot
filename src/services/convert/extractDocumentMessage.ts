@@ -1,3 +1,11 @@
+/**
+ * extractDocumentMessage.ts
+ *
+ * VaniaBot services module exposing `extractDocumentMessage`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WAMessage } from 'baileys';
 import type { MessageContext } from '@/types/index.js';
 

@@ -4,7 +4,7 @@
  * SQLite-based database manager for subbots with slot system.
  * Handles up to 50 slots numbered 1-50.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @created 2026-03-16
  */
 

@@ -1,3 +1,11 @@
+/**
+ * YouTubeDownloader.ts
+ *
+ * VaniaBot services module exposing `YouTubeDownloader`.
+ *
+ * @author **Carlos G**
+ */
+
 import fs from 'fs';
 import { spawnSync } from 'child_process';
 import { left, right } from '@/utils/either.js';

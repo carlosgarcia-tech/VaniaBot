@@ -1,3 +1,20 @@
+/**
+ * AntiDeleteService.ts
+ *
+ * Anti-delete: keeps a short-lived copy of recent messages so that when someone
+ * deletes one, the owner can still see what it was.
+ *
+ * Storage is deliberately bounded on three axes, because this runs on every
+ * inbound message and holds media buffers in RAM:
+ * - entry count capped at MAX_STORED_MESSAGES (oldest dropped first),
+ * - media buffers skipped above MAX_MEDIA_BUFFER_BYTES,
+ * - video payloads never buffered at all,
+ * - entries expire after MAX_MESSAGE_AGE and are swept hourly.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { WASocket } from 'baileys';
 import { downloadContentFromMessage } from 'baileys';
 import type { proto } from 'baileys';
@@ -6,6 +23,7 @@ import path from 'path';
 import { logError } from '@/utils/logger.js';
 import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
+/** A retained message; `mediaBuffer` is absent when the payload was too large. */
 export interface StoredMessage {
   id: string;
   content: string;
@@ -19,9 +37,14 @@ export interface StoredMessage {
 
 export interface AntiDeleteConfig {
   enabled: boolean;
+  /** Per-group overrides; a group mapped to false is explicitly excluded. */
   groups: Record<string, boolean>;
 }
 
+/**
+ * Coerces parsed JSON into a valid config, dropping any `groups` entry that is
+ * not a boolean so a corrupted file cannot produce misleading behaviour.
+ */
 function validateAntiDeleteConfig(data: unknown): AntiDeleteConfig {
   const raw = (data ?? {}) as Record<string, unknown>;
   const groups: Record<string, boolean> = {};
@@ -38,6 +61,7 @@ function validateAntiDeleteConfig(data: unknown): AntiDeleteConfig {
 
 export class AntiDeleteService {
   private static instance: AntiDeleteService;
+  /** Retained messages keyed by message ID; insertion order is arrival order. */
   private messageStore = new Map<string, StoredMessage>();
   private config: AntiDeleteConfig;
   private cleanupTimer: NodeJS.Timeout | null = null;
@@ -106,6 +130,11 @@ export class AntiDeleteService {
     }
   }
 
+  /**
+   * Resolves whether capture is active.
+   * With no groupJid this reports the global flag; with one, an explicit
+   * per-group `false` opts that group out even when the global flag is on.
+   */
   isEnabled(groupJid?: string): boolean {
     if (groupJid) {
       return this.config.enabled && this.config.groups[groupJid] !== false;
@@ -135,6 +164,13 @@ export class AntiDeleteService {
     return this.config;
   }
 
+  /**
+   * Captures an inbound message for later recovery.
+   *
+   * Called for every message, so the early returns matter: capture is skipped
+   * entirely when disabled for the group (or globally, in DMs) and when the
+   * message has no ID. Buffering is best-effort and never throws.
+   */
   async storeMessage(sock: WASocket, message: proto.IWebMessageInfo): Promise<void> {
     const groupJid = message.key?.remoteJid?.endsWith('@g.us') ? message.key.remoteJid : undefined;
 
@@ -217,6 +253,7 @@ export class AntiDeleteService {
     }
   }
 
+  /** Looks up a retained message; undefined once evicted or expired. */
   getMessage(messageId: string): StoredMessage | undefined {
     return this.messageStore.get(messageId);
   }
@@ -237,6 +274,7 @@ export class AntiDeleteService {
     }
   }
 
+  /** Removes entries older than MAX_MESSAGE_AGE. */
   private cleanup(): void {
     const now = Date.now();
     const toDelete: string[] = [];
@@ -252,6 +290,12 @@ export class AntiDeleteService {
     }
   }
 
+  /**
+   * Builds the owner-facing report for a deleted message.
+   *
+   * Falls back to the phone number when a push name was not captured, and omits
+   * the content section entirely when there was neither text nor media.
+   */
   formatDeletedMessageNotification(
     deletedBy: string,
     original: StoredMessage,

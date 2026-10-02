@@ -1,3 +1,11 @@
+/**
+ * CraftService.ts
+ *
+ * VaniaBot services module exposing `CraftService`, `CraftRecipe`, `CraftResult`, `craftService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { itemRegistry, type RPGItem } from './ItemRegistry.js';
 import { itemService } from './ItemService.js';
 import { serviceManager } from '../system/Servicemanager.js';

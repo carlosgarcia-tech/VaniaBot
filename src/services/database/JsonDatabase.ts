@@ -1,3 +1,11 @@
+/**
+ * JsonDatabase.ts
+ *
+ * VaniaBot services module exposing `JsonDatabase`.
+ *
+ * @author **Carlos G**
+ */
+
 import {
   readFileSync,
   writeFileSync,

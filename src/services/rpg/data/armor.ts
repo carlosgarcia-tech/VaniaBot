@@ -1,3 +1,11 @@
+/**
+ * armor.ts
+ *
+ * VaniaBot services module exposing `armor`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { RPGItem } from '../ItemRegistry.js';
 
 export const armor: RPGItem[] = [

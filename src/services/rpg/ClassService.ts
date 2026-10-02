@@ -1,3 +1,11 @@
+/**
+ * ClassService.ts
+ *
+ * VaniaBot services module exposing `ClassService`, `RPGClass`, `classService`.
+ *
+ * @author **Carlos G**
+ */
+
 export interface RPGClass {
   id: string;
   name: string;

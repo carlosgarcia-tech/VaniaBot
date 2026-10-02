@@ -1,3 +1,11 @@
+/**
+ * ImageService.ts
+ *
+ * VaniaBot services module exposing `ImageService`, `imageService`.
+ *
+ * @author **Carlos G**
+ */
+
 import axios, { type AxiosResponse } from 'axios';
 import { logger } from '@/utils/logger.js';
 import { env } from '@/config/env.js';

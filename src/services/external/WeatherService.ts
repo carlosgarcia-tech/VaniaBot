@@ -1,3 +1,11 @@
+/**
+ * WeatherService.ts
+ *
+ * VaniaBot services module exposing `WeatherService`, `weatherService`.
+ *
+ * @author **Carlos G**
+ */
+
 import axios from 'axios';
 import { logError } from '@/utils/logger.js';
 

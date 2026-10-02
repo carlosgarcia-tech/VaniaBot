@@ -1,3 +1,18 @@
+/**
+ * ResilienceService.ts
+ *
+ * Per-command circuit breaker: when a command fails repeatedly within a sliding
+ * window, it is temporarily disabled so a persistently broken command stops
+ * consuming resources and spamming users.
+ *
+ * State is persisted to JSON so a command disabled for its cooldown stays
+ * disabled across restarts, and survives even if the process is recycled
+ * during the cooldown window.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import path from 'path';
 import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
@@ -8,8 +23,11 @@ const resilienceFileStore = new JsonFileStore<ResilienceStore>({
   defaults: createDefaultStore,
 });
 
+/** Failure history and cooldown state for one command. */
 export interface CommandFailureEntry {
+  /** Timestamps of failures still inside the window. */
   failures: number[];
+  /** Epoch ms until which the command is disabled; 0 when enabled. */
   disabledUntil: number;
   lastError: string;
   lastFailureAt: number;
@@ -17,12 +35,16 @@ export interface CommandFailureEntry {
 
 export interface ResilienceStore {
   enabled: boolean;
+  /** Failures within the window that trigger a cooldown. */
   threshold: number;
+  /** Sliding window in which failures are counted. */
   windowMs: number;
+  /** How long a tripped command stays disabled. */
   cooldownMs: number;
   commands: Record<string, CommandFailureEntry>;
 }
 
+/** Enabled, 4 failures in 10 minutes, 15-minute cooldown. */
 function createDefaultStore(): ResilienceStore {
   return {
     enabled: true,
@@ -33,6 +55,10 @@ function createDefaultStore(): ResilienceStore {
   };
 }
 
+/**
+ * Constrains a config value to a safe range.
+ * Non-finite input falls back to the default rather than corrupting the store.
+ */
 function clampNumber(value: number, min: number, max: number, fallback: number): number {
   const n = Number(value);
   if (!Number.isFinite(n)) return fallback;
@@ -42,10 +68,15 @@ function clampNumber(value: number, min: number, max: number, fallback: number):
 export class ResilienceService {
   private store: ResilienceStore;
 
+  /** Loads persisted state from disk. */
   constructor() {
     this.store = resilienceFileStore.load();
   }
 
+  /**
+   * Returns the entry for a command, creating it on first use.
+   * Keys are lower-cased and trimmed so `!Ping` and `ping` share one counter.
+   */
   private ensureCommand(name: string): CommandFailureEntry {
     const key = name.toLowerCase().trim();
     if (!this.store.commands[key]) {
@@ -59,12 +90,19 @@ export class ResilienceService {
     return this.store.commands[key];
   }
 
+  /** Drops failures that have fallen out of the sliding window. */
   private pruneFailures(entry: CommandFailureEntry): void {
     const now = Date.now();
     const windowMs = this.store.windowMs;
     entry.failures = entry.failures.filter(timestamp => now - timestamp <= windowMs);
   }
 
+  /**
+   * Records a failure and trips the cooldown once the threshold is reached.
+   *
+   * Failures are cleared when tripping so the next window starts clean, and
+   * `lastError` is truncated to keep the persisted file small.
+   */
   recordFailure(commandName: string, error: unknown): void {
     if (!this.store.enabled) return;
 
@@ -84,12 +122,18 @@ export class ResilienceService {
     resilienceFileStore.save(this.store);
   }
 
+  /** Clears a command's failure history after a successful run. */
   recordSuccess(commandName: string): void {
     const entry = this.ensureCommand(commandName);
     entry.failures = [];
     resilienceFileStore.save(this.store);
   }
 
+  /**
+   * Reports whether the command is currently in its cooldown.
+   * An expired cooldown is cleared here (and persisted), so the state does not
+   * linger in the file.
+   */
   isBlocked(commandName: string): { blocked: boolean; remainingMs: number; lastError: string } {
     const entry = this.ensureCommand(commandName);
     const disabledUntil = entry.disabledUntil;
@@ -110,6 +154,7 @@ export class ResilienceService {
     };
   }
 
+  /** Per-command state for the dashboard, longest-blocked first. */
   getSnapshot(): {
     enabled: boolean;
     threshold: number;
@@ -138,6 +183,11 @@ export class ResilienceService {
     };
   }
 
+  /**
+   * Updates the breaker configuration.
+   * Numeric values are clamped (threshold 2-20, cooldown 1 minute to 24 hours)
+   * so an owner command cannot disable the bot indefinitely by accident.
+   */
   setConfig(patch: { enabled?: boolean; threshold?: number; cooldownMs?: number }): void {
     if (patch.enabled !== undefined) {
       this.store.enabled = Boolean(patch.enabled);
@@ -156,6 +206,7 @@ export class ResilienceService {
     resilienceFileStore.save(this.store);
   }
 
+  /** Forgets a command entirely, lifting its cooldown immediately. */
   clearCommand(commandName: string): void {
     const key = commandName.toLowerCase().trim();
     delete this.store.commands[key];

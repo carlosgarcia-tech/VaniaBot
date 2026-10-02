@@ -1,4 +1,12 @@
 /**
+ * WebSearchService.ts
+ *
+ * VaniaBot services module exposing `WebSearchService`, `SearchResult`, `webSearchService`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview WebSearchService.ts - Web search using DuckDuckGo
  *
  * Provides web search functionality using DuckDuckGo Lite.

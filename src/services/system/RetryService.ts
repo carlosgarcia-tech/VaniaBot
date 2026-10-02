@@ -1,14 +1,41 @@
+/**
+ * RetryService.ts
+ *
+ * Generic resilience helpers: exponential-backoff retry and promise timeouts.
+ *
+ * Both are used on every outbound network call (downloads, AI providers,
+ * WhatsApp requests) so a transient failure does not surface as a user-visible
+ * error.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { logger } from '@/utils/logger.js';
 
+/** Backoff and classification settings for withRetry. */
 export interface RetryOptions {
+  /** Total attempts, including the first. */
   maxAttempts: number;
+  /** Delay before the second attempt, in milliseconds. */
   baseDelay: number;
+  /** Ceiling for the growing delay. */
   maxDelay: number;
+  /** Factor applied to the delay after each failure. */
   backoffMultiplier: number;
+  /** Substrings/regexes marking an error as worth retrying. */
   retryableErrors: (string | RegExp)[];
+  /**
+   * Per-attempt hook. Returning false aborts the retry loop early; returning
+   * nothing (or a non-boolean) keeps the default behaviour.
+   */
   onRetry?: (attempt: number, error: Error, delay: number) => boolean | void;
 }
 
+/**
+ * Defaults tuned for outbound HTTP: three attempts, 1s doubling up to 30s, and
+ * a blocklist covering connection resets, timeouts, 5xx and rate limiting.
+ */
 const DEFAULT_OPTIONS: RetryOptions = {
   maxAttempts: 3,
   baseDelay: 1000,
@@ -31,6 +58,10 @@ const DEFAULT_OPTIONS: RetryOptions = {
   ],
 };
 
+/**
+ * Matches an error message against the retryable patterns.
+ * String patterns are compared case-insensitively as substrings.
+ */
 function isRetryableError(errorMessage: string, retryableErrors: (string | RegExp)[]): boolean {
   for (const pattern of retryableErrors) {
     if (typeof pattern === 'string') {

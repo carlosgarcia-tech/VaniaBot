@@ -1,3 +1,11 @@
+/**
+ * JidService.ts
+ *
+ * VaniaBot services module exposing `normalizeJid`, `getBotJid`, `getBotLid`, `getBotPhone`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WASocket } from 'baileys';
 
 export function normalizeJid(jid: string): string {

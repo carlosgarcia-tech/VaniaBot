@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the services layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 export {
   normalizeJid,
   getBotJid,

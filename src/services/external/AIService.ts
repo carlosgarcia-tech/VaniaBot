@@ -1,3 +1,11 @@
+/**
+ * AIService.ts
+ *
+ * VaniaBot services module exposing `AIService`, `aiService`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { WASocket } from 'baileys';
 import Groq from 'groq-sdk';
 import fs from 'fs';

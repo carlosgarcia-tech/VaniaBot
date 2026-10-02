@@ -1,3 +1,11 @@
+/**
+ * YouTubeSearchService.ts
+ *
+ * VaniaBot services module exposing `YouTubeVideo`.
+ *
+ * @author **Carlos G**
+ */
+
 import { logError, logger } from '@/utils/logger.js';
 import { execFile } from 'child_process';
 import { promisify } from 'util';

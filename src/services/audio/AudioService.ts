@@ -1,3 +1,11 @@
+/**
+ * AudioService.ts
+ *
+ * VaniaBot services module exposing `AudioInfo`, `AudioAnalisis`, `TranscripcionCompletaSuccess`, `audioService`.
+ *
+ * @author **Carlos G**
+ */
+
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';

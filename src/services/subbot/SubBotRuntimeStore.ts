@@ -18,7 +18,7 @@
  * - Every failure is silent-but-logged: runtime state es best-effort,
  *   nunca debe romper el arranque de un subbot.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'fs';

@@ -4,7 +4,7 @@
  * Global rate limiting service for group messages and flood protection.
  * Tracks message rates per group and user, with configurable whitelist.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import { config } from '@/config/index.js';
@@ -134,7 +134,7 @@ export class RateLimitService {
   /**
    * Resets a group's accumulated warnings after WARNING_DECAY_MS of quiet
    * time since the last warning. Mirrors the decay in AntiSpamMiddleware:
-   * without it a once-active group could stay at "⛔ bloqueado" forever,
+   * without it a once-active group could stay permanently blocked,
    * because the cleanup pass kept the tracker alive while warnings > 0.
    */
   private decayWarnings(groupJid: string): void {

@@ -1,8 +1,26 @@
+/**
+ * VaniaToggleService.ts
+ *
+ * Per-chat, per-bot enable/disable gate for the "Vania" (bot active) state.
+ *
+ * Each bot — the main one plus every sub-bot slot — is toggled independently
+ * within a chat, keyed by `${chatJid}|${botId}`. A chat that has never been
+ * configured defaults to disabled.
+ *
+ * The two guards below (`isAllowedForMain` / `isAllowedForSubbot`) are the only
+ * entry points used by the pipelines; both fail open on database errors so a
+ * broken toggle store never silences every group.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { IDatabase } from '../database/Database';
 import { normalizeJid } from '../PermissionService.js';
 import { VANIA_TOGGLE_COMMANDS } from '@/config/index.js';
 import { logError } from '@/utils/logger.js';
 
+/** Stored toggle state, including who enabled/disabled it and when. */
 export interface ToggleRecord {
   key: string;
   chatJid: string;
@@ -18,18 +36,26 @@ export class VaniaToggleService {
   private db!: IDatabase;
   private readonly COLLECTION = 'vania_toggle';
 
+  /** Injected by ServiceManager during startup. */
   setDatabase(db: IDatabase): void {
     this.db = db;
   }
 
+  /** Composite key so one chat can hold a separate state per bot. */
   private makeKey(chatJid: string, botId: string): string {
     return `${normalizeJid(chatJid)}|${botId}`;
   }
 
+  /**
+   * Synchronous variant retained for call sites without async context.
+   * Always reports false: there is no synchronous store, so a sync caller must
+   * be treated as not-enabled and use the async path for the real answer.
+   */
   isEnabledSync(_chatJid: string): boolean {
     return false;
   }
 
+  /** True when this bot is currently enabled in the chat. Defaults to false. */
   async isEnabled(chatJid: string, botId: string = 'main'): Promise<boolean> {
     const key = this.makeKey(chatJid, botId);
     const record = await this.db.get<ToggleRecord>(this.COLLECTION, key);
@@ -101,6 +127,10 @@ export class VaniaToggleService {
     }
   }
 
+  /**
+   * Enables the bot in a chat, preserving the previous disable audit fields.
+   * A fresh record carries an empty disable history until it is first disabled.
+   */
   async enable(chatJid: string, enabledBy: string, botId: string = 'main'): Promise<void> {
     const key = this.makeKey(chatJid, botId);
     const normalizedJid = normalizeJid(chatJid);
@@ -121,6 +151,7 @@ export class VaniaToggleService {
     await this.db.flush();
   }
 
+  /** Disables the bot in a chat, preserving the previous enable audit fields. */
   async disable(chatJid: string, disabledBy: string, botId: string = 'main'): Promise<void> {
     const key = this.makeKey(chatJid, botId);
     const normalizedJid = normalizeJid(chatJid);
@@ -141,6 +172,10 @@ export class VaniaToggleService {
     await this.db.flush();
   }
 
+  /**
+   * Flips the toggle.
+   * @returns The state after the flip.
+   */
   async toggle(chatJid: string, toggledBy: string, botId: string = 'main'): Promise<boolean> {
     const isCurrentlyEnabled = await this.isEnabled(chatJid, botId);
 
@@ -152,6 +187,7 @@ export class VaniaToggleService {
     return !isCurrentlyEnabled;
   }
 
+  /** Current state plus the full audit record for the dashboard/panel. */
   async getStatus(
     chatJid: string,
     botId: string = 'main',
@@ -164,6 +200,11 @@ export class VaniaToggleService {
     };
   }
 
+  /**
+   * Enabled state for every bot active in a chat.
+   * Scans collection keys for the chat prefix, so sub-bots created after the main
+   * record are included automatically.
+   */
   async getBotsStatus(
     chatJid: string,
   ): Promise<{ main: boolean; subbots: Record<string, boolean> }> {

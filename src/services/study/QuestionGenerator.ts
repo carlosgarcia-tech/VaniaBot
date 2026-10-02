@@ -1,4 +1,12 @@
 /**
+ * QuestionGenerator.ts
+ *
+ * VaniaBot services module exposing `QuestionGenerator`, `questionGenerator`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview Generates quiz questions via AIService (Groq) with in-memory cache.
  *
  * Each question is a structured JSON object validated before returning.

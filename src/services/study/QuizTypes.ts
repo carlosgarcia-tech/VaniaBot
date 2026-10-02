@@ -1,3 +1,11 @@
+/**
+ * QuizTypes.ts
+ *
+ * VaniaBot services module exposing `QuizQuestion`, `QuizPlayer`, `QuizSession`, `QuestionLogEntry`.
+ *
+ * @author **Carlos G**
+ */
+
 export enum QuizDifficulty {
   EASY = 'easy',
   MEDIUM = 'medium',

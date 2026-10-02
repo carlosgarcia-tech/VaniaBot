@@ -1,3 +1,11 @@
+/**
+ * CanvasService.ts
+ *
+ * VaniaBot services module exposing `CanvasService`, `canvasService`.
+ *
+ * @author **Carlos G**
+ */
+
 import { logError } from '@/utils/logger.js';
 
 const BASE_URL = 'https://api.delirius.store/canvas';
