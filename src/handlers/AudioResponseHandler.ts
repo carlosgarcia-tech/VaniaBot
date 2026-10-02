@@ -3,10 +3,6 @@
  *
  * Handles automatic audio responses based on keyword triggers.
  * This handler listens for specific words/phrases and responds with audio.
- *
- * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
- * @created 2026-04-04
  */
 
 import type { WASocket, proto } from 'baileys';
@@ -92,6 +88,14 @@ const AUDIO_TRIGGERS: AudioTrigger[] = [
 
 const processedMessages = new Set<string>();
 
+/**
+ * Handles automatic audio responses based on message text triggers.
+ * Only active in groups where the 'audios' setting is enabled.
+ *
+ * @param sock - The WhatsApp socket.
+ * @param message - The incoming message.
+ * @returns A promise that resolves when handling is complete.
+ */
 export async function handleAudioResponse(
   sock: WASocket,
   message: proto.IWebMessageInfo,
