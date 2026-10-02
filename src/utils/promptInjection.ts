@@ -1,10 +1,25 @@
 /**
  * promptInjection.ts
  *
- * Detector de prompt injection y contenido malicioso usado antes de enviar
- * texto del usuario al modelo de IA. Es un módulo puro (sin dependencias de
- * Baileys, config ni servicios) para poder testearse de forma aislada: los
- * patrones viven en un solo sitio y no se duplican en los tests.
+ * VaniaBot utils module exposing `InjectionCheckResult`, `detectPromptInjection`, `BLOCKED_PROMPT_PATTERNS`, `BLOCKED_CONTENT_PATTERNS`.
+ *
+ * @author **Carlos G**
+ */
+
+/**
+ * promptInjection.ts
+ *
+ * Detector for prompt injection and malicious payloads, run before user text
+ * is forwarded to the language model.
+ *
+ * Deliberately a pure module (no Baileys, config or service imports) so it can
+ * be unit tested in isolation: the patterns live in one place instead of being
+ * duplicated across tests.
+ *
+ * Two independent checks are applied:
+ * 1. Prompt injection — attempts to override the system prompt or persona.
+ * 2. Malicious content — code/SQL/script payloads the bot has no reason to run.
+ * Plus two encoding tricks: null bytes and excessive invisible Unicode.
  */
 
 export const BLOCKED_PROMPT_PATTERNS = [
@@ -27,6 +42,7 @@ export const BLOCKED_PROMPT_PATTERNS = [
   /\x00|\x1b|\u200b|\u202e/,
 ];
 
+/** Code/SQL/script payloads with no legitimate use in a chat bot. */
 export const BLOCKED_CONTENT_PATTERNS = [
   /<\?php|\$\w+\s*=/i,
   /import\s+(os|sys|subprocess)/i,
@@ -39,15 +55,22 @@ export const BLOCKED_CONTENT_PATTERNS = [
   /data:text\/html/i,
 ];
 
+/** Outcome of a scan; `reason` is only set when `blocked` is true. */
 export interface InjectionCheckResult {
   blocked: boolean;
   reason?: 'prompt_injection' | 'malicious_content' | 'null_byte_injection' | 'unicode_overload';
 }
 
 const NULL_BYTE = /\x00/g;
+/** Zero-width, bidi-control and line/paragraph-separator characters. */
 const UNICODE_OVERLOAD_RANGE = /[\u200b-\u200f\u2028-\u202f]/g;
+/** Tolerates a few invisible characters, blocks a deliberate obfuscation flood. */
 const UNICODE_OVERLOAD_LIMIT = 50;
 
+/**
+ * Scans text for injection attempts and malicious payloads.
+ * Returns on the first match, so the reason reflects the earliest rule hit.
+ */
 export function detectPromptInjection(text: string): InjectionCheckResult {
   for (const pattern of BLOCKED_PROMPT_PATTERNS) {
     if (pattern.test(text)) {

@@ -1,3 +1,26 @@
+/**
+ * errors.ts
+ *
+ * Error hierarchy for the bot.
+ *
+ * Two roots exist by design:
+ * - `BotError` for structural/runtime failures that happen while a command runs
+ *   (permissions, validation, plugin loading).
+ * - `VBotError` for domain failures carrying an `ErrorCode` plus a
+ *   `recoverable` flag, which lets callers decide between retrying and giving up
+ *   (see ErrorHandler.isRetryable).
+ *
+ * The distinction lets a caller catch a specific condition without matching on
+ * message text, which is fragile and would break on translation.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
+/**
+ * Base error for command/runtime failures.
+ * `code` is a free-form string; `details` carries any structured context.
+ */
 export class BotError extends Error {
   constructor(
     message: string,
@@ -11,6 +34,7 @@ export class BotError extends Error {
   }
 }
 
+/** Machine-readable failure categories used for branching and user messaging. */
 export enum ErrorCode {
   NETWORK_ERROR = 'NETWORK_ERROR',
   TIMEOUT = 'TIMEOUT',
@@ -39,6 +63,12 @@ export enum ErrorCode {
   USER_BANNED = 'USER_BANNED',
 }
 
+/**
+ * Domain error with a stable code.
+ *
+ * @param recoverable Whether retrying the operation could succeed. Used by
+ *        ErrorHandler.isRetryable and by retry/circuit-breaker logic.
+ */
 export class VBotError extends Error {
   constructor(
     message: string,
@@ -66,6 +96,7 @@ export class ValidationError extends BotError {
   }
 }
 
+/** Wraps a failure thrown from inside a command's execute(). */
 export class CommandExecutionError extends BotError {
   constructor(
     public commandName: string,
@@ -78,6 +109,7 @@ export class CommandExecutionError extends BotError {
   }
 }
 
+/** Wraps a failure raised while importing a command module. */
 export class PluginLoadError extends BotError {
   constructor(
     public pluginPath: string,
@@ -118,6 +150,10 @@ export class ItemNotFoundError extends VBotError {
   }
 }
 
+/**
+ * Thrown when a limit is hit.
+ * @param waitTime Milliseconds the caller should wait, when known.
+ */
 export class RateLimitError extends VBotError {
   constructor(message: string, waitTime?: number) {
     super(message, ErrorCode.RATE_LIMITED, true, { waitTime });
@@ -125,6 +161,7 @@ export class RateLimitError extends VBotError {
   }
 }
 
+/** Economy failure; carries both the required and the available amount. */
 export class InsufficientFundsError extends VBotError {
   constructor(needed: number, has: number) {
     super(`Necesitas $${needed}, tienes $${has}`, ErrorCode.INSUFFICIENT_FUNDS, true, {
@@ -211,6 +248,11 @@ export class AuthError extends VBotError {
   }
 }
 
+/**
+ * Session is no longer valid.
+ * `requiresReauth` in the details tells the auth layer to wipe credentials and
+ * request a new pairing/QR instead of retrying.
+ */
 export class SessionExpiredError extends AuthError {
   constructor() {
     super('Sesión expirada', { requiresReauth: true });

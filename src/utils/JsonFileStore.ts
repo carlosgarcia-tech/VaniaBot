@@ -9,7 +9,7 @@
  * temp file in the same directory and renamed over the target, so a
  * crash mid-write never corrupts the store.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'fs';

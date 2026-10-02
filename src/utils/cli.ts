@@ -1,13 +1,33 @@
+/**
+ * cli.ts
+ *
+ * Terminal presentation for startup: animated banner, authentication method
+ * prompt, staged progress reporting and the help screen.
+ *
+ * The ASCII art, colours and emoji in this file are the actual product rather
+ * than decoration in comments — they are what the operator sees on startup. They
+ * are intentionally left exactly as they are.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { createInterface } from 'readline';
 import chalk from 'chalk';
 
+/** Reporter for staged startup progress, used by index.ts. */
 export interface StartupProgress {
+  /** Marks a stage as started and prints its spinner line. */
   begin(stage: string): void;
+  /** Marks a stage as finished, printing the elapsed time. */
   done(stage: string, detail?: string): void;
+  /** Marks a stage as failed, printing the elapsed time and error. */
   fail(stage: string, error?: string): void;
+  /** Prints the summary line and closing banner. */
   finalize(): void;
 }
 
+/** Full-screen animation frames shown during boot. */
 const FRAMES_VANIA = [
   chalk.hex('#FF69B4')(`
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -48,6 +68,7 @@ const FRAMES_VANIA = [
 `),
 ];
 
+/** Single-line "boot progress" messages printed beneath the banner. */
 const LOADING_FRAMES = [
   '[🦋] Inicializando Vania-Core...',
   '[✨] Sincronizando módulos inteligentes...',
@@ -62,6 +83,7 @@ async function wait(ms: number): Promise<void> {
   return new Promise(res => setTimeout(res, ms));
 }
 
+/** Clears the screen and prints each frame in turn, evenly spaced over `durationMs`. */
 async function playFrames(frames: string[], durationMs: number): Promise<void> {
   const delay = Math.floor(durationMs / frames.length);
   for (const frame of frames) {
@@ -72,6 +94,10 @@ async function playFrames(frames: string[], durationMs: number): Promise<void> {
   }
 }
 
+/**
+ * In-place status line that overwrites itself on each tick (via \r).
+ * Note this writes to stdout directly rather than the logger.
+ */
 async function playLoadingBar(): Promise<void> {
   for (const frame of LOADING_FRAMES) {
     process.stdout.write('\r' + chalk.magentaBright(frame));
@@ -80,6 +106,7 @@ async function playLoadingBar(): Promise<void> {
   console.info('\n');
 }
 
+/** Plays the full startup animation and prints the product banner. */
 export async function mostrarBannerVania(): Promise<void> {
   // eslint-disable-next-line no-console
   console.clear();
@@ -118,6 +145,11 @@ export async function mostrarBannerVania(): Promise<void> {
   await wait(400);
 }
 
+/**
+ * Interactively asks which authentication method to use.
+ * Falls back to QR when the input is not 1 or 2, so start-up never blocks on a
+ * bad answer.
+ */
 export async function seleccionarMetodoAuth(): Promise<'qr' | 'code'> {
   return new Promise(resolve => {
     const rl = createInterface({
@@ -159,6 +191,13 @@ export async function seleccionarMetodoAuth(): Promise<'qr' | 'code'> {
   });
 }
 
+/**
+ * Builds the staged progress reporter used during boot.
+ *
+ * Each `begin`/`done`/`fail` pair prints a line with the elapsed time for that
+ * stage; `finalize` prints the total. Times are recorded per stage so a slow
+ * dependency is obvious rather than being hidden inside the overall total.
+ */
 export function createStartupProgress(): StartupProgress {
   const overallStart = Date.now();
   const stageTimes: Record<string, number> = {};
@@ -184,6 +223,7 @@ export function createStartupProgress(): StartupProgress {
   }
 
   return {
+    /** Prints the header on the first call, then the stage's start line. */
     begin(stage: string): void {
       if (!started) {
         started = true;
@@ -194,6 +234,7 @@ export function createStartupProgress(): StartupProgress {
       process.stdout.write(chalk.cyan(`  ⚙️  ${stage.padEnd(22)} `) + chalk.yellow('⋯  '));
     },
 
+    /** Completes a started stage, reporting its duration. */
     done(stage: string, detail?: string): void {
       const elapsed = ((Date.now() - (stageTimes[stage] ?? overallStart)) / 1000).toFixed(1);
       completed++;
@@ -205,6 +246,7 @@ export function createStartupProgress(): StartupProgress {
       console.info(line);
     },
 
+    /** Fails a started stage, reporting its duration and the error text. */
     fail(stage: string, error?: string): void {
       const elapsed = ((Date.now() - (stageTimes[stage] ?? overallStart)) / 1000).toFixed(1);
       const line =
@@ -215,6 +257,7 @@ export function createStartupProgress(): StartupProgress {
       console.info(line);
     },
 
+    /** Prints the stage summary and the closing banner. */
     finalize(): void {
       const totalTime = ((Date.now() - overallStart) / 1000).toFixed(1);
 
@@ -229,6 +272,7 @@ export function createStartupProgress(): StartupProgress {
   };
 }
 
+/** Prints the available npm scripts, grouped by workflow. */
 export function mostrarAyuda(): void {
   const c = chalk.bold.cyan;
   const w = chalk.bold.white;

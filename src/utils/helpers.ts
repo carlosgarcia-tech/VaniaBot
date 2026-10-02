@@ -1,7 +1,25 @@
+/**
+ * helpers.ts
+ *
+ * Small, dependency-free utilities shared across commands and services:
+ * formatting, array manipulation, text parsing and small HTTP helpers.
+ *
+ * Everything here is pure or trivially side-effecting, which is what makes it
+ * safe to use from the hot message path.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
+/** Formats a number with thousands separators, e.g. 1234567 -> "1,234,567". */
 export function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+/**
+ * Formats a duration using its two largest non-zero units, e.g. "2d 5h".
+ * Falls back to seconds for short durations.
+ */
 export function formatTime(ms: number): string {
   const seconds = Math.floor(ms / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -20,15 +38,24 @@ export function formatTime(ms: number): string {
   return `${seconds}s`;
 }
 
+/** Uppercases the first character and lowercases the rest. */
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
+/**
+ * Shortens a string to `maxLength` *including* the suffix.
+ * The input is returned untouched when it already fits.
+ */
 export function truncate(str: string, maxLength: number, suffix: string = '...'): string {
   if (str.length <= maxLength) return str;
   return str.substring(0, maxLength - suffix.length) + suffix;
 }
 
+/**
+ * Formats a remaining duration for display in the user's language.
+ * Reports only the largest non-zero unit, e.g. "5 minutos".
+ */
 export function formatTimeRemaining(ms: number, locale: 'es' | 'en' = 'es'): string {
   if (ms <= 0) return locale === 'es' ? 'Expira inmediatamente' : 'Expires immediately';
 
@@ -49,18 +76,22 @@ export function formatTimeRemaining(ms: number, locale: 'es' | 'en' = 'es'): str
   return plural(seconds, l.second);
 }
 
+/** Promise-based delay. */
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/** Uniformly random element. Returns undefined for an empty array. */
 export function randomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
+/** Uniformly random integer in the inclusive range [min, max]. */
 export function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/** Fisher-Yates shuffle. Returns a new array; the input is not mutated. */
 export function shuffle<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -70,6 +101,7 @@ export function shuffle<T>(array: T[]): T[] {
   return shuffled;
 }
 
+/** Groups items by the stringified value of one property. */
 export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
   return array.reduce(
     (result, item) => {
@@ -84,10 +116,12 @@ export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
   );
 }
 
+/** Removes duplicates, preserving first-seen order. */
 export function unique<T>(array: T[]): T[] {
   return [...new Set(array)];
 }
 
+/** Splits an array into consecutive chunks of at most `size` items. */
 export function chunk<T>(array: T[], size: number): T[][] {
   const chunks: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -96,15 +130,21 @@ export function chunk<T>(array: T[], size: number): T[][] {
   return chunks;
 }
 
+/**
+ * Extracts `@123456` mentions from text and expands them into full user JIDs,
+ * which is the format Baileys expects in a `mentions` array.
+ */
 export function extractMentions(text: string): string[] {
   const mentions = text.match(/@(\d+)/g);
   return mentions ? mentions.map(m => m.substring(1) + '@s.whatsapp.net') : [];
 }
 
+/** Strips punctuation, keeping only word characters and whitespace. */
 export function sanitize(str: string): string {
   return str.replace(/[^\w\s]/gi, '');
 }
 
+/** Parses `key=value` arguments into a record; non-matching args are ignored. */
 export function parseKeyValueArgs(args: string[]): Record<string, string> {
   const result: Record<string, string> = {};
 
@@ -118,6 +158,7 @@ export function parseKeyValueArgs(args: string[]): Record<string, string> {
   return result;
 }
 
+/** Human-readable byte size, e.g. 1536 -> "1.5 KB". */
 export function formatBytes(bytes: number, decimals: number = 2): string {
   if (bytes === 0) return '0 Bytes';
 
@@ -131,6 +172,7 @@ export function formatBytes(bytes: number, decimals: number = 2): string {
 
 export { isValidUrl } from './validators.js';
 
+/** Removes Markdown/WhatsApp markup, keeping only the inner text. */
 export function stripMarkdown(text: string): string {
   return text
     .replace(/\*\*(.+?)\*\*/g, '$1')
@@ -142,6 +184,10 @@ export function stripMarkdown(text: string): string {
     .replace(/\[(.+?)\]\(.+?\)/g, '$1');
 }
 
+/**
+ * Renders a text progress bar.
+ * `current` is clamped to `total`, so an over-full bar never overflows.
+ */
 export function createProgressBar(
   current: number,
   total: number,
@@ -156,6 +202,7 @@ export function createProgressBar(
   return filledChar.repeat(filled) + emptyChar.repeat(empty);
 }
 
+/** Formats seconds as zero-padded HH:MM:SS. */
 export function secondsToHMS(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -164,6 +211,11 @@ export function secondsToHMS(seconds: number): string {
   return [h, m, s].map(v => (v < 10 ? '0' + v : v)).join(':');
 }
 
+/**
+ * Escapes the five XML entities.
+ * The ampersand is replaced first, otherwise it would double-escape the entities
+ * introduced by the later replacements.
+ */
 export function escapeXml(text: string): string {
   return text
     .replace(/&/g, '&amp;')
@@ -173,6 +225,11 @@ export function escapeXml(text: string): string {
     .replace(/'/g, '&apos;');
 }
 
+/**
+ * Greedy word wrap to a maximum line length.
+ * Words longer than the limit are emitted as their own (over-long) line rather
+ * than being broken, so no characters are lost.
+ */
 export function wrapText(text: string, maxChars: number): string[] {
   const words = text.split(' ');
   const lines: string[] = [];
@@ -191,6 +248,13 @@ export function wrapText(text: string, maxChars: number): string[] {
   return lines.length > 0 ? lines : [text];
 }
 
+/**
+ * Uploads a PNG buffer to tmpfiles.org and returns the direct-download URL.
+ *
+ * The multipart body is assembled manually to avoid pulling in a form-data
+ * dependency for a single call. Returns null on any failure: this is a best
+ * effort convenience, not a critical path.
+ */
 export async function uploadToTmpfiles(buffer: Buffer): Promise<string | null> {
   try {
     const boundary = `----FormBoundary${Date.now()}`;
@@ -228,6 +292,10 @@ export async function uploadToTmpfiles(buffer: Buffer): Promise<string | null> {
   }
 }
 
+/**
+ * Parses a compact duration such as `30s`, `5m`, `2h`, `7d` into milliseconds.
+ * @returns Milliseconds, or 0 when the format does not match.
+ */
 export function parseDuration(str: string): number {
   const match = str.match(/^(\d+)([smhd])$/);
 

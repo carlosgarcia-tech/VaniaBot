@@ -1,3 +1,16 @@
+/**
+ * getContextInfo.ts
+ *
+ * Normalises reply metadata out of a WhatsApp message.
+ *
+ * Baileys nests `contextInfo` inside whichever sub-message matches the type the
+ * user replied to, so callers would otherwise need to probe every variant. This
+ * collapses them into a single lookup.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { proto } from 'baileys';
 
 /**
@@ -17,6 +30,10 @@ import type { proto } from 'baileys';
  *  - ephemeral (reply)        -> ephemeralMessage.message.extendedTextMessage.contextInfo
  */
 
+/**
+ * Returns the reply context (quoted message, stanzaId, participant, mentions),
+ * or undefined when the message is not a reply.
+ */
 export function getContextInfo(
   msg: proto.IMessage | null | undefined,
 ): proto.IContextInfo | undefined {

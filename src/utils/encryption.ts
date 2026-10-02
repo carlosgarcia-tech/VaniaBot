@@ -1,3 +1,19 @@
+/**
+ * encryption.ts
+ *
+ * AES-256-GCM encryption for persisted sub-bot session files.
+ *
+ * GCM is used rather than CBC because it authenticates the ciphertext: a
+ * tampered session file fails to decrypt instead of silently yielding garbage
+ * credentials. The output format is `iv:authTag:ciphertext`, all hex.
+ *
+ * The key is derived once with scrypt from SESSION_ENCRYPTION_KEY (first half
+ * salt, second half password) and cached for the process lifetime.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
@@ -7,8 +23,15 @@ const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
 const SALT_LENGTH = 32;
 
+/** Derived key cache; deriving it per call would be needlessly expensive. */
 let encryptionKey: Buffer | null = null;
 
+/**
+ * Derives (once) the 32-byte encryption key.
+ *
+ * When SESSION_ENCRYPTION_KEY is unset it falls back to an all-zero key and
+ * warns, so the bot still runs unencrypted rather than failing to start.
+ */
 function getEncryptionKey(): Buffer {
   if (encryptionKey) return encryptionKey;
 
@@ -24,6 +47,10 @@ function getEncryptionKey(): Buffer {
   return encryptionKey;
 }
 
+/**
+ * Encrypts a string.
+ * @returns `iv:authTag:ciphertext`, all hex-encoded.
+ */
 export function encrypt(data: string): string {
   const key = getEncryptionKey();
   const iv = randomBytes(IV_LENGTH);
@@ -37,6 +64,10 @@ export function encrypt(data: string): string {
   return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
 }
 
+/**
+ * Decrypts a string produced by `encrypt`.
+ * @throws If the format is malformed or the auth tag does not verify.
+ */
 export function decrypt(encryptedData: string): string {
   const key = getEncryptionKey();
   const [ivHex, authTagHex, encrypted] = encryptedData.split(':');
@@ -59,6 +90,7 @@ export function decrypt(encryptedData: string): string {
   return decrypted;
 }
 
+/** Encrypts `data` and writes it to `filePath`, creating parent directories. */
 export function encryptFile(filePath: string, data: string): void {
   const encrypted = encrypt(data);
   const dir = dirname(filePath);
@@ -68,6 +100,14 @@ export function encryptFile(filePath: string, data: string): void {
   writeFileSync(filePath, encrypted, 'utf8');
 }
 
+/**
+ * Reads and decrypts a file written by `encryptFile`.
+ *
+ * Legacy plaintext files (no `iv:tag:data` separators) are returned as-is so
+ * sessions encrypted before this feature keep working.
+ *
+ * @returns Decrypted contents, or null when the file is missing or undecryptable.
+ */
 export function decryptFile(filePath: string): string | null {
   if (!existsSync(filePath)) {
     return null;
@@ -86,6 +126,7 @@ export function decryptFile(filePath: string): string | null {
   }
 }
 
+/** True when a real encryption key is configured. */
 export function isEncryptionEnabled(): boolean {
   return !!process.env.SESSION_ENCRYPTION_KEY;
 }

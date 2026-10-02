@@ -10,7 +10,7 @@
  * Previously duplicated (and drifting) in MessageContext.parseCommand and
  * MainMessagePipeline.handleMessage.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import { config } from '@/config/index.js';

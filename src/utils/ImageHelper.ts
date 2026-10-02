@@ -1,7 +1,28 @@
+/**
+ * ImageHelper.ts
+ *
+ * Resolves which image a command should operate on.
+ *
+ * Commands that accept "an image" must handle several ways of supplying it:
+ * a directly attached image, a quoted image, or no image at all (in which case a
+ * profile picture stands in). These helpers centralise that precedence so every
+ * command behaves the same way.
+ *
+ * All lookups return null instead of throwing, since a missing profile picture
+ * is normal and should not fail the command.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import type { MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 
 export class ImageHelper {
+  /**
+   * Profile picture of the mentioned user, falling back to the sender's.
+   * @returns Image URL, or null when neither has a picture.
+   */
   static async getProfileImage(ctx: MessageContext): Promise<string | null> {
     const mentionedJid = ctx.mentionedJid;
     const targetJid = mentionedJid || ctx.sender.jid;
@@ -15,6 +36,12 @@ export class ImageHelper {
     }
   }
 
+  /**
+   * Profile pictures of the sender and the mentioned user, for two-avatar cards.
+   *
+   * When the mentioned user has no picture the sender's is reused, so
+   * two-avatar commands still produce a complete image instead of a blank half.
+   */
   static async getTwoProfileImages(ctx: MessageContext): Promise<[string | null, string | null]> {
     const mentionedJid = ctx.mentionedJid;
 
@@ -46,6 +73,11 @@ export class ImageHelper {
     return [image1, image2];
   }
 
+  /**
+   * Best available image, in precedence order:
+   * attached image, quoted image, then the profile picture of the mentioned
+   * user, the quoting user, or finally the sender.
+   */
   static async getImageOrProfile(ctx: MessageContext): Promise<string | null> {
     const msg = ctx.message.message;
     const directImage = msg?.imageMessage;

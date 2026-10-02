@@ -1,3 +1,23 @@
+/**
+ * imageProcessor.ts
+ *
+ * Image loading, text compositing and resizing, with a layered fallback chain.
+ *
+ * The bot targets environments where native tooling varies wildly (Docker,
+ * plain Linux VPS, and Android/Termux where FFmpeg is built without several
+ * usual features), so every operation degrades instead of failing:
+ *
+ *   text compositing:  FFmpeg drawtext -> resvg + Jimp -> canvas -> base image
+ *   image loading:     FFmpeg -> Jimp
+ *   resizing:          FFmpeg -> Jimp
+ *
+ * SVG text is never handed to FFmpeg's own SVG decoder (it needs librsvg, absent
+ * on Termux); text is parsed out and re-rendered via the `drawtext` filter.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import { Jimp } from 'jimp';
 import { readFileSync, existsSync, mkdirSync, unlinkSync, readdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -7,12 +27,14 @@ import { logger, logError } from '@/utils/logger.js';
 
 const execAsync = promisify(exec);
 
+/** An image plus its dimensions, which callers need for layout maths. */
 export interface ImageProcessorResult {
   buffer: Buffer;
   width: number;
   height: number;
 }
 
+/** A single `<text>` element parsed out of an SVG. */
 interface ParsedTextBlock {
   content: string;
   x: number;
@@ -24,12 +46,15 @@ interface ParsedTextBlock {
 }
 
 export class ImageProcessor {
+  /** Lazily probed capability flags; null means "not checked yet". */
   private static ffmpegAvailable: boolean | null = null;
   private static resvgAvailable: boolean | null = null;
   private static readonly TEMP_DIR = './data/temp';
 
+  /** Cached font path. `undefined` = not yet searched, `null` = none found. */
   private static fontPath: string | null | undefined = undefined;
 
+  /** Probes for FFmpeg once and caches the result. */
   static async isFFmpegAvailable(): Promise<boolean> {
     if (this.ffmpegAvailable !== null) return this.ffmpegAvailable;
     try {
@@ -42,6 +67,7 @@ export class ImageProcessor {
     return this.ffmpegAvailable;
   }
 
+  /** Probes for the resvg SVG renderer once and caches the result. */
   static async isResvgAvailable(): Promise<boolean> {
     if (this.resvgAvailable !== null) return this.resvgAvailable;
     try {
@@ -54,14 +80,16 @@ export class ImageProcessor {
   }
 
   /**
-   * Busca la primera fuente TTF utilizable por FFmpeg drawtext.
+   * Finds the first TTF font usable by FFmpeg's drawtext filter.
    *
-   * En lugar de adivinar nombres específicos, escanea directorios completos.
-   * Orden de prioridad:
-   *   1. data/assets/font.ttf     (fuente propia del proyecto)
-   *   2. /system/fonts/           (Android — cualquier .ttf disponible)
-   *   3. Termux font packages     (pkg install font-dejavu, etc.)
-   *   4. Rutas estándar de Linux  (VPS / PC)
+   * Rather than guessing specific filenames, whole directories are scanned.
+   * Priority order:
+   *   1. data/assets/font.ttf        (project's own font)
+   *   2. /system/fonts/              (Android — any available .ttf)
+   *   3. Termux font packages        (pkg install font-dejavu, etc.)
+   *   4. standard Linux font paths   (VPS / desktop)
+   *
+   * @returns Font path, or null when none is found (drawtext then cannot run).
    */
   private static findFont(): string | null {
     if (this.fontPath !== undefined) return this.fontPath;
@@ -127,6 +155,7 @@ export class ImageProcessor {
     return null;
   }
 
+  /** Loads an image, preferring FFmpeg and falling back to Jimp. */
   static async loadImage(imagePath: string): Promise<ImageProcessorResult> {
     const useFFmpeg = await this.isFFmpegAvailable();
     if (useFFmpeg) {
@@ -152,6 +181,10 @@ export class ImageProcessor {
     return { buffer, width, height };
   }
 
+  /**
+   * Reads image dimensions via ffprobe.
+   * Falls back to 512x512 when probing fails, so callers always get usable values.
+   */
   private static async probeDimensions(
     imagePath: string,
   ): Promise<{ width: number; height: number }> {
@@ -176,6 +209,11 @@ export class ImageProcessor {
     };
   }
 
+  /**
+   * Renders an SVG to PNG.
+   * Tries resvg first, then the canvas-based text-only renderer.
+   * @throws When no SVG renderer is available.
+   */
   static async svgToBuffer(svgContent: string, width: number, height: number): Promise<Buffer> {
     if (await this.isResvgAvailable()) {
       try {
@@ -196,6 +234,11 @@ export class ImageProcessor {
     throw new Error('No hay renderer SVG disponible. Ejecuta: npm install @resvg/resvg-js');
   }
 
+  /**
+   * Canvas-based SVG renderer used when resvg is unavailable.
+   * Renders only the text elements, since shapes are already baked into the
+   * base image by the time this runs.
+   */
   private static async svgToBufferCanvas(
     svgContent: string,
     width: number,
@@ -214,6 +257,13 @@ export class ImageProcessor {
     return canvas.toBuffer('image/png');
   }
 
+  /**
+   * Draws the text from an SVG onto a base image.
+   *
+   * Tries FFmpeg drawtext, then resvg+Jimp, then canvas. If every method fails
+   * the untouched base image is returned rather than throwing, so a card always
+   * gets sent to the user.
+   */
   static async compositeText(
     imagePath: string,
     svgContent: string,
@@ -256,12 +306,15 @@ export class ImageProcessor {
   }
 
   /**
-   * Parsea los <text> del SVG y construye un filtro `drawtext` para FFmpeg.
+   * Parses the SVG `<text>` elements and builds an FFmpeg `drawtext` filter chain.
    *
-   * No usa el decoder SVG de FFmpeg (requiere librsvg, ausente en Termux).
-   * Solo usa el filtro drawtext de libavfilter, disponible en el FFmpeg de Termux.
+   * Deliberately avoids FFmpeg's SVG decoder (it requires librsvg, which is
+   * absent on Termux) and uses only the libavfilter `drawtext` filter, which is
+   * available in Termux's FFmpeg build.
    *
-   * NOTA: `bold=` eliminado — no soportado en el FFmpeg de Termux (ARM64).
+   * NOTE: the `bold=` option is not emitted — unsupported in Termux FFmpeg (ARM64).
+   *
+   * @throws When no usable TTF font can be found.
    */
   private static async compositeTextFFmpegDrawtext(
     imagePath: string,
@@ -300,13 +353,16 @@ export class ImageProcessor {
   }
 
   /**
-   * Convierte un ParsedTextBlock a una cláusula `drawtext` de FFmpeg.
+   * Converts a ParsedTextBlock into an FFmpeg `drawtext` clause.
    *
-   * - SVG  y = baseline → FFmpeg y = top del bounding box (restamos ~82% fontSize)
-   * - text-anchor="middle" → x = cx - text_w/2  (expresión FFmpeg)
-   * - Colores: SVG #RRGGBB → FFmpeg 0xRRGGBBAA
-   * - fontfile= obligatorio en Termux/Android
-   * - bold= eliminado: no soportado en Termux FFmpeg
+   * Coordinate and colour conversions required between the two models:
+   * - SVG y = baseline -> FFmpeg y = top of the bounding box (subtract ~82% of fontSize)
+   * - text-anchor="middle" -> x = cx - text_w/2  (FFmpeg expression)
+   * - colours: SVG #RRGGBB -> FFmpeg 0xRRGGBBAA
+   * - fontfile= is mandatory on Termux/Android
+   * - bold= omitted: unsupported in Termux FFmpeg
+   *
+   * @returns The filter clause, or an empty string for a blank text block.
    */
   private static buildDrawtextFilter(b: ParsedTextBlock, fontPath: string): string {
     if (!b.content) return '';
@@ -346,6 +402,11 @@ export class ImageProcessor {
     );
   }
 
+  /**
+   * Extracts every `<text>` element with its geometry and styling.
+   * A regex is used deliberately: a full XML parser is unnecessary here and
+   * these SVGs are generated internally with a known, simple shape.
+   */
   private static parseSvgTextBlocks(svgContent: string): ParsedTextBlock[] {
     const regex = /<text([^>]*)>([\s\S]*?)<\/text>/gi;
     const blocks: ParsedTextBlock[] = [];
@@ -392,9 +453,7 @@ export class ImageProcessor {
     return canvas.toBuffer('image/png');
   }
 
-  /**
-   * Resize con COVER (recorta para rellenar el cuadro).
-   */
+  /** Resizes with COVER: scales and crops to fill the frame exactly. */
   static async resizeImage(buffer: Buffer, width: number, height: number): Promise<Buffer> {
     const useFFmpeg = await this.isFFmpegAvailable();
     if (useFFmpeg) {
@@ -410,8 +469,8 @@ export class ImageProcessor {
   }
 
   /**
-   * Resize con CONTAIN (escala proporcional, rellena con transparente).
-   * Usar para stickers donde no se puede recortar el contenido.
+   * Resizes with CONTAIN: scales proportionally and pads with transparency.
+   * Use for stickers, where cropping the content is not acceptable.
    */
   static async resizeContain(buffer: Buffer, width: number, height: number): Promise<Buffer> {
     const useFFmpeg = await this.isFFmpegAvailable();
@@ -427,6 +486,10 @@ export class ImageProcessor {
     return await image.getBuffer('image/png');
   }
 
+  /**
+   * Resizes via FFmpeg, cropping (cover) or padding with transparency (contain).
+   * Temp files are always removed, including on failure.
+   */
   private static async ffmpegResize(
     buffer: Buffer,
     width: number,
@@ -457,6 +520,7 @@ export class ImageProcessor {
     }
   }
 
+  /** Spawns FFmpeg and rejects on a non-zero exit code, including stderr output. */
   private static async runFFmpeg(args: string[]): Promise<void> {
     return new Promise((resolve, reject) => {
       const proc = spawn('ffmpeg', args);
@@ -477,6 +541,7 @@ export class ImageProcessor {
     return existsSync(this.TEMP_DIR);
   }
 
+  /** Best-effort deletion of temp files; failures are logged, never thrown. */
   private static cleanup(...files: string[]): void {
     files.forEach(f => {
       try {

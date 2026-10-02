@@ -1,3 +1,16 @@
+/**
+ * assetHelper.ts
+ *
+ * Locates bundled image assets (rule cards, welcome banners, etc.) and sends
+ * them to a chat.
+ *
+ * Assets are searched across several roots because the bot runs both from a
+ * Docker image and from a checkout, where the project root differs.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,9 +21,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Busca un archivo en múltiples rutas posibles
- * @param filename - Nombre del archivo (ej: 'clkRules.png')
- * @returns Buffer del archivo o null si no se encuentra
+ * Searches every known asset root and returns the first match.
+ *
+ * @param filename Asset name, e.g. `clkRules.png`.
+ * @returns File contents, or null when the asset is missing everywhere.
  */
 export function findAssetFile(filename: string): Buffer | null {
   const possiblePaths = [
@@ -38,11 +52,14 @@ export function findAssetFile(filename: string): Buffer | null {
 }
 
 /**
- * Envía una imagen de asset con manejo de errores
- * @param ctx - MessageContext
- * @param filename - Nombre del archivo
- * @param errorMessage - Mensaje de error personalizado
- * @returns Promise<boolean> - true si se envió correctamente, false si falló
+ * Sends a bundled asset image, replying with a user-facing error on any failure.
+ *
+ * Never throws: callers get a boolean so a missing asset degrades to an error
+ * message instead of an unhandled rejection.
+ *
+ * @param filename Asset to send.
+ * @param errorMessage Message used when the asset cannot be found.
+ * @returns True when the image was sent, false otherwise.
  */
 export async function sendAssetImage(
   ctx: MessageContext,

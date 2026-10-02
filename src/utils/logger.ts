@@ -1,3 +1,24 @@
+/**
+ * logger.ts
+ *
+ * Structured logging built on pino, in two layers:
+ *
+ * - `structuredLogger` — one `CategoryLogger` per subsystem, each with its own
+ *   level and, in production, its own file under logs/. Used where per-subsystem
+ *   verbosity matters (see LOG_CATEGORIES).
+ * - `logger` — the buffered logger used almost everywhere else. Writes are
+ *   queued and flushed in batches so logging never blocks the message pipeline,
+ *   and errors always go through immediately.
+ *
+ * In production, entries go to a log file; in development they go to a
+ * colourised pretty-printed stdout.
+ *
+ * `flush()` must be awaited during shutdown or queued entries are lost.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 import pino from 'pino';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
@@ -6,6 +27,7 @@ const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const LOG_DIR = join(process.cwd(), 'logs');
 
+/** Per-subsystem log levels, overridable via environment variables. */
 const LOG_CATEGORIES = {
   system: process.env.LOG_SYSTEM || 'info',
   commands: process.env.LOG_COMMANDS || 'warn',
@@ -21,6 +43,10 @@ if (IS_PRODUCTION && !existsSync(LOG_DIR)) {
   mkdirSync(LOG_DIR, { recursive: true });
 }
 
+/**
+ * Builds a pino instance for a category.
+ * Production writes to logs/vania[-<category>].log; development uses pino-pretty.
+ */
 const createPinoLogger = (category?: string) => {
   const categoryLevel = category
     ? LOG_CATEGORIES[category as keyof typeof LOG_CATEGORIES] || LOG_LEVEL
@@ -63,6 +89,7 @@ const createPinoLogger = (category?: string) => {
   });
 };
 
+/** Logger bound to one subsystem category. */
 class CategoryLogger {
   private category: string;
   private logger: pino.Logger;
@@ -72,6 +99,7 @@ class CategoryLogger {
     this.logger = createPinoLogger(category);
   }
 
+  /** Builds the structured payload, merging caller metadata over the base fields. */
   private formatMessage(
     level: string,
     message: string,
@@ -98,6 +126,11 @@ class CategoryLogger {
     this.logger.warn(this.formatMessage('warn', message, meta));
   }
 
+  /**
+   * Logs an error, flattening a thrown Error into serialisable fields.
+   * The stack is omitted in production to keep log files smaller and avoid
+   * leaking paths.
+   */
   error(message: string, meta?: Record<string, unknown>): void {
     const errorMeta =
       meta?.error instanceof Error
@@ -117,12 +150,18 @@ class CategoryLogger {
     this.logger.debug(this.formatMessage('debug', message, meta));
   }
 
+  /**
+   * Returns a logger for the same category.
+   * Bindings are accepted for API compatibility but not used: pino is already
+   * created per category, so there is nothing to bind.
+   */
   child(_bindings: Record<string, unknown>): CategoryLogger {
     const child = new CategoryLogger(this.category);
     return child;
   }
 }
 
+/** Aggregates the per-category loggers and exposes the default (system) one. */
 class MainLogger {
   private categoryLoggers: Map<string, CategoryLogger> = new Map();
 
@@ -166,6 +205,7 @@ class MainLogger {
     logger.debug(message, meta);
   }
 
+  /** Records a security-relevant action, tagged so audits can be filtered out. */
   audit(action: string, details: Record<string, unknown>): void {
     const auditLog = this.getLogger('system');
     auditLog.info(`[AUDIT] ${action}`, {
@@ -182,6 +222,7 @@ class MainLogger {
 
 export const structuredLogger = new MainLogger();
 
+/** When false, production logs only to the file and not to stdout. */
 const CONSOLE_LOG_ENABLED = process.env.CONSOLE_LOG !== 'false';
 
 const logStream = IS_PRODUCTION
@@ -216,16 +257,26 @@ const consoleLogger = !IS_PRODUCTION
   : pino();
 
 type PinoLogger = typeof fileLogger | typeof consoleLogger;
+
+/** Invokes a level method on a possibly-null pino instance. */
 function pinoLog(pinoInst: PinoLogger, level: string, args: unknown[]): void {
   if (!pinoInst) return;
   (pinoInst as unknown as Record<string, (...a: unknown[]) => void>)[level]?.(...args);
 }
 
+/**
+ * Buffered logger used throughout the codebase.
+ *
+ * Entries are queued and drained in batches of 100 on a 100ms timer, so a burst
+ * of activity does not turn into a burst of synchronous writes. Errors bypass
+ * the level filters but are still batched; call `flush()` before exiting.
+ */
 class AsyncLogger {
   private queue: Array<{ level: string; args: unknown[] }> = [];
   private isProcessing = false;
   private processTimer: NodeJS.Timeout | null = null;
 
+  /** Drains up to 100 queued entries, re-arming itself while the queue is busy. */
   private async processQueue(): Promise<void> {
     if (this.isProcessing || this.queue.length === 0) return;
 
@@ -252,6 +303,7 @@ class AsyncLogger {
     }
   }
 
+  /** Queues an entry and (re)arms the batch timer. */
   private schedule(level: string, ...args: unknown[]): void {
     this.queue.push({ level, args });
 
@@ -282,6 +334,7 @@ class AsyncLogger {
     this.schedule('debug', ...args);
   }
 
+  /** Drains the queue immediately. Await this during shutdown. */
   async flush(): Promise<void> {
     await this.processQueue();
   }
@@ -289,6 +342,10 @@ class AsyncLogger {
 
 export const logger = new AsyncLogger();
 
+/**
+ * Logs an error with its originating context.
+ * Accepts unknown values so it can be used directly in catch blocks.
+ */
 export function logError(context: string, error: unknown): void {
   if (error instanceof Error) {
     logger.error({

@@ -1,3 +1,20 @@
+/**
+ * constants.ts
+ *
+ * Shared magic numbers, grouped by subsystem so a threshold can be tuned in one
+ * place instead of being duplicated across services.
+ *
+ * Time values are milliseconds unless the name says otherwise; sizes are bytes
+ * or megabytes as named.
+ *
+ * These are internal engineering defaults, not operator settings: values meant
+ * to be configurable come from the environment via config/env.ts instead.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
+/** Duration multipliers for readable time arithmetic. */
 export const TIME = {
   SECOND: 1_000,
   MINUTE: 60 * 1_000,
@@ -6,6 +23,7 @@ export const TIME = {
   WEEK: 7 * 24 * 60 * 60 * 1_000,
 } as const;
 
+/** Anti-spam thresholds and escalation timings. */
 export const RATE_LIMITS = {
   MAX_MESSAGES_PER_SECOND: 3,
   MAX_MESSAGES_PER_MINUTE: 20,
@@ -14,6 +32,7 @@ export const RATE_LIMITS = {
   ANTI_SPAM_MAX_AGE: 5 * TIME.MINUTE,
 } as const;
 
+/** Default cache lifetimes per data category. */
 export const CACHE = {
   DEFAULT_TTL: 5 * TIME.MINUTE,
   USER_TTL: 30 * TIME.MINUTE,
@@ -22,6 +41,7 @@ export const CACHE = {
   MESSAGE_DEDUP_CLEANUP: 5 * TIME.MINUTE,
 } as const;
 
+/** Size ceilings and timeouts for media downloads. */
 export const DOWNLOAD = {
   MAX_AUDIO_SIZE_MB: 50,
   MAX_VIDEO_SIZE_MB: 100,
@@ -30,6 +50,7 @@ export const DOWNLOAD = {
   SOCIAL_TIMEOUT: 120 * TIME.SECOND,
 } as const;
 
+/** Media encoding limits. */
 export const MEDIA = {
   STICKER_SIZE: 512,
   MAX_MEDIA_SIZE: 52428800,
@@ -37,6 +58,7 @@ export const MEDIA = {
   MIN_AUDIO_SIZE_BYTES: 1000,
 } as const;
 
+/** Write batching and persistence cadence. */
 export const DATABASE = {
   BATCH_INTERVAL: 3 * TIME.SECOND,
   MAX_BATCH_SIZE: 100,
@@ -45,6 +67,7 @@ export const DATABASE = {
   SAVE_DELAY: 2 * TIME.SECOND,
 } as const;
 
+/** Authentication retry budgets and backoff ceilings. */
 export const AUTH = {
   MAX_QR_RETRIES: 10,
   MAX_RECONNECT_ATTEMPTS: 20,
@@ -55,17 +78,23 @@ export const AUTH = {
   PAIRING_CODE_EXPIRY: 3 * TIME.MINUTE,
 } as const;
 
+/**
+ * Reconnection limits re-exported individually.
+ * AuthManager imports these directly, so they are kept alongside AUTH.
+ */
 export const MAX_RECONNECT_ATTEMPTS = 20;
 export const MAX_RECONNECT_DELAY = 5 * 60_000;
 export const FIRST_RECONNECT_DELAY = 15_000;
 export const RECONNECT_BASE_DELAY = 1_000;
 
+/** Periodic housekeeping thresholds. */
 export const MAINTENANCE = {
   CLEANUP_INTERVAL: TIME.HOUR,
   USER_INACTIVITY_THRESHOLD: 7 * TIME.DAY,
   LISTA_TTL: 12 * TIME.HOUR,
 } as const;
 
+/** AI conversation memory and cache settings. */
 export const AI = {
   SESSION_TTL: 30 * TIME.MINUTE,
   CLEANUP_INTERVAL: 5 * TIME.MINUTE,

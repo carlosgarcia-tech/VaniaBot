@@ -4,7 +4,7 @@
  * Provides a type-safe way to handle errors without throwing exceptions.
  * Either<L, R> represents a value that can be either a Left (error) or Right (success).
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import type { VBotError } from './errors.js';
