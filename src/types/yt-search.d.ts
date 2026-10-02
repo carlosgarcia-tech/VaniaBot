@@ -1,4 +1,18 @@
+/**
+ * yt-search.d.ts
+ *
+ * Ambient types for the YouTube search helper.
+ *
+ * The module exposes an overloaded `search` that behaves differently depending
+ * on its argument: a text query returns mixed results, while a `videoId` returns
+ * the metadata for a single video. The overloads below mirror that.
+ *
+ * @author **Carlos G**
+ * @created 2026-04-07
+ */
+
 declare module 'yt-search' {
+  /** A video as returned by a text search. */
   export interface VideoSearchResult {
     videoId: string;
     title: string;
@@ -18,6 +32,7 @@ declare module 'yt-search' {
     description: string;
   }
 
+  /** Mixed result set from a text query. */
   export interface SearchResult {
     videos: VideoSearchResult[];
     playlists: Playlist[];
@@ -25,6 +40,7 @@ declare module 'yt-search' {
     live: LiveStream[];
   }
 
+  /** Metadata for a single video, returned when searching by videoId. */
   export interface VideoResult {
     videoId: string;
     title: string;
@@ -43,6 +59,7 @@ declare module 'yt-search' {
     description: string;
   }
 
+  /** Search input; either `query` or `videoId` drives the lookup. */
   export interface SearchOptions {
     query?: string;
     videoId?: string;
