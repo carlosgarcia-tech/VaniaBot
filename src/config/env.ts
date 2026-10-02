@@ -3,12 +3,6 @@
  *
  * Environment configuration for VaniaBot using Zod validation.
  * All configuration values can be set via .env file.
- *
- * @author **Carlos G** ⭐
- * @github CARLOSGRCIAGRCIA
- * @tiktok carlos.grcia0
- * @instagram carlos.gxv
- * @created 2026-03-16
  */
 
 import { z } from 'zod';
@@ -310,7 +304,8 @@ const envSchema = z.object({
 });
 
 /**
- * Parsed and validated environment configuration
+ * Parsed and validated environment configuration.
+ *
  * @example
  * import { env } from '@/config/env.js';
  * console.log(env.BOT_NAME);

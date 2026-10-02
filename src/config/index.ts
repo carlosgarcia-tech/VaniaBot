@@ -3,25 +3,23 @@
  *
  * Central configuration aggregator for VaniaBot.
  * Combines environment variables with application defaults.
- *
- * @author **Carlos G** ⭐
- * @github CARLOSGRCIAGRCIA
- * @tiktok carlos.grcia0
- * @instagram carlos.gxv
- * @created 2026-03-16
  */
 
 import { env } from './env.js';
 import type { BotConfig } from '@/types/index.js';
 
 /**
- * Bot configuration object aggregating all settings
+ * Commands that toggle the Vania bot state.
+ */
+export const VANIA_TOGGLE_COMMANDS: readonly string[] = ['vaniaon', 'vaniaoff', 'vaniastatus'];
+
+/**
+ * Bot configuration object aggregating all settings.
+ *
  * @example
  * import { config } from '@/config/index.js';
  * console.log(config.name);
  */
-export const VANIA_TOGGLE_COMMANDS: readonly string[] = ['vaniaon', 'vaniaoff', 'vaniastatus'];
-
 export const config: BotConfig = {
   /** Bot display name */
   name: env.BOT_NAME,
