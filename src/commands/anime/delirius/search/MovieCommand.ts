@@ -1,3 +1,12 @@
+/**
+ * MovieCommand.ts
+ *
+ * anime command `movie` — Busca información de películas
+ * Usage: !movie <pelicula>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!movie`: Busca información de películas. */
 export class MovieCommand extends Command {
   name = 'movie';
   description = 'Busca información de películas';

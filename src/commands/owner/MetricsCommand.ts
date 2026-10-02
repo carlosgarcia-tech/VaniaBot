@@ -1,3 +1,12 @@
+/**
+ * MetricsCommand.ts
+ *
+ * owner command `metrics` — Muestra métricas y estadísticas del bot
+ * Usage: !metrics
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import {
   CommandCategory,
@@ -9,6 +18,7 @@ import { commandRegistry } from '@/core/CommandRegistry.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { cacheManager } from '@/core/CacheManager.js';
 
+/** Command handler for `!metrics`: Muestra métricas y estadísticas del bot. */
 export class MetricsCommand extends Command {
   name = 'metrics';
   description = 'Muestra métricas y estadísticas del bot';

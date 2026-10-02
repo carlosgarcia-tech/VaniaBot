@@ -1,8 +1,18 @@
+/**
+ * StatsCommand.ts
+ *
+ * rpg command `stats` — Muestra tus estadísticas RPG
+ * Usage: !stats [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { itemService } from '@/services/rpg/ItemService.js';
 
+/** Command handler for `!stats`: Muestra tus estadísticas RPG. */
 export class StatsCommand extends Command {
   name = 'stats';
   description = 'Muestra tus estadísticas RPG';

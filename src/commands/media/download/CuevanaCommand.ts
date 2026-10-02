@@ -1,4 +1,13 @@
 /**
+ * CuevanaCommand.ts
+ *
+ * media command `cuevana` — Busca y descarga películas/series de Cuevana
+ * Usage: !cv <título>
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview CuevanaCommand.ts - Search and download movies/series
  *
  * Searches and downloads movies and series from Cuevana.
@@ -18,6 +27,7 @@ import os from 'os';
 
 const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-cuevana');
 
+/** Command handler for `!cuevana`: Busca y descarga películas/series de Cuevana. */
 export class CuevanaCommand extends Command {
   name = 'cuevana';
   description = 'Busca y descarga películas/series de Cuevana';

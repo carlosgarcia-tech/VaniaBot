@@ -1,3 +1,11 @@
+/**
+ * NhentaisearchCommand.ts
+ *
+ * VaniaBot commands module exposing `NhentaisearchCommand`.
+ *
+ * @author **Carlos G**
+ */
+
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { NsfwMediaBase } from './NsfwMediaBase.js';
 import { CommandContext, type MessageContext } from '@/types/index.js';

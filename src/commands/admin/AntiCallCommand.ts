@@ -1,3 +1,12 @@
+/**
+ * AntiCallCommand.ts
+ *
+ * admin command `anticall` — Activar/desactivar sistema anti-call
+ * Usage: !anticall [on|off|status]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import {
   CommandCategory,
@@ -8,6 +17,7 @@ import {
 import { antiCallService } from '@/services/system/AntiCallService.js';
 import { getTargetUser } from '@/utils/moderationUtils.js';
 
+/** Command handler for `!anticall`: Activar/desactivar sistema anti-call. */
 export class AntiCallCommand extends Command {
   name = 'anticall';
   description = 'Activar/desactivar sistema anti-call';

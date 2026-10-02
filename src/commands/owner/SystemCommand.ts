@@ -1,3 +1,12 @@
+/**
+ * SystemCommand.ts
+ *
+ * owner command `broadcast` — Enviar mensaje a todos los grupos
+ * Usage: .broadcast <mensaje>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -23,6 +32,7 @@ function sanitizeBroadcastMessage(message: string): string {
   return sanitized;
 }
 
+/** Command handler for `!broadcast`: Enviar mensaje a todos los grupos. */
 export class BroadcastCommand extends Command {
   name = 'broadcast';
   description = 'Enviar mensaje a todos los grupos';

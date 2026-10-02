@@ -4,7 +4,7 @@
  * Command to manage rate limiting and anti-spam settings.
  * Allows admins to view stats, whitelist users/groups, and reset limits.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import { Command } from '../Command.js';

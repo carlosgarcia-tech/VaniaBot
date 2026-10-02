@@ -1,9 +1,19 @@
+/**
+ * InventoryCommand.ts
+ *
+ * utility command `inventory` — Muestra tu inventario de items
+ * Usage: !inventory [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** Command handler for `!inventory`: Muestra tu inventario de items. */
 export class InventoryCommand extends Command {
   name = 'inventory';
   description = 'Muestra tu inventario de items';

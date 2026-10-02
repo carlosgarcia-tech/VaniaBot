@@ -1,9 +1,19 @@
+/**
+ * TakeCommand.ts
+ *
+ * media command `take` — Change sticker pack name and author
+ * Usage: !take <packname>|<author>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { StickerService } from '@/services/media/StickerService.js';
 
+/** Command handler for `!take`: Change sticker pack name and author. */
 export class TakeCommand extends Command {
   name = 'take';
   description = 'Change sticker pack name and author';

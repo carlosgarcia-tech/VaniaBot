@@ -1,3 +1,12 @@
+/**
+ * LogsCommand.ts
+ *
+ * owner command `logs` — Ver los últimos logs del bot
+ * Usage: !logs [número]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import {
   CommandCategory,
@@ -8,6 +17,7 @@ import {
 import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
 
+/** Command handler for `!logs`: Ver los últimos logs del bot. */
 export class LogsCommand extends Command {
   name = 'logs';
   description = 'Ver los últimos logs del bot';

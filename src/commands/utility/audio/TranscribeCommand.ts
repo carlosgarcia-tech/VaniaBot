@@ -1,3 +1,12 @@
+/**
+ * TranscribeCommand.ts
+ *
+ * utility command `transcribe` — Transcribe audio/notas de voz a texto con IA, compresión y resumen
+ * Usage: !transcribe [resumen|completo|idioma]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { audioService } from '@/services/audio/AudioService.js';
 import { isRight } from '@/utils/either.js';
@@ -128,6 +137,7 @@ export async function extractAudio(ctx: MessageContext): Promise<AudioData | nul
   return null;
 }
 
+/** Command handler for `!transcribe`: Transcribe audio/notas de voz a texto con IA, compresión y resumen. */
 export class TranscribeCommand extends Command {
   name = 'transcribe';
   description = 'Transcribe audio/notas de voz a texto con IA, compresión y resumen';

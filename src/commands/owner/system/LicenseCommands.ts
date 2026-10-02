@@ -1,7 +1,16 @@
+/**
+ * LicenseCommands.ts
+ *
+ * owner command `setplan` — Asignar o cambiar plan de licencia (Owner only)
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, PermissionLevel, type MessageContext } from '@/types/index.js';
 import { licenseService } from '@/services/system/LicenseService.js';
 
+/** Command handler for `!setplan`: Asignar o cambiar plan de licencia (Owner only). */
 export class SetPlanCommand extends Command {
   name = 'setplan';
   description = 'Asignar o cambiar plan de licencia (Owner only)';

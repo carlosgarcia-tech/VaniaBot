@@ -1,3 +1,12 @@
+/**
+ * NotaCommand.ts
+ *
+ * media command `nota` — Create a note sticker with text
+ * Usage: !nota <text>
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
@@ -8,6 +17,7 @@ import { escapeXml, wrapText } from '@/utils/helpers.js';
 import path from 'path';
 import fs from 'fs';
 
+/** Command handler for `!nota`: Create a note sticker with text. */
 export class NotaCommand extends Command {
   name = 'nota';
   description = 'Create a note sticker with text';

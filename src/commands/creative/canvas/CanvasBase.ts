@@ -1,3 +1,11 @@
+/**
+ * CanvasBase.ts
+ *
+ * VaniaBot commands module exposing `CanvasBase`.
+ *
+ * @author **Carlos G**
+ */
+
 import { canvasService } from '@/services/external/CanvasService.js';
 import { logError } from '@/utils/logger.js';
 import { execFile } from 'child_process';

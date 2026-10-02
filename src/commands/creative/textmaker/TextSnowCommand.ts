@@ -1,3 +1,12 @@
+/**
+ * TextSnowCommand.ts
+ *
+ * creative command `snow` — Crea un efecto de texto de nieve
+ * Usage: !snow <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-a-snow-3d-text-effect-free-online-621.html';
 
+/** Command handler for `!snow`: Crea un efecto de texto de nieve. */
 export class TextSnowCommand extends Command {
   name = 'snow';
   description = 'Crea un efecto de texto de nieve';

@@ -1,3 +1,12 @@
+/**
+ * TextSandCommand.ts
+ *
+ * creative command `sand` — Crea un efecto de texto en la arena
+ * Usage: !sand <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/write-names-and-messages-on-the-sand-online-582.html';
 
+/** Command handler for `!sand`: Crea un efecto de texto en la arena. */
 export class TextSandCommand extends Command {
   name = 'sand';
   description = 'Crea un efecto de texto en la arena';

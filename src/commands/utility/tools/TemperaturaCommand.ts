@@ -1,7 +1,17 @@
+/**
+ * TemperaturaCommand.ts
+ *
+ * utility command `clima` — Consulta el clima de una ciudad
+ * Usage: !clima <ciudad>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { weatherService } from '@/services/external/WeatherService.js';
 
+/** Command handler for `!clima`: Consulta el clima de una ciudad. */
 export class TemperaturaCommand extends Command {
   name = 'clima';
   description = 'Consulta el clima de una ciudad';

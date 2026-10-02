@@ -1,3 +1,12 @@
+/**
+ * TextFireCommand.ts
+ *
+ * creative command `fire` — Crea un efecto de texto de fuego
+ * Usage: !fire <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/flame-lettering-effect-372.html';
 
+/** Command handler for `!fire`: Crea un efecto de texto de fuego. */
 export class TextFireCommand extends Command {
   name = 'fire';
   description = 'Crea un efecto de texto de fuego';

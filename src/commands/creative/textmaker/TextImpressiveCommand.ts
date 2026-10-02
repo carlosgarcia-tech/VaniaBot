@@ -1,3 +1,12 @@
+/**
+ * TextImpressiveCommand.ts
+ *
+ * creative command `impressive` — Crea un efecto de texto impresionante en 3D
+ * Usage: !impressive <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-3d-colorful-paint-text-effect-online-801.html';
 
+/** Command handler for `!impressive`: Crea un efecto de texto impresionante en 3D. */
 export class TextImpressiveCommand extends Command {
   name = 'impressive';
   description = 'Crea un efecto de texto impresionante en 3D';

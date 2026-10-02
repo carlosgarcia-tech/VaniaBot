@@ -5,7 +5,7 @@
  * Supports text messages, images, videos, stickers, audio, and documents.
  * Can quote/reply to messages and add extra text.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @created 2026-04-03
  * @module commands/utility/system/NotifyCommand

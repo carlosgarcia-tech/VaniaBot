@@ -1,3 +1,12 @@
+/**
+ * StickerlyCommand.ts
+ *
+ * media command `stickerly` — Descarga stickers de Stickerly
+ * Usage: !stickerly <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { downloadService } from '@/services/external/DownloadService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!stickerly`: Descarga stickers de Stickerly. */
 export class StickerlyCommand extends Command {
   name = 'stickerly';
   description = 'Descarga stickers de Stickerly';

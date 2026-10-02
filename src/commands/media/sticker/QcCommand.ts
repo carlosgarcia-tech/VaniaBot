@@ -1,3 +1,12 @@
+/**
+ * QcCommand.ts
+ *
+ * media command `qc` — Create a quote sticker with text and profile picture
+ * Usage: !qc <text>
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
@@ -8,6 +17,7 @@ import { escapeXml, wrapText } from '@/utils/helpers.js';
 import { logError } from '@/utils/logger.js';
 import axios from 'axios';
 
+/** Command handler for `!qc`: Create a quote sticker with text and profile picture. */
 export class QcCommand extends Command {
   name = 'qc';
   description = 'Create a quote sticker with text and profile picture';

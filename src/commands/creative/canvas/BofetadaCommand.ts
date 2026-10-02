@@ -1,3 +1,12 @@
+/**
+ * BofetadaCommand.ts
+ *
+ * creative command `bofetada` — Genera imagen de bofetada
+ * Usage: !bofetada [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!bofetada`: Genera imagen de bofetada. */
 export class BofetadaCommand extends Command {
   name = 'bofetada';
   description = 'Genera imagen de bofetada';

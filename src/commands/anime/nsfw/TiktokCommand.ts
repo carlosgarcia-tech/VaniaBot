@@ -1,3 +1,11 @@
+/**
+ * TiktokCommand.ts
+ *
+ * VaniaBot commands module exposing `TiktokCommand`.
+ *
+ * @author **Carlos G**
+ */
+
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { NsfwMediaBase } from './NsfwMediaBase.js';
 import { CommandContext } from '@/types/index.js';

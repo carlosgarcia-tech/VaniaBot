@@ -1,3 +1,12 @@
+/**
+ * TextThunderCommand.ts
+ *
+ * creative command `thunder` — Crea un efecto de texto de rayos
+ * Usage: !thunder <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/thunder-text-effect-online-97.html';
 
+/** Command handler for `!thunder`: Crea un efecto de texto de rayos. */
 export class TextThunderCommand extends Command {
   name = 'thunder';
   description = 'Crea un efecto de texto de rayos';

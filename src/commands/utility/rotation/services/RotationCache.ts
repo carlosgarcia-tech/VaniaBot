@@ -1,3 +1,11 @@
+/**
+ * RotationCache.ts
+ *
+ * VaniaBot commands module exposing `RotationCache`, `formatAnalysis`, `rotationCache`.
+ *
+ * @author **Carlos G**
+ */
+
 import type { TacticalAnalysis, ScoredRoute } from './RotationSimulator.js';
 
 interface CacheEntry<T> {

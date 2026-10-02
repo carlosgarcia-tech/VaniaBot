@@ -1,3 +1,12 @@
+/**
+ * InsultCommand.ts
+ *
+ * fun command `insult` — Insulta a un usuario de forma graciosa
+ * Usage: !insult [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import {
   CommandCategory,
@@ -47,6 +56,7 @@ const ENGLISH_INULTS = [
   'Light travels faster than sound, which is why you seemed bright until you spoke.',
 ];
 
+/** Command handler for `!insult`: Insulta a un usuario de forma graciosa. */
 export class InsultCommand extends Command {
   name = 'insult';
   description = 'Insulta a un usuario de forma graciosa';

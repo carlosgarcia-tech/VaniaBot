@@ -1,3 +1,12 @@
+/**
+ * SpotifyCommand.ts
+ *
+ * media command `spotify` — Descarga música de Spotify
+ * Usage: !spotify <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!spotify`: Descarga música de Spotify. */
 export class SpotifyCommand extends Command {
   name = 'spotify';
   description = 'Descarga música de Spotify';

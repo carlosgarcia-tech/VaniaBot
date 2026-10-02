@@ -1,3 +1,12 @@
+/**
+ * AnimeLinkCommand.ts
+ *
+ * media command `animelink` — Enlaces de páginas de anime
+ * Usage: !animelink
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -15,6 +24,7 @@ const ANIME_LINKS = [
   { name: 'MyAnimeList', url: 'https://myanimelist.net' },
 ];
 
+/** Command handler for `!animelink`: Enlaces de páginas de anime. */
 export class AnimeLinkCommand extends Command {
   name = 'animelink';
   description = 'Enlaces de páginas de anime';

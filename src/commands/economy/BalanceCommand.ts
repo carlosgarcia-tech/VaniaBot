@@ -1,8 +1,18 @@
+/**
+ * BalanceCommand.ts
+ *
+ * economy command `balance` — Check your or someone else's balance
+ * Usage: !balance [@user]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 
+/** Command handler for `!balance`: Check your or someone else's balance. */
 export class BalanceCommand extends Command {
   name = 'balance';
   description = "Check your or someone else's balance";

@@ -1,3 +1,12 @@
+/**
+ * PayRandomCommand.ts
+ *
+ * economy command `payrandom` — Envía una cantidad aleatoria a un usuario aleatorio (Solo Owner)
+ * Usage: !payrandom <cantidad>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -5,6 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!payrandom`: Envía una cantidad aleatoria a un usuario aleatorio (Solo Owner). */
 export class PayRandomCommand extends Command {
   name = 'payrandom';
   description = 'Envía una cantidad aleatoria a un usuario aleatorio (Solo Owner)';

@@ -1,3 +1,12 @@
+/**
+ * PoesiaCommand.ts
+ *
+ * fun command `poema` — Genera un poema sobre cualquier tema
+ * Usage: !poema [tema] [estilo] [para:nombre]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { poesiaService } from '@/services/creative/PoesiaService.js';
 import {
@@ -53,6 +62,7 @@ async function ejecutarPoesia(
   await ctx.reply(poesiaService.formatEntry(result.right.entry, true, formattedFooter));
 }
 
+/** Command handler for `!poema`: Genera un poema sobre cualquier tema. */
 export class PoemaCommand extends Command {
   name = 'poema';
   description = 'Genera un poema sobre cualquier tema';

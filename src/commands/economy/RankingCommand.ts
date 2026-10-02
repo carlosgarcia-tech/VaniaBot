@@ -1,8 +1,18 @@
+/**
+ * RankingCommand.ts
+ *
+ * economy command `ranking` — Ver ranking de usuarios
+ * Usage: !ranking [money|xp|level|networth]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 
+/** Command handler for `!ranking`: Ver ranking de usuarios. */
 export class RankingCommand extends Command {
   name = 'ranking';
   description = 'Ver ranking de usuarios';

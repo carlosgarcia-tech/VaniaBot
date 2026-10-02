@@ -1,3 +1,12 @@
+/**
+ * MineCommand.ts
+ *
+ * economy command `mine` — Minar criptomonedas
+ * Usage: !mine
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -5,6 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 const mineCooldowns = new Map<string, number>();
 const MINE_COOLDOWN = 5 * 60 * 1000;
 
+/** Command handler for `!mine`: Minar criptomonedas. */
 export class MineCommand extends Command {
   name = 'mine';
   description = 'Minar criptomonedas';

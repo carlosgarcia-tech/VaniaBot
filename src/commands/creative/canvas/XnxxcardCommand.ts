@@ -1,3 +1,12 @@
+/**
+ * XnxxcardCommand.ts
+ *
+ * creative command `xnxxcard` — Genera tarjeta estilo XNXX
+ * Usage: !xnxxcard <titulo>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
 import { StickerHelper } from '@/utils/StickerHelper.js';
@@ -23,6 +32,7 @@ async function getDefaultImageUrl(): Promise<string | null> {
   return url;
 }
 
+/** Command handler for `!xnxxcard`: Genera tarjeta estilo XNXX. */
 export class XnxxcardCommand extends Command {
   name = 'xnxxcard';
   description = 'Genera tarjeta estilo XNXX';

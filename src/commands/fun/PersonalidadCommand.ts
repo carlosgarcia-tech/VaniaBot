@@ -1,3 +1,12 @@
+/**
+ * PersonalidadCommand.ts
+ *
+ * fun command `personalidad` — Analizar la personalidad de alguien
+ * Usage: !personalidad <nombre>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -96,6 +105,7 @@ const generatePercent = (): string => {
   return pickRandom(options);
 };
 
+/** Command handler for `!personalidad`: Analizar la personalidad de alguien. */
 export class PersonalidadCommand extends Command {
   name = 'personalidad';
   description = 'Analizar la personalidad de alguien';

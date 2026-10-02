@@ -1,3 +1,12 @@
+/**
+ * WelcardCommand.ts
+ *
+ * creative command `welcard` — Genera tarjeta de bienvenida
+ * Usage: !welcard [nombre] [autor] [servidor]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!welcard`: Genera tarjeta de bienvenida. */
 export class WelcardCommand extends Command {
   name = 'welcard';
   description = 'Genera tarjeta de bienvenida';

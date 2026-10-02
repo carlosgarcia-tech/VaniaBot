@@ -1,3 +1,12 @@
+/**
+ * FactoCommand.ts
+ *
+ * fun command `facto` — Envía una verdad incómoda y elegante
+ * Usage: !facto [tema]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { aiService } from '@/services/external/AIService.js';
 import { isRight } from '@/utils/either.js';
@@ -38,6 +47,7 @@ Ejemplos de estilo:
 
 Genera solo el facto, sin introducción ni explicación. Sé creativo y diferente cada vez.`;
 
+/** Command handler for `!facto`: Envía una verdad incómoda y elegante. */
 export class FactoCommand extends Command {
   name = 'facto';
   description = 'Envía una verdad incómoda y elegante';

@@ -1,3 +1,12 @@
+/**
+ * SetBotPhotoCommand.ts
+ *
+ * owner command `setbotphoto` — Cambia la foto de perfil del bot
+ * Usage: !setbotphoto <url|imagen>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -54,6 +63,7 @@ async function downloadImageFromMessage(ctx: MessageContext): Promise<Buffer | n
   }
 }
 
+/** Command handler for `!setbotphoto`: Cambia la foto de perfil del bot. */
 export class SetBotPhotoCommand extends Command {
   name = 'setbotphoto';
   description = 'Cambia la foto de perfil del bot';

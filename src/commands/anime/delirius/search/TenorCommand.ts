@@ -1,3 +1,12 @@
+/**
+ * TenorCommand.ts
+ *
+ * anime command `tenor` — Busca GIFs en Tenor
+ * Usage: !tenor <busqueda>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!tenor`: Busca GIFs en Tenor. */
 export class TenorCommand extends Command {
   name = 'tenor';
   description = 'Busca GIFs en Tenor';

@@ -1,3 +1,12 @@
+/**
+ * StickerRandomCommand.ts
+ *
+ * fun command `stickerrandom` — Genera un sticker meme aleatorio
+ * Usage: !stickerrandom
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { logError } from '@/utils/logger.js';
 import { MEDIA } from '@/utils/constants.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!stickerrandom`: Genera un sticker meme aleatorio. */
 export class StickerRandomCommand extends Command {
   name = 'stickerrandom';
   description = 'Genera un sticker meme aleatorio';

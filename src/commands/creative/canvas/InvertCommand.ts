@@ -1,3 +1,12 @@
+/**
+ * InvertCommand.ts
+ *
+ * creative command `invert` — Efecto de colores invertidos
+ * Usage: !invert [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!invert`: Efecto de colores invertidos. */
 export class InvertCommand extends Command {
   name = 'invert';
   description = 'Efecto de colores invertidos';

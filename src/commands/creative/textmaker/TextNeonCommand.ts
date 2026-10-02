@@ -1,3 +1,12 @@
+/**
+ * TextNeonCommand.ts
+ *
+ * creative command `neon` — Crea un efecto de texto neon
+ * Usage: !neon <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-colorful-neon-light-text-effects-online-797.html';
 
+/** Command handler for `!neon`: Crea un efecto de texto neon. */
 export class TextNeonCommand extends Command {
   name = 'neon';
   description = 'Crea un efecto de texto neon';

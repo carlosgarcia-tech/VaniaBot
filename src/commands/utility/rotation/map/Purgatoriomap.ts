@@ -1,3 +1,11 @@
+/**
+ * Purgatoriomap.ts
+ *
+ * VaniaBot commands module exposing `Coord`, `MapNode`, `MapEdge`, `ResolvedEdge`.
+ *
+ * @author **Carlos G**
+ */
+
 export type ZoneId = 'A' | 'B' | 'C' | 'D' | 'CENTER';
 export type EdgeType = 'road' | 'bridge' | 'zipline' | 'river_crossing';
 export type CirclePhase = 'early' | 'mid' | 'late';

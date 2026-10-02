@@ -1,3 +1,12 @@
+/**
+ * ThreadsCommand.ts
+ *
+ * media command `threads` — Descarga contenido de Threads
+ * Usage: !threads <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { downloadService } from '@/services/external/DownloadService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!threads`: Descarga contenido de Threads. */
 export class ThreadsCommand extends Command {
   name = 'threads';
   description = 'Descarga contenido de Threads';

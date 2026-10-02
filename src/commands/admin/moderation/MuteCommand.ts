@@ -1,3 +1,12 @@
+/**
+ * MuteCommand.ts
+ *
+ * moderation command `mute` — Mute a user for a specified duration
+ * Usage: !mute @user <duration> [reason]
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
@@ -13,6 +22,7 @@ import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 import { middlewareCache } from '@/middlewares/MiddlewareCache.js';
 import { formatTimeRemaining } from '@/utils/helpers.js';
 
+/** Command handler for `!mute`: Mute a user for a specified duration. */
 export class MuteCommand extends Command {
   name = 'mute';
   description = 'Mute a user for a specified duration';

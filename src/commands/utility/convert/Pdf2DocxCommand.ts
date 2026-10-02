@@ -1,3 +1,12 @@
+/**
+ * Pdf2DocxCommand.ts
+ *
+ * utility command `pdf2docx` — Convierte un PDF a Word (DOCX) editable
+ * Usage: !pdf2docx (responder a un archivo PDF)
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { downloadMediaMessage } from 'baileys';
@@ -6,6 +15,7 @@ import { ScannedPdfError, TooManyPagesError } from '@/services/convert/PythonBri
 import { extractDocumentMessage } from '@/services/convert/extractDocumentMessage.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!pdf2docx`: Convierte un PDF a Word (DOCX) editable. */
 export class Pdf2DocxCommand extends Command {
   name = 'pdf2docx';
   description = 'Convierte un PDF a Word (DOCX) editable';

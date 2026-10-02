@@ -1,8 +1,18 @@
+/**
+ * MailmessagesCommand.ts
+ *
+ * media command `mailmessages` — Verifica los mensajes de un email temporal
+ * Usage: !mailmessages <email>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 
+/** Command handler for `!mailmessages`: Verifica los mensajes de un email temporal. */
 export class MailmessagesCommand extends Command {
   name = 'mailmessages';
   description = 'Verifica los mensajes de un email temporal';

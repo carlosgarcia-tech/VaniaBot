@@ -1,3 +1,12 @@
+/**
+ * ChangeMyMindCommand.ts
+ *
+ * creative command `changemymind` — Genera imagen "Change My Mind"
+ * Usage: !changemymind <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { StickerHelper } from '@/utils/StickerHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!changemymind`: Genera imagen "Change My Mind". */
 export class ChangeMyMindCommand extends Command {
   name = 'changemymind';
   description = 'Genera imagen "Change My Mind"';

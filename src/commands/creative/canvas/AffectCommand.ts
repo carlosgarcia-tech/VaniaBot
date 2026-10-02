@@ -1,3 +1,12 @@
+/**
+ * AffectCommand.ts
+ *
+ * creative command `affect` — Genera imagen estilo affect
+ * Usage: !affect [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!affect`: Genera imagen estilo affect. */
 export class AffectCommand extends Command {
   name = 'affect';
   description = 'Genera imagen estilo affect';

@@ -1,3 +1,12 @@
+/**
+ * Facebookv2Command.ts
+ *
+ * media command `facebookv2` — Descarga videos de Facebook (v2)
+ * Usage: !facebookv2 <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!facebookv2`: Descarga videos de Facebook (v2). */
 export class Facebookv2Command extends Command {
   name = 'facebookv2';
   description = 'Descarga videos de Facebook (v2)';

@@ -1,3 +1,12 @@
+/**
+ * TextArenaCommand.ts
+ *
+ * creative command `arena` — Crea un efecto de texto estilo Arena of Valor
+ * Usage: !arena <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-cover-arena-of-valor-by-mastering-360.html';
 
+/** Command handler for `!arena`: Crea un efecto de texto estilo Arena of Valor. */
 export class TextArenaCommand extends Command {
   name = 'arena';
   description = 'Crea un efecto de texto estilo Arena of Valor';

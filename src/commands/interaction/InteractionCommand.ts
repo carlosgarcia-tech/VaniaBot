@@ -1,3 +1,11 @@
+/**
+ * InteractionCommand.ts
+ *
+ * VaniaBot commands module exposing `agarrarnalgasCommand`, `chuparpataCommand`, `follarCommand`, `grabboobsCommand`.
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';

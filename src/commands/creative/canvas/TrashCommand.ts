@@ -1,3 +1,12 @@
+/**
+ * TrashCommand.ts
+ *
+ * creative command `trash` — Genera imagen estilo trash
+ * Usage: !trash [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!trash`: Genera imagen estilo trash. */
 export class TrashCommand extends Command {
   name = 'trash';
   description = 'Genera imagen estilo trash';

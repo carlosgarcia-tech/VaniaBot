@@ -1,3 +1,12 @@
+/**
+ * HelpCommand.ts
+ *
+ * utility command `help` — Muestra lista de comandos disponibles
+ * Usage: !help [comando]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -41,6 +50,7 @@ const charset: Record<string, string> = {
 const toSmallCaps = (text: string): string =>
   text.toLowerCase().replace(/[a-z]/g, c => charset[c] ?? c);
 
+/** Command handler for `!help`: Muestra lista de comandos disponibles. */
 export class HelpCommand extends Command {
   name = 'help';
   description = 'Muestra lista de comandos disponibles';

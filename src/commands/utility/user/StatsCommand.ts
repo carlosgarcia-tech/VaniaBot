@@ -1,3 +1,12 @@
+/**
+ * StatsCommand.ts
+ *
+ * utility command `botinfo` — Displays real-time bot statistics
+ * Usage: !botinfo
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -28,6 +37,7 @@ interface CacheStats {
   };
 }
 
+/** Command handler for `!botinfo`: Displays real-time bot statistics. */
 export class StatsCommand extends Command {
   name = 'botinfo';
   description = 'Displays real-time bot statistics';

@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the commands layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 export { NsfwMediaBase } from './NsfwMediaBase.js';
 export { TiktokCommand } from './TiktokCommand.js';
 export { Rule34Command } from './Rule34Command.js';

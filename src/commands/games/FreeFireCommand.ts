@@ -1,3 +1,12 @@
+/**
+ * FreeFireCommand.ts
+ *
+ * freefire command `freefire` — Organiza torneos de Free Fire en grupos
+ * Usage: !ff <comando>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -15,6 +24,7 @@ function parsePipeArgs(args: string[]): string[] {
     .filter(Boolean);
 }
 
+/** Command handler for `!freefire`: Organiza torneos de Free Fire en grupos. */
 export class FreeFireCommand extends Command {
   name = 'freefire';
   description = 'Organiza torneos de Free Fire en grupos';

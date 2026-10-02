@@ -1,3 +1,12 @@
+/**
+ * SimpCommand.ts
+ *
+ * creative command `simp` — Efecto simp
+ * Usage: !simp [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!simp`: Efecto simp. */
 export class SimpCommand extends Command {
   name = 'simp';
   description = 'Efecto simp';

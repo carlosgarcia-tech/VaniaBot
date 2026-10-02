@@ -1,8 +1,18 @@
+/**
+ * QrCommand.ts
+ *
+ * utility command `qr` — Genera un código QR de cualquier texto o URL.
+ * Usage: !qr <texto o URL>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 import { isValidUrl } from '@/utils/validators.js';
 
+/** Command handler for `!qr`: Genera un código QR de cualquier texto o URL. */
 export class QrCommand extends Command {
   name = 'qr';
   description = 'Genera un código QR de cualquier texto o URL.';

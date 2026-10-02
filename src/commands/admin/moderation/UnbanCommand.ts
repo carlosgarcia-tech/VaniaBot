@@ -1,3 +1,12 @@
+/**
+ * UnbanCommand.ts
+ *
+ * moderation command `unban` — Unban a user from the group
+ * Usage: !unban @user
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
@@ -10,6 +19,7 @@ import { logError } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 
+/** Command handler for `!unban`: Unban a user from the group. */
 export class UnbanCommand extends Command {
   name = 'unban';
   description = 'Unban a user from the group';

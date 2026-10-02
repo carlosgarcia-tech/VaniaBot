@@ -1,7 +1,17 @@
+/**
+ * SetBotNameCommand.ts
+ *
+ * owner command `setbotname` — Cambia el nombre del bot
+ * Usage: !setbotname <nombre>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 
+/** Command handler for `!setbotname`: Cambia el nombre del bot. */
 export class SetBotNameCommand extends Command {
   name = 'setbotname';
   description = 'Cambia el nombre del bot';

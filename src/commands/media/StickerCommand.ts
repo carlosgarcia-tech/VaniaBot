@@ -1,9 +1,19 @@
+/**
+ * StickerCommand.ts
+ *
+ * media command `sticker` — Convert image/video to sticker
+ * Usage: !sticker <reply to image/video>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { StickerHelper } from '@/utils/StickerHelper.js';
 
+/** Command handler for `!sticker`: Convert image/video to sticker. */
 export class StickerCommand extends Command {
   name = 'sticker';
   description = 'Convert image/video to sticker';

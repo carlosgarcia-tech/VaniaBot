@@ -1,3 +1,11 @@
+/**
+ * Pathfinding.ts
+ *
+ * VaniaBot commands module exposing `PathStep`, `PathResult`, `findPath`, `findTopKPaths`.
+ *
+ * @author **Carlos G**
+ */
+
 import { MinHeap } from './Minheap.js';
 import { NODES, GRAPH, type ResolvedEdge, type Coord } from '../map/Purgatoriomap.js';
 

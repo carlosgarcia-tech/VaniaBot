@@ -1,3 +1,12 @@
+/**
+ * AvatarRandomCommand.ts
+ *
+ * anime command `avatarrandom` — Obtiene un avatar aleatorio con estilo
+ * Usage: !avatarrandom [estilo]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!avatarrandom`: Obtiene un avatar aleatorio con estilo. */
 export class AvatarRandomCommand extends Command {
   name = 'avatarrandom';
   description = 'Obtiene un avatar aleatorio con estilo';

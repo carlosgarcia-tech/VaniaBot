@@ -1,3 +1,12 @@
+/**
+ * MemeCommand.ts
+ *
+ * fun command `meme` — Muestra un meme o chiste de programador
+ * Usage: !meme
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import {
   CommandCategory,
@@ -30,6 +39,7 @@ const MEMES = [
   '¿Por qué los zombies no pueden comer brains? ¡Porque ya están brains!',
 ];
 
+/** Command handler for `!meme`: Muestra un meme o chiste de programador. */
 export class MemeCommand extends Command {
   name = 'meme';
   description = 'Muestra un meme o chiste de programador';

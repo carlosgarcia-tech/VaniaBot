@@ -1,3 +1,12 @@
+/**
+ * YtMp3Command.ts
+ *
+ * media command `ytmp3` — Download YouTube audio as MP3
+ * Usage: !ytmp3 <search or URL>
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
@@ -26,6 +35,7 @@ class YtAudioPreview extends MediaPreviewBase {
   }
 }
 
+/** Command handler for `!ytmp3`: Download YouTube audio as MP3. */
 export class YtMp3Command extends Command {
   name = 'ytmp3';
   description = 'Download YouTube audio as MP3';

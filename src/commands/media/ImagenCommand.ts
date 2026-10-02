@@ -1,9 +1,19 @@
+/**
+ * ImagenCommand.ts
+ *
+ * media command `imagen` — Busca imágenes en alta calidad
+ * Usage: !imagen <búsqueda>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { imageService } from '@/services/external/ImageService.js';
 import { logger } from '@/utils/logger.js';
 
+/** Command handler for `!imagen`: Busca imágenes en alta calidad. */
 export class ImagenCommand extends Command {
   name = 'imagen';
   description = 'Busca imágenes en alta calidad';

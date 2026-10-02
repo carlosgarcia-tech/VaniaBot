@@ -1,8 +1,18 @@
+/**
+ * ShopRPGCommand.ts
+ *
+ * rpg command `shoprpg` — Tienda de items RPG
+ * Usage: !shoprpg [tipo]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { itemRegistry, type ItemType } from '@/services/rpg/ItemRegistry.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** Command handler for `!shoprpg`: Tienda de items RPG. */
 export class ShopRPGCommand extends Command {
   name = 'shoprpg';
   description = 'Tienda de items RPG';

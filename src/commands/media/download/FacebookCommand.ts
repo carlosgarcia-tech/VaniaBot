@@ -1,3 +1,12 @@
+/**
+ * FacebookCommand.ts
+ *
+ * media command `facebook` — Download Facebook videos and Reels
+ * Usage: !facebook <URL>
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
@@ -24,6 +33,7 @@ class FacebookPreview extends MediaPreviewBase {
   }
 }
 
+/** Command handler for `!facebook`: Download Facebook videos and Reels. */
 export class FacebookCommand extends Command {
   name = 'facebook';
   description = 'Download Facebook videos and Reels';

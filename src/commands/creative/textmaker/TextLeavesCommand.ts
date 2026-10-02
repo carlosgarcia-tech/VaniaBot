@@ -1,3 +1,12 @@
+/**
+ * TextLeavesCommand.ts
+ *
+ * creative command `leaves` — Crea un efecto de texto con hojas
+ * Usage: !leaves <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -10,6 +19,7 @@ import {
 const PAGE_URL =
   'https://en.ephoto360.com/green-brush-text-effect-typography-maker-online-153.html';
 
+/** Command handler for `!leaves`: Crea un efecto de texto con hojas. */
 export class TextLeavesCommand extends Command {
   name = 'leaves';
   description = 'Crea un efecto de texto con hojas';

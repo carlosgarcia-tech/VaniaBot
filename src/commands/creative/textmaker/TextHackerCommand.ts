@@ -1,3 +1,12 @@
+/**
+ * TextHackerCommand.ts
+ *
+ * creative command `hacker` — Crea un efecto de texto estilo hacker
+ * Usage: !hacker <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-anonymous-hacker-avatars-cyan-neon-677.html';
 
+/** Command handler for `!hacker`: Crea un efecto de texto estilo hacker. */
 export class TextHackerCommand extends Command {
   name = 'hacker';
   description = 'Crea un efecto de texto estilo hacker';

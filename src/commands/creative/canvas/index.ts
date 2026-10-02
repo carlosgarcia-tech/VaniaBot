@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the commands layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 export { BratCommand } from './BratCommand.js';
 export { TTPCommand } from './TTPCommand.js';
 export { ATTPCommand } from './ATTPCommand.js';

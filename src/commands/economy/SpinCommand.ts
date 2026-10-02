@@ -1,3 +1,12 @@
+/**
+ * SpinCommand.ts
+ *
+ * economy command `spin` — Ruleta diaria gratis
+ * Usage: !spin
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -5,6 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 const spinCooldowns = new Map<string, number>();
 const SPIN_COOLDOWN = 4 * 60 * 60 * 1000;
 
+/** Command handler for `!spin`: Ruleta diaria gratis. */
 export class SpinCommand extends Command {
   name = 'spin';
   description = 'Ruleta diaria gratis';

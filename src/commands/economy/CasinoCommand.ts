@@ -1,3 +1,12 @@
+/**
+ * CasinoCommand.ts
+ *
+ * economy command `casino` — Juega en el casino
+ * Usage: !casino [juego] [apuesta]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -114,6 +123,7 @@ const CASINO_GAMES: CasinoGame[] = [
   },
 ];
 
+/** Command handler for `!casino`: Juega en el casino. */
 export class CasinoCommand extends Command {
   name = 'casino';
   description = 'Juega en el casino';

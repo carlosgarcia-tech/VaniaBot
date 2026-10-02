@@ -1,9 +1,19 @@
+/**
+ * LoanCommand.ts
+ *
+ * economy command `prestamo` — Sistema de préstamos entre usuarios
+ * Usage: !prestamo [dar|aceptar|rechazar|pagar|estado]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { loanService } from '@/services/economy/LoanService.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 
+/** Command handler for `!prestamo`: Sistema de préstamos entre usuarios. */
 export class LoanCommand extends Command {
   name = 'prestamo';
   description = 'Sistema de préstamos entre usuarios';

@@ -1,8 +1,18 @@
+/**
+ * SellCommand.ts
+ *
+ * rpg command `sell` — Vende items en el mercado
+ * Usage: !sell [item] [precio] [cantidad] | !sell [item]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { tradeService } from '@/services/rpg/TradeService.js';
 import { isRight } from '@/utils/either.js';
 
+/** Command handler for `!sell`: Vende items en el mercado. */
 export class SellCommand extends Command {
   name = 'sell';
   description = 'Vende items en el mercado';

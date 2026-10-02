@@ -1,3 +1,12 @@
+/**
+ * LoremFlickrCommand.ts
+ *
+ * anime command `loremflickr` — Obtiene una imagen de LoremFlickr
+ * Usage: !loremflickr <tags>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!loremflickr`: Obtiene una imagen de LoremFlickr. */
 export class LoremFlickrCommand extends Command {
   name = 'loremflickr';
   description = 'Obtiene una imagen de LoremFlickr';

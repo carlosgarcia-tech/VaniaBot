@@ -1,3 +1,12 @@
+/**
+ * ExecCommand.ts
+ *
+ * owner command `exec` — Ejecuta comandos del sistema
+ * Usage: !exec <comando>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -7,6 +16,7 @@ import { checkPinVerification } from '@/utils/pinVerificationHelper.js';
 
 const execAsync = promisify(exec);
 
+/** Command handler for `!exec`: Ejecuta comandos del sistema. */
 export class ExecCommand extends Command {
   name = 'exec';
   description = 'Ejecuta comandos del sistema';

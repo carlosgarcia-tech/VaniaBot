@@ -1,3 +1,12 @@
+/**
+ * VaniaToggleCommand.ts
+ *
+ * admin command `vaniaoff` — Desactiva a Vania en este grupo
+ * Usage: !vaniaoff [slot]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import {
   CommandCategory,
@@ -8,6 +17,7 @@ import {
 import { logError } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** Command handler for `!vaniaoff`: Desactiva a Vania en este grupo. */
 export class VaniaOffCommand extends Command {
   name = 'vaniaoff';
   description = 'Desactiva a Vania en este grupo';

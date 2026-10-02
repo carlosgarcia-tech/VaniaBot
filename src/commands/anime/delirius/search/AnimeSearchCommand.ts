@@ -1,3 +1,12 @@
+/**
+ * AnimeSearchCommand.ts
+ *
+ * anime command `animesearch` — Busca anime en AniList
+ * Usage: !animesearch <anime>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!animesearch`: Busca anime en AniList. */
 export class AnimeSearchCommand extends Command {
   name = 'animesearch';
   description = 'Busca anime en AniList';

@@ -1,3 +1,12 @@
+/**
+ * TextMatrixCommand.ts
+ *
+ * creative command `matrix` — Crea un efecto de texto estilo Matrix
+ * Usage: !matrix <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/matrix-text-effect-154.html';
 
+/** Command handler for `!matrix`: Crea un efecto de texto estilo Matrix. */
 export class TextMatrixCommand extends Command {
   name = 'matrix';
   description = 'Crea un efecto de texto estilo Matrix';

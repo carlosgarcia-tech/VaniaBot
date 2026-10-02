@@ -1,3 +1,12 @@
+/**
+ * RipCommand.ts
+ *
+ * creative command `rip` — Genera imagen RIP
+ * Usage: !rip [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -9,6 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!rip`: Genera imagen RIP. */
 export class RipCommand extends Command {
   name = 'rip';
   description = 'Genera imagen RIP';

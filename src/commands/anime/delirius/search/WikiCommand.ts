@@ -1,3 +1,12 @@
+/**
+ * WikiCommand.ts
+ *
+ * anime command `wiki` — Busca en Wikipedia
+ * Usage: !wiki <busqueda>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!wiki`: Busca en Wikipedia. */
 export class WikiCommand extends Command {
   name = 'wiki';
   description = 'Busca en Wikipedia';

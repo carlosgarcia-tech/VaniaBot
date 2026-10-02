@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the commands layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 export { MemeCommand } from './MemeCommand.js';
 export { ChisteCommand } from './ChisteCommand.js';
 export { Bola8Command } from './Bola8Command.js';

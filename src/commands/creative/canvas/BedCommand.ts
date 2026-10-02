@@ -1,3 +1,12 @@
+/**
+ * BedCommand.ts
+ *
+ * creative command `bed` — Genera imagen en la cama
+ * Usage: !bed [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!bed`: Genera imagen en la cama. */
 export class BedCommand extends Command {
   name = 'bed';
   description = 'Genera imagen en la cama';

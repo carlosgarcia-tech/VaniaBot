@@ -1,3 +1,12 @@
+/**
+ * SpotifyplaylistCommand.ts
+ *
+ * media command `spotifyplaylist` — Descarga playlists completas de Spotify
+ * Usage: !spotifyplaylist <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!spotifyplaylist`: Descarga playlists completas de Spotify. */
 export class SpotifyplaylistCommand extends Command {
   name = 'spotifyplaylist';
   description = 'Descarga playlists completas de Spotify';

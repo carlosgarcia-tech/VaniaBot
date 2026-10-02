@@ -1,9 +1,19 @@
+/**
+ * BankCommand.ts
+ *
+ * economy command `bank` — Ver saldo del banco
+ * Usage: !bank
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { formatNumber } from '@/utils/helpers.js';
 
+/** Command handler for `!bank`: Ver saldo del banco. */
 export class BankCommand extends Command {
   name = 'bank';
   description = 'Ver saldo del banco';

@@ -1,9 +1,19 @@
+/**
+ * ExternalAPIsCommand.ts
+ *
+ * utility command `wikipedia` — Buscar en Wikipedia
+ * Usage: .wikipedia <tema>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '@/commands/Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import axios from 'axios';
 import { logger } from '@/utils/logger.js';
 
+/** Command handler for `!wikipedia`: Buscar en Wikipedia. */
 export class WikipediaCommand extends Command {
   name = 'wikipedia';
   description = 'Buscar en Wikipedia';

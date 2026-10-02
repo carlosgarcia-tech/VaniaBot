@@ -1,3 +1,12 @@
+/**
+ * PrimeCommand.ts
+ *
+ * admin command `prime` — Activa el modo Prime para este grupo
+ * Usage: !prime [on/off/status]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import {
   CommandCategory,
@@ -7,6 +16,7 @@ import {
 } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** Command handler for `!prime`: Activa el modo Prime para este grupo. */
 export class PrimeCommand extends Command {
   name = 'prime';
   description = 'Activa el modo Prime para este grupo';

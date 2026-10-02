@@ -1,7 +1,17 @@
+/**
+ * UrlShortenerCommand.ts
+ *
+ * utility command `acortar` — Acorta una URL larga usando TinyURL.
+ * Usage: !acortar <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!acortar`: Acorta una URL larga usando TinyURL. */
 export class UrlShortenerCommand extends Command {
   name = 'acortar';
   description = 'Acorta una URL larga usando TinyURL.';

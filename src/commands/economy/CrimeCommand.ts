@@ -1,3 +1,12 @@
+/**
+ * CrimeCommand.ts
+ *
+ * economy command `crime` — Comete delitos para ganar dinero
+ * Usage: !crime [tipo] [@user]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -103,6 +112,7 @@ const HACK_BANK: CrimeType = {
   fineMultiplier: 3.0,
 };
 
+/** Command handler for `!crime`: Comete delitos para ganar dinero. */
 export class CrimeCommand extends Command {
   name = 'crime';
   description = 'Comete delitos para ganar dinero';

@@ -1,7 +1,16 @@
+/**
+ * StatusCommand.ts
+ *
+ * utility command `status` — Ver estado y salud del sistema
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '@/commands/Command.js';
 import { type MessageContext, PermissionLevel, CommandCategory } from '@/types/index.js';
 import { healthCheckService } from '@/services/system/HealthCheckService.js';
 
+/** Command handler for `!status`: Ver estado y salud del sistema. */
 export class StatusCommand extends Command {
   name = 'status';
   description = 'Ver estado y salud del sistema';

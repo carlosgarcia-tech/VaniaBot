@@ -1,3 +1,12 @@
+/**
+ * DailyCommand.ts
+ *
+ * economy command `daily` — Recompensa diaria mejorada
+ * Usage: !daily
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -7,6 +16,7 @@ import { errorHandler } from '@/utils/ErrorHandler.js';
 import { logError } from '@/utils/logger.js';
 import { achievementService } from '@/services/rpg/AchievementService.js';
 
+/** Command handler for `!daily`: Recompensa diaria mejorada. */
 export class DailyCommand extends Command {
   name = 'daily';
   description = 'Recompensa diaria mejorada';

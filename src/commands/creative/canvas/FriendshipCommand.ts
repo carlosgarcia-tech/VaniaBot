@@ -1,3 +1,12 @@
+/**
+ * FriendshipCommand.ts
+ *
+ * creative command `friendship` — Genera imagen de amistad
+ * Usage: !friendship [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!friendship`: Genera imagen de amistad. */
 export class FriendshipCommand extends Command {
   name = 'friendship';
   description = 'Genera imagen de amistad';

@@ -1,3 +1,11 @@
+/**
+ * TextMakerBase.ts
+ *
+ * VaniaBot commands module exposing `TextMakerBase`.
+ *
+ * @author **Carlos G**
+ */
+
 import * as mumaker from 'mumaker';
 import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';

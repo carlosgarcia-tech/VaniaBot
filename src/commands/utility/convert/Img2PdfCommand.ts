@@ -1,3 +1,12 @@
+/**
+ * Img2PdfCommand.ts
+ *
+ * utility command `img2pdf` — Convierte una o más imágenes a PDF
+ * Usage: !img2pdf (responder a una o más imágenes, o enviarlas y luego usar el comando)
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { downloadMediaMessage } from 'baileys';
@@ -6,6 +15,7 @@ import { ConversionService } from '@/services/convert/ConversionService.js';
 import { mediaGroupBuffer } from '@/core/MediaGroupBuffer.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!img2pdf`: Convierte una o más imágenes a PDF. */
 export class Img2PdfCommand extends Command {
   name = 'img2pdf';
   description = 'Convierte una o más imágenes a PDF';

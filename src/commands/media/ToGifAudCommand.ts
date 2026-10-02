@@ -1,3 +1,12 @@
+/**
+ * ToGifAudCommand.ts
+ *
+ * media command `togifaud` — Convertir video a GIF
+ * Usage: !togifaud (responde a video)
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -12,6 +21,7 @@ import { logger } from '@/utils/logger.js';
 const execAsync = promisify(exec);
 const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-togif');
 
+/** Command handler for `!togifaud`: Convertir video a GIF. */
 export class ToGifAudCommand extends Command {
   name = 'togifaud';
   description = 'Convertir video a GIF';

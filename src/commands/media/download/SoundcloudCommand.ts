@@ -1,3 +1,12 @@
+/**
+ * SoundcloudCommand.ts
+ *
+ * media command `soundcloud` — Descarga audio de SoundCloud
+ * Usage: !soundcloud <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { downloadService } from '@/services/external/DownloadService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!soundcloud`: Descarga audio de SoundCloud. */
 export class SoundcloudCommand extends Command {
   name = 'soundcloud';
   description = 'Descarga audio de SoundCloud';

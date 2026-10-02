@@ -1,9 +1,19 @@
+/**
+ * OwnersCommand.ts
+ *
+ * utility command `owners` — Muestra la lista de owners del bot
+ * Usage: !owners
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** Command handler for `!owners`: Muestra la lista de owners del bot. */
 export class OwnersCommand extends Command {
   name = 'owners';
   description = 'Muestra la lista de owners del bot';

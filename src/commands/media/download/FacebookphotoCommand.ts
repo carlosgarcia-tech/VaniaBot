@@ -1,3 +1,12 @@
+/**
+ * FacebookphotoCommand.ts
+ *
+ * media command `facebookphoto` — Descarga fotos de Facebook
+ * Usage: !facebookphoto <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!facebookphoto`: Descarga fotos de Facebook. */
 export class FacebookphotoCommand extends Command {
   name = 'facebookphoto';
   description = 'Descarga fotos de Facebook';

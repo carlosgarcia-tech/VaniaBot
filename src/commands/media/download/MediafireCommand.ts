@@ -1,4 +1,13 @@
 /**
+ * MediafireCommand.ts
+ *
+ * media command `mediafire` — Descarga archivos de Mediafire
+ * Usage: !mf <url de mediafire>
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview MediafireCommand.ts - Download from Mediafire
  *
  * Downloads files from Mediafire.
@@ -12,6 +21,7 @@ import { mediafireDownloader } from '@/services/download/MediafireDownloader.js'
 import { isRight } from '@/utils/either.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!mediafire`: Descarga archivos de Mediafire. */
 export class MediafireCommand extends Command {
   name = 'mediafire';
   description = 'Descarga archivos de Mediafire';

@@ -1,8 +1,18 @@
+/**
+ * DepositCommand.ts
+ *
+ * economy command `deposit` — Depositar dinero al banco
+ * Usage: !deposit <cantidad>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 
+/** Command handler for `!deposit`: Depositar dinero al banco. */
 export class DepositCommand extends Command {
   name = 'deposit';
   description = 'Depositar dinero al banco';

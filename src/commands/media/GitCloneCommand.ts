@@ -1,3 +1,12 @@
+/**
+ * GitCloneCommand.ts
+ *
+ * media command `gitclon` — Clonar repositorio de GitHub
+ * Usage: !gitclon <URL>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -9,6 +18,7 @@ import { logger } from '@/utils/logger.js';
 
 const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-gitclone');
 
+/** Command handler for `!gitclon`: Clonar repositorio de GitHub. */
 export class GitCloneCommand extends Command {
   name = 'gitclon';
   description = 'Clonar repositorio de GitHub';

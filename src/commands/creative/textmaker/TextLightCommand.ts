@@ -1,3 +1,12 @@
+/**
+ * TextLightCommand.ts
+ *
+ * creative command `light` — Crea un efecto de texto de luz futurista
+ * Usage: !light <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/light-text-effect-futuristic-technology-style-648.html';
 
+/** Command handler for `!light`: Crea un efecto de texto de luz futurista. */
 export class TextLightCommand extends Command {
   name = 'light';
   description = 'Crea un efecto de texto de luz futurista';

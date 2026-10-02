@@ -1,3 +1,12 @@
+/**
+ * TTPCommand.ts
+ *
+ * creative command `ttp` — Genera texto en imagen estilo TTP
+ * Usage: !ttp <texto> [color]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import {
@@ -7,6 +16,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!ttp`: Genera texto en imagen estilo TTP. */
 export class TTPCommand extends Command {
   name = 'ttp';
   description = 'Genera texto en imagen estilo TTP';

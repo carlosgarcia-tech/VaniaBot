@@ -1,3 +1,12 @@
+/**
+ * AutoAdminCommand.ts
+ *
+ * owner command `autoadmin` — Automatically promote yourself to admin (owner only)
+ * Usage: !autoadmin
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import {
   CommandCategory,
@@ -10,6 +19,7 @@ import { logError } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { cacheManager } from '@/core/CacheManager.js';
 
+/** Command handler for `!autoadmin`: Automatically promote yourself to admin (owner only). */
 export class AutoAdminCommand extends Command {
   name = 'autoadmin';
   description = 'Automatically promote yourself to admin (owner only)';

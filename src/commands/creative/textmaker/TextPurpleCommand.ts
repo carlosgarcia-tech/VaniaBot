@@ -1,3 +1,12 @@
+/**
+ * TextPurpleCommand.ts
+ *
+ * creative command `purple` — Crea un efecto de texto morado
+ * Usage: !purple <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/purple-text-effect-online-100.html';
 
+/** Command handler for `!purple`: Crea un efecto de texto morado. */
 export class TextPurpleCommand extends Command {
   name = 'purple';
   description = 'Crea un efecto de texto morado';

@@ -1,3 +1,12 @@
+/**
+ * WorkCommand.ts
+ *
+ * economy command `work` — Work to earn money
+ * Usage: !work
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -6,6 +15,7 @@ import { formatNumber } from '@/utils/helpers.js';
 import { achievementService } from '@/services/rpg/AchievementService.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!work`: Work to earn money. */
 export class WorkCommand extends Command {
   name = 'work';
   description = 'Work to earn money';

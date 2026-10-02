@@ -1,3 +1,12 @@
+/**
+ * PromoteCommand.ts
+ *
+ * moderation command `promote` — Promote a user to admin
+ * Usage: !promote @user
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
@@ -12,6 +21,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { cacheManager } from '@/core/CacheManager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 
+/** Command handler for `!promote`: Promote a user to admin. */
 export class PromoteCommand extends Command {
   name = 'promote';
   description = 'Promote a user to admin';

@@ -1,3 +1,12 @@
+/**
+ * FormarParejaCommand.ts
+ *
+ * fun command `formarpareja` — Formar 5 parejas random del grupo
+ * Usage: !formarpareja
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -6,6 +15,7 @@ import { logError } from '@/utils/logger.js';
 const R = Math.random;
 const Fl = Math.floor;
 
+/** Command handler for `!formarpareja`: Formar 5 parejas random del grupo. */
 export class FormarParejaCommand extends Command {
   name = 'formarpareja';
   description = 'Formar 5 parejas random del grupo';

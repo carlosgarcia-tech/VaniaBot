@@ -1,7 +1,17 @@
+/**
+ * EquipCommand.ts
+ *
+ * rpg command `equip` — Equipa un item de tu inventario
+ * Usage: !equip [item] | !equip list
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { itemService } from '@/services/rpg/ItemService.js';
 
+/** Command handler for `!equip`: Equipa un item de tu inventario. */
 export class EquipCommand extends Command {
   name = 'equip';
   description = 'Equipa un item de tu inventario';

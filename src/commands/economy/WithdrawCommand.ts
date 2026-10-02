@@ -1,8 +1,18 @@
+/**
+ * WithdrawCommand.ts
+ *
+ * economy command `withdraw` — Retirar dinero del banco
+ * Usage: !withdraw <cantidad>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 
+/** Command handler for `!withdraw`: Retirar dinero del banco. */
 export class WithdrawCommand extends Command {
   name = 'withdraw';
   description = 'Retirar dinero del banco';

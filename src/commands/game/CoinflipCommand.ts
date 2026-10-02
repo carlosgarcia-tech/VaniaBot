@@ -1,3 +1,12 @@
+/**
+ * CoinflipCommand.ts
+ *
+ * game command `coinflip` — Bet on a coin flip (heads or tails)
+ * Usage: !coinflip <heads|tails> <amount>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -6,6 +15,7 @@ import { formatNumber } from '@/utils/helpers.js';
 import { validateBetAmount } from '@/utils/validators.js';
 import { config } from '@/config/index.js';
 
+/** Command handler for `!coinflip`: Bet on a coin flip (heads or tails). */
 export class CoinflipCommand extends Command {
   name = 'coinflip';
   description = 'Bet on a coin flip (heads or tails)';

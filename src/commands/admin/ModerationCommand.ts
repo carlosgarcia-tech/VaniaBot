@@ -1,7 +1,17 @@
+/**
+ * ModerationCommand.ts
+ *
+ * admin command `antiwele` — Bloquear usuarios que usan WhatsApp Web
+ * Usage: .antiwele [on/off]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 
+/** Command handler for `!antiwele`: Bloquear usuarios que usan WhatsApp Web. */
 export class AntiWeleCommand extends Command {
   name = 'antiwele';
   description = 'Bloquear usuarios que usan WhatsApp Web';

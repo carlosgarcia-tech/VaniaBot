@@ -1,3 +1,12 @@
+/**
+ * TextGlitchCommand.ts
+ *
+ * creative command `glitch` — Crea un efecto de texto glitch
+ * Usage: !glitch <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-digital-glitch-text-effects-online-767.html';
 
+/** Command handler for `!glitch`: Crea un efecto de texto glitch. */
 export class TextGlitchCommand extends Command {
   name = 'glitch';
   description = 'Crea un efecto de texto glitch';

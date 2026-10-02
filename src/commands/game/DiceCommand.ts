@@ -1,9 +1,19 @@
+/**
+ * DiceCommand.ts
+ *
+ * game command `dice` — Juega a los dados
+ * Usage: !dice <1-6> <cantidad>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { validateBetAmount } from '@/utils/validators.js';
 import { config } from '@/config/index.js';
 
+/** Command handler for `!dice`: Juega a los dados. */
 export class DiceCommand extends Command {
   name = 'dice';
   description = 'Juega a los dados';

@@ -4,10 +4,11 @@
  * Shared fetch → send-media → react flow for the anime/nsfw commands.
  * Subclasses only declare metadata and describe how to obtain the media
  * URL; the base class handles UX (reactions, usage errors) and failure
- * handling (log + ❌ + friendly message), consolidating the boilerplate
- * previously copy-pasted across every command in this directory.
+ * handling (log the error, react with a failure marker, reply with a
+ * friendly message), consolidating the boilerplate previously copy-pasted
+ * across every command in this directory.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import { Command } from '../../Command.js';
@@ -27,10 +28,10 @@ export abstract class NsfwMediaBase extends Command {
   // Gated behind the persisted NSFW toggle instead of being hard-disabled.
   nsfw = true;
 
-  /** Emoji reacted while the request is in flight. */
+  /** Reaction shown while the request is in flight. */
   protected abstract readonly searchEmoji: string;
 
-  /** Emoji reacted when the usage message is shown (defaults to ✍️). */
+  /** Prefix reaction used when the usage message is shown (defaults to a writing-hand emoji). */
   protected get usageEmoji(): string {
     return '✍️';
   }

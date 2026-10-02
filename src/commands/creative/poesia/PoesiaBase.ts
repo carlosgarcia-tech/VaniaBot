@@ -1,3 +1,11 @@
+/**
+ * PoesiaBase.ts
+ *
+ * fun command `PoesiaBase`
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { poesiaService } from '@/services/creative/PoesiaService.js';
 import { parsePoesiaArgs } from '@/services/creative/PoesiaParser.js';
@@ -10,6 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!PoesiaBase`: command handler. */
 export abstract class PoesiaBaseCommand extends Command {
   name = '';
   description = '';

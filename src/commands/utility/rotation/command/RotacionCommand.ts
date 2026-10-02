@@ -1,3 +1,12 @@
+/**
+ * RotacionCommand.ts
+ *
+ * utility command `r cuadri` — Motor de rotación táctica — Purgatorio (Free Fire)
+ * Usage: !r cuadri [posición] [cierre] [equipos?]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -101,6 +110,7 @@ const HELP =
   `Brasilia:6,E · Crossroads:2,C · Ski:4,I · Forge:6,I\n` +
   `Golf:7,C · Marble:4,C · Central:9,D · Fire:9,F · Lumber:9,H`;
 
+/** Command handler for `!r cuadri`: Motor de rotación táctica — Purgatorio (Free Fire). */
 export class RotacionCommand extends Command {
   name = 'r cuadri';
   description = 'Motor de rotación táctica — Purgatorio (Free Fire)';

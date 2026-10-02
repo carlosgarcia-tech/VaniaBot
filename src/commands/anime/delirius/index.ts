@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the commands layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 export { LoremFlickrCommand } from './LoremFlickrCommand.js';
 export { CatCommand } from './CatCommand.js';
 export { AvatarRandomCommand } from './AvatarRandomCommand.js';

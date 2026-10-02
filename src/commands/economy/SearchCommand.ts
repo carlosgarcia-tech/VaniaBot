@@ -1,3 +1,12 @@
+/**
+ * SearchCommand.ts
+ *
+ * economy command `encontrar` — Encontrar dinero en la calle
+ * Usage: !search
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -5,6 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 const searchCooldowns = new Map<string, number>();
 const SEARCH_COOLDOWN = 60 * 1000;
 
+/** Command handler for `!encontrar`: Encontrar dinero en la calle. */
 export class SearchCommand extends Command {
   // Sin name 'search' (chocaba con la busqueda web de BuscarCommand):
   // el juego se ejecuta ahora como !encontrar.

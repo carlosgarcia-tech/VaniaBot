@@ -1,3 +1,12 @@
+/**
+ * TranslateCommand.ts
+ *
+ * utility command `traducirsimple` — Traduce texto a cualquier idioma.
+ * Usage: !traducir <idioma> <texto> | responde un mensaje con !traducir <idioma>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { primeService } from '@/services/system/PrimeService.js';
@@ -11,6 +20,7 @@ interface TranslationResponse {
   };
 }
 
+/** Command handler for `!traducirsimple`: Traduce texto a cualquier idioma. */
 export class TranslateCommand extends Command {
   name = 'traducirsimple';
   description = 'Traduce texto a cualquier idioma.';

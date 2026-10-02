@@ -1,3 +1,12 @@
+/**
+ * ProfileCommand.ts
+ *
+ * utility command `profile` — Show user profile
+ * Usage: !profile [@user]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
@@ -23,6 +32,7 @@ interface ClientStats {
     processing: number;
   };
 }
+/** Command handler for `!profile`: Show user profile. */
 export class ProfileCommand extends Command {
   name = 'profile';
   description = 'Show user profile';

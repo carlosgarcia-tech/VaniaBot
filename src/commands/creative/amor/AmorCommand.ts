@@ -1,3 +1,12 @@
+/**
+ * AmorCommand.ts
+ *
+ * fun command `amor` — Genera mensajes de amor románticos
+ * Usage: !amor [tipo] [para:nombre]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { aiService } from '@/services/external/AIService.js';
 import { isRight } from '@/utils/either.js';
@@ -19,6 +28,7 @@ const EMOJIS: Record<AmorTipo, string> = {
   dedicatoria: '🎵',
 };
 
+/** Command handler for `!amor`: Genera mensajes de amor románticos. */
 export class AmorCommand extends Command {
   name = 'amor';
   description = 'Genera mensajes de amor románticos';

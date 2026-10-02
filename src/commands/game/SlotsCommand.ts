@@ -1,3 +1,12 @@
+/**
+ * SlotsCommand.ts
+ *
+ * game command `slots` — Play slot machine and win money
+ * Usage: !slots <bet>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -5,6 +14,7 @@ import { primeService } from '@/services/system/PrimeService.js';
 import { validateBetAmount } from '@/utils/validators.js';
 import { config } from '@/config/index.js';
 
+/** Command handler for `!slots`: Play slot machine and win money. */
 export class SlotsCommand extends Command {
   name = 'slots';
   description = 'Play slot machine and win money';

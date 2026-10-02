@@ -1,3 +1,12 @@
+/**
+ * EnhanceCommand.ts
+ *
+ * media command `enhance` — Mejora y enlarge una imagen con IA
+ * Usage: !enhance (responde a imagen) [scale] o !enhance <url> [scale]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -5,6 +14,7 @@ import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import axios from 'axios';
 
+/** Command handler for `!enhance`: Mejora y enlarge una imagen con IA. */
 export class EnhanceCommand extends Command {
   name = 'enhance';
   description = 'Mejora y enlarge una imagen con IA';

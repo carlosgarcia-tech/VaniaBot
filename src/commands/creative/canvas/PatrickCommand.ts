@@ -1,3 +1,12 @@
+/**
+ * PatrickCommand.ts
+ *
+ * creative command `patrick` — Genera imagen con Patrick Star
+ * Usage: !patrick [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!patrick`: Genera imagen con Patrick Star. */
 export class PatrickCommand extends Command {
   name = 'patrick';
   description = 'Genera imagen con Patrick Star';

@@ -1,3 +1,12 @@
+/**
+ * TweetCommand.ts
+ *
+ * creative command `tweet` — Genera imagen de tweet
+ * Usage: !tweet <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -9,6 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!tweet`: Genera imagen de tweet. */
 export class TweetCommand extends Command {
   name = 'tweet';
   description = 'Genera imagen de tweet';

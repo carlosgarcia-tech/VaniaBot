@@ -5,7 +5,7 @@
  * When enabled, only group admins and bot owners can use commands.
  * Regular users can still react to lists but cannot use other commands.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

@@ -1,3 +1,11 @@
+/**
+ * Minheap.ts
+ *
+ * VaniaBot commands module exposing `MinHeap`, `HeapItem`.
+ *
+ * @author **Carlos G**
+ */
+
 export interface HeapItem {
   id: string;
   g: number;

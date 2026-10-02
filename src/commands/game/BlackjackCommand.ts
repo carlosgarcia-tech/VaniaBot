@@ -1,3 +1,12 @@
+/**
+ * BlackjackCommand.ts
+ *
+ * game command `blackjack` — Juega blackjack contra el bot
+ * Usage: !blackjack <cantidad> [hit|stand]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -14,6 +23,7 @@ interface BlackjackGame {
 
 const activeGames = new Map<string, BlackjackGame>();
 
+/** Command handler for `!blackjack`: Juega blackjack contra el bot. */
 export class BlackjackCommand extends Command {
   name = 'blackjack';
   description = 'Juega blackjack contra el bot';

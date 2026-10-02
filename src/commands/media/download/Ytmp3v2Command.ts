@@ -1,3 +1,12 @@
+/**
+ * Ytmp3v2Command.ts
+ *
+ * media command `ytmp3v2` — Descarga audio de YouTube (v2)
+ * Usage: !ytmp3v2 <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!ytmp3v2`: Descarga audio de YouTube (v2). */
 export class Ytmp3v2Command extends Command {
   name = 'ytmp3v2';
   description = 'Descarga audio de YouTube (v2)';

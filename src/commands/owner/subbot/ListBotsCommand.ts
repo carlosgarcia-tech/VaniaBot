@@ -1,3 +1,12 @@
+/**
+ * ListBotsCommand.ts
+ *
+ * subbot command `listbots` — Lista todas las subbots (solo owner)
+ * Usage: .listbots
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import {
   CommandCategory,
@@ -7,6 +16,7 @@ import {
 } from '@/types/index.js';
 import { subBotManager } from '@/services/subbot/SubBotManager.js';
 
+/** Command handler for `!listbots`: Lista todas las subbots (solo owner). */
 export class ListBotsCommand extends Command {
   name = 'listbots';
   description = 'Lista todas las subbots (solo owner)';

@@ -4,7 +4,7 @@
  * Commands for managing subbots with slot system.
  * Supports: register, delete, status, reconnect, and list subbots.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

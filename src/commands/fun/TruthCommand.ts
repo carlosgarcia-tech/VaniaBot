@@ -1,3 +1,12 @@
+/**
+ * TruthCommand.ts
+ *
+ * fun command `truth` — Obtiene una pregunta de verdad aleatoria
+ * Usage: !truth
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { logError } from '@/utils/logger.js';
 import {
@@ -51,6 +60,7 @@ const TRUTH_QUESTIONS = [
   '¿Cuál es la verdad que escondes de tu familia?',
 ];
 
+/** Command handler for `!truth`: Obtiene una pregunta de verdad aleatoria. */
 export class TruthCommand extends Command {
   name = 'truth';
   description = 'Obtiene una pregunta de verdad aleatoria';

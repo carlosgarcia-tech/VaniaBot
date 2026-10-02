@@ -1,3 +1,12 @@
+/**
+ * SpotifyinfoCommand.ts
+ *
+ * media command `spotifyinfo` — Obtiene información de una canción o artista de Spotify
+ * Usage: !spotifyinfo <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!spotifyinfo`: Obtiene información de una canción o artista de Spotify. */
 export class SpotifyinfoCommand extends Command {
   name = 'spotifyinfo';
   description = 'Obtiene información de una canción o artista de Spotify';

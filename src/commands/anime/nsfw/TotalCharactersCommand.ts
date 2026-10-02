@@ -1,3 +1,11 @@
+/**
+ * TotalCharactersCommand.ts
+ *
+ * VaniaBot commands module exposing `TotalCharactersCommand`.
+ *
+ * @author **Carlos G**
+ */
+
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { NsfwMediaBase } from './NsfwMediaBase.js';
 import { CommandContext } from '@/types/index.js';

@@ -1,3 +1,12 @@
+/**
+ * GitHubSearchCommand.ts
+ *
+ * media command `githubsearch` — Buscar repositorios en GitHub
+ * Usage: !githubsearch <búsqueda>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -13,6 +22,7 @@ const formatDate = (dateStr: string): string => {
   });
 };
 
+/** Command handler for `!githubsearch`: Buscar repositorios en GitHub. */
 export class GitHubSearchCommand extends Command {
   name = 'githubsearch';
   description = 'Buscar repositorios en GitHub';

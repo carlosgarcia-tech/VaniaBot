@@ -1,3 +1,12 @@
+/**
+ * PastebinCommand.ts
+ *
+ * media command `pastebin` — Crea un Pastebin con texto
+ * Usage: !pastebin <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { downloadService } from '@/services/external/DownloadService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!pastebin`: Crea un Pastebin con texto. */
 export class PastebinCommand extends Command {
   name = 'pastebin';
   description = 'Crea un Pastebin con texto';

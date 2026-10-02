@@ -1,7 +1,17 @@
+/**
+ * AiClearCommand.ts
+ *
+ * utility command `aiclear` — Limpia tu historial de conversación con Vania IA
+ * Usage: !aiclear  |  !aiclear all (solo admins)
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { aiService } from '@/services/external/AIService.js';
 
+/** Command handler for `!aiclear`: Limpia tu historial de conversación con Vania IA. */
 export class AiClearCommand extends Command {
   name = 'aiclear';
   description = 'Limpia tu historial de conversación con Vania IA';

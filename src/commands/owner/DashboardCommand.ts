@@ -1,8 +1,18 @@
+/**
+ * DashboardCommand.ts
+ *
+ * owner command `dashboard` — Activa una mini API web con estado del bot
+ * Usage: !dashboard on|off|status
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { dashboardService } from '@/services/system/DashboardService.js';
 
+/** Command handler for `!dashboard`: Activa una mini API web con estado del bot. */
 export class DashboardCommand extends Command {
   name = 'dashboard';
   description = 'Activa una mini API web con estado del bot';

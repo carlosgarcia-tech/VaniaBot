@@ -1,3 +1,12 @@
+/**
+ * PetCommand.ts
+ *
+ * rpg command `pet` — Gestiona tus mascotas
+ * Usage: !pet [list/adopt/release/feed] [nombre]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { petService } from '@/services/rpg/PetService.js';
@@ -5,6 +14,7 @@ import { isRight } from '@/utils/either.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { itemRegistry } from '@/services/rpg/ItemRegistry.js';
 
+/** Command handler for `!pet`: Gestiona tus mascotas. */
 export class PetCommand extends Command {
   name = 'pet';
   description = 'Gestiona tus mascotas';

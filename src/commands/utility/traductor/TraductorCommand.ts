@@ -1,3 +1,12 @@
+/**
+ * TraductorCommand.ts
+ *
+ * utility command `traducir` — Traductor contextual inteligente — detecta idioma y preserva tono
+ * Usage: !tr [idioma] [texto] | !tr [origen]>[destino] [texto] | !tr idiomas
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { translatorService } from '@/services/translator/TranslatorService.js';
 import { isRight } from '@/utils/either.js';
@@ -50,6 +59,7 @@ function buildHelp(): string {
   );
 }
 
+/** Command handler for `!traducir`: Traductor contextual inteligente — detecta idioma y preserva tono. */
 export class TraductorCommand extends Command {
   name = 'traducir';
   description = 'Traductor contextual inteligente — detecta idioma y preserva tono';

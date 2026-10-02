@@ -1,8 +1,17 @@
+/**
+ * ListaTTLCommand.ts
+ *
+ * owner command `listattl` — Configura el tiempo de expiración de las listas (solo owner)
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { listaManager } from '@/services/game/ListaManager.js';
 
+/** Command handler for `!listattl`: Configura el tiempo de expiración de las listas (solo owner). */
 export class ListaTTLCommand extends Command {
   name = 'listattl';
   description = 'Configura el tiempo de expiración de las listas (solo owner)';

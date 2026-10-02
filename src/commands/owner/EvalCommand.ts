@@ -1,8 +1,18 @@
+/**
+ * EvalCommand.ts
+ *
+ * owner command `eval` — Evalúa código JavaScript en tiempo real
+ * Usage: !eval <codigo>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { checkPinVerification } from '@/utils/pinVerificationHelper.js';
 
+/** Command handler for `!eval`: Evalúa código JavaScript en tiempo real. */
 export class EvalCommand extends Command {
   name = 'eval';
   description = 'Evalúa código JavaScript en tiempo real';

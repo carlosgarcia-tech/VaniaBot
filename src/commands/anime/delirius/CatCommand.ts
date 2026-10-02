@@ -1,3 +1,12 @@
+/**
+ * CatCommand.ts
+ *
+ * anime command `cat` — Obtiene una imagen de gato aleatoria
+ * Usage: !cat [texto]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!cat`: Obtiene una imagen de gato aleatoria. */
 export class CatCommand extends Command {
   name = 'cat';
   description = 'Obtiene una imagen de gato aleatoria';

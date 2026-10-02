@@ -1,8 +1,18 @@
+/**
+ * LevelCommand.ts
+ *
+ * utility command `level` — Check your or someone else's level
+ * Usage: !level [@user]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 
+/** Command handler for `!level`: Check your or someone else's level. */
 export class LevelCommand extends Command {
   name = 'level';
   description = "Check your or someone else's level";

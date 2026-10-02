@@ -1,3 +1,12 @@
+/**
+ * HealCommand.ts
+ *
+ * rpg command `heal` — Recupera tu vida
+ * Usage: !heal
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -5,6 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 const healCooldowns = new Map<string, number>();
 const HEAL_COOLDOWN = 60000;
 
+/** Command handler for `!heal`: Recupera tu vida. */
 export class HealCommand extends Command {
   name = 'heal';
   description = 'Recupera tu vida';

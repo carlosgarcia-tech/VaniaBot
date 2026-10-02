@@ -1,8 +1,18 @@
+/**
+ * FreeFireMenuCommand.ts
+ *
+ * freefire command `freefiremenu` — Menú de comandos Free Fire
+ * Usage: !freefiremenu
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { freeFireService } from '@/services/games/FreeFireService.js';
 
+/** Command handler for `!freefiremenu`: Menú de comandos Free Fire. */
 export class FreeFireMenuCommand extends Command {
   name = 'freefiremenu';
   description = 'Menú de comandos Free Fire';

@@ -1,3 +1,12 @@
+/**
+ * GeniusCommand.ts
+ *
+ * anime command `genius` — Busca letras de canciones en Genius
+ * Usage: !genius <cancion>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!genius`: Busca letras de canciones en Genius. */
 export class GeniusCommand extends Command {
   name = 'genius';
   description = 'Busca letras de canciones en Genius';

@@ -1,3 +1,12 @@
+/**
+ * SetOwnerCommand.ts
+ *
+ * owner command `setowner` — Grant or remove owner permissions
+ * Usage: !setowner <add|remove> <@user>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
@@ -5,6 +14,7 @@ import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { checkPinVerification } from '@/utils/pinVerificationHelper.js';
 
+/** Command handler for `!setowner`: Grant or remove owner permissions. */
 export class SetOwnerCommand extends Command {
   name = 'setowner';
   description = 'Grant or remove owner permissions';

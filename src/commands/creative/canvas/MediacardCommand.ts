@@ -1,3 +1,12 @@
+/**
+ * MediacardCommand.ts
+ *
+ * creative command `mediacard` — Genera una card de preview para medios (test)
+ * Usage: !mediacard [plataforma] [titulo] [autor] [duracion] [vistas]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { MediaCardService, type MediaCardOptions } from '@/services/creative/MediaCardService.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
@@ -12,6 +21,7 @@ const THUMBNAILS = {
   twitter: 'https://pbs.twimg.com/media/EXAMPL_E2.jpg',
 };
 
+/** Command handler for `!mediacard`: Genera una card de preview para medios (test). */
 export class MediacardCommand extends Command {
   name = 'mediacard';
   description = 'Genera una card de preview para medios (test)';

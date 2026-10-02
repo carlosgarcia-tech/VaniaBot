@@ -1,3 +1,12 @@
+/**
+ * TiktokCommand.ts
+ *
+ * media command `tiktok` — Download TikTok videos without watermark
+ * Usage: !tiktok <URL> [calidad]
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
@@ -31,6 +40,7 @@ class TikTokPreview extends MediaPreviewBase {
   }
 }
 
+/** Command handler for `!tiktok`: Download TikTok videos without watermark. */
 export class TiktokCommand extends Command {
   name = 'tiktok';
   description = 'Download TikTok videos without watermark';

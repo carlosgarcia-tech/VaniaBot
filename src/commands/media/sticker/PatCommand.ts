@@ -1,3 +1,12 @@
+/**
+ * PatCommand.ts
+ *
+ * media command `patsticker` — Create a Patrick meme sticker
+ * Usage: !patsticker <text>
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
@@ -8,6 +17,7 @@ import { escapeXml, wrapText } from '@/utils/helpers.js';
 import path from 'path';
 import fs from 'fs';
 
+/** Command handler for `!patsticker`: Create a Patrick meme sticker. */
 export class PatCommand extends Command {
   name = 'patsticker';
   description = 'Create a Patrick meme sticker';

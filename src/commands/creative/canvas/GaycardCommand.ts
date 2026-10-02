@@ -1,3 +1,12 @@
+/**
+ * GaycardCommand.ts
+ *
+ * creative command `gaycard` — Genera tarjeta gay
+ * Usage: !gaycard [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -18,6 +27,7 @@ function generateRank(jid: string): string {
   return String(Math.min(base + jitter, 10));
 }
 
+/** Command handler for `!gaycard`: Genera tarjeta gay. */
 export class GaycardCommand extends Command {
   name = 'gaycard';
   description = 'Genera tarjeta gay';

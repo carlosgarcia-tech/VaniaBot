@@ -1,3 +1,12 @@
+/**
+ * DemoteCommand.ts
+ *
+ * moderation command `demote` — Demote an admin to regular user
+ * Usage: !demote @user
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
@@ -12,6 +21,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { cacheManager } from '@/core/CacheManager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 
+/** Command handler for `!demote`: Demote an admin to regular user. */
 export class DemoteCommand extends Command {
   name = 'demote';
   description = 'Demote an admin to regular user';

@@ -1,3 +1,12 @@
+/**
+ * PornhubCommand.ts
+ *
+ * media command `pornhub` — Descarga video de Pornhub
+ * Usage: !pornhub <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { downloadService } from '@/services/external/DownloadService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!pornhub`: Descarga video de Pornhub. */
 export class PornhubCommand extends Command {
   name = 'pornhub';
   description = 'Descarga video de Pornhub';

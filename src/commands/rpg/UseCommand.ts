@@ -1,7 +1,17 @@
+/**
+ * UseCommand.ts
+ *
+ * rpg command `use` — Usa un item consumible de tu inventario
+ * Usage: !use [item]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { itemService } from '@/services/rpg/ItemService.js';
 
+/** Command handler for `!use`: Usa un item consumible de tu inventario. */
 export class UseCommand extends Command {
   name = 'use';
   description = 'Usa un item consumible de tu inventario';

@@ -1,3 +1,12 @@
+/**
+ * GitcloneCommand.ts
+ *
+ * media command `gitclone` — Clona repositorios de GitHub
+ * Usage: !gitclone <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!gitclone`: Clona repositorios de GitHub. */
 export class GitcloneCommand extends Command {
   name = 'gitclone';
   description = 'Clona repositorios de GitHub';

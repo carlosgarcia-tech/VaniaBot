@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the commands layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 export { WikiCommand } from './WikiCommand.js';
 export { GoogleSearchCommand } from './GoogleSearchCommand.js';
 export { YoutubeSearchCommand } from './YoutubeSearchCommand.js';

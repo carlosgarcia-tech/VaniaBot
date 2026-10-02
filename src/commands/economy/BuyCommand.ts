@@ -1,3 +1,12 @@
+/**
+ * BuyCommand.ts
+ *
+ * economy command `buy` — Buy an item from the shop
+ * Usage: !buy <item_number>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
@@ -5,6 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { shopService } from '@/services/economy/ShopService.js';
 
+/** Command handler for `!buy`: Buy an item from the shop. */
 export class BuyCommand extends Command {
   name = 'buy';
   description = 'Buy an item from the shop';

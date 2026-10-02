@@ -1,3 +1,12 @@
+/**
+ * TextBlackpinkCommand.ts
+ *
+ * creative command `blackpink` — Crea un efecto de texto estilo Blackpink
+ * Usage: !blackpink <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -10,6 +19,7 @@ import {
 const PAGE_URL =
   'https://en.ephoto360.com/create-a-blackpink-style-logo-with-members-signatures-810.html';
 
+/** Command handler for `!blackpink`: Crea un efecto de texto estilo Blackpink. */
 export class TextBlackpinkCommand extends Command {
   name = 'blackpink';
   description = 'Crea un efecto de texto estilo Blackpink';

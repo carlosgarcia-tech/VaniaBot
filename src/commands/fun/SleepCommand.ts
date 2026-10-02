@@ -1,3 +1,12 @@
+/**
+ * SleepCommand.ts
+ *
+ * fun command `sleep` — Dormir
+ * Usage: !sleep [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -15,6 +24,7 @@ const SLEEP_VIDEOS = [
   'https://telegra.ph/file/6b8e6cc26de052d4018ba.mp4',
 ];
 
+/** Command handler for `!sleep`: Dormir. */
 export class SleepCommand extends Command {
   name = 'sleep';
   description = 'Dormir';

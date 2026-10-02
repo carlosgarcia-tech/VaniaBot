@@ -1,3 +1,12 @@
+/**
+ * FacepalmCommand.ts
+ *
+ * creative command `facepalm` — Genera imagen con facepalm
+ * Usage: !facepalm [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!facepalm`: Genera imagen con facepalm. */
 export class FacepalmCommand extends Command {
   name = 'facepalm';
   description = 'Genera imagen con facepalm';

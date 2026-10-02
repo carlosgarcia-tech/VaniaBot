@@ -1,3 +1,12 @@
+/**
+ * ChisteCommand.ts
+ *
+ * fun command `chiste` — Cuenta un chiste random
+ * Usage: !chiste [categoria]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { aiService } from '@/services/external/AIService.js';
 import { isRight } from '@/utils/either.js';
@@ -10,6 +19,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!chiste`: Cuenta un chiste random. */
 export class ChisteCommand extends Command {
   name = 'chiste';
   description = 'Cuenta un chiste random';

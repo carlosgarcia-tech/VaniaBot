@@ -1,3 +1,12 @@
+/**
+ * BanCommand.ts
+ *
+ * moderation command `ban` — Ban a user from the group
+ * Usage: !ban @user [reason]
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
@@ -11,6 +20,7 @@ import { logError } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 
+/** Command handler for `!ban`: Ban a user from the group. */
 export class BanCommand extends Command {
   name = 'ban';
   description = 'Ban a user from the group';

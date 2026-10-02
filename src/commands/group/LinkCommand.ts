@@ -1,8 +1,18 @@
+/**
+ * LinkCommand.ts
+ *
+ * group command `link` — Obtener el enlace de invitación del grupo
+ * Usage: !link
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!link`: Obtener el enlace de invitación del grupo. */
 export class LinkCommand extends Command {
   name = 'link';
   description = 'Obtener el enlace de invitación del grupo';

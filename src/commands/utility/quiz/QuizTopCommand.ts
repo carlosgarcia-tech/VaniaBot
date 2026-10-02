@@ -1,3 +1,12 @@
+/**
+ * QuizTopCommand.ts
+ *
+ * utility command `quiztop` — Top jugadores de quiz del grupo
+ * Usage: !quiztop [categoria?]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import {
   CommandCategory,
@@ -33,6 +42,7 @@ interface TopEntry {
   bestStreak: number;
 }
 
+/** Command handler for `!quiztop`: Top jugadores de quiz del grupo. */
 export class QuizTopCommand extends Command {
   name = 'quiztop';
   description = 'Top jugadores de quiz del grupo';

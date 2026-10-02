@@ -1,4 +1,13 @@
 /**
+ * ProcesosCommand.ts
+ *
+ * owner command `procesos` — Lista procesos activos
+ * Usage: !procesos
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview ProcesosCommand.ts - List active processes
  *
  * Shows a list of active processes similar to top.
@@ -19,6 +28,7 @@ import { logError } from '@/utils/logger.js';
 
 const execAsync = promisify(exec);
 
+/** Command handler for `!procesos`: Lista procesos activos. */
 export class ProcesosCommand extends Command {
   name = 'procesos';
   description = 'Lista procesos activos';

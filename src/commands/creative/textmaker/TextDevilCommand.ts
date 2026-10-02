@@ -1,3 +1,12 @@
+/**
+ * TextDevilCommand.ts
+ *
+ * creative command `devil` — Crea un efecto de texto estilo demonio
+ * Usage: !devil <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/neon-devil-wings-text-effect-online-683.html';
 
+/** Command handler for `!devil`: Crea un efecto de texto estilo demonio. */
 export class TextDevilCommand extends Command {
   name = 'devil';
   description = 'Crea un efecto de texto estilo demonio';

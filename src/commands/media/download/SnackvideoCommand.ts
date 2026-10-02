@@ -1,3 +1,12 @@
+/**
+ * SnackvideoCommand.ts
+ *
+ * media command `snackvideo` — Descarga videos de SnackVideo
+ * Usage: !snackvideo <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!snackvideo`: Descarga videos de SnackVideo. */
 export class SnackvideoCommand extends Command {
   name = 'snackvideo';
   description = 'Descarga videos de SnackVideo';

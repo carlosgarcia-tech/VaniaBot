@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the commands layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 export { NhentaiCommand } from './nsfw/NhentaiCommand.js';
 export { TiktokCommand } from './nsfw/TiktokCommand.js';
 export { LoremFlickrCommand } from './delirius/LoremFlickrCommand.js';

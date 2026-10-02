@@ -1,9 +1,19 @@
+/**
+ * AllCommand.ts
+ *
+ * utility command `all` — Mention all group members with an optional message
+ * Usage: !all [message]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 import { cacheManager } from '@/core/CacheManager.js';
 
+/** Command handler for `!all`: Mention all group members with an optional message. */
 export class AllCommand extends Command {
   name = 'all';
   description = 'Mention all group members with an optional message';

@@ -1,3 +1,12 @@
+/**
+ * StickerWikiCommand.ts
+ *
+ * media command `stickerwiki` — Descarga stickers de StickerWiki
+ * Usage: !stickerwiki <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { downloadService } from '@/services/external/DownloadService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!stickerwiki`: Descarga stickers de StickerWiki. */
 export class StickerWikiCommand extends Command {
   name = 'stickerwiki';
   description = 'Descarga stickers de StickerWiki';

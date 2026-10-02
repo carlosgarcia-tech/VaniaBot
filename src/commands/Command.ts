@@ -1,3 +1,11 @@
+/**
+ * Command.ts
+ *
+ * VaniaBot commands module exposing `Command`.
+ *
+ * @author **Carlos G**
+ */
+
 import { CommandContext, PermissionLevel } from '@/types/index.js';
 import type { ICommand, MessageContext, CommandCategory, BotPermission } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';

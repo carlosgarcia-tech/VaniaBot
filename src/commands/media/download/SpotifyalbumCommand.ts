@@ -1,3 +1,12 @@
+/**
+ * SpotifyalbumCommand.ts
+ *
+ * media command `spotifyalbum` — Descarga albums completos de Spotify
+ * Usage: !spotifyalbum <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!spotifyalbum`: Descarga albums completos de Spotify. */
 export class SpotifyalbumCommand extends Command {
   name = 'spotifyalbum';
   description = 'Descarga albums completos de Spotify';

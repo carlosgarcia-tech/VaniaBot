@@ -1,3 +1,12 @@
+/**
+ * TextIceCommand.ts
+ *
+ * creative command `ice` — Crea un efecto de texto de hielo
+ * Usage: !ice <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/ice-text-effect-online-101.html';
 
+/** Command handler for `!ice`: Crea un efecto de texto de hielo. */
 export class TextIceCommand extends Command {
   name = 'ice';
   description = 'Crea un efecto de texto de hielo';

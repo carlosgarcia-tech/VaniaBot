@@ -1,3 +1,12 @@
+/**
+ * PayCommand.ts
+ *
+ * economy command `pay` — Transfer money to another user
+ * Usage: !pay @user <quantity>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -6,6 +15,7 @@ import { formatNumber } from '@/utils/helpers.js';
 import { validateTransferAmount } from '@/utils/validators.js';
 import { config } from '@/config/index.js';
 
+/** Command handler for `!pay`: Transfer money to another user. */
 export class PayCommand extends Command {
   name = 'pay';
   description = 'Transfer money to another user';

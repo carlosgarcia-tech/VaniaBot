@@ -1,3 +1,12 @@
+/**
+ * BookCommand.ts
+ *
+ * creative command `book` — Genera imagen de libro
+ * Usage: !book <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const MAX_WORDS = 30;
 
+/** Command handler for `!book`: Genera imagen de libro. */
 export class BookCommand extends Command {
   name = 'book';
   description = 'Genera imagen de libro';

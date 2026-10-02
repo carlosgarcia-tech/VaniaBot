@@ -1,3 +1,12 @@
+/**
+ * LotteryCommand.ts
+ *
+ * economy command `loteria` — Compra tickets de lotería
+ * Usage: !loteria [comprar|estado|resultado|reiniciar]
+ *
+ * @author **Carlos G**
+ */
+
 import path from 'path';
 import { randomBytes } from 'crypto';
 import { Command } from '../Command.js';
@@ -84,6 +93,7 @@ function generateTicketNumber(): string {
   return randomBytes(3).toString('hex').toUpperCase().slice(0, 5);
 }
 
+/** Command handler for `!loteria`: Compra tickets de lotería. */
 export class LotteryCommand extends Command {
   name = 'loteria';
   description = 'Compra tickets de lotería';

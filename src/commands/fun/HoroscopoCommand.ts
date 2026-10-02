@@ -1,3 +1,12 @@
+/**
+ * HoroscopoCommand.ts
+ *
+ * fun command `horoscopo` — Muestra el horóscopo del día
+ * Usage: !horoscopo [signo]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { aiService } from '@/services/external/AIService.js';
 import { isRight } from '@/utils/either.js';
@@ -9,6 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!horoscopo`: Muestra el horóscopo del día. */
 export class HoroscopoCommand extends Command {
   name = 'horoscopo';
   description = 'Muestra el horóscopo del día';

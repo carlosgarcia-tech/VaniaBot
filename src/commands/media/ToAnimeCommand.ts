@@ -1,3 +1,12 @@
+/**
+ * ToAnimeCommand.ts
+ *
+ * media command `toanime` — Convertir imagen a estilo anime
+ * Usage: !toanime (responde a imagen)
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -6,6 +15,7 @@ import axios from 'axios';
 import { env } from '@/config/env.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!toanime`: Convertir imagen a estilo anime. */
 export class ToAnimeCommand extends Command {
   name = 'toanime';
   description = 'Convertir imagen a estilo anime';

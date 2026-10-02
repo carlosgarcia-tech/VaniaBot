@@ -1,9 +1,19 @@
+/**
+ * PollCommand.ts
+ *
+ * utility command `encuesta` — Crea y gestiona encuestas con múltiples opciones.
+ * Usage: !encuesta "Pregunta" "Op1" "Op2" "Op3..."
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import type { Poll } from '@/services/system/PersistenceService.js';
 import { persistenceService } from '@/services/system/PersistenceService.js';
 import { formatTime } from '@/utils/helpers.js';
 
+/** Command handler for `!encuesta`: Crea y gestiona encuestas con múltiples opciones. */
 export class PollCommand extends Command {
   name = 'encuesta';
   description = 'Crea y gestiona encuestas con múltiples opciones.';

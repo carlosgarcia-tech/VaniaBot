@@ -1,3 +1,12 @@
+/**
+ * PlayStoreCommand.ts
+ *
+ * anime command `playstore` — Busca aplicaciones en Google Play Store
+ * Usage: !playstore <app>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!playstore`: Busca aplicaciones en Google Play Store. */
 export class PlayStoreCommand extends Command {
   name = 'playstore';
   description = 'Busca aplicaciones en Google Play Store';

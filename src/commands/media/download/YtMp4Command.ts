@@ -1,3 +1,12 @@
+/**
+ * YtMp4Command.ts
+ *
+ * media command `ytmp4` — Download YouTube video as MP4
+ * Usage: !ytmp4 <search or URL> [calidad]
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
@@ -31,6 +40,7 @@ class YtVideoPreview extends MediaPreviewBase {
   }
 }
 
+/** Command handler for `!ytmp4`: Download YouTube video as MP4. */
 export class YtMp4Command extends Command {
   name = 'ytmp4';
   description = 'Download YouTube video as MP4';

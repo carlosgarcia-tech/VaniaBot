@@ -1,3 +1,12 @@
+/**
+ * QuizCommand.ts
+ *
+ * utility command `quiz` — Modo estudio — responde preguntas y gana monedas
+ * Usage: !quiz [categoría] [preguntas?] | !quiz stop
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { quizService } from '@/services/study/QuizService.js';
 import { isRight } from '@/utils/either.js';
@@ -61,6 +70,7 @@ const DEFAULT_STATS: UserQuizStats = {
   sessionsPlayed: 0,
 };
 
+/** Command handler for `!quiz`: Modo estudio — responde preguntas y gana monedas. */
 export class QuizCommand extends Command {
   name = 'quiz';
   description = 'Modo estudio — responde preguntas y gana monedas';

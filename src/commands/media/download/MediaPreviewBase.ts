@@ -12,7 +12,7 @@
  * 2. ...send the raw thumbnail with a caption; if there is no thumbnail...
  * 3. ...send a plain text caption.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import type { MessageContext } from '@/types/index.js';
@@ -32,9 +32,9 @@ export interface PreviewInfo {
 
 /** Describes the fallback caption card when MediaCardService fails. */
 export interface PreviewCaptionConfig {
-  /** Decorative header, e.g. `✦ ˚₊· 𝙔𝙤𝙪𝙩𝙪𝙗𝙚 𝘼𝙪𝙙𝙞𝙤 ·₊˚ ✦` */
+  /** Decorative header line rendered above the title (e.g. a stylised banner). */
   header: string;
-  /** Quality label shown next to a film emoji, e.g. `1080p` */
+  /** Quality label shown next to a film icon, e.g. `1080p` */
   quality?: string;
   /** Custom extra lines appended before the footer. */
   extraLines?: string[];

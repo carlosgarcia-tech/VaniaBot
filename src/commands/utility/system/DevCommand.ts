@@ -1,3 +1,12 @@
+/**
+ * DevCommand.ts
+ *
+ * utility command `dev` — Creador del bot
+ * Usage: !dev
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -35,6 +44,7 @@ const charset: Record<string, string> = {
 const toSmallCaps = (text: string): string =>
   text.toLowerCase().replace(/[a-z]/g, c => charset[c] || c);
 
+/** Command handler for `!dev`: Creador del bot. */
 export class DevCommand extends Command {
   name = 'dev';
   description = 'Creador del bot';

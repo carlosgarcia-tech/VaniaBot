@@ -1,9 +1,19 @@
+/**
+ * WarnCommand.ts
+ *
+ * admin command `warn` — Warn a user (3 warnings = automatic kick)
+ * Usage: !warn @user [reason]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 
+/** Command handler for `!warn`: Warn a user (3 warnings = automatic kick). */
 export class WarnCommand extends Command {
   name = 'warn';
   description = 'Warn a user (3 warnings = automatic kick)';

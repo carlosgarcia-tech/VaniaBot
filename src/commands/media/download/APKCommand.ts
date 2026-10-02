@@ -1,4 +1,13 @@
 /**
+ * APKCommand.ts
+ *
+ * media command `apk` — Busca aplicaciones Android
+ * Usage: !apk <nombre de app>
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview APKCommand.ts - Search Android apps
  *
  * Searches for Android applications using dvyer-api.
@@ -11,6 +20,7 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { apkSearchService } from '@/services/download/APKSearchService.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!apk`: Busca aplicaciones Android. */
 export class APKCommand extends Command {
   name = 'apk';
   description = 'Busca aplicaciones Android';

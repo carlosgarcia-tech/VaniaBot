@@ -1,3 +1,12 @@
+/**
+ * QuoteCommand.ts
+ *
+ * creative command `quote` — Genera imagen de cita famosa
+ * Usage: !quote <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import {
@@ -7,6 +16,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!quote`: Genera imagen de cita famosa. */
 export class QuoteCommand extends Command {
   name = 'quote';
   description = 'Genera imagen de cita famosa';

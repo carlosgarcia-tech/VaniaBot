@@ -1,8 +1,18 @@
+/**
+ * InviteCommand.ts
+ *
+ * group command `invite` — Enviar enlace de invitación a un número
+ * Usage: !invite <número>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 
+/** Command handler for `!invite`: Enviar enlace de invitación a un número. */
 export class InviteCommand extends Command {
   name = 'invite';
   description = 'Enviar enlace de invitación a un número';

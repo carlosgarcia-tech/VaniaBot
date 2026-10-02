@@ -1,9 +1,19 @@
+/**
+ * BuyRPGCommand.ts
+ *
+ * rpg command `buyrpg` — Compra items de la tienda RPG
+ * Usage: !buyrpg [item] [cantidad]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { itemRegistry, type RPGItem } from '@/services/rpg/ItemRegistry.js';
 import { itemService } from '@/services/rpg/ItemService.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** Command handler for `!buyrpg`: Compra items de la tienda RPG. */
 export class BuyRPGCommand extends Command {
   name = 'buyrpg';
   description = 'Compra items de la tienda RPG';

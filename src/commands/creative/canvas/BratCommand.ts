@@ -1,3 +1,12 @@
+/**
+ * BratCommand.ts
+ *
+ * creative command `brat` — Genera imagen estilo Brat
+ * Usage: !brat <texto | @usuario>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { StickerHelper } from '@/utils/StickerHelper.js';
 import { canvasService } from '@/services/external/CanvasService.js';
@@ -9,6 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!brat`: Genera imagen estilo Brat. */
 export class BratCommand extends Command {
   name = 'brat';
   description = 'Genera imagen estilo Brat';

@@ -1,4 +1,13 @@
 /**
+ * UpdateCommand.ts
+ *
+ * owner command `update` — Actualiza el bot desde git
+ * Usage: !update
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview UpdateCommand.ts - Update the bot from git
  *
  * Pulls latest changes from git and rebuilds.
@@ -19,6 +28,7 @@ import { logger } from '@/utils/logger.js';
 
 const execAsync = promisify(exec);
 
+/** Command handler for `!update`: Actualiza el bot desde git. */
 export class UpdateCommand extends Command {
   name = 'update';
   description = 'Actualiza el bot desde git';

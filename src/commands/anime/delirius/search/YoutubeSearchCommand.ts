@@ -1,3 +1,12 @@
+/**
+ * YoutubeSearchCommand.ts
+ *
+ * anime command `ytsearch` — Busca videos en YouTube
+ * Usage: !ytsearch <busqueda>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!ytsearch`: Busca videos en YouTube. */
 export class YoutubeSearchCommand extends Command {
   name = 'ytsearch';
   description = 'Busca videos en YouTube';

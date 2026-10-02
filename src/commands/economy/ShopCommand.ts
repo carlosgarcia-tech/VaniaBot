@@ -1,9 +1,19 @@
+/**
+ * ShopCommand.ts
+ *
+ * economy command `shop` — Browse the shop and buy items
+ * Usage: !shop
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { shopService } from '@/services/economy/ShopService.js';
 
+/** Command handler for `!shop`: Browse the shop and buy items. */
 export class ShopCommand extends Command {
   name = 'shop';
   description = 'Browse the shop and buy items';

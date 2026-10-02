@@ -1,8 +1,18 @@
+/**
+ * AiCommand.ts
+ *
+ * utility command `ai` — Chatea con Vania IA. Mantiene historial de conversación.
+ * Usage: !ai <mensaje>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { aiService } from '@/services/external/AIService.js';
 import { isRight } from '@/utils/either.js';
 
+/** Command handler for `!ai`: Chatea con Vania IA. Mantiene historial de conversación. */
 export class AiCommand extends Command {
   name = 'ai';
   description = 'Chatea con Vania IA. Mantiene historial de conversación.';

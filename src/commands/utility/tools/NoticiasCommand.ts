@@ -1,3 +1,12 @@
+/**
+ * NoticiasCommand.ts
+ *
+ * utility command `noticias` — Consulta las últimas noticias
+ * Usage: !noticias [categoría]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { primeService } from '@/services/system/PrimeService.js';
@@ -14,6 +23,7 @@ const CATEGORIES = [
   { id: 'health', name: 'Salud', emoji: '🏥' },
 ];
 
+/** Command handler for `!noticias`: Consulta las últimas noticias. */
 export class NoticiasCommand extends Command {
   name = 'noticias';
   description = 'Consulta las últimas noticias';

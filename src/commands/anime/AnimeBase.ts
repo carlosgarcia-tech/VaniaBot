@@ -1,3 +1,11 @@
+/**
+ * AnimeBase.ts
+ *
+ * VaniaBot commands module exposing `AnimeBase`.
+ *
+ * @author **Carlos G**
+ */
+
 import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 

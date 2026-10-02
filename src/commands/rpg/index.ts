@@ -1,3 +1,11 @@
+/**
+ * index.ts
+ *
+ * Barrel module re-exporting the commands layer's public API.
+ *
+ * @author **Carlos G**
+ */
+
 export { RPGCommand } from './RPGCommand.js';
 export { StatsCommand } from './StatsCommand.js';
 export { ClassCommand } from './ClassCommand.js';

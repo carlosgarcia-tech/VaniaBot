@@ -1,3 +1,12 @@
+/**
+ * ImageConvertCommand.ts
+ *
+ * utility command `imgconvert` — Convierte una imagen a otro formato (jpeg, png, webp, gif, bmp, tiff).
+ * Usage: !imgconvert <formato> [calidad 1-100]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
@@ -12,6 +21,7 @@ import { logError } from '@/utils/logger.js';
 
 const converterService = new ConverterService();
 
+/** Command handler for `!imgconvert`: Convierte una imagen a otro formato (jpeg, png, webp, gif, bmp, tiff). */
 export class ImageConvertCommand extends Command {
   name = 'imgconvert';
   description = 'Convierte una imagen a otro formato (jpeg, png, webp, gif, bmp, tiff).';

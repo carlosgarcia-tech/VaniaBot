@@ -1,3 +1,12 @@
+/**
+ * Bola8Command.ts
+ *
+ * fun command `8ball` — Pregunta a la bola 8 mágica
+ * Usage: !8ball <pregunta>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import {
   CommandCategory,
@@ -6,6 +15,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!8ball`: Pregunta a la bola 8 mágica. */
 export class Bola8Command extends Command {
   name = '8ball';
   description = 'Pregunta a la bola 8 mágica';

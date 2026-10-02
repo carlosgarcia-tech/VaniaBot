@@ -1,9 +1,19 @@
+/**
+ * WeeklyCommand.ts
+ *
+ * economy command `weekly` — Recompensa semanal mejorada
+ * Usage: !weekly
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { formatNumber } from '@/utils/helpers.js';
 
+/** Command handler for `!weekly`: Recompensa semanal mejorada. */
 export class WeeklyCommand extends Command {
   name = 'weekly';
   description = 'Recompensa semanal mejorada';

@@ -1,3 +1,12 @@
+/**
+ * AnimeinfourlCommand.ts
+ *
+ * anime command `animeinfourl` — Muestra información de anime por URL
+ * Usage: !animeinfourl <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!animeinfourl`: Muestra información de anime por URL. */
 export class AnimeinfourlCommand extends Command {
   name = 'animeinfourl';
   description = 'Muestra información de anime por URL';

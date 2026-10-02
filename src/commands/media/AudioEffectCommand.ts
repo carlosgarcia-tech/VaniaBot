@@ -1,3 +1,12 @@
+/**
+ * AudioEffectCommand.ts
+ *
+ * media command `audiofx` — Aplicar efectos de audio
+ * Usage: !<efecto> responde a un audio
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -31,6 +40,7 @@ const EFFECTS: Record<string, { filter: string; description: string }> = {
   fat: { filter: '-filter:a "atempo=1.6,asetrate=22100"', description: 'Fat' },
 };
 
+/** Command handler for `!audiofx`: Aplicar efectos de audio. */
 export class AudioEffectCommand extends Command {
   name = 'audiofx';
   description = 'Aplicar efectos de audio';

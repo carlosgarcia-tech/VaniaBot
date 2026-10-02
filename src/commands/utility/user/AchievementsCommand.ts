@@ -1,9 +1,19 @@
+/**
+ * AchievementsCommand.ts
+ *
+ * utility command `achievements` — Muestra tus logros desbloqueados
+ * Usage: !achievements [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** Command handler for `!achievements`: Muestra tus logros desbloqueados. */
 export class AchievementsCommand extends Command {
   name = 'achievements';
   description = 'Muestra tus logros desbloqueados';

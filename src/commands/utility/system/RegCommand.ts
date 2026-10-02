@@ -1,7 +1,17 @@
+/**
+ * RegCommand.ts
+ *
+ * utility command `reg` — Regístrate para usar el bot
+ * Usage: !reg nombre.edad
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** Command handler for `!reg`: Regístrate para usar el bot. */
 export class RegCommand extends Command {
   name = 'reg';
   description = 'Regístrate para usar el bot';

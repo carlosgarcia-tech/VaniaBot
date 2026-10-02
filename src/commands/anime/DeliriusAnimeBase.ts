@@ -1,3 +1,11 @@
+/**
+ * DeliriusAnimeBase.ts
+ *
+ * VaniaBot commands module exposing `DeliriusAnimeBase`.
+ *
+ * @author **Carlos G**
+ */
+
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';

@@ -1,3 +1,12 @@
+/**
+ * TopCommand.ts
+ *
+ * utility command `top` — Displays the bot leaderboards
+ * Usage: !top [money|level|xp]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -5,6 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 import type { User } from '@/services/database/UserService.js';
 
+/** Command handler for `!top`: Displays the bot leaderboards. */
 export class TopCommand extends Command {
   name = 'top';
   description = 'Displays the bot leaderboards';

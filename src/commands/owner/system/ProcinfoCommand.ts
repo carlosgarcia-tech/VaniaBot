@@ -1,4 +1,13 @@
 /**
+ * ProcinfoCommand.ts
+ *
+ * owner command `procinfo` — Información del proceso
+ * Usage: !procinfo
+ *
+ * @author **Carlos G**
+ */
+
+/**
  * @fileoverview ProcinfoCommand.ts - Process information
  *
  * Shows detailed information about the current process.
@@ -15,6 +24,7 @@ import {
 } from '@/types/index.js';
 import os from 'os';
 
+/** Command handler for `!procinfo`: Información del proceso. */
 export class ProcinfoCommand extends Command {
   name = 'procinfo';
   description = 'Información del proceso';

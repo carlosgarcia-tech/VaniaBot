@@ -1,3 +1,12 @@
+/**
+ * PeliculaCommand.ts
+ *
+ * fun command `pelicula` — Recomienda una película
+ * Usage: !pelicula [género]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { aiService } from '@/services/external/AIService.js';
 import { isRight } from '@/utils/either.js';
@@ -10,6 +19,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!pelicula`: Recomienda una película. */
 export class PeliculaCommand extends Command {
   name = 'pelicula';
   description = 'Recomienda una película';

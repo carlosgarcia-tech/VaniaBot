@@ -1,3 +1,12 @@
+/**
+ * TwitterCommand.ts
+ *
+ * media command `twitter` — Descarga videos de Twitter/X
+ * Usage: !twitter <url>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { TwitterDownloader } from '@/services/download/TwitterDownloader.js';
@@ -22,6 +31,7 @@ class TwitterPreview extends MediaPreviewBase {
   }
 }
 
+/** Command handler for `!twitter`: Descarga videos de Twitter/X. */
 export class TwitterCommand extends Command {
   name = 'twitter';
   description = 'Descarga videos de Twitter/X';

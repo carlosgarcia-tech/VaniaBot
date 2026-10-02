@@ -1,3 +1,11 @@
+/**
+ * ListaCommand.ts
+ *
+ * freefire command `ListaCommand`
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -11,6 +19,7 @@ interface ListaConfig {
   tieneColor: boolean;
 }
 
+/** Command handler for `!ListaCommand`: command handler. */
 export class ListaCommand extends Command {
   name: string;
   description: string;

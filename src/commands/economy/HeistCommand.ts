@@ -1,3 +1,12 @@
+/**
+ * HeistCommand.ts
+ *
+ * economy command `heist` — Asalto al banco (alto riesgo, alta recompensa)
+ * Usage: !heist <cantidad>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -7,6 +16,7 @@ const heistCooldowns = new Map<string, number>();
 const HEIST_COOLDOWN = 30 * 60 * 1000;
 const MIN_HEIST_AMOUNT = 1000;
 
+/** Command handler for `!heist`: Asalto al banco (alto riesgo, alta recompensa). */
 export class HeistCommand extends Command {
   name = 'heist';
   description = 'Asalto al banco (alto riesgo, alta recompensa)';

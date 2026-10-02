@@ -1,3 +1,12 @@
+/**
+ * Text1917Command.ts
+ *
+ * creative command `1917` — Crea un efecto de texto estilo 1917
+ * Usage: !1917 <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { TextMakerBase } from './TextMakerBase.js';
 import {
@@ -9,6 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/1917-style-text-effect-523.html';
 
+/** Command handler for `!1917`: Crea un efecto de texto estilo 1917. */
 export class Text1917Command extends Command {
   name = '1917';
   description = 'Crea un efecto de texto estilo 1917';

@@ -1,7 +1,17 @@
+/**
+ * EncuestaNativeCommand.ts
+ *
+ * utility command `sondaggio` — Crea encuestas nativas de WhatsApp
+ * Usage: !sondaggio "Pregunta" "Op1" "Op2" "Op3..."
+ *
+ * @author **Carlos G**
+ */
+
 import type { proto } from 'baileys';
 import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 
+/** Command handler for `!sondaggio`: Crea encuestas nativas de WhatsApp. */
 export class EncuestaNativeCommand extends Command {
   name = 'sondaggio';
   description = 'Crea encuestas nativas de WhatsApp';

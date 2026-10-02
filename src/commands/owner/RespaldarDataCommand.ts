@@ -1,3 +1,12 @@
+/**
+ * RespaldarDataCommand.ts
+ *
+ * owner command `respaldar` — Genera un respaldo de tus datos
+ * Usage: !respaldar
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import {
   CommandCategory,
@@ -8,6 +17,7 @@ import {
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 
+/** Command handler for `!respaldar`: Genera un respaldo de tus datos. */
 export class RespaldarDataCommand extends Command {
   name = 'respaldar';
   description = 'Genera un respaldo de tus datos';

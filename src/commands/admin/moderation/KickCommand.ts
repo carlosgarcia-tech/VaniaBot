@@ -1,3 +1,12 @@
+/**
+ * KickCommand.ts
+ *
+ * moderation command `kick` — Kick a user from the group (can rejoin)
+ * Usage: !kick @user [reason]
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import {
@@ -11,6 +20,7 @@ import { logError } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 
+/** Command handler for `!kick`: Kick a user from the group (can rejoin). */
 export class KickCommand extends Command {
   name = 'kick';
   description = 'Kick a user from the group (can rejoin)';

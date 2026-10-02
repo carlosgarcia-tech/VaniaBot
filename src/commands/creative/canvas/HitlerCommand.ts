@@ -1,3 +1,12 @@
+/**
+ * HitlerCommand.ts
+ *
+ * creative command `hitler` — Efecto estilo hitler
+ * Usage: !hitler [@usuario]
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../Command.js';
 import { CanvasBase } from './CanvasBase.js';
 import { ImageHelper } from '@/utils/ImageHelper.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!hitler`: Efecto estilo hitler. */
 export class HitlerCommand extends Command {
   name = 'hitler';
   description = 'Efecto estilo hitler';

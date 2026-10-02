@@ -1,9 +1,19 @@
+/**
+ * RPGCommand.ts
+ *
+ * rpg command `rpg` — Panel principal del sistema RPG
+ * Usage: !rpg
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { itemService } from '@/services/rpg/ItemService.js';
 import { classService } from '@/services/rpg/ClassService.js';
 
+/** Command handler for `!rpg`: Panel principal del sistema RPG. */
 export class RPGCommand extends Command {
   name = 'rpg';
   description = 'Panel principal del sistema RPG';

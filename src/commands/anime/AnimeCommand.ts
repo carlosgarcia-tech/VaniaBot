@@ -1,3 +1,11 @@
+/**
+ * AnimeCommand.ts
+ *
+ * VaniaBot commands module exposing `hugCommand`, `patCommand`, `kissCommand`, `cryCommand`.
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { AnimeBase } from './AnimeBase.js';
 import { DeliriusAnimeBase } from './DeliriusAnimeBase.js';

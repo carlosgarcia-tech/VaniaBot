@@ -1,3 +1,12 @@
+/**
+ * GimageCommand.ts
+ *
+ * anime command `gimage` — Busca imágenes en Google
+ * Usage: !gimage <busqueda>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!gimage`: Busca imágenes en Google. */
 export class GimageCommand extends Command {
   name = 'gimage';
   description = 'Busca imágenes en Google';

@@ -1,3 +1,12 @@
+/**
+ * ReportCommand.ts
+ *
+ * utility command `report` — Enviar un reporte al owner del bot
+ * Usage: !report <mensaje>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, CommandContext, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
@@ -6,6 +15,7 @@ import { env } from '@/config/env.js';
 import { logError } from '@/utils/logger.js';
 import type { Report } from '@/services/system/ReportService.js';
 
+/** Command handler for `!report`: Enviar un reporte al owner del bot. */
 export class ReportCommand extends Command {
   name = 'report';
   description = 'Enviar un reporte al owner del bot';

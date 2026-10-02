@@ -1,3 +1,12 @@
+/**
+ * GoogleSearchCommand.ts
+ *
+ * anime command `google` — Busca en Google
+ * Usage: !google <busqueda>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../../../Command.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!google`: Busca en Google. */
 export class GoogleSearchCommand extends Command {
   name = 'google';
   description = 'Busca en Google';

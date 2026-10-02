@@ -1,8 +1,18 @@
+/**
+ * AntiCaidasCommand.ts
+ *
+ * owner command `anticaidas` — Pausa comandos con muchos errores repetidos
+ * Usage: !anticaidas on|off|status|config|clear
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { resilienceService, formatDuration } from '@/services/system/ResilienceService.js';
 
+/** Command handler for `!anticaidas`: Pausa comandos con muchos errores repetidos. */
 export class AntiCaidasCommand extends Command {
   name = 'anticaidas';
   description = 'Pausa comandos con muchos errores repetidos';

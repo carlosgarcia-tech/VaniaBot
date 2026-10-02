@@ -1,3 +1,12 @@
+/**
+ * TTSCommand.ts
+ *
+ * fun command `tts` — Convierte texto a voz
+ * Usage: !tts <texto>
+ *
+ * @author **Carlos G**
+ */
+
 import { Command } from '../Command.js';
 import { ttsService } from '@/services/external/TTSService.js';
 import { logError } from '@/utils/logger.js';
@@ -8,6 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
+/** Command handler for `!tts`: Convierte texto a voz. */
 export class TTSCommand extends Command {
   name = 'tts';
   description = 'Convierte texto a voz';

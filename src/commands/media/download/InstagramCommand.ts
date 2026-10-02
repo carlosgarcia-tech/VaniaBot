@@ -1,3 +1,12 @@
+/**
+ * InstagramCommand.ts
+ *
+ * media command `instagram` — Download Instagram Reels, posts and stories
+ * Usage: !instagram <URL>
+ *
+ * @author **Carlos G**
+ */
+
 import { errorMessage } from '@/utils/errors.js';
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
@@ -30,6 +39,7 @@ class InstagramPreview extends MediaPreviewBase {
   }
 }
 
+/** Command handler for `!instagram`: Download Instagram Reels, posts and stories. */
 export class InstagramCommand extends Command {
   name = 'instagram';
   description = 'Download Instagram Reels, posts and stories';
