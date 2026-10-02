@@ -13,7 +13,7 @@
  * cooldown, gates), closing the previous bypass that executed the command
  * directly. Commands outside PIN_ALLOWED_COMMANDS are never confirmed.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  */
 
 import { Middleware } from './Middleware.js';

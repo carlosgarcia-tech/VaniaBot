@@ -4,7 +4,7 @@
  * Middleware for checking user and bot permissions before command execution.
  * Includes support for admin-only mode and owner exceptions.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

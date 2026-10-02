@@ -1,3 +1,20 @@
+/**
+ * MuteMiddleware.ts
+ *
+ * Drops messages from muted users and deletes them when the bot has the rights.
+ *
+ * The mute flag itself is resolved upstream by the pipeline guard (which also
+ * decides whether the message is a command at all); this middleware only reads
+ * the cached verdict. Deletion failures are logged and the message is still
+ * suppressed, so a permission problem never lets a muted message through.
+ *
+ * @author **Carlos G**
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
+ */
+
 import { Middleware } from './Middleware.js';
 import type { MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';

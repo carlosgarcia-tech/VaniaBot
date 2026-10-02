@@ -1,3 +1,19 @@
+/**
+ * ValidationMiddleware.ts
+ *
+ * Rejects commands used in the wrong context (group-only or private-only).
+ *
+ * This must run before PermissionMiddleware and cannot be registered as
+ * parallel: its rejection relies on returning without calling `next()`, which a
+ * parallel middleware could not guarantee.
+ *
+ * @author **Carlos G**
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
+ */
+
 import { Middleware } from './Middleware.js';
 import type { MessageContext, ICommand } from '@/types/index.js';
 import type { CommandRegistry } from '@/core/CommandRegistry.js';
@@ -26,11 +42,15 @@ export class ValidationMiddleware extends Middleware {
     await next();
   }
 
-  /** Nombre del contexto donde el comando sí está disponible. */
+  /** Human-readable context name used in the rejection message. */
   private getRequiredContextName(command: ICommand): string {
     return command.contexts?.includes(CommandContext.GROUP) ? 'grupos' : 'chats privados';
   }
 
+  /**
+   * True when the current chat type is among the command's allowed contexts.
+   * A command with no `contexts`, or with BOTH, accepts anything.
+   */
   private validateContext(command: ICommand, ctx: MessageContext): boolean {
     if (!command.contexts || command.contexts.includes(CommandContext.BOTH)) return true;
 

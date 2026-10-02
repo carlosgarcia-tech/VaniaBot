@@ -1,3 +1,23 @@
+/**
+ * AutoRegisterMiddleware.ts
+ *
+ * Implicitly creates rows for unknown users and groups the first time they are
+ * seen, and keeps the stored display name in sync with the WhatsApp push name.
+ *
+ * This middleware is intentionally not part of the registered chain (see
+ * Client.initialize); it is wired separately where implicit registration is
+ * wanted, because it performs writes on every message.
+ *
+ * Failures are swallowed and the chain still continues: auto-registration is a
+ * convenience and must never block a command.
+ *
+ * @author **Carlos G**
+ * @github CARLOSGRCIAGRCIA
+ * @tiktok carlos.grcia0
+ * @instagram carlos.gxv
+ * @created 2026-03-16
+ */
+
 import { Middleware } from './Middleware.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
@@ -10,6 +30,7 @@ export class AutoRegisterMiddleware extends Middleware {
     try {
       const userExists = await serviceManager.db.has('users', ctx.sender.jid);
 
+      // getUser() creates the row with defaults when it is missing.
       if (!userExists) {
         await serviceManager.userService.getUser(ctx.sender.jid);
 
