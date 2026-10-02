@@ -5,7 +5,7 @@
  * Processes mentions and routes them to the AI service for contextual responses.
  * Includes logic for solo-admin mode and permission checking.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv
@@ -22,7 +22,15 @@ import { detectPromptInjection } from '@/utils/promptInjection.js';
 
 /**
  * Handles mention events for AI chat.
- * Checks if the bot was mentioned and routes to AI service if valid.
+ *
+ * Returns true when the message was consumed (the caller must stop processing
+ * it), false when the bot was not actually addressed or was addressed by
+ * someone without permission to use it.
+ *
+ * Filtering order matters: self-mentions are rejected first, then the mention is
+ * matched against both the bot's phone number and its LID (WhatsApp may tag the
+ * bot by either identifier), then group admin-only mode is enforced, and only
+ * then is the prompt sanitised and forwarded.
  */
 export async function handleMention(ctx: MessageContext, botJid: string): Promise<boolean> {
   const rawText: string = ctx.text ?? '';
@@ -43,6 +51,8 @@ export async function handleMention(ctx: MessageContext, botJid: string): Promis
 
   const mentionedJids: string[] = getContextInfo(message)?.mentionedJid ?? [];
 
+  // A mention can carry the bot's phone number or its LID; both must be
+  // compared after stripping the device suffix (":12") and domain.
   const sockUser = ctx.sock.user as { id?: string; lid?: string } | undefined;
   const botLid: string | undefined = sockUser?.lid;
   const botNumber = botJid.split('@')[0].split(':')[0];
@@ -74,6 +84,8 @@ export async function handleMention(ctx: MessageContext, botJid: string): Promis
     }
   }
 
+  // Strip the mention itself so the model receives only the user's actual
+  // question, then trim the punctuation left behind by the removal.
   const cleanText = rawText
     .replace(/@\d+/g, '')
     .replace(/@vania/gi, '')
@@ -86,6 +98,7 @@ export async function handleMention(ctx: MessageContext, botJid: string): Promis
     return true;
   }
 
+  // Reject jailbreak attempts before they reach the model.
   const injectionCheck = detectPromptInjection(cleanText);
   if (injectionCheck.blocked) {
     await ctx.react('🚫');

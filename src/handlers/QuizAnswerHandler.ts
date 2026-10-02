@@ -5,7 +5,7 @@
  * Manages answer validation, scoring, streaks, and rewards.
  * Part of the interactive quiz system with adaptive difficulty.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv

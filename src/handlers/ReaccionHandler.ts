@@ -5,7 +5,7 @@
  * Routes reactions to the ListaManager for game logic processing.
  * This handler is always active regardless of admin-only mode.
  *
- * @author **Carlos G** ⭐
+ * @author **Carlos G**
  * @github CARLOSGRCIAGRCIA
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv
@@ -19,13 +19,15 @@ import { normalizeJid } from '@/services/PermissionService.js';
 import { logError } from '@/utils/logger.js';
 
 /**
- * Handles reaction messages for list games.
- * Processes emoji reactions and forwards them to ListaManager.
- * Always enabled regardless of admin-only mode.
+ * Forwards an incoming reaction to ListaManager for list-game logic.
  *
- * @param sock - The Baileys socket
- * @param message - The message containing the reaction
- * @returns Promise<void>
+ * Runs for every reaction regardless of admin-only mode, since reacting to a
+ * list entry is normal participation rather than a privileged action. All
+ * failures are logged and swallowed: a reaction must never interrupt the
+ * pipeline, which treats this as a side channel.
+ *
+ * @param sock Active Baileys socket.
+ * @param message Raw message carrying a `reactionMessage`.
  *
  * @example
  * ```typescript
@@ -71,6 +73,8 @@ export async function handleReaccion(
       emoji,
     });
 
+    // A failed reaction is not an error: the user reacted to a message that is
+    // not a tracked list entry, which is the common case.
     if (!result.success) {
     }
   } catch (error) {

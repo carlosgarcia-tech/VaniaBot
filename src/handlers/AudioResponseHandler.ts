@@ -13,11 +13,19 @@ import type { WASocket, proto } from 'baileys';
 import { logError, logger } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
+/** A keyword pattern and the clip played when it matches. */
 interface AudioTrigger {
   pattern: RegExp;
   audioUrl: string;
 }
 
+/**
+ * Keyword -> audio clip table.
+ *
+ * The first matching entry wins, so order is significant: more specific phrases
+ * must precede broader ones. Patterns are case-insensitive and may also match
+ * literal emojis, which is how purely visual reactions are supported.
+ */
 const AUDIO_TRIGGERS: AudioTrigger[] = [
   { pattern: /\bbuenos?\s+d[ií]as?\b/i, audioUrl: 'https://qu.ax/wLUF.mp3' },
   { pattern: /\bbuenas\s+noches\b/i, audioUrl: 'https://qu.ax/TTfs.mp3' },
@@ -90,8 +98,20 @@ const AUDIO_TRIGGERS: AudioTrigger[] = [
   { pattern: /\b(vete\s+a\s+la\s+verga|vetealavrg)\b/i, audioUrl: 'https://qu.ax/pXts.mp3' },
 ];
 
+/**
+ * Recent message IDs already answered with an audio clip.
+ * Bounded: cleared wholesale once it grows past the threshold, which is cheap
+ * here because a duplicate answer within the same burst is the only real risk.
+ */
 const processedMessages = new Set<string>();
 
+/**
+ * Replies with a voice note when a message matches one of the audio triggers.
+ *
+ * Applies to group chats only and is opt-in per group (`audios` setting). The
+ * first matching trigger ends the loop, and failures are contained so a dead
+ * audio URL cannot break message processing.
+ */
 export async function handleAudioResponse(
   sock: WASocket,
   message: proto.IWebMessageInfo,
@@ -114,8 +134,8 @@ export async function handleAudioResponse(
     try {
       groupSettings = await serviceManager.groupService.getGroup(chatJid);
     } catch (error) {
-      // Sin settings, la función de audios del grupo se desactiva para este
-      // mensaje sin ningún rastro: dejar constancia para diagnosticarlo.
+      // Without settings, audio replies are disabled for this message;
+      // the failure is logged so it can be diagnosed.
       logger.debug(`[AudioResponseHandler] getGroup(${chatJid}) failed, audios skipped:`, error);
       return;
     }
