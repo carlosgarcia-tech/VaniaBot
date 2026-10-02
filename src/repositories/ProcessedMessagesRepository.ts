@@ -4,7 +4,7 @@
  * Repository for tracking processed messages to prevent duplicate processing
  * after bot restarts (prevents command spam from queued messages).
  *
- * @author Carlos G
+ * @author **Carlos G**
  * @created 2026-04-07
  */
 
@@ -16,6 +16,15 @@ export interface ProcessedMessageRecord {
   processed_at: string;
 }
 
+/**
+ * Durable dedup ledger for handled messages.
+ *
+ * The in-memory cache in CacheManager only survives while the process lives, so
+ * a reconnect that re-delivers a batch of queued messages would re-run their
+ * commands. This repository persists what was already handled, letting the
+ * pipeline skip those echoes after a restart. Rows are keyed per bot because
+ * several sessions can observe the same message ID.
+ */
 export class ProcessedMessagesRepository {
   private static instance: ProcessedMessagesRepository;
 
@@ -28,6 +37,7 @@ export class ProcessedMessagesRepository {
     return ProcessedMessagesRepository.instance;
   }
 
+  /** True when this bot already handled the message. */
   isProcessed(messageId: string, botId: string): boolean {
     const result = getDatabase().fetchOne<ProcessedMessageRecord>(
       'SELECT 1 FROM processed_messages WHERE message_id = ? AND bot_id = ?',
@@ -36,6 +46,7 @@ export class ProcessedMessagesRepository {
     return result !== null;
   }
 
+  /** Records a message as handled. INSERT OR REPLACE keeps it idempotent. */
   markProcessed(messageId: string, botId: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -52,6 +63,10 @@ export class ProcessedMessagesRepository {
     return result?.max_processed_at ?? null;
   }
 
+  /**
+   * Prunes entries older than the given age.
+   * @returns Number of deleted rows.
+   */
   cleanOldProcessedMessages(botId: string, olderThanMs: number): number {
     const cutoff = new Date(Date.now() - olderThanMs).toISOString();
     const result = getDatabase().query(

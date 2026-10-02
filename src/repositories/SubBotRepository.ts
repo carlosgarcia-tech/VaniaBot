@@ -3,7 +3,7 @@
  *
  * Repository for subbot data (mirrors subbot_slots for compatibility).
  *
- * @author Carlos G
+ * @author **Carlos G**
  * @created 2026-04-07
  */
 

@@ -4,7 +4,7 @@
  * Repository for bot runtime state persistence.
  * Tracks heartbeat, connection status, and health metrics per bot.
  *
- * @author Carlos G
+ * @author **Carlos G**
  * @created 2026-04-07
  */
 
@@ -48,9 +48,18 @@ export interface CreateRuntimeStateInput {
   connection_latency_ms?: number;
 }
 
+/** Lifecycle states a bot session can be observed in. */
 export type ConnectionState =
   'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'quarantined' | 'error';
 
+/**
+ * Per-bot liveness and health persistence.
+ *
+ * Backs the watchdog, recovery and quarantine logic: it records heartbeats,
+ * connection transitions, restart/error counters and metrics for every bot, so
+ * a crashed or flapping session can be detected across process restarts instead
+ * of only while it is alive.
+ */
 export class RuntimeStateRepository {
   private static instance: RuntimeStateRepository;
 
@@ -63,6 +72,7 @@ export class RuntimeStateRepository {
     return RuntimeStateRepository.instance;
   }
 
+  /** Inserts a new state row and returns it, throwing if it cannot be read back. */
   create(input: CreateRuntimeStateInput): BotRuntimeStateRecord {
     const now = new Date().toISOString();
 
@@ -121,6 +131,10 @@ export class RuntimeStateRepository {
     );
   }
 
+  /**
+   * Bots that claim to be connected but have not reported a heartbeat within
+   * `maxAgeMs`. These are the sessions the watchdog treats as silently dead.
+   */
   findStaleHeartbeat(maxAgeMs: number): BotRuntimeStateRecord[] {
     const cutoff = new Date(Date.now() - maxAgeMs).toISOString();
     return getDatabase().fetchAll<BotRuntimeStateRecord>(
@@ -161,6 +175,11 @@ export class RuntimeStateRepository {
     );
   }
 
+  /**
+   * Records a connection transition. The reconnect counter is incremented only
+   * on disconnect, so it reflects consecutive failures rather than churn in both
+   * directions.
+   */
   updateConnection(botId: string, isConnected: number, reason?: string): void {
     const now = new Date().toISOString();
     getDatabase().query(
@@ -256,6 +275,7 @@ export class RuntimeStateRepository {
     );
   }
 
+  /** True while the bot is inside an active quarantine cooldown. */
   isQuarantined(botId: string): boolean {
     const state = this.findByBotId(botId);
     if (!state || !state.quarantined_until) return false;
@@ -318,6 +338,7 @@ export class RuntimeStateRepository {
     return true;
   }
 
+  /** Creates the state row, or updates an existing one. */
   upsert(input: CreateRuntimeStateInput): BotRuntimeStateRecord {
     const existing = this.findByBotId(input.bot_id);
     if (existing) {

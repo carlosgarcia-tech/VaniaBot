@@ -7,7 +7,7 @@
  * NO Redis dependency - SQLite as single source of truth.
  * Uses sql.js (WebAssembly) for cross-platform compatibility (Termux/Docker/Linux).
  *
- * @author Carlos G
+ * @author **Carlos G**
  * @created 2026-04-07
  */
 
@@ -21,18 +21,33 @@ const DB_DIR = './storage/database';
 const DB_PATH: string = join(DB_DIR, 'vania.db');
 
 export interface DatabaseConfig {
+  /** File path of the database; defaults to ./storage/database/vania.db. */
   path?: string;
+  /** When true, initialization fails instead of creating a missing file. */
   mustExist?: boolean;
 }
 
 export interface Migration {
+  /** Monotonic version; applied exactly once and recorded in _migrations. */
   version: number;
+  /** Human-readable label used in logs. */
   name: string;
+  /** Raw SQL applied verbatim. Leave empty when using `custom`. */
   up: string;
-  /** Optional safe runner used when the SQL cannot be made idempotent. */
+  /**
+   * Optional JS runner for statements SQLite cannot make idempotent
+   * (e.g. ALTER TABLE ADD COLUMN, which throws if the column exists).
+   */
   custom?: (db: SqlJsDatabase) => void;
 }
 
+/**
+ * Ordered schema history.
+ *
+ * Append-only: never edit or renumber an existing entry, because every applied
+ * version is persisted and a changed older entry would never re-run on deployed
+ * databases. The apparent gaps (v20 is absent) are historical and intentional.
+ */
 const MIGRATIONS: Migration[] = [
   {
     version: 1,
@@ -399,7 +414,7 @@ const MIGRATIONS: Migration[] = [
         created_at INTEGER
       );
 
-      -- Tabla bans
+      -- bans table
       CREATE TABLE IF NOT EXISTS bans (
         id TEXT PRIMARY KEY,
         jid TEXT,
@@ -411,7 +426,7 @@ const MIGRATIONS: Migration[] = [
         updated_at INTEGER
       );
 
-      -- Tabla moderation_logs
+      -- moderation_logs table
       DROP TABLE IF EXISTS moderation_logs;
       CREATE TABLE IF NOT EXISTS moderation_logs (
         id TEXT PRIMARY KEY,
@@ -428,7 +443,7 @@ const MIGRATIONS: Migration[] = [
         updatedAt INTEGER
       );
 
-      -- Tabla ai_sessions
+      -- ai_sessions table
       CREATE TABLE IF NOT EXISTS ai_sessions (
         id TEXT PRIMARY KEY,
         jid TEXT,
@@ -493,7 +508,9 @@ const MIGRATIONS: Migration[] = [
 ];
 
 export interface QueryResult {
+  /** Rows affected by the statement. */
   changes: number;
+  /** Rowid of the last inserted row. */
   lastInsertRowid: number;
 }
 
@@ -501,12 +518,21 @@ export interface QueryOptions {
   params?: unknown[];
 }
 
+/**
+ * Singleton wrapper around an in-memory sql.js database backed by a file.
+ *
+ * sql.js keeps the whole database in memory and requires an explicit export to
+ * disk, so durability is handled here: writes mark the instance dirty and a
+ * timer flushes them, with every mutation also bumping the dirty flag so nothing
+ * is lost when `close()` runs.
+ */
 class DatabaseManager {
   private static _instance: DatabaseManager;
   private db: SqlJsDatabase | null = null;
   private config: DatabaseConfig;
   private _initialized = false;
   private saveInterval: ReturnType<typeof setInterval> | null = null;
+  /** True when in-memory state has diverged from the file on disk. */
   private dirty = false;
 
   private constructor(config: DatabaseConfig = {}) {
@@ -554,6 +580,11 @@ class DatabaseManager {
     }
   }
 
+  /**
+   * Applies every migration whose version is not yet recorded in `_migrations`.
+   * Each migration is recorded only after it succeeds, so a failing migration is
+   * retried on the next boot rather than being silently skipped.
+   */
   private async runMigrations(): Promise<void> {
     if (!this.db) return;
 
@@ -611,6 +642,11 @@ class DatabaseManager {
     this.saveToFile();
   }
 
+  /**
+   * Exports the in-memory database to disk atomically (temp file + rename), so a
+   * crash mid-write can never leave a truncated database behind. A failed rename
+   * removes the orphaned temp file rather than leaking it on every flush.
+   */
   private saveToFile(): void {
     if (!this.db) return;
     const dbPath = this.config.path ?? DB_PATH;
@@ -640,6 +676,10 @@ class DatabaseManager {
     }
   }
 
+  /**
+   * Runs a mutating statement.
+   * @throws If the engine is not initialized or the SQL fails.
+   */
   query(sql: string, options: QueryOptions = {}): QueryResult {
     if (!this.db) throw new Error('Database not initialized');
 
@@ -659,6 +699,11 @@ class DatabaseManager {
     }
   }
 
+  /**
+   * Reads a single row, mapped from sql.js's column/value arrays into an object.
+   * Returns null for an empty result, and also on error (logged) so a broken
+   * query degrades to "no data" instead of taking down the caller.
+   */
   fetchOne<T>(sql: string, options: QueryOptions = {}): T | null {
     if (!this.db) throw new Error('Database not initialized');
 
@@ -683,6 +728,7 @@ class DatabaseManager {
     }
   }
 
+  /** Reads every matching row; returns an empty array when there are none or on error. */
   fetchAll<T>(sql: string, options: QueryOptions = {}): T[] {
     if (!this.db) throw new Error('Database not initialized');
 
@@ -706,6 +752,7 @@ class DatabaseManager {
     }
   }
 
+  /** Flushes pending writes, stops the autosave timer and releases the engine. */
   close(): void {
     if (this.saveInterval) {
       clearInterval(this.saveInterval);
@@ -737,6 +784,7 @@ class DatabaseManager {
 
 let _dbManager: DatabaseManager;
 
+/** Opens the database and runs migrations. Must run before any repository call. */
 export async function initializeDatabase(config?: DatabaseConfig): Promise<void> {
   _dbManager = DatabaseManager.getInstance(config);
   await _dbManager.initialize();
