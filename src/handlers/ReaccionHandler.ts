@@ -6,7 +6,7 @@
  * This handler is always active regardless of admin-only mode.
  *
  * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
+ * @github carlosgarcia-tech
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv
  * @created 2026-03-16

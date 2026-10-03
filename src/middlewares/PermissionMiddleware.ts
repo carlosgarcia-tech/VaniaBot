@@ -5,7 +5,7 @@
  * Includes support for admin-only mode and owner exceptions.
  *
  * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
+ * @github carlosgarcia-tech
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv
  * @created 2026-03-16

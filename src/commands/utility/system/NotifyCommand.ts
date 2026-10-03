@@ -6,7 +6,7 @@
  * Can quote/reply to messages and add extra text.
  *
  * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
+ * @github carlosgarcia-tech
  * @created 2026-04-03
  * @module commands/utility/system/NotifyCommand
  */

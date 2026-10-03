@@ -13,7 +13,7 @@
  * - No hay spam de notificaciones al owner durante reconexiones
  *
  * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
+ * @github carlosgarcia-tech
  */
 import type { WASocket, ConnectionState } from 'baileys';
 import {

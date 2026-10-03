@@ -278,7 +278,7 @@ Images are built and published automatically by CI on every push to `main` (tagg
 ### Local development
 
 ```bash
-git clone https://github.com/CARLOSGRCIAGRCIA/VaniaBot.git
+git clone https://github.com/carlosgarcia-tech/VaniaBot.git
 cd VaniaBot
 npm install
 cp .env.example .env

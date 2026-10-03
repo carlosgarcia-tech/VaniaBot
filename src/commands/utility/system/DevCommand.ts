@@ -65,7 +65,7 @@ export class DevCommand extends Command {
       `👑 ${toSmallCaps('nombre')}\n` +
       `   » Carlos G\n\n` +
       `💻 ${toSmallCaps('github')}\n` +
-      `   » CARLOSGRCIAGRCIA\n\n` +
+      `   » carlosgarcia-tech\n\n` +
       `📷 ${toSmallCaps('instagram')}\n` +
       `   » carlos.gxv\n\n` +
       `🎵 ${toSmallCaps('tiktok')}\n` +
@@ -75,7 +75,7 @@ export class DevCommand extends Command {
       `📱 ${toSmallCaps('whatsapp')}\n` +
       `   » +52 951 652 6675\n\n` +
       `⧼⋆꙳• *ENLACES* ⋆꙳•⧽\n\n` +
-      `💝 https://github.com/CARLOSGRCIAGRCIA\n\n` +
+      `💝 https://github.com/carlosgarcia-tech\n\n` +
       `💝 https://www.instagram.com/carlos.gxv\n\n` +
       `💝 https://www.tiktok.com/@carlos.grcia0\n\n` +
       `💝 https://www.youtube.com/@carlos.dev01\n\n` +

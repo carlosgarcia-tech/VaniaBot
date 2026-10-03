@@ -19,7 +19,7 @@ NC='\033[0m'
 
 VERSION="${1:-6.12.18}"
 RAW_MODE="${2:-}"
-IMAGE="ghcr.io/carlosgrciagrcia/vaniabot:${VERSION}"
+IMAGE="ghcr.io/carlosgarcia-tech/vaniabot:${VERSION}"
 START_TIME=$(date +%s%3N 2>/dev/null || echo 0)
 UPDATE_MODE=false
 [[ "$RAW_MODE" == "update" || "$RAW_MODE" == "--update" || "$RAW_MODE" == "-u" ]] \

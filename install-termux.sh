@@ -4,7 +4,7 @@
 #          VaniaBot - Script de Instalación para Termux
 #                Optimizado para Android/Termux
 #
-# Autor: Carlos G (@CARLOSGRCIAGRCIA)
+# Autor: Carlos G (@carlosgarcia-tech)
 # Versión: leída dinámicamente de package.json
 # Compatibilidad: Termux (Android 7.0+), Node.js 20+
 #

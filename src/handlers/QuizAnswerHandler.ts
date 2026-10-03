@@ -6,7 +6,7 @@
  * Part of the interactive quiz system with adaptive difficulty.
  *
  * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
+ * @github carlosgarcia-tech
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv
  * @created 2026-03-16

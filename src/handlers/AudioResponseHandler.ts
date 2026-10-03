@@ -5,7 +5,7 @@
  * This handler listens for specific words/phrases and responds with audio.
  *
  * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
+ * @github carlosgarcia-tech
  * @created 2026-04-04
  */
 

@@ -12,7 +12,7 @@
  * convenience and must never block a command.
  *
  * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
+ * @github carlosgarcia-tech
  * @tiktok carlos.grcia0
  * @instagram carlos.gxv
  * @created 2026-03-16

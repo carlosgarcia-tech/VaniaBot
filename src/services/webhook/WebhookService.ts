@@ -5,7 +5,7 @@
  * Handles pairing code generation and delivery via callbacks.
  *
  * @author **Carlos G**
- * @github CARLOSGRCIAGRCIA
+ * @github carlosgarcia-tech
  * @created 2026-04-03
  * @module services/webhook/WebhookService
  */
