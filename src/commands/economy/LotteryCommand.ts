@@ -135,7 +135,7 @@ export class LotteryCommand extends Command {
       default:
         await ctx.reply(
           `🎫 *LOTERÍA ORBIT* 🎫\n\n` +
-            `✿ *Cómo funciona:*\n` +
+            `✦ *Cómo funciona:*\n` +
             `Compra tickets y participa\n` +
             `en el sorteo semanal.\n\n` +
             `💰 *Premio:* 80% del pozo total\n\n` +
@@ -229,7 +229,7 @@ export class LotteryCommand extends Command {
         `⏰ *Sorteo en:* ${timeUntilDraw}\n\n` +
         (userTickets.length > 0
           ? `🎫 *Tus tickets:*\n${userTickets.map(t => `\`${t.number}\``).join(', ')}\n\n`
-          : `✿ *No tienes tickets*\n`) +
+          : `✦ *No tienes tickets*\n`) +
         `💵 *Precio:* $${LOTTERY_CONFIG.ticketPrice.toLocaleString()}\n\n` +
         `📝 *Compra:* !loteria comprar [cantidad]`,
     );
@@ -279,7 +279,7 @@ export class LotteryCommand extends Command {
       `🔄 *SORTEO REINICIADO* 🔄\n\n` +
         `🗑️ *Tickets eliminados:* ${removedTickets}\n` +
         `💎 *Pozo descartado:* $${formatNumber(discardedPool)}\n\n` +
-        `✿ *La lotería comienza de nuevo*`,
+        `✦ *La lotería comienza de nuevo*`,
     );
   }
 

@@ -70,9 +70,9 @@ export class PayCommand extends Command {
 
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *regalito enviado* ˚₊· ͟͟͞͞➳\n\n` +
-        `✿ *$${formatNumber(amount)}* se fueron volando\n` +
-        `✿ para: ${receiver.name}\n\n` +
-        `♡ te quedan: *$${formatNumber(sender.money - amount)}* ♡`,
+        `✦ *$${formatNumber(amount)}* se fueron volando\n` +
+        `✦ para: ${receiver.name}\n\n` +
+        `✦ te quedan: *$${formatNumber(sender.money - amount)}* ✦`,
     );
   }
 }

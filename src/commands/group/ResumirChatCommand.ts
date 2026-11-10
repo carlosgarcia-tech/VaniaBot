@@ -45,7 +45,7 @@ export class ResumirChatCommand extends Command {
       : 'Sin temas claros';
 
     await ctx.reply(
-      `╭━━━〔 🧠 RESUMEN DE CHAT 〕━━━⬣\n` +
+      `╭━━━〔 🔭 RESUMEN DE CHAT 〕━━━⬣\n` +
         `┃ Mensajes analizados: *${summary.count}*\n` +
         `┃ Rango: *${summary.range}*\n` +
         `╰━━━━━━━━━━━━━━━━━━━━━━⬣\n\n` +

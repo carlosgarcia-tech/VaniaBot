@@ -60,7 +60,7 @@ export class OrbitOffCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *${botName} está descansando* ˚₊· ͟͟͞͞➳\n\n` +
           `No voy a responder hasta que me activen con *!orbiton${targetSlot ? ' ' + targetSlot : ''}*.\n\n` +
-          `_Me apagó @${ctx.sender.pushName || 'admin'}_ ✿`,
+          `_Me apagó @${ctx.sender.pushName || 'admin'}_ ✦`,
       );
     } catch (error) {
       logError('[OrbitOff] Error', error);
@@ -110,7 +110,7 @@ export class OrbitOnCommand extends Command {
       await ctx.react('🟢');
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *${botName} ya está aquí* ˚₊· ͟͟͞͞➳\n\n` +
-          `¡Listo, ya puedo funcionar! ✿\n\n` +
+          `¡Listo, ya puedo funcionar! ✦\n\n` +
           `_Me encendió @${ctx.sender.pushName || 'admin'}_ ✩`,
       );
     } catch (error) {

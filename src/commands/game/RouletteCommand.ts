@@ -75,7 +75,7 @@ export class RouletteCommand extends Command {
     if (!choices || !validChoices.includes(choices)) {
       await ctx.reply(
         `🎰 *RULETA* 🎰\n\n` +
-          `✿ *Cómo jugar:*\n` +
+          `✦ *Cómo jugar:*\n` +
           `!roulette <opción> <cantidad>\n\n` +
           `📊 *Opciones y multiplicadores:*\n` +
           `🔴 Rojo    → 2x\n` +
@@ -105,7 +105,7 @@ export class RouletteCommand extends Command {
             `❌ *No tienes efectivo suficiente*\n\n` +
               `💵 Efectivo: $${user.money.toLocaleString()}\n` +
               `🏦 Banco: $${bankBalance.toLocaleString()}\n\n` +
-              `✿ *Retira dinero primero:*\n` +
+              `✦ *Retira dinero primero:*\n` +
               `!withdraw ${amount - user.money}`,
           );
         } else {

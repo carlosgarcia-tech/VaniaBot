@@ -109,7 +109,7 @@ export abstract class MediaPreviewBase {
       caption.header,
       '',
       `꒰ 🎀 ꒱ ${this.truncateTitle(info.title)}`,
-      ...(info.author ? [`꒰ 🌸 ꒱ ${info.author}`] : []),
+      ...(info.author ? [`꒰ 🌌 ꒱ ${info.author}`] : []),
       ...(info.duration ? [`꒰ ⏳ ꒱ ${info.duration}`] : []),
       ...(caption.quality ? [`꒰ 🎞️ ꒱ ${caption.quality}`] : []),
       ...(caption.extraLines ?? []),

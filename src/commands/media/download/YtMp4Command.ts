@@ -66,7 +66,7 @@ export class YtMp4Command extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, necesito una búsqueda o enlace* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!ytmp4* <búsqueda o URL> [calidad]\n` +
+          `✦ *!ytmp4* <búsqueda o URL> [calidad]\n` +
           `✩ ejemplo: *!ytmp4 tutorial* ✩\n` +
           `✩ calidad: 360, 480, 720, 1080 (default: 720)`,
       );
@@ -98,7 +98,7 @@ export class YtMp4Command extends Command {
           viewCount: video.viewCount,
           likeCount: video.likeCount,
         },
-        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 🚀',
         quality,
       );
 

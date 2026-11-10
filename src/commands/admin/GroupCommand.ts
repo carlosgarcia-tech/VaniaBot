@@ -111,7 +111,7 @@ export class GroupCommand extends Command {
     try {
       const metadata = await cacheManager.getGroupMetadataSafe(ctx.sock, ctx.chat.jid);
 
-      let message = `*⚙️ Configuración del Grupo*\n\n`;
+      let message = `*🛰️ Group Settings*\n\n`;
       message += `*Nombre:* ${metadata.subject}\n`;
       message += `*Miembros:* ${metadata.participants.length}\n`;
       message += `*Código:* ${metadata.id.split('@')[0]}\n\n`;
@@ -124,7 +124,7 @@ export class GroupCommand extends Command {
   }
 
   private async showHelp(ctx: MessageContext): Promise<void> {
-    let message = `*⚙️ Comandos de Grupo*\n\n`;
+    let message = `*🛰️ Group Commands*\n\n`;
     message += `*• .group lock* - Cerrar grupo (solo admins escriben)\n`;
     message += `*• .group unlock* - Abrir grupo\n`;
     message += `*• .group info* - Ver información del grupo\n`;
@@ -150,7 +150,7 @@ export class RevokeCommand extends Command {
 
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *enlace actualizado* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ el enlace anterior ha sido invalidado ✿\n\n` +
+          `✦ el enlace anterior ha sido invalidado ✦\n\n` +
           `🔗 *Nuevo enlace:*\n` +
           `https://chat.whatsapp.com/${newCode}\n\n` +
           `⚠️ Comparte el nuevo enlace con los miembros`,
@@ -208,7 +208,7 @@ export class SetnameCommand extends Command {
     if (!newName) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *setname* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ cambia el nombre del grupo ✿\n\n` +
+          `✦ cambia el nombre del grupo ✦\n\n` +
           `\`!setname <nombre>\`\n\n` +
           `✩ ejemplo:\n` +
           `  ﹒!setname Mi Grupo Awesome`,
@@ -229,7 +229,7 @@ export class SetnameCommand extends Command {
     try {
       await (ctx.sock as GroupSocket).groupUpdateSubject(ctx.chat.jid, newName);
 
-      await ctx.reply(`˚₊· ͟͟͞͞➳ *nombre actualizado* ˚₊· ͟͟͞͞➳\n\n` + `✿ "${newName}" ✿`);
+      await ctx.reply(`˚₊· ͟͟͞͞➳ *nombre actualizado* ˚₊· ͟͟͞͞➳\n\n` + `✦ "${newName}" ✦`);
     } catch {
       await ctx.reply('❌ Error al cambiar el nombre. Asegúrate de que soy admin.');
     }
@@ -254,7 +254,7 @@ export class SetdescCommand extends Command {
     if (!newDesc) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *setdesc* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ cambia la descripción del grupo ✿\n\n` +
+          `✦ cambia la descripción del grupo ✦\n\n` +
           `\`!setdesc <descripción>\`\n\n` +
           `✩ ejemplo:\n` +
           `  ﹒!setdesc Bienvenidos a este gran grupo`,
@@ -272,7 +272,7 @@ export class SetdescCommand extends Command {
 
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *descripción actualizada* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ "${newDesc.substring(0, 50)}${newDesc.length > 50 ? '...' : ''}" ✿`,
+          `✦ "${newDesc.substring(0, 50)}${newDesc.length > 50 ? '...' : ''}" ✦`,
       );
     } catch {
       await ctx.reply('❌ Error al cambiar la descripción. Asegúrate de que soy admin.');
@@ -299,7 +299,7 @@ export class SetpicCommand extends Command {
     if (!imageMessage) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *setpic* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ cambia la foto del grupo ✿\n\n` +
+          `✦ cambia la foto del grupo ✦\n\n` +
           `📸 Responde a una imagen con el comando:\n` +
           `\`!setpic\`\n\n` +
           `✩ También puedes responder a un sticker`,
@@ -318,7 +318,7 @@ export class SetpicCommand extends Command {
       await (ctx.sock as GroupSocket).updateProfilePicture(ctx.chat.jid, buffer);
 
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *foto actualizada* ˚₊· ͟͟͞͞➳\n\n` + `✿ la foto del grupo ha sido cambiada ✿`,
+        `˚₊· ͟͟͞͞➳ *foto actualizada* ˚₊· ͟͟͞͞➳\n\n` + `✦ la foto del grupo ha sido cambiada ✦`,
       );
     } catch {
       await ctx.reply(
@@ -343,7 +343,7 @@ export class DelpicCommand extends Command {
       await (ctx.sock as GroupSocket).deleteProfilePicture(ctx.chat.jid);
 
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *foto eliminada* ˚₊· ͟͟͞͞➳\n\n` + `✿ la foto del grupo ha sido eliminada ✿`,
+        `˚₊· ͟͟͞͞➳ *foto eliminada* ˚₊· ͟͟͞͞➳\n\n` + `✦ la foto del grupo ha sido eliminada ✦`,
       );
     } catch {
       await ctx.reply('❌ Error al eliminar la foto. Asegúrate de que soy admin.');

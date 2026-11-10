@@ -39,8 +39,8 @@ export class DailyCommand extends Command {
         const remaining = this.getTimeRemaining(user.lastDaily);
         await ctx.reply(
           `˚₊· ͟͟͞͞➳ *ya lo tienes* ˚₊· ͟͟͞͞➳\n\n` +
-            `✿ Vuelve en: *${formatTime(remaining)}*\n\n` +
-            `♡ Te espero ♡`,
+            `✦ Vuelve en: *${formatTime(remaining)}*\n\n` +
+            `✦ Te espero ✦`,
         );
         return;
       }
@@ -89,10 +89,10 @@ export class DailyCommand extends Command {
 
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *para ti* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *+$${formatNumber(totalReward)}* moneditas\n` +
+          `✦ *+$${formatNumber(totalReward)}* moneditas\n` +
           `✩ racha: *${streak}* días\n` +
-          `✿ *+${xpGained} XP*${bonusText}\n\n` +
-          `♡ tu saldo: *$${formatNumber(updatedUser.money)}* ♡`,
+          `✦ *+${xpGained} XP*${bonusText}\n\n` +
+          `✦ tu saldo: *$${formatNumber(updatedUser.money)}* ✦`,
       );
     } catch (error) {
       const message = errorHandler.handleCommandError(error, 'daily', {

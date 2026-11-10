@@ -31,7 +31,7 @@ export class LinkCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *enlace del grupo* ˚₊· ͟͟͞͞➳\n\n` +
           `🔗 ${link}\n\n` +
-          `✿ Comparte este enlace para invitar a otros ✩`,
+          `✦ Comparte este enlace para invitar a otros ✩`,
       );
     } catch (error) {
       logError('[LinkCommand] Error:', error);

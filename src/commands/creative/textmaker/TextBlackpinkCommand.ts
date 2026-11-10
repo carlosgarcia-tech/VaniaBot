@@ -39,7 +39,7 @@ export class TextBlackpinkCommand extends Command {
       return;
     }
 
-    await ctx.react('💖');
+    await ctx.react('🚀');
 
     try {
       const base = new TextMakerBase();

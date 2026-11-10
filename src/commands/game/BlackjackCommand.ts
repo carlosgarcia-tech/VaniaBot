@@ -88,7 +88,7 @@ export class BlackjackCommand extends Command {
           `Ya tienes un juego activo!\n\n` +
           `Tus cartas: ${existingGame.playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
           `Puntaje: ${this.calculateScore(existingGame.playerCards).score}\n\n` +
-          `✿ *Acciones:*\n` +
+          `✦ *Acciones:*\n` +
           `!blackjack ${existingGame.bet} hit  - Tomar carta\n` +
           `!blackjack ${existingGame.bet} stand - Quedarse`,
       );
@@ -119,7 +119,7 @@ export class BlackjackCommand extends Command {
         await ctx.reply(
           `🃏 *BLACKJACK* 🃏\n\n` +
             `📊 *Resultados:*\n\n` +
-            `✿ *Tus cartas:* ${existingGame.playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
+            `✦ *Tus cartas:* ${existingGame.playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
             `📈 Tu puntaje: ${playerScore.score}\n\n` +
             `🤖 *Cartas del dealer:* ${existingGame.dealerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
             `📉 Dealer: ${dealerScore.score}\n\n` +
@@ -134,7 +134,7 @@ export class BlackjackCommand extends Command {
         `🃏 *BLACKJACK* 🃏\n\n` +
           `📊 *Tu mano:* ${existingGame.playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
           `📈 Puntaje: ${playerScore.score}${playerScore.isSoft ? ' (Soft)' : ''}\n\n` +
-          `✿ *Acciones:*\n` +
+          `✦ *Acciones:*\n` +
           `!blackjack ${existingGame.bet} hit  - Tomar carta\n` +
           `!blackjack ${existingGame.bet} stand - Quedarse`,
       );
@@ -191,7 +191,7 @@ export class BlackjackCommand extends Command {
       await ctx.reply(
         `🃏 *BLACKJACK* 🃏\n\n` +
           `📊 *Resultados:*\n\n` +
-          `✿ *Tus cartas:* ${existingGame.playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
+          `✦ *Tus cartas:* ${existingGame.playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
           `📈 Tu puntaje: ${playerScore}\n\n` +
           `🤖 *Cartas del dealer:* ${dealerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
           `📉 Dealer: ${dealerScore}\n\n` +
@@ -211,7 +211,7 @@ export class BlackjackCommand extends Command {
     if (isNaN(amount) || amount <= 0) {
       await ctx.reply(
         `🃏 *BLACKJACK* 🃏\n\n` +
-          `✿ *Cómo jugar:*\n` +
+          `✦ *Cómo jugar:*\n` +
           `!blackjack <cantidad>\n\n` +
           `📊 *Reglas:*\n` +
           `• Llega a 21 o más cerca para ganar\n` +
@@ -235,7 +235,7 @@ export class BlackjackCommand extends Command {
             `❌ *No tienes efectivo suficiente*\n\n` +
               `💵 Efectivo: $${user.money.toLocaleString()}\n` +
               `🏦 Banco: $${bankBalance.toLocaleString()}\n\n` +
-              `✿ *Retira dinero primero:*\n` +
+              `✦ *Retira dinero primero:*\n` +
               `!withdraw ${amount - user.money}`,
           );
         } else {
@@ -280,7 +280,7 @@ export class BlackjackCommand extends Command {
       await ctx.reply(
         `🃏 *BLACKJACK* 🃏\n\n` +
           `📊 *Resultados:*\n\n` +
-          `✿ *Tus cartas:* ${playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
+          `✦ *Tus cartas:* ${playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
           `🤖 *Del dealer:* ${dealerCards.map(c => this.getCardDisplay(c)).join(' ')}\n\n` +
           `🤝 *AMBOS TIENEN BLACKJACK! EMPATE!*`,
       );
@@ -301,7 +301,7 @@ export class BlackjackCommand extends Command {
       await ctx.reply(
         `🃏 *BLACKJACK!* 🃏\n\n` +
           `📊 *BLACKJACK NATURAL!*\n\n` +
-          `✿ *Tus cartas:* ${playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
+          `✦ *Tus cartas:* ${playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
           `📈 Puntaje: 21\n\n` +
           `🎉 *GANASTE!*\n` +
           `💰 Apuesta: $${amount.toLocaleString()}\n` +
@@ -323,7 +323,7 @@ export class BlackjackCommand extends Command {
       await ctx.reply(
         `🃏 *BLACKJACK* 🃏\n\n` +
           `📊 *Resultados:*\n\n` +
-          `✿ *Tus cartas:* ${playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
+          `✦ *Tus cartas:* ${playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
           `🤖 *Del dealer:* ${dealerCards.map(c => this.getCardDisplay(c)).join(' ')}\n\n` +
           `💔 *EL DEALER TIENE BLACKJACK! PERDISTE*\n` +
           `💸 Perdiste: $${amount.toLocaleString()}\n\n` +
@@ -346,7 +346,7 @@ export class BlackjackCommand extends Command {
         `📊 *Tu mano:* ${playerCards.map(c => this.getCardDisplay(c)).join(' ')}\n` +
         `📈 Puntaje: ${playerScore.score}${playerScore.isSoft ? ' (Soft)' : ''}\n\n` +
         `🤖 *Del dealer:* ${this.getCardDisplay(dealerCards[0])} 🔒\n\n` +
-        `✿ *Acciones:*\n` +
+        `✦ *Acciones:*\n` +
         `!blackjack ${amount} hit  - Tomar carta\n` +
         `!blackjack ${amount} stand - Quedarte`,
     );

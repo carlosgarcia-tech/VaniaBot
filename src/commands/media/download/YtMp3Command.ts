@@ -57,7 +57,7 @@ export class YtMp3Command extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, necesito una búsqueda o enlace* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!ytmp3* <búsqueda o URL>\n` +
+          `✦ *!ytmp3* <búsqueda o URL>\n` +
           `✩ ejemplo: *!ytmp3 bad bunny* ✩`,
       );
       return;
@@ -87,7 +87,7 @@ export class YtMp3Command extends Command {
           viewCount: video.viewCount,
           likeCount: video.likeCount,
         },
-        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 🚀',
       );
 
       await ctx.react('⏳');

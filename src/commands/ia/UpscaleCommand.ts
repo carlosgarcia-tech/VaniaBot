@@ -29,7 +29,7 @@ export class UpscaleCommand extends Command {
 
     if (!imageUrl) {
       await ctx.reply(
-        '✿ *!upscale* 〃\n\n' +
+        '✦ *!upscale* 〃\n\n' +
           '✩ Responde a una *imagen*\n' +
           '✩ O envíala junto al comando\n' +
           '✩ O usa una *URL*: !upscale <link>',

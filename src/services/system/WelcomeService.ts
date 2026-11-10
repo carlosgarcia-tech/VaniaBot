@@ -118,7 +118,7 @@ async function getRandomFact(): Promise<string> {
 
 /** Wraps a fact in the decorative frame used by the default templates. */
 function formatFact(fact: string): string {
-  return `\n.・✦─⋆⋅ 𝘿𝙖𝙩𝙤 𝙘𝙪𝙧𝙞𝙤𝙨𝙤 ⋅⋆─✦・.\n${fact}\n.・✦────────────✦・.`;
+  return `\n.・✦─⋆⋅ 𝘿𝙖𝙩𝙤 𝙘𝙪𝙧𝙞𝙤𝙨𝙤 ⋅⋆─✦・.\n${fact}\n.・◌────────────◌・.`;
 }
 
 export class WelcomeService {
@@ -126,7 +126,7 @@ export class WelcomeService {
   private readonly DEFAULT_PROFILE_PIC = 'logo.png';
   private readonly DEFAULT_WELCOME = `
 ✧･ﾟ:*  𝙚𝙮, 𝙣𝙪𝙚𝙫𝙖 𝙘𝙖𝙧𝙖  *:･ﾟ✧
-hola @user ♡
+hola @user ✦
 @fact
 ✧･ﾟ:*  𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩  *:･ﾟ✧
   `.trim();

@@ -94,8 +94,8 @@ export class TraductorCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *idiomas que entiendo* ˚₊· ͟͟͞͞➳\n\n${idiomasDisponibles()}\n\n` +
           `✩ *cómo pedírmelos:* nombre, código ISO, o como los digas en español/inglés\n` +
-          `♡ *ejemplo:* "inglés", "en", "english" — los entiendo todos ♡\n\n` +
-          `> _OrbitBot 🌸 — tu traductora favorita_`,
+          `✦ *ejemplo:* "inglés", "en", "english" — los entiendo todos ✦\n\n` +
+          `> _OrbitBot 🌌 — tu traductora favorita_`,
       );
       return;
     }

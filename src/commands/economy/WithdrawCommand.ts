@@ -29,7 +29,7 @@ export class WithdrawCommand extends Command {
     if (!amountStr) {
       await ctx.reply(
         `🏦 *RETIRAR* 🏦\n\n` +
-          `✿ *Cómo usar:*\n` +
+          `✦ *Cómo usar:*\n` +
           `!withdraw <cantidad>\n` +
           `!withdraw all - Todo el banco\n\n` +
           `📝 *Ejemplo:*\n` +

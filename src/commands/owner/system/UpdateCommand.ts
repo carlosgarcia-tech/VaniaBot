@@ -44,7 +44,7 @@ export class UpdateCommand extends Command {
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *update* ˚₊· ͟͟͞͞➳\n\n` +
         `📥 iniciando actualización...\n` +
-        `✿ verificando estado del repositorio`,
+        `✦ verificando estado del repositorio`,
     );
 
     try {
@@ -55,7 +55,7 @@ export class UpdateCommand extends Command {
         await ctx.reply(
           `˚₊· ͟͟͞͞➳ *update* ˚₊· ͟͟͞͞➳\n\n` +
             `⚠️ hay cambios sin guardar\n\n` +
-            `✿ guarda o haz stash antes de actualizar\n\n` +
+            `✦ guarda o haz stash antes de actualizar\n\n` +
             `\`\`\`${status.trim()}\`\`\``,
         );
         return;
@@ -69,7 +69,7 @@ export class UpdateCommand extends Command {
         await ctx.react('✅');
         await ctx.reply(
           `˚₊· ͟͟͞͞➳ *update* ˚₊· ͟͟͞͞➳\n\n` +
-            `✿ ya estás al día ✿\n\n` +
+            `✦ ya estás al día ✦\n\n` +
             `✅ no hay cambios nuevos en el repositorio`,
         );
         return;
@@ -88,7 +88,7 @@ export class UpdateCommand extends Command {
       await ctx.react('✅');
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *update* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ actualización completada ✿\n\n` +
+          `✦ actualización completada ✦\n\n` +
           `🔄 el bot se reiniciará en 3 segundos...`,
       );
 
@@ -98,7 +98,7 @@ export class UpdateCommand extends Command {
       await ctx.react('❌');
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *update* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ error al actualizar ✿\n\n` +
+          `✦ error al actualizar ✦\n\n` +
           `❌ ${error instanceof Error ? error.message : String(error)}`,
       );
     }

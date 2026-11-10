@@ -59,7 +59,7 @@ export class CoinflipCommand extends Command {
             `❌ *No tienes efectivo suficiente*\n\n` +
               `💵 Efectivo: $${user.money.toLocaleString()}\n` +
               `🏦 Banco: $${bankBalance.toLocaleString()}\n\n` +
-              `✿ *Retira dinero primero:*\n` +
+              `✦ *Retira dinero primero:*\n` +
               `!withdraw ${amount - user.money}`,
           );
         } else {
@@ -99,9 +99,9 @@ export class CoinflipCommand extends Command {
 
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *moneda al aire* ˚₊· ͟͟͞͞➳\n\n` +
-        `✿ tú: *${userChoice}*\n` +
-        `✿ salió: *${result}*\n\n` +
-        `♡ *${status}* ♡\n` +
+        `✦ tú: *${userChoice}*\n` +
+        `✦ salió: *${result}*\n\n` +
+        `✦ *${status}* ✦\n` +
         `${change}\n\n` +
         `✩ tu bolsita: *$${formatNumber(updatedUser.money)}*`,
     );

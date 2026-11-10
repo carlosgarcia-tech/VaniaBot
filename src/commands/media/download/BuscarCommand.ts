@@ -37,7 +37,7 @@ export class BuscarCommand extends Command {
     if (!query) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *Buscador Web* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  ﹒!buscar <consulta>\n\n` +
           `✩ *ejemplos:*\n` +
           `  ﹒!buscar Node.js tutorial\n` +

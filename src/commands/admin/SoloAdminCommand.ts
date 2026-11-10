@@ -60,7 +60,7 @@ export class SoloAdminCommand extends Command {
       case 'activar':
         await serviceManager.groupService.setOnlyAdmin(ctx.chat.jid, true);
         await ctx.reply(
-          `╭━━━ 🌸  *OrbitBot*  ━━━╮\n` +
+          `╭━━━ 🌌  *OrbitBot*  ━━━╮\n` +
             `   *Modo Solo Admin* activado\n` +
             `\n` +
             `Ahora solo los *admins del grupo*\n` +
@@ -71,7 +71,7 @@ export class SoloAdminCommand extends Command {
             `   reaccionar a las listas.\n` +
             `\n` +
             `   Gracias por cuidar el orden\n` +
-            `   del grupo conmigo 💗\n` +
+            `   del grupo conmigo 🚀\n` +
             `╰━━━━━━━━━━━━━━━━━━━━╯`,
         );
         break;
@@ -80,7 +80,7 @@ export class SoloAdminCommand extends Command {
       case 'desactivar':
         await serviceManager.groupService.setOnlyAdmin(ctx.chat.jid, false);
         await ctx.reply(
-          `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+          `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
             `   *Modo Solo Admin desactivado*\n` +
             `\n` +
             `Todos los miembros del grupo\n` +
@@ -90,7 +90,7 @@ export class SoloAdminCommand extends Command {
             `Gracias por mantener\n` +
             `   el grupo organizado.\n` +
             `\n` +
-            `   Estoy aquí para ayudar 💗\n` +
+            `   Estoy aquí para ayudar 🚀\n` +
             `╰━━━━━━━━━━━━━━━━━━━━╯`,
         );
         break;
@@ -107,7 +107,7 @@ export class SoloAdminCommand extends Command {
             `• \`.soloadmin on\` — Enable admin-only mode\n` +
             `• \`.soloadmin off\` — Disable admin-only mode\n` +
             `• \`.soloadmin status\` — Show current status\n\n` +
-            `_— OrbitBot 🌸_`,
+            `_— OrbitBot 🌌_`,
         );
     }
   }
@@ -122,8 +122,8 @@ export class SoloAdminCommand extends Command {
     const onlyAdmin = await serviceManager.groupService.getOnlyAdmin(ctx.chat.jid);
 
     await ctx.reply(
-      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
-        `   ⚙️ *Modo Solo Admin*\n` +
+      `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
+        `   🛰️ *Modo Solo Admin*\n` +
         `\n` +
         `*Estado actual:* ${onlyAdmin ? '✅ Activado' : '❌ Desactivado'}\n` +
         `\n` +
@@ -143,7 +143,7 @@ export class SoloAdminCommand extends Command {
         `• \`.soloadmin on\`  — Activar\n` +
         `• \`.soloadmin off\` — Desactivar\n` +
         `\n` +
-        `   Estoy aquí para ayudarte 💗\n` +
+        `   Estoy aquí para ayudarte 🚀\n` +
         `╰━━━━━━━━━━━━━━━━━━━━╯`,
     );
   }

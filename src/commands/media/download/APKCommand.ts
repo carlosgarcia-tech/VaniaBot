@@ -37,7 +37,7 @@ export class APKCommand extends Command {
     if (!query) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *APK Search* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  ﹒!apk <nombre de app>\n\n` +
           `✩ *ejemplos:*\n` +
           `  ﹒!apk freefire\n` +
@@ -85,7 +85,7 @@ export class APKDLCommand extends Command {
     const query = ctx.args.join(' ').trim();
 
     if (!query) {
-      await ctx.reply(`✿ *cómo usar:* !apkdl <nombre de app>`);
+      await ctx.reply(`✦ *cómo usar:* !apkdl <nombre de app>`);
       return;
     }
 

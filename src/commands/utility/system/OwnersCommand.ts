@@ -42,7 +42,7 @@ export class OwnersCommand extends Command {
       ﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒
 
       ${ownersList}
-      ✿ total: ${owners.length} ✿
+      ✦ total: ${owners.length} ✦
       `.trim();
 
       await ctx.reply(message);

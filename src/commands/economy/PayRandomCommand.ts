@@ -32,7 +32,7 @@ export class PayRandomCommand extends Command {
     if (!amountStr || isNaN(amount) || amount <= 0) {
       await ctx.reply(
         `🎁 *PAGO ALEATORIO* 🎁\n\n` +
-          `✿ *Cómo funciona:*\n` +
+          `✦ *Cómo funciona:*\n` +
           `El bot elige un usuario al azar\n` +
           `de todos los usuarios registrados\n` +
           `y le envía la cantidad especificada.\n\n` +

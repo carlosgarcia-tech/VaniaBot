@@ -192,7 +192,7 @@ export class PanelServer {
 </head>
 <body>
   <div class="container">
-    <div class="emoji">🌸</div>
+    <div class="emoji">🌌</div>
     <h1>OrbitBot Panel</h1>
     <p>
       El servidor del panel está funcionando correctamente.<br><br>
@@ -214,7 +214,7 @@ export class PanelServer {
       this.server = http.createServer(this.app);
 
       this.server.listen(this.config.port, this.config.host, () => {
-        logger.info(`🌸 OrbitBot Panel running at http://${this.config.host}:${this.config.port}`);
+        logger.info(`🌌 OrbitBot Panel running at http://${this.config.host}:${this.config.port}`);
         logger.info(`📊 API: http://${this.config.host}:${this.config.port}/api/stats`);
         resolve();
       });
@@ -235,7 +235,7 @@ export class PanelServer {
           });
           this.server.listen(this.config.port + 1, this.config.host, () => {
             logger.info(
-              `🌸 OrbitBot Panel running at http://${this.config.host}:${this.config.port + 1}`,
+              `🌌 OrbitBot Panel running at http://${this.config.host}:${this.config.port + 1}`,
             );
             resolve();
           });
@@ -250,7 +250,7 @@ export class PanelServer {
     return new Promise(resolve => {
       if (this.server) {
         this.server.close(() => {
-          logger.info('🌸 OrbitBot Panel stopped');
+          logger.info('🌌 OrbitBot Panel stopped');
           resolve();
         });
       } else {

@@ -34,7 +34,7 @@ export class DiceCommand extends Command {
     if (!choiceStr || isNaN(choice) || choice < 1 || choice > 6) {
       await ctx.reply(
         `🎲 *DADOS* 🎲\n\n` +
-          `✿ *Cómo jugar:*\n` +
+          `✦ *Cómo jugar:*\n` +
           `!dice <número> <cantidad>\n\n` +
           `📊 *Multiplicador:* 6x\n\n` +
           `💰 Límites: $${config.economy.minBet} - $${config.economy.maxBet.toLocaleString()}\n\n` +
@@ -59,7 +59,7 @@ export class DiceCommand extends Command {
             `❌ *No tienes efectivo suficiente*\n\n` +
               `💵 Efectivo: $${user.money.toLocaleString()}\n` +
               `🏦 Banco: $${bankBalance.toLocaleString()}\n\n` +
-              `✿ *Retira dinero primero:*\n` +
+              `✦ *Retira dinero primero:*\n` +
               `!withdraw ${amount - user.money}`,
           );
         } else {

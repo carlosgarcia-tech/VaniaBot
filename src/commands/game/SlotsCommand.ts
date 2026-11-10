@@ -40,7 +40,7 @@ export class SlotsCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, cuánto quieres apostar?* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!slots* <cantidad>\n` +
+          `✦ *!slots* <cantidad>\n` +
           `✩ ejemplo: *!slots 100*`,
       );
       return;
@@ -63,7 +63,7 @@ export class SlotsCommand extends Command {
             `❌ *No tienes efectivo suficiente*\n\n` +
               `💵 Efectivo: $${user.money.toLocaleString()}\n` +
               `🏦 Banco: $${bankBalance.toLocaleString()}\n\n` +
-              `✿ *Retira dinero primero:*\n` +
+              `✦ *Retira dinero primero:*\n` +
               `!withdraw ${bet - user.money}`,
           );
         } else {

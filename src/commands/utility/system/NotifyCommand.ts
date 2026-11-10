@@ -135,7 +135,7 @@ export class NotifyCommand extends Command {
         if (!extraText) {
           await ctx.reply(
             `˚₊· ͟͟͞͞➳ *oops, escríbeme algo* ˚₊· ͟͟͞͞➳\n\n` +
-              `✿ *!n* <texto>\n` +
+              `✦ *!n* <texto>\n` +
               `✩ o responde a un mensaje con *!n* ✩`,
           );
           return;

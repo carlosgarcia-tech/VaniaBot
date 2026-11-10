@@ -21,7 +21,7 @@ const AMOR_TIPOS = ['mensaje', 'carta', 'poesia', 'piropo', 'dedicatoria'] as co
 type AmorTipo = (typeof AMOR_TIPOS)[number];
 
 const EMOJIS: Record<AmorTipo, string> = {
-  mensaje: '💕',
+  mensaje: '🚀',
   carta: '💌',
   poesia: '🌹',
   piropo: '😏',
@@ -69,7 +69,7 @@ export class AmorCommand extends Command {
         return;
       }
 
-      const header = paraNombre ? `💕 *Para: ${paraNombre}* 💕\n\n` : '💕 *Mensaje de Amor* 💕\n\n';
+      const header = paraNombre ? `🚀 *Para: ${paraNombre}* 🚀\n\n` : '🚀 *Mensaje de Amor* 🚀\n\n';
 
       await ctx.reply(header + response.right.trim());
       await ctx.react('💝');
@@ -125,7 +125,7 @@ export class ShipCommand extends Command {
     if (!mentioned || mentioned.length < 2) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *shippeo* ˚₊· ͟͟͞͞➳\n\n` +
-          `Menciona a dos personas y veo qué tan bien se llevan ✿\n\n` +
+          `Menciona a dos personas y veo qué tan bien se llevan ✦\n\n` +
           `✩ ejemplo ✩\n` +
           `${ctx.args?.[0] || '!ship'} @persona1 @persona2`,
       );
@@ -135,7 +135,7 @@ export class ShipCommand extends Command {
     const nombre1 = mentioned[0].split('@')[0];
     const nombre2 = mentioned[1].split('@')[0];
 
-    await ctx.react('💕');
+    await ctx.react('🚀');
 
     const { final, breakdown } = this.calculateShip(nombre1, nombre2);
     const hearts = this.getHearts(final);
@@ -207,7 +207,7 @@ export class ShipCommand extends Command {
       return (
         `˚₊· ͟͟͞͞➳ *¡${name1} y ${name2} son almas gemelas!* ˚₊· ͟͟͞͞➳\n\n` +
         `✩ compatibilidad: ${percentage}%\n\n` +
-        `🌸 ¡amor eterno! Son perfectitos juntos 🌸` +
+        `🌌 ¡amor eterno! Son perfectitos juntos 🌌` +
         breakdown_text
       );
     }
@@ -215,7 +215,7 @@ export class ShipCommand extends Command {
       return (
         `˚₊· ͟͟͞͞➳ *¡${name1} y ${name2} hacen una pareja increíble!* ˚₊· ͟͟͞͞➳\n\n` +
         `✩ compatibilidad: ${percentage}%\n\n` +
-        `🌸 tienen mucha química. ¡anímate! 🌸` +
+        `🌌 tienen mucha química. ¡anímate! 🌌` +
         breakdown_text
       );
     }
@@ -223,7 +223,7 @@ export class ShipCommand extends Command {
       return (
         `˚₊· ͟͟͞͞➳ *${name1} y ${name2} tienen potencial* ˚₊· ͟͟͞͞➳\n\n` +
         `✩ compatibilidad: ${percentage}%\n\n` +
-        `🌸 el amor está en el aire. ¡quién sabe qué puede pasar! 🌸` +
+        `🌌 el amor está en el aire. ¡quién sabe qué puede pasar! 🌌` +
         breakdown_text
       );
     }
@@ -231,14 +231,14 @@ export class ShipCommand extends Command {
       return (
         `˚₊· ͟͟͞͞➳ *amor no correspondido...* ˚₊· ͟͟͞͞➳\n\n` +
         `✩ compatibilidad: ${percentage}%\n\n` +
-        `🌸 hay más amistad que romance... pero quién sabe, el amor puede nacer 🌸` +
+        `🌌 hay más amistad que romance... pero quién sabe, el amor puede nacer 🌌` +
         breakdown_text
       );
     }
     return (
       `˚₊· ͟͟͞͞➳ *${name1} y ${name2}...* ˚₊· ͟͟͞͞➳\n\n` +
       `✩ compatibilidad: ${percentage}%\n\n` +
-      `🌸 tal vez es mejor quedarse como amigos. ¡el mar está lleno de peces! 🌸` +
+      `🌌 tal vez es mejor quedarse como amigos. ¡el mar está lleno de peces! 🌌` +
       breakdown_text
     );
   }

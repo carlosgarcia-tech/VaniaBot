@@ -38,7 +38,7 @@ export class GitHubSearchCommand extends Command {
     if (!query) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *falta la búsqueda* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!githubsearch* <búsqueda>\n` +
+          `✦ *!githubsearch* <búsqueda>\n` +
           `✩ ejemplo: *!githubsearch DolphinBot* ✩`,
       );
       return;

@@ -55,7 +55,7 @@ export class TwitterCommand extends Command {
     if (!url) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *twitter downloader* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:* !twitter <url>\n\n` +
+          `✦ *cómo usar:* !twitter <url>\n\n` +
           `✩ *ejemplos:*\n` +
           `  ﹒!twitter https://twitter.com/user/status/123\n` +
           `  ﹒!twitter https://x.com/user/status/123`,
@@ -82,7 +82,7 @@ export class TwitterCommand extends Command {
           thumbnail: info?.thumbnailUrl,
           author: info?.author,
         },
-        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 🚀',
       );
 
       await ctx.react('⬇️');

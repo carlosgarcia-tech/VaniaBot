@@ -35,7 +35,7 @@ describe('ReaccionHandler', () => {
     });
 
     it('should reject non-quiz reactions', () => {
-      expect(isQuizReaction('❤️')).toBe(false);
+      expect(isQuizReaction('🚀')).toBe(false);
       expect(isQuizReaction('🎉')).toBe(false);
     });
   });
@@ -78,7 +78,7 @@ describe('ReaccionHandler', () => {
     });
 
     it('should return undefined for invalid emoji', () => {
-      expect(emojiToNumber['❤️']).toBeUndefined();
+      expect(emojiToNumber['🚀']).toBeUndefined();
     });
   });
 });

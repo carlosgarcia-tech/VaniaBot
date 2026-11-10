@@ -148,7 +148,7 @@ export class RotacionCommand extends Command {
     if (start.nodeId === goal.nodeId) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *ya estás a salvo* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ estás en *${start.label}*\n` +
+          `✦ estás en *${start.label}*\n` +
           `✩ quédate quietecita y cuídate ✩`,
       );
       return;
@@ -173,8 +173,8 @@ export class RotacionCommand extends Command {
 
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ _calculando..._ ˚₊· ͟͟͞͞➳\n` +
-        `✩ *${start.label}* → 🌸 *${goal.label}*\n` +
-        `✿ ${teamCount} equipos | fase: *${analysis.circlePhase}*`,
+        `✩ *${start.label}* → 🌌 *${goal.label}*\n` +
+        `✦ ${teamCount} equipos | fase: *${analysis.circlePhase}*`,
     );
 
     const scored = scoreRoutes(

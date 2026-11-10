@@ -71,7 +71,7 @@ export class GayCommand extends Command {
 
     const messages = [
       `🌈 *${targetTag}* es ${percent}% homosexual 🏳️🌈`,
-      `💖 Compatibilidad con arcoíris: ${percent}% para *${targetTag}* ✨`,
+      `🚀 Compatibilidad con arcoíris: ${percent}% para *${targetTag}* ✨`,
       `*${targetTag}* tiene un ${percent}% de magia under the rainbow 🌟`,
       `🏳️🌈 *${targetTag}* level: ${percent}% diva 💃`,
       `✨ El universo dice que *${targetTag}* es ${percent}% fabuloso 💅`,

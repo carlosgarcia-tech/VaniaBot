@@ -122,7 +122,7 @@ export class PersonalidadCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *analizando personalidad* ˚₊· ͟͟͞͞➳\n\n` +
           `Analizando la personalidad de *${name}*\n\n` +
-          `✿ Usa: *!personalidad <nombre>*`,
+          `✦ Usa: *!personalidad <nombre>*`,
       );
       return;
     }
@@ -137,7 +137,7 @@ export class PersonalidadCommand extends Command {
 ┃ 🎭 *Tipo de persona:* ${pickRandom(PERSONAS)}
 ┃ 🔄 *Siempre:* ${pickRandom(ACTIVITIES)}
 ┃
-┃ 🧠 *Inteligencia:* ${generatePercent()}
+┃ 🔭 *Inteligencia:* ${generatePercent()}
 ┃ 💸 *Morosidad:* ${generatePercent()}
 ┃ 😤 *Coraje:* ${generatePercent()}
 ┃ 😨 *Miedo:* ${generatePercent()}

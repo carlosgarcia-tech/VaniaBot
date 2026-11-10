@@ -35,9 +35,9 @@ export class PPTCommand extends Command {
     if (!eleccion || !opciones.includes(eleccion)) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *qué eliges?* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ piedra\n` +
-          `✿ papel\n` +
-          `✿ tijera\n\n` +
+          `✦ piedra\n` +
+          `✦ papel\n` +
+          `✦ tijera\n\n` +
           `✩ ejemplo: *!ppt piedra* ✩`,
       );
       return;
@@ -70,8 +70,8 @@ export class PPTCommand extends Command {
 
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *ppt* ˚₊· ͟͟͞͞➳\n\n` +
-        `✿ tu: ${eleccionEmoji[eleccion]} *${eleccion}*\n` +
-        `✿ yo: ${eleccionEmoji[eleccionBot]} *${eleccionBot}*\n\n` +
+        `✦ tu: ${eleccionEmoji[eleccion]} *${eleccion}*\n` +
+        `✦ yo: ${eleccionEmoji[eleccionBot]} *${eleccionBot}*\n\n` +
         `✩ *${resultado}* ✩`,
     );
 

@@ -43,7 +43,7 @@ export class AutoAdminCommand extends Command {
       if (!participant) {
         await ctx.reply(
           `˚₊· ͟͟͞͞➳ *oops, un pequeño error* ˚₊· ͟͟͞͞➳\n\n` +
-            `✿ no te encuentro en este grupo\n` +
+            `✦ no te encuentro en este grupo\n` +
             `✩ esto no debería pasar... perdóname ✩`,
         );
         return;
@@ -56,9 +56,9 @@ export class AutoAdminCommand extends Command {
 
         await ctx.reply(
           `˚₊· ͟͟͞͞➳ *ya tienes poderes* ˚₊· ͟͟͞͞➳\n\n` +
-            `✿ ${ctx.sender.pushName}\n` +
+            `✦ ${ctx.sender.pushName}\n` +
             `✩ rol: ${role}\n\n` +
-            `♡ ya eres admin, lindo ♡`,
+            `✦ ya eres admin, lindo ✦`,
         );
         return;
       }
@@ -76,9 +76,9 @@ export class AutoAdminCommand extends Command {
 
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *te dieron podercitos* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ ${ctx.sender.pushName}\n` +
+          `✦ ${ctx.sender.pushName}\n` +
           `✩ ahora eres admin\n` +
-          `♡ con poderes de owner ♡\n\n` +
+          `✦ con poderes de owner ✦\n\n` +
           `> ${new Date().toLocaleString()}`,
       );
 

@@ -39,7 +39,7 @@ export class MediafireCommand extends Command {
     if (!url) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *Mediafire Downloader* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  ﹒!mf <url de mediafire>\n\n` +
           `✩ *ejemplo:*\n` +
           `  ﹒!mf https://www.mediafire.com/file/abc123`,

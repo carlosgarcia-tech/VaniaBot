@@ -50,7 +50,7 @@ describe('encryption', () => {
     });
 
     it('handles unicode content', () => {
-      const text = 'ñandú 🦋 日本語';
+      const text = 'ñandú 🪐 日本語';
       expect(decrypt(encrypt(text))).toBe(text);
     });
 

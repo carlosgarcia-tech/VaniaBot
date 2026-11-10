@@ -71,7 +71,7 @@ export class LoanCommand extends Command {
     if (!mentionedJid) {
       await ctx.reply(
         `💰 *PRÉSTAMOS*\n\n` +
-          `✿ *Cómo dar un préstamo:*\n` +
+          `✦ *Cómo dar un préstamo:*\n` +
           `!prestamo dar @usuario [cantidad]\n\n` +
           `📋 *Detalles:*\n` +
           `• Mínimo: $1,000\n` +
@@ -244,7 +244,7 @@ export class LoanCommand extends Command {
   private async showHelp(ctx: MessageContext): Promise<void> {
     await ctx.reply(
       `💰 *SISTEMA DE PRÉSTAMOS*\n\n` +
-        `✿ *Presta dinero a otros usuarios*\n` +
+        `✦ *Presta dinero a otros usuarios*\n` +
         `con interés del 10%.\n\n` +
         `📋 *Comandos:*\n\n` +
         `• !prestamo dar @user [cantidad]\n` +

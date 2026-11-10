@@ -75,7 +75,7 @@ export class ReminderCommand extends Command {
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n` +
           lines.join('\n\n') +
           `\n﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n` +
-          `♡ si quieres cancelar: *!recordatorio cancelar* <ID> ♡`,
+          `✦ si quieres cancelar: *!recordatorio cancelar* <ID> ✦`,
       );
       return;
     }
@@ -161,11 +161,11 @@ export class ReminderCommand extends Command {
       `˚₊· ͟͟͞͞➳ *recordatorio listo* ˚₊· ͟͟͞͞➳\n` +
         `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n` +
         `✩ ID: *${id}*\n` +
-        `✿ mensaje: ${messageText}\n` +
+        `✦ mensaje: ${messageText}\n` +
         `⏳ te aviso en: *${formatTime(delayMs)}*\n` +
         `🕐 será a las: ${new Date(triggerAt).toLocaleTimeString('es-MX')}\n` +
         `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n` +
-        `♡ si quieres cancelar: *!recordatorio cancelar ${id}* ♡`,
+        `✦ si quieres cancelar: *!recordatorio cancelar ${id}* ✦`,
     );
   }
 }

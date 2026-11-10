@@ -233,7 +233,7 @@ export class PoesiaService {
     if (showMeta) {
       msg += `\n\n━━━━━━━━━━━━━\n`;
       msg += `🆔 ID: \`${entry.id}\` | 👤 Por: ${entry.autorName}\n`;
-      msg += `❤️ Vota con *!votar* o *!votar ${entry.id}*\n`;
+      msg += `🚀 Vota con *!votar* o *!votar ${entry.id}*\n`;
       msg += `\n${defaultFooter}`;
     }
 
@@ -256,7 +256,7 @@ export class PoesiaService {
     for (const { entry, rank } of entries) {
       const medal = medals[rank - 1] ?? `${rank}.`;
       const preview = entry.contenido.split('\n')[0].slice(0, 50) + '...';
-      msg += `${medal} *${entry.autorName}* — ❤️ ${entry.votes} votos\n`;
+      msg += `${medal} *${entry.autorName}* — 🚀 ${entry.votes} votos\n`;
       msg += `   _"${preview}"_\n`;
       msg += `   🆔 ${entry.id} | ${TIPO_EMOJI[entry.tipo]} ${TIPO_LABEL[entry.tipo]}\n\n`;
     }

@@ -29,7 +29,7 @@ export class DepositCommand extends Command {
     if (!amountStr) {
       await ctx.reply(
         `🏦 *DEPOSITAR* 🏦\n\n` +
-          `✿ *Cómo usar:*\n` +
+          `✦ *Cómo usar:*\n` +
           `!deposit <cantidad>\n` +
           `!deposit all - Todo el efectivo\n\n` +
           `📝 *Ejemplo:*\n` +

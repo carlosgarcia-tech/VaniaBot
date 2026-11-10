@@ -58,7 +58,7 @@ export class FacebookCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, necesito el enlace de Facebook* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!facebook* <URL>\n` +
+          `✦ *!facebook* <URL>\n` +
           `✩ ejemplo: *!facebook https://fb.watch/XXXXXXXXXX/* ✩`,
       );
       return;
@@ -69,7 +69,7 @@ export class FacebookCommand extends Command {
     if (!this.downloader.isValidUrl(url)) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, ese enlace no me sirve* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ necesito un link válido de Facebook\n` +
+          `✦ necesito un link válido de Facebook\n` +
           `✩ solo videos públicos, por favor ✩`,
       );
       return;
@@ -89,7 +89,7 @@ export class FacebookCommand extends Command {
           thumbnail: info?.thumbnailUrl,
           author: info?.author,
         },
-        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 🚀',
       );
 
       await ctx.react('⏳');

@@ -75,11 +75,11 @@ export class SubBotManager extends EventEmitter {
 
   setMainSocket(sock: WASocket): void {
     this.mainSock = sock;
-    logger.debug('🌸 SubBotManager: socket principal registrado');
+    logger.debug('🌌 SubBotManager: socket principal registrado');
   }
 
   async initialize(): Promise<void> {
-    logger.debug('🌸 Iniciando SubBotManager (OrbitBot)...');
+    logger.debug('🌌 Iniciando SubBotManager (OrbitBot)...');
 
     this.messageHandler = new SubBotMessageHandler(
       id => this.middlewaresPerInstance.get(id) ?? [],
@@ -528,7 +528,7 @@ export class SubBotManager extends EventEmitter {
         try {
           await this.mainSock.sendMessage(subConfig.ownerJid, {
             text:
-              `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+              `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
               `   *Vincular SubBot*\n` +
               `\n` +
               `💝 Tu SubBot está lista\n` +
@@ -552,7 +552,7 @@ export class SubBotManager extends EventEmitter {
               `Número:\n` +
               `   *+${subConfig.phoneNumber}*\n` +
               `\n` +
-              `   Estaré esperando 💗\n` +
+              `   Estaré esperando 🚀\n` +
               `╰━━━━━━━━━━━━━━━━━━━━╯`,
           });
 
@@ -568,7 +568,7 @@ export class SubBotManager extends EventEmitter {
                 try {
                   await this.mainSock.sendMessage(subConfig.ownerJid, {
                     text:
-                      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+                      `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
                       `   *Recordatorio SubBot*\n` +
                       `\n` +
                       `⏰ El código anterior\n` +
@@ -577,7 +577,7 @@ export class SubBotManager extends EventEmitter {
                       `✨ Usa *.reconbot*\n` +
                       `   para generar uno nuevo.\n` +
                       `\n` +
-                      `   Estoy aquí 💗\n` +
+                      `   Estoy aquí 🚀\n` +
                       `╰━━━━━━━━━━━━━━━━━━━━╯`,
                   });
                 } catch (error) {
@@ -645,7 +645,7 @@ export class SubBotManager extends EventEmitter {
         try {
           await this.mainSock.sendMessage(subConfig.ownerJid, {
             text:
-              `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+              `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
               `   🤖 *SubBot activada*\n` +
               `\n` +
               `💝 ¡Tu SubBot ya está\n` +
@@ -663,7 +663,7 @@ export class SubBotManager extends EventEmitter {
               `Prefijo:\n` +
               `   *${config.prefix}*\n` +
               `\n` +
-              `   ¡Disfrútala! 💗\n` +
+              `   ¡Disfrútala! 🚀\n` +
               `╰━━━━━━━━━━━━━━━━━━━━╯`,
           });
         } catch (e) {
@@ -692,7 +692,7 @@ export class SubBotManager extends EventEmitter {
         try {
           await this.mainSock.sendMessage(subConfig.ownerJid, {
             text:
-              `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+              `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
               `   *SubBot desconectada*\n` +
               `\n` +
               `Parece que tu SubBot\n` +
@@ -707,7 +707,7 @@ export class SubBotManager extends EventEmitter {
               `\n` +
               `   *.reconbot*\n` +
               `\n` +
-              `   Estoy aquí 💗\n` +
+              `   Estoy aquí 🚀\n` +
               `╰━━━━━━━━━━━━━━━━━━━━╯`,
           });
         } catch (error) {

@@ -30,7 +30,7 @@ export class ImagenCommand extends Command {
     if (!query) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *buscador de imágenes* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:* !imagen <búsqueda>\n\n` +
+          `✦ *cómo usar:* !imagen <búsqueda>\n\n` +
           `✩ *ejemplos:*\n` +
           `  ﹒!imagen atardecer\n` +
           `  ﹒!imagen gato\n` +

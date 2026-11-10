@@ -42,7 +42,7 @@ export class AntiDeleteCommand extends Command {
       antiDeleteService.enable(groupJid);
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *anti-delete* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ activado ✿\n\n` +
+          `✦ activado ✦\n\n` +
           `ahora se notificará al owner cuando alguien elimine un mensaje`,
       );
       return;
@@ -52,7 +52,7 @@ export class AntiDeleteCommand extends Command {
       antiDeleteService.disable(groupJid);
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *anti-delete* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ desactivado ✿\n\n` +
+          `✦ desactivado ✦\n\n` +
           `los mensajes eliminados ya no se notificarán`,
       );
       return;
@@ -60,8 +60,8 @@ export class AntiDeleteCommand extends Command {
 
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *anti-delete* ˚₊· ͟͟͞͞➳\n\n` +
-        `✿ \`on/off\` para activar/desactivar\n` +
-        `✿ \`status\` para ver el estado actual`,
+        `✦ \`on/off\` para activar/desactivar\n` +
+        `✦ \`status\` para ver el estado actual`,
     );
   }
 
@@ -75,8 +75,8 @@ export class AntiDeleteCommand extends Command {
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *anti-delete* ˚₊· ͟͟͞͞➳\n\n` +
         `📌 *Estado:* ${status}\n\n` +
-        `✿ Este grupo: ${groupEnabled ? '✅' : '❌'}\n` +
-        `✿ Global: ${globalEnabled ? '✅' : '❌'}\n\n` +
+        `✦ Este grupo: ${groupEnabled ? '✅' : '❌'}\n` +
+        `✦ Global: ${globalEnabled ? '✅' : '❌'}\n\n` +
         `*Comandos:*\n` +
         `\`!antidelete on\` - Activar\n` +
         `\`!antidelete off\` - Desactivar`,

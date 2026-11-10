@@ -39,9 +39,9 @@ export class WeeklyCommand extends Command {
 
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *tu regalito semanal* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ ya lo tienes guardado\n` +
-          `✿ puedes volver en: *${days}d ${hours}h*\n\n` +
-          `♡ te espero ♡`,
+          `✦ ya lo tienes guardado\n` +
+          `✦ puedes volver en: *${days}d ${hours}h*\n\n` +
+          `✦ te espero ✦`,
       );
       return;
     }

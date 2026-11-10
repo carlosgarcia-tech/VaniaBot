@@ -89,11 +89,11 @@ export class PollCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *encuestas — OrbitBot* ˚₊· ͟͟͞͞➳\n` +
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
-          `✿ *para crear:*\n` +
+          `✦ *para crear:*\n` +
           `  ﹒!encuesta "Pregunta" "Op1" "Op2" "Op3"...\n\n` +
           `✩ *ejemplo:*\n` +
           `  ﹒!encuesta "¿Qué comemos?" "Pizza" "Tacos" "Sushi"\n\n` +
-          `♡ *qué más puedo hacer:*\n` +
+          `✦ *qué más puedo hacer:*\n` +
           `  ﹒!encuesta votar <número>\n` +
           `  ﹒!encuesta resultado\n` +
           `  ﹒!encuesta cerrar\n` +

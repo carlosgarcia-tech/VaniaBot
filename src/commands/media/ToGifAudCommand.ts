@@ -38,14 +38,14 @@ export class ToGifAudCommand extends Command {
 
     if (!quotedMsg || !quotedMsg.videoMessage) {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *falta el video* ˚₊· ͟͟͞͞➳\n\n` + `✿ Responde a un *video* con *!togifaud*`,
+        `˚₊· ͟͟͞͞➳ *falta el video* ˚₊· ͟͟͞͞➳\n\n` + `✦ Responde a un *video* con *!togifaud*`,
       );
       return;
     }
 
     const mime = quotedMsg.videoMessage.mimetype || '';
     if (!mime.includes('video')) {
-      await ctx.reply(`˚₊· ͟͟͞͞➳ *no es video* ˚₊· ͟͟͞͞➳\n\n` + `✿ Necesito que respondas a un *video*.`);
+      await ctx.reply(`˚₊· ͟͟͞͞➳ *no es video* ˚₊· ͟͟͞͞➳\n\n` + `✦ Necesito que respondas a un *video*.`);
       return;
     }
 

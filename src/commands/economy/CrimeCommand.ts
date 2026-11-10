@@ -221,7 +221,7 @@ export class CrimeCommand extends Command {
     if (!mentionedJid) {
       await ctx.reply(
         `🚨 *ROBAR* 🚨\n\n` +
-          `✿ *Cómo usar:*\n` +
+          `✦ *Cómo usar:*\n` +
           `!crime @usuario\n\n` +
           `📊 *Información:*\n` +
           `• Los owners no pueden ser robados\n` +

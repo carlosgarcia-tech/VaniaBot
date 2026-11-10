@@ -108,9 +108,9 @@ export class QuizCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *modo estudio — OrbitBot* ˚₊· ͟͟͞͞➳\n` +
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
-          `✿ *cómo lo usas:* !quiz [categoría] [preguntas]\n\n` +
+          `✦ *cómo lo usas:* !quiz [categoría] [preguntas]\n\n` +
           `✩ *categorías:*\n${CATEGORIES_LIST}\n\n` +
-          `♡ *ejemplos:*\n` +
+          `✦ *ejemplos:*\n` +
           `  ﹒!quiz javascript\n` +
           `  ﹒!quiz historia 10\n` +
           `  ﹒!quiz stop\n\n` +
@@ -124,7 +124,7 @@ export class QuizCommand extends Command {
     if (quizService.hasActiveSession(ctx.chat.jid)) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *ya estamos jugando* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ si quieres uno nuevo, primero termina este con *!quiz stop*\n` +
+          `✦ si quieres uno nuevo, primero termina este con *!quiz stop*\n` +
           `✩ no quiero mezclar las preguntas ✩`,
       );
       return;
@@ -215,10 +215,10 @@ export class QuizCommand extends Command {
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *quiz iniciado* — ${total} preguntas ˚₊· ͟͟͞͞➳\n` +
         `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n` +
-        `✿ categoría: *${category}*\n` +
+        `✦ categoría: *${category}*\n` +
         `${difficultyEngine.emoji(diff)} dificultad inicial: *${difficultyEngine.label(diff)}*\n` +
         `✩ recompensas: hasta *${difficultyEngine.calculateCoins(diff, 5)} moneditas* por respuesta ✩\n\n` +
-        `_la dificultad sube solita con tu racha_ 🌸\n` +
+        `_la dificultad sube solita con tu racha_ 🌌\n` +
         `_usa !hint si necesitas ayuda (la recompensa baja un poquito)_\n\n` +
         `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n` +
         `*pregunta 1/${total}* ${difficultyEngine.emoji(diff)} ${difficultyEngine.label(diff)}\n` +

@@ -38,7 +38,7 @@ export class PinterestCommand extends Command {
     if (!url) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *Pinterest Downloader* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  ﹒!pin <url de pinterest>\n\n` +
           `✩ *ejemplo:*\n` +
           `  ﹒!pin https://pin.it/abc123`,

@@ -31,7 +31,7 @@ export class AiCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *OrbitBot IA* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ háblame, quiero platicar contigo\n\n` +
+          `✦ háblame, quiero platicar contigo\n\n` +
           `✩ *lo que puedo hacer:*\n` +
           `  ﹒*!ai* <mensaje> — chateamos con recuerdos\n` +
           `  ﹒*!transcribe* — paso audios a texto\n` +

@@ -29,7 +29,7 @@ export class InviteCommand extends Command {
     if (!number) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *necesito un número* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!invite* <número>\n` +
+          `✦ *!invite* <número>\n` +
           `✩ ejemplo: *!invite 5219514639799* ✩`,
       );
       return;

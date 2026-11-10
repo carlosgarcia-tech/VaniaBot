@@ -204,7 +204,7 @@ export class AcrosticoCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *acróstico* ˚₊· ͟͟͞͞➳\n\n` +
           `Necesito un nombre para escribirte un verso por cada letra ✩\n\n` +
-          `✿ *ejemplos:*\n` +
+          `✦ *ejemplos:*\n` +
           `﹒!acrostico Alejandra\n` +
           `﹒!acrostico Daniela amor romántico\n` +
           `﹒!acrostico Valeria vida tierno\n\n` +
@@ -273,7 +273,7 @@ export class PoesiaMenuCommand extends Command {
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *OrbitBot — poesía para el alma* ˚₊· ͟͟͞͞➳\n` +
         `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
-        `✿ *mis poemitas:*\n` +
+        `✦ *mis poemitas:*\n` +
         `﹒!poema [tema] [estilo] [para:nombre]\n` +
         `﹒!frases [tema] [estilo]\n` +
         `﹒!piropo [estilo] [para:nombre]\n` +
@@ -286,12 +286,12 @@ export class PoesiaMenuCommand extends Command {
         `﹒!historia [tema] [estilo]\n\n` +
         `✩ *estilos:*\n${ESTILOS_LIST}\n\n` +
         `✩ *temas:*\n${TEMAS_LIST}\n\n` +
-        `✿ *otros comanditos:*\n` +
+        `✦ *otros comanditos:*\n` +
         `﹒!votar [ID?] — votar el último contenido\n` +
         `﹒!poetop — ranking del grupo\n` +
         `﹒!poetop poema — top por tipo\n` +
         `﹒!poetastats — tus estadísticas\n\n` +
-        `✿ *ejemplitos:*\n` +
+        `✦ *ejemplitos:*\n` +
         `_!poema amor romántico para:valeria_\n` +
         `_!piropo pícaro_\n` +
         `_!acrostico Valeria amor_\n` +
@@ -326,8 +326,8 @@ export class VotarPoesiaCommand extends Command {
       return;
     }
 
-    await ctx.react('❤️');
-    await ctx.reply(`❤️ *¡Voto registrado!* — Total: ${result.newVotes} ❤️`);
+    await ctx.react('🚀');
+    await ctx.reply(`🚀 *¡Voto registrado!* — Total: ${result.newVotes} 🚀`);
   }
 }
 
@@ -387,7 +387,7 @@ export class PoesiaStatsCommand extends Command {
     if (stats.total === 0) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ todavía no me has pedido nada lindo ˚₊· ͟͟͞͞➳\n\n` +
-          `Prueba con *!poema*, *!frases*, *!piropo* y más ✿`,
+          `Prueba con *!poema*, *!frases*, *!piropo* y más ✦`,
       );
       return;
     }
@@ -400,14 +400,14 @@ export class PoesiaStatsCommand extends Command {
       `📊 *Tu Poesía — ${name}*\n` +
       `━━━━━━━━━━━\n` +
       `✍️ Contenidos creados: ${stats.total}\n` +
-      `❤️ Votos recibidos:    ${stats.totalVotes}\n\n`;
+      `🚀 Votos recibidos:    ${stats.totalVotes}\n\n`;
 
     if (byTipoLines) msg += `📂 *Por tipo:*\n${byTipoLines}\n\n`;
 
     if (stats.topEntry) {
       const preview = stats.topEntry.contenido.split('\n')[0].slice(0, 60) + '...';
       msg +=
-        `🏆 *Tu mejor contenido* (${stats.topEntry.votes} ❤️):\n` +
+        `🏆 *Tu mejor contenido* (${stats.topEntry.votes} 🚀):\n` +
         `_"${preview}"_\n` +
         `🆔 ID: ${stats.topEntry.id}\n\n`;
     }

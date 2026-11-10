@@ -31,7 +31,7 @@ export class FlirtCommand extends Command {
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
-    await ctx.react('💕');
+    await ctx.react('🚀');
 
     try {
       const response = await fetch(`https://api.shizo.top/quote/flirt?apikey=${FLIRT_API_KEY}`, {
@@ -65,16 +65,16 @@ export class FlirtCommand extends Command {
 
       if (targetJid) {
         const targetName = targetJid.split('@')[0];
-        message = `*${senderName}* le dice a *@${targetName}:*\n\n💖 ${data.result}`;
+        message = `*${senderName}* le dice a *@${targetName}:*\n\n🚀 ${data.result}`;
         await ctx.sock.sendMessage(ctx.chat.jid, {
           text: message,
           mentions: [targetJid],
         });
       } else {
-        await ctx.reply(`*${senderName}* dice:\n\n💖 ${data.result}`);
+        await ctx.reply(`*${senderName}* dice:\n\n🚀 ${data.result}`);
       }
 
-      await ctx.react('💖');
+      await ctx.react('🚀');
     } catch (error) {
       logError('[FlirtCommand]', error);
       await ctx.react('❌');

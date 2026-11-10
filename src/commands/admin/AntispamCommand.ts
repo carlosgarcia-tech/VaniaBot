@@ -54,10 +54,10 @@ export class AntispamCommand extends Command {
 
     await ctx.reply(
       `*: ̗̀➛ anti-spam ̖́-*\n\n` +
-        `✿ stats ﹒ver estadísticas\n` +
-        `✿ whitelist ﹒gestionar lista blanca\n` +
-        `✿ reset ﹒reiniciar contadores\n` +
-        `✿ config ﹒ver configuración\n\n` +
+        `✦ stats ﹒ver estadísticas\n` +
+        `✦ whitelist ﹒gestionar lista blanca\n` +
+        `✦ reset ﹒reiniciar contadores\n` +
+        `✦ config ﹒ver configuración\n\n` +
         `*๑ ˖ ejemplo ˖ ๑* \`!antispam stats\``,
     );
   }
@@ -188,10 +188,10 @@ export class AntispamCommand extends Command {
 
     await ctx.reply(
       `*: ̗̀➛ mis reglas ̖́-*\n\n` +
-        `✿ grupo ﹒${cfg.maxMessagesPerGroup} msgs/min\n` +
-        `✿ tiempo ﹒${cfg.windowMs / 1000}s\n` +
-        `✿ ráfaga ﹒${cfg.floodMaxPerSecond} msgs/s\n` +
-        `✿ ventana ﹒${cfg.floodWindowMs}ms`,
+        `✦ grupo ﹒${cfg.maxMessagesPerGroup} msgs/min\n` +
+        `✦ tiempo ﹒${cfg.windowMs / 1000}s\n` +
+        `✦ ráfaga ﹒${cfg.floodMaxPerSecond} msgs/s\n` +
+        `✦ ventana ﹒${cfg.floodWindowMs}ms`,
     );
   }
 }

@@ -10,7 +10,7 @@ import { spawn, type ChildProcess } from 'child_process';
 import { existsSync, writeFileSync, unlinkSync } from 'fs';
 import chalk from 'chalk';
 import { createInterface } from 'readline';
-import { displayOrbitBanner, selectAuthMethod } from './utils/cli.js';
+import { displayOrbitBanner, selectAuthMethod, ink } from './utils/cli.js';
 import { env } from './config/env.js';
 import { logger, logError } from '@/utils/logger.js';
 
@@ -33,9 +33,9 @@ let isAuthenticated = false;
 let shutdownRegistered = false;
 
 if (IS_DOCKER) {
-  console.info(chalk.bold.hex('#FF1493')('\n🦋─ Starting OrbitBot AI ─🦋\n'));
+  console.info(ink.primary.bold('\n🪐─ Starting OrbitBot AI ─🪐\n'));
 } else {
-  logger.info(chalk.bold.hex('#FF1493')('\n🦋─ Starting OrbitBot AI ─🦋\n'));
+  logger.info(ink.primary.bold('\n🪐─ Starting OrbitBot AI ─🪐\n'));
 }
 
 function hasExistingSession(): boolean {

@@ -58,7 +58,7 @@ export class AudioEffectCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *efectos disponibles* ˚₊· ͟͟͞͞➳\n\n` +
           Object.keys(EFFECTS)
-            .map(e => `✿ *!${e}*`)
+            .map(e => `✦ *!${e}*`)
             .join('\n') +
           `\n\n✩ Responde a un audio con el comando.`,
       );
@@ -72,7 +72,7 @@ export class AudioEffectCommand extends Command {
     if (!quotedMsg || !quotedMsg.audioMessage) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *falta el audio* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ Responde a un *audio/nota de voz* con *!${commandName}*`,
+          `✦ Responde a un *audio/nota de voz* con *!${commandName}*`,
       );
       return;
     }
@@ -80,7 +80,7 @@ export class AudioEffectCommand extends Command {
     const mime = quotedMsg.audioMessage.mimetype ?? '';
     if (!mime.includes('audio')) {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *no es audio* ˚₊· ͟͟͞͞➳\n\n` + `✿ Necesito que respondas a un *audio/nota de voz*.`,
+        `˚₊· ͟͟͞͞➳ *no es audio* ˚₊· ͟͟͞͞➳\n\n` + `✦ Necesito que respondas a un *audio/nota de voz*.`,
       );
       return;
     }

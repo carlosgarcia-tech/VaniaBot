@@ -6,6 +6,7 @@
  * @author **Carlos G**
  */
 
+import { PALETTE } from '../../utils/cli.js';
 import type { Canvas, CanvasRenderingContext2D } from 'canvas';
 import { createCanvas, loadImage } from 'canvas';
 
@@ -71,7 +72,7 @@ export class ProfileCardService {
   static async generate(opts: ProfileCardOptions): Promise<Buffer> {
     const W = 750;
     const H = 300;
-    const accent = opts.accentColor ?? '#FFD700';
+    const accent = opts.accentColor ?? PALETTE.star;
 
     const canvas: Canvas = createCanvas(W, H);
     const ctx = canvas.getContext('2d');

@@ -33,7 +33,7 @@ export class StickerCommand extends Command {
     if (!message || !(message.imageMessage || message.videoMessage)) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, necesito una imagen o video* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ responde a una foto/video con *!sticker*\n` +
+          `✦ responde a una foto/video con *!sticker*\n` +
           `✩ videos cortitos, menos de 10 segundos ✩`,
       );
       return;

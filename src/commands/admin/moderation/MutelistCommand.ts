@@ -48,14 +48,14 @@ export class MutelistCommand extends Command {
       if (mutes.length === 0) {
         await ctx.reply(
           `˚₊· ͟͟͞͞➳ *silenciados* ˚₊· ͟͟͞͞➳\n\n` +
-            `✿ no hay nadie silenciado ✿\n\n` +
+            `✦ no hay nadie silenciado ✦\n\n` +
             `✨ el grupo está en paz`,
         );
         return;
       }
 
       let message = `˚₊· ͟͟͞͞➳ *silenciados* ˚₊· ͟͟͞͞➳\n\n`;
-      message += `✿ ${mutes.length} usuario${mutes.length !== 1 ? 's' : ''} silenciado${mutes.length !== 1 ? 's' : ''}\n\n`;
+      message += `✦ ${mutes.length} usuario${mutes.length !== 1 ? 's' : ''} silenciado${mutes.length !== 1 ? 's' : ''}\n\n`;
 
       for (const mute of mutes) {
         const remaining = this.formatRemainingTime(mute.expiresAt - Date.now());
@@ -81,7 +81,7 @@ export class MutelistCommand extends Command {
       if (!muteInfo) {
         const user = await serviceManager.userService.getUser(userJid);
         await ctx.reply(
-          `˚₊· ͟͟͞͞➳ *${user.name}* ˚₊· ͟͟͞͞➳\n\n` + `✿ puede hablar libremente ✿\n\n` + `✨ no tiene mute`,
+          `˚₊· ͟͟͞͞➳ *${user.name}* ˚₊· ͟͟͞͞➳\n\n` + `✦ puede hablar libremente ✦\n\n` + `✨ no tiene mute`,
         );
         return;
       }

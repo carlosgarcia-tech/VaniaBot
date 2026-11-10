@@ -59,7 +59,7 @@ export class WelcomeCommand extends Command {
         if (!message) {
           await ctx.reply(
             '˚₊· ͟͟͞͞➳ oops, falta el mensajito ˚₊· ͟͟͞͞➳\n\n' +
-              '✿ así me gusta ✿\n' +
+              '✦ así me gusta ✦\n' +
               '`!welcome set qué onda @user, bienvenid@ a @group`\n\n' +
               '✩ mis variables ✩\n' +
               '`@user` ﹒`@group` ﹒`@desc` ﹒`@count` ﹒`@fact`',
@@ -101,7 +101,7 @@ export class WelcomeCommand extends Command {
       default:
         await ctx.reply(
           '*: ̗̀➛ hmm, no sé eso ̖́-*\n\n' +
-            '✿ comanditos\n' +
+            '✦ comanditos\n' +
             '`on` → activar bienvenida\n' +
             '`off` → desactivar bienvenida\n' +
             '`set` → cambiar mensaje\n' +
@@ -109,7 +109,7 @@ export class WelcomeCommand extends Command {
             '`reset` → volver al defecto\n' +
             '`pic` → activar foto\n' +
             '`nopic` → quitar foto\n\n' +
-            '✿ variables\n' +
+            '✦ variables\n' +
             '`@user` ✩ `@group` ✩ `@desc` ✩ `@count` ✩ `@fact`',
         );
     }

@@ -13,13 +13,13 @@
         --bg-deep: #050a1a;
         --bg-card: rgba(15, 20, 40, 0.8);
         --aurora-green: #00d4aa;
-        --aurora-magenta: #ff006e;
+        --aurora-indigo: #818CF8;
         --aurora-blue: #00b4d8;
         --aurora-purple: #7b2fff;
         --text-primary: #e8f1f5;
         --text-muted: rgba(232, 241, 245, 0.6);
         --glow-green: 0 0 20px rgba(0, 212, 170, 0.3);
-        --glow-magenta: 0 0 20px rgba(255, 0, 110, 0.3);
+        --glow-indigo: 0 0 20px rgba(129, 140, 248, 0.35);
         --glow-blue: 0 0 20px rgba(0, 180, 216, 0.3);
         --noise-opacity: 0.03;
       }
@@ -138,7 +138,7 @@
         font-size: 2rem;
         font-weight: 800;
         letter-spacing: 0.05em;
-        background: linear-gradient(135deg, var(--aurora-green) 0%, var(--aurora-magenta) 50%, var(--aurora-blue) 100%);
+        background: linear-gradient(135deg, var(--aurora-green) 0%, var(--aurora-indigo) 50%, var(--aurora-blue) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-shadow: 0 0 40px rgba(0, 212, 170, 0.5);
@@ -191,10 +191,10 @@
       }
 
       .status-dot.warning {
-        background: var(--aurora-magenta);
+        background: var(--aurora-indigo);
       }
       .status-dot.warning::before {
-        background: var(--aurora-magenta);
+        background: var(--aurora-indigo);
       }
       .status-dot.danger {
         background: #ff4757;
@@ -269,7 +269,7 @@
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, var(--aurora-green), var(--aurora-magenta), var(--aurora-blue));
+        background: linear-gradient(90deg, var(--aurora-green), var(--aurora-indigo), var(--aurora-blue));
         opacity: 0;
         transition: opacity 0.4s;
       }
@@ -507,7 +507,7 @@
       }
       .badge-warning {
         background: rgba(255, 0, 110, 0.15);
-        color: var(--aurora-magenta);
+        color: var(--aurora-indigo);
         border: 1px solid rgba(255, 0, 110, 0.3);
       }
       .badge-danger {
@@ -605,8 +605,8 @@
       }
       .health-icon.warn {
         background: rgba(255, 0, 110, 0.15);
-        color: var(--aurora-magenta);
-        box-shadow: var(--glow-magenta);
+        color: var(--aurora-indigo);
+        box-shadow: var(--glow-indigo);
       }
       .health-icon.fail {
         background: rgba(255, 71, 87, 0.15);
@@ -670,7 +670,7 @@
 
       .log-level.info { color: var(--aurora-blue); }
       .log-level.error { color: #ff4757; }
-      .log-level.warn { color: var(--aurora-magenta); }
+      .log-level.warn { color: var(--aurora-indigo); }
       .log-level.success { color: var(--aurora-green); }
 
       .log-message {
@@ -786,7 +786,7 @@
       .slot.pending .slot-status,
       .slot.linking .slot-status {
         background: rgba(255, 0, 110, 0.15);
-        color: var(--aurora-magenta);
+        color: var(--aurora-indigo);
         border: 1px solid rgba(255, 0, 110, 0.3);
       }
       .slot.disconnected .slot-status {
@@ -876,7 +876,7 @@
         left: 25%;
         right: 25%;
         height: 1px;
-        background: linear-gradient(90deg, transparent, var(--aurora-green), var(--aurora-magenta), var(--aurora-blue), transparent);
+        background: linear-gradient(90deg, transparent, var(--aurora-green), var(--aurora-indigo), var(--aurora-blue), transparent);
       }
 
       footer p {
@@ -1673,7 +1673,7 @@
     <div class="dashboard">
       <header>
         <div class="logo">
-          <span class="logo-emoji">🌸</span>
+          <span class="logo-emoji">🌌</span>
           <h1>OrbitBot Dashboard</h1>
         </div>
         <div class="header-status">
@@ -1709,7 +1709,7 @@
         <div class="stat-card">
           <div class="stat-header">
             <span class="stat-label">RAM Usada</span>
-            <span class="stat-icon">🧠</span>
+            <span class="stat-icon">🔭</span>
           </div>
           <div class="stat-value" id="ramPercent">-</div>
           <div class="stat-sub"><span id="ramUsed">0</span> / <span id="ramTotal">0</span> GB</div>
@@ -1765,7 +1765,7 @@
           </div>
           <div class="section">
             <div class="section-header">
-              <h3 class="section-title">🧠 Memory Usage</h3>
+              <h3 class="section-title">🔭 Memory Usage</h3>
             </div>
             <div class="chart-container">
               <canvas id="memoryChart"></canvas>

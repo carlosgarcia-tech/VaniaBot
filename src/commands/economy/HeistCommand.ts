@@ -47,7 +47,7 @@ export class HeistCommand extends Command {
     if (!amountStr || isNaN(amount) || amount < MIN_HEIST_AMOUNT) {
       await ctx.reply(
         `🏦 *ASALTO AL BANCO* 🏦\n\n` +
-          `✿ *Cómo funciona:*\n` +
+          `✦ *Cómo funciona:*\n` +
           `Invierte dinero en un asalto al banco.\n` +
           `Si tienes éxito, duplicas tu inversión.\n` +
           `Si fail, pierdes todo.\n\n` +
@@ -72,7 +72,7 @@ export class HeistCommand extends Command {
           `❌ *No tienes efectivo suficiente*\n\n` +
             `💵 Efectivo: $${formatNumber(user.money)}\n` +
             `🏦 Banco: $${formatNumber(bankBalance)}\n\n` +
-            `✿ *Retira dinero primero:*\n` +
+            `✦ *Retira dinero primero:*\n` +
             `!withdraw ${amount - user.money}`,
         );
       } else {

@@ -86,7 +86,7 @@ export class DemoteCommand extends Command {
           `✩ *ahora es:* miembro\n` +
           `✩ *por:* ${ctx.sender.pushName}\n` +
           `✩ *cuándo:* ${new Date().toLocaleString()}\n\n` +
-          `✿ ya es parte del grupo ✿`,
+          `✦ ya es parte del grupo ✦`,
       );
 
       await ctx.react('✅');

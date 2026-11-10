@@ -66,7 +66,7 @@ export class TiktokCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, necesito el enlace de TikTok* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!tiktok* <URL> [calidad]\n` +
+          `✦ *!tiktok* <URL> [calidad]\n` +
           `✩ ejemplo: *!tiktok https://vm.tiktok.com/XXXXXXXX/* ✩\n` +
           `✩ calidad: 360, 480, 720, 1080 (default: 720)`,
       );
@@ -79,7 +79,7 @@ export class TiktokCommand extends Command {
     if (!this.downloader.isValidUrl(url)) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, ese enlace no me sirve* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ necesito un link válido de TikTok\n` +
+          `✦ necesito un link válido de TikTok\n` +
           `✩ ejemplo: *https://www.tiktok.com/@user/video/123456789* ✩`,
       );
       return;
@@ -100,7 +100,7 @@ export class TiktokCommand extends Command {
           thumbnail: info?.thumbnailUrl,
           duration: info?.duration,
         },
-        '\n> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '\n> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 🚀',
         quality,
       );
 

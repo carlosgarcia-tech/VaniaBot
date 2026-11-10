@@ -104,7 +104,7 @@ export class TranslateCommand extends Command {
 
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *traductor* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo lo usas:*\n` +
+          `✦ *cómo lo usas:*\n` +
           `  ﹒!traducir <código> <texto>\n` +
           `  ﹒o responde a un mensaje\n\n` +
           `✩ *idiomas que entiendo:*\n${langs} ✩`,

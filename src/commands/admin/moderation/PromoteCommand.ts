@@ -81,7 +81,7 @@ export class PromoteCommand extends Command {
           `✩ *ahora es:* admin\n` +
           `✩ *por:* ${ctx.sender.pushName}\n` +
           `✩ *cuándo:* ${new Date().toLocaleString()}\n\n` +
-          `✿ ya puede ayudar a cuidar el grupo ✿`,
+          `✦ ya puede ayudar a cuidar el grupo ✦`,
       );
 
       await ctx.react('✅');

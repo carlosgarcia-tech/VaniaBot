@@ -47,7 +47,7 @@ export class GrantCommand extends Command {
     if (args.length < 3) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, algo no está bien* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ así lo haces: ${this.usage}\n\n` +
+          `✦ así lo haces: ${this.usage}\n\n` +
           `✩ *ejemplos:*\n${this.examples.map(ex => `  ﹒${ex}`).join('\n')}`,
       );
       return;

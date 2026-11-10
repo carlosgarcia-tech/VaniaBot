@@ -102,7 +102,7 @@ export class SubBotCommand extends Command {
     const maxSlots = subBotDatabase.getMaxSlots();
 
     let helpText =
-      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+      `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
       `   *Sistema de SubBots*\n` +
       `   ${usedSlots}/${maxSlots} slots en uso\n` +
       `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
@@ -149,7 +149,7 @@ export class SubBotCommand extends Command {
 
     if (!phone) {
       await ctx.reply(
-        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+        `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
           `   *Solicitar SubBot*\n` +
           `\n` +
           `💝 Vincula tu número\n` +
@@ -165,7 +165,7 @@ export class SubBotCommand extends Command {
           `🌍 Incluye el código\n` +
           `   de país sin el +\n` +
           `\n` +
-          `   Estaré lista 💗\n` +
+          `   Estaré lista 🚀\n` +
           `╰━━━━━━━━━━━━━━━━━━━━╯`,
       );
       return;
@@ -200,7 +200,7 @@ export class SubBotCommand extends Command {
       const { slot } = result;
 
       await ctx.reply(
-        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+        `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
           `   *Slot #${slot.slot} reservado*\n` +
           `\n` +
           `💝 Tu *pairing code*\n` +
@@ -209,7 +209,7 @@ export class SubBotCommand extends Command {
           `Enviaremos el código\n` +
           `   a este chat pronto.\n` +
           `\n` +
-          `   Estaré aquí 💗\n` +
+          `   Estaré aquí 🚀\n` +
           `╰━━━━━━━━━━━━━━━━━━━━╯`,
       );
       await ctx.react('✅');
@@ -267,13 +267,13 @@ export class SubBotCommand extends Command {
       );
 
       await ctx.reply(
-        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+        `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
           `   *Slot #${result.slot.slot} reservado*\n` +
           `\n` +
           `💝 Tu *pairing code*\n` +
           `   está siendo generado...\n` +
           `\n` +
-          `   Estaré aquí 💗\n` +
+          `   Estaré aquí 🚀\n` +
           `╰━━━━━━━━━━━━━━━━━━━━╯`,
       );
       await ctx.react('✅');
@@ -329,7 +329,7 @@ export class SubBotCommand extends Command {
     const { emoji, label } = formatSlotStatus(slot.status);
 
     let info =
-      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` + `   *Slot #${slot.slot}*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
+      `╭━━━ 🌌 *OrbitBot* ━━━╮\n` + `   *Slot #${slot.slot}*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
 
     info += `${emoji} Estado: *${label}*\n\n`;
 
@@ -428,7 +428,7 @@ export class SubBotsCommand extends Command {
     const usedSlots = slots.filter(s => s.status !== 'free').length;
 
     let text =
-      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+      `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
       `   *Slots SubBot*\n` +
       `   ${usedSlots}/${maxSlots} en uso\n` +
       `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
@@ -506,7 +506,7 @@ export class DelBotCommand extends Command {
     }
 
     if (slots.length > 1) {
-      let text = `╭━━━ 🌸 *OrbitBot* ━━━╮\n` + `   *Tus SubBots*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
+      let text = `╭━━━ 🌌 *OrbitBot* ━━━╮\n` + `   *Tus SubBots*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
 
       for (const slot of slots) {
         const { emoji, label } = formatSlotStatus(slot.status);
@@ -523,13 +523,13 @@ export class DelBotCommand extends Command {
     try {
       await subBotManager.deleteSubBot(ctx.sender.jid, slot.slot);
       await ctx.reply(
-        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+        `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
           `   *SubBot eliminada*\n` +
           `\n` +
           `Tu subbot del slot #${slot.slot}\n` +
           `   fue eliminada.\n` +
           `\n` +
-          `   Estoy aquí 💗\n` +
+          `   Estoy aquí 🚀\n` +
           `╰━━━━━━━━━━━━━━━━━━━━╯`,
       );
       await ctx.react('✅');
@@ -559,7 +559,7 @@ export class StatusBotCommand extends Command {
       return;
     }
 
-    let text = `╭━━━ 🌸 *OrbitBot* ━━━╮\n` + `   *Tus SubBots*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
+    let text = `╭━━━ 🌌 *OrbitBot* ━━━╮\n` + `   *Tus SubBots*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
 
     for (const slot of slots) {
       const { emoji, label } = formatSlotStatus(slot.status);

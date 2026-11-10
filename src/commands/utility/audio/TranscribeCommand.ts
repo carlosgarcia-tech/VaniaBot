@@ -167,15 +167,15 @@ export class TranscribeCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *transcriptor de voz — OrbitBot* ˚₊· ͟͟͞͞➳\n` +
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
-          `✿ mándame un audio con *!transcribe* y te lo escribo\n\n` +
+          `✦ mándame un audio con *!transcribe* y te lo escribo\n\n` +
           `✩ *cómo usarme:*\n` +
           `  ﹒*!transcribe* — solo el texto\n` +
           `  ﹒*!transcribe resumen* — texto + resumen + puntos clave\n` +
           `  ﹒*!transcribe completo* — texto + análisis + metadatos\n\n` +
-          `♡ *cambiar idioma:*\n` +
+          `✦ *cambiar idioma:*\n` +
           `  ﹒*!transcribe en* — inglés\n` +
           `  ﹒*!transcribe es resumen* — español + resumen\n\n` +
-          `✿ *formatos que acepto:*\n` +
+          `✦ *formatos que acepto:*\n` +
           `  notas de voz · mp3 · ogg · mp4 · wav · flac · webm\n\n` +
           `*extras:*\n` +
           `  • compresión automática para audios grandes\n` +

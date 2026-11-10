@@ -79,7 +79,7 @@ export class HelpCommand extends Command {
     if (!command) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, "${commandName}" no está en mi lista* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ prueba con *!help* para ver lo que sé hacer ✩`,
+          `✦ prueba con *!help* para ver lo que sé hacer ✩`,
       );
       return;
     }
@@ -140,7 +140,7 @@ export class HelpCommand extends Command {
 
     let menu = `⧼⋆꙳• *REGISTRO ${botName}* ⋆꙳•⧽\n\n`;
     menu += `> 💝 ɴᴏᴍʙʀᴇ   » ${userData.name}\n`;
-    menu += `> ⚙️ ɴɪᴠᴇʟ     » ${userData.level}\n`;
+    menu += `> 🪐 ɴɪᴠᴇʟ     » ${userData.level}\n`;
     menu += `> ⚡ ᴇxᴘ        » ${progress.currentXP} / ${progress.requiredXP}\n`;
     menu += `> 🌐 ᴍᴏᴅᴏ      » ${isPrime ? 'Prime' : 'Público'}\n`;
     menu += `> ⏳ ᴀᴄᴛɪᴠᴏ   » ${uptime}\n`;
@@ -170,7 +170,7 @@ export class HelpCommand extends Command {
       [CommandCategory.FUN]: '🎉',
       [CommandCategory.ANIME]: '🐾',
       [CommandCategory.CREATIVE]: '🎭',
-      [CommandCategory.SUBBOT]: '🌸',
+      [CommandCategory.SUBBOT]: '🌌',
       [CommandCategory.ECONOMY]: '💰',
       [CommandCategory.MODERATION]: '🛡️',
       [CommandCategory.GROUP]: '👥',
@@ -179,7 +179,7 @@ export class HelpCommand extends Command {
       [CommandCategory.RPG]: '⚔️',
       [CommandCategory.FREEFIRE]: '🎯',
       [CommandCategory.INFORMATION]: '📚',
-      [CommandCategory.ADMIN]: '⚙️',
+      [CommandCategory.ADMIN]: '🪐',
       [CommandCategory.OWNER]: '♛',
     };
     const categoryNames: Record<CommandCategory, string> = {

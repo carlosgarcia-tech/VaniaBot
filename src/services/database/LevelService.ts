@@ -115,7 +115,7 @@ export class LevelService {
 👤 ${userName}
 📊 Nivel ${result.oldLevel} → ${result.newLevel}
 ✨ +${result.xpGained} XP
-💫 XP Total: ${result.totalXP}
+🌠 XP Total: ${result.totalXP}
 
 Sigue así! 🚀
 `.trim();

@@ -38,7 +38,7 @@ export class Ytmp3v2Command extends Command {
     }
 
     await ctx.react('🎵');
-    await ctx.reply('> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕');
+    await ctx.reply('> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 🚀');
 
     try {
       const data = (await deliriusService.getJson('download', 'ytmp3v2', { url })) as {

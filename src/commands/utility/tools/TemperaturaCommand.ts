@@ -28,7 +28,7 @@ export class TemperaturaCommand extends Command {
     if (!city) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *clima — OrbitBot* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usarlo:* !clima <ciudad>\n\n` +
+          `✦ *cómo usarlo:* !clima <ciudad>\n\n` +
           `✩ *ejemplos:*\n` +
           `  ﹒!clima Ciudad de México\n` +
           `  ﹒!clima Tokio\n` +

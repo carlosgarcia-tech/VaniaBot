@@ -34,7 +34,7 @@ export class GitCloneCommand extends Command {
     if (!url) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *falta la URL* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!gitclon* <URL de GitHub>\n` +
+          `✦ *!gitclon* <URL de GitHub>\n` +
           `✩ ejemplo: *!gitclon https://github.com/username/repo* ✩`,
       );
       return;

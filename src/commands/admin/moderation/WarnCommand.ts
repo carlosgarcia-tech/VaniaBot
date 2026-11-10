@@ -67,7 +67,7 @@ export class WarnCommand extends Command {
             `✩ *quién:* ${user.name}\n` +
             `✩ *advertencias:* 3/3\n` +
             `✩ *por:* ${reason}\n\n` +
-            `✿ ay, no soy admin, no pude hacer nada ✿`,
+            `✦ ay, no soy admin, no pude hacer nada ✦`,
         );
       }
     } else {
@@ -76,7 +76,7 @@ export class WarnCommand extends Command {
           `✩ *quién:* ${user.name}\n` +
           `✩ *lleva:* ${newWarnings}/3\n` +
           `✩ *por:* ${reason}\n\n` +
-          `✿ cuidado, a las 3 se tiene que ir ✿`,
+          `✦ cuidado, a las 3 se tiene que ir ✦`,
       );
     }
   }

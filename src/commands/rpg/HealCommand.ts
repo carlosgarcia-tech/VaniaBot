@@ -44,7 +44,7 @@ export class HealCommand extends Command {
       const maxHp = stats.maxHp || 100;
 
       if (currentHp >= maxHp) {
-        await ctx.reply('❤️ Ya tienes la vida completa');
+        await ctx.reply('🚀 Ya tienes la vida completa');
         return;
       }
 
@@ -58,13 +58,13 @@ export class HealCommand extends Command {
       healCooldowns.set(ctx.sender.jid, now);
 
       await ctx.reply(
-        `❤️ *¡SANADO!*\n\n` +
-          `❤️ HP: ${currentHp} → ${newHp}/${maxHp}\n` +
+        `🚀 *¡SANADO!*\n\n` +
+          `🚀 HP: ${currentHp} → ${newHp}/${maxHp}\n` +
           `+${healAmount} HP recuperado\n\n` +
           `⏰ Cooldown: 60s`,
       );
 
-      await ctx.react('❤️');
+      await ctx.react('🚀');
     } catch {
       await ctx.reply('❌ Error al sanar');
     }

@@ -38,7 +38,7 @@ export class ImageConvertCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *conversor de imágenes* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *uso:* !imgconvert <formato> [calidad]\n\n` +
+          `✦ *uso:* !imgconvert <formato> [calidad]\n\n` +
           `✩ *formatos:* jpeg, png, webp, gif, bmp, tiff\n` +
           `  ﹒!imgconvert png\n` +
           `  ﹒!imgconvert webp 80\n\n` +

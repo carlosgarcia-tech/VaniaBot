@@ -234,7 +234,7 @@ export class CalculatorCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *calculadora y conversora* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *qué puedo hacer:*\n` +
+          `✦ *qué puedo hacer:*\n` +
           `  ﹒!calc 25 * 4 + 100\n` +
           `  ﹒!calc (5 + 3) ^ 2\n` +
           `  ﹒!calc 15% de 340\n\n` +
@@ -243,7 +243,7 @@ export class CalculatorCommand extends Command {
           `  ﹒!calc 100 kg a lb\n` +
           `  ﹒!calc 37 C a F\n` +
           `  ﹒!calc 1 gb a mb\n\n` +
-          `♡ *unidades que conozco:*\n` +
+          `✦ *unidades que conozco:*\n` +
           `  ﹒📏 km, m, cm, mm, mi, ft, in\n` +
           `  ﹒⚖️ t, kg, g, lb, oz\n` +
           `  ﹒🌡️ C, F, K\n` +
@@ -322,7 +322,7 @@ export class CalculatorCommand extends Command {
       logError('[CalculatorCommand] Error', error);
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, no sé calcular eso* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *prueba con estos:*\n` +
+          `✦ *prueba con estos:*\n` +
           `  ﹒!calc 25 * 4\n` +
           `  ﹒!calc (10 + 5) * 2\n` +
           `  ﹒!calc 15% de 200`,

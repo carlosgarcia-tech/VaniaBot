@@ -32,7 +32,7 @@ export class ToAnimeCommand extends Command {
 
     if (!quotedMsg || !quotedMsg.imageMessage) {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *falta la imagen* ˚₊· ͟͟͞͞➳\n\n` + `✿ Responde a una *imagen* con *!toanime*`,
+        `˚₊· ͟͟͞͞➳ *falta la imagen* ˚₊· ͟͟͞͞➳\n\n` + `✦ Responde a una *imagen* con *!toanime*`,
       );
       return;
     }
@@ -40,7 +40,7 @@ export class ToAnimeCommand extends Command {
     const mime = quotedMsg.imageMessage.mimetype || '';
     if (!mime.startsWith('image/')) {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *no es imagen* ˚₊· ͟͟͞͞➳\n\n` + `✿ Necesito que respondas a una *imagen*.`,
+        `˚₊· ͟͟͞͞➳ *no es imagen* ˚₊· ͟͟͞͞➳\n\n` + `✦ Necesito que respondas a una *imagen*.`,
       );
       return;
     }

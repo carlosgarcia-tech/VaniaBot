@@ -23,7 +23,7 @@ export class BegCommand extends Command {
   cooldown = 0;
 
   private readonly RESPONSES = [
-    { text: 'te da unas monedas', min: 10, max: 50, emoji: '💕' },
+    { text: 'te da unas monedas', min: 10, max: 50, emoji: '🚀' },
     { text: 'te mira mal y te da nada', min: 0, max: 0, emoji: '😒' },
     { text: 'te da una moneda', min: 1, max: 5, emoji: '🪙' },
     { text: 'te da все', min: 50, max: 100, emoji: '🥺' },

@@ -32,7 +32,7 @@ export class ReportCommand extends Command {
     if (!content) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *reporte* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ describe tu problema ✿\n\n` +
+          `✦ describe tu problema ✦\n\n` +
           `\`!report <mensaje>\`\n\n` +
           `✩ ejemplo:\n` +
           `  ﹒!report El comando .ai no funciona`,
@@ -67,7 +67,7 @@ export class ReportCommand extends Command {
 
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *enviado* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ tu reporte fue enviado al owner ✿\n\n` +
+          `✦ tu reporte fue enviado al owner ✦\n\n` +
           `📋 ID: \`${report.id}\`\n` +
           `🕐 Recibirás respuesta pronto`,
       );
@@ -109,7 +109,7 @@ export class BugReportCommand extends Command {
     if (!content) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *bug report* ˚₊· ͟͟͞͞➳\n\n` +
-          `🐛 describe el bug que encontraste ✿\n\n` +
+          `🐛 describe el bug que encontraste ✦\n\n` +
           `\`!bugreport <descripción>\`\n\n` +
           `✩ *tips para un buen reporte:*\n` +
           `  ﹒qué comando falló\n` +
@@ -147,7 +147,7 @@ export class BugReportCommand extends Command {
 
       await ctx.reply(
         `🐛 *bug reportado*\n\n` +
-          `✿ gracias por ayudar a mejorar ✿\n\n` +
+          `✦ gracias por ayudar a mejorar ✦\n\n` +
           `📋 ID: \`${report.id}\``,
       );
 
@@ -188,7 +188,7 @@ export class FeedbackCommand extends Command {
     if (!content) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *feedback* ˚₊· ͟͟͞͞➳\n\n` +
-          `💡 comparte tu idea o sugerencia ✿\n\n` +
+          `💡 comparte tu idea o sugerencia ✦\n\n` +
           `\`!feedback <sugerencia>\`\n\n` +
           `✩ ejemplo:\n` +
           `  ﹒!feedback Podrían agregar un comando de tarot`,
@@ -223,7 +223,7 @@ export class FeedbackCommand extends Command {
 
       await ctx.reply(
         `💡 *feedback enviado*\n\n` +
-          `✿ gracias por tus sugerencias ✿\n\n` +
+          `✦ gracias por tus sugerencias ✦\n\n` +
           `📋 ID: \`${report.id}\``,
       );
 
@@ -412,7 +412,7 @@ export class ResolveReportCommand extends Command {
           `✅ *Tu reporte fue resuelto*\n\n` +
           `📋 ID: \`${report.id}\`\n` +
           `📝 ${report.content.substring(0, 100)}...\n\n` +
-          `Gracias por tu paciencia ✿`;
+          `Gracias por tu paciencia ✦`;
 
         await ctx.sock.sendMessage(report.fromJid, { text: resolvedMsg });
       } catch (error) {

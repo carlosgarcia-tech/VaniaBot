@@ -73,7 +73,7 @@ export class KickCommand extends Command {
           `✩ *por qué:* ${reason}\n` +
           `✩ *por:* ${ctx.sender.pushName}\n` +
           `✩ *cuándo:* ${new Date().toLocaleString()}\n\n` +
-          `✿ la puerta no está abierta para volver ✿`,
+          `✦ la puerta no está abierta para volver ✦`,
       );
 
       await ctx.react('✅');

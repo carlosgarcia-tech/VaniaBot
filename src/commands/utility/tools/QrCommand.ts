@@ -31,7 +31,7 @@ export class QrCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *generador de QR* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usarlo:* !qr <texto o URL>\n\n` +
+          `✦ *cómo usarlo:* !qr <texto o URL>\n\n` +
           `✩ *ejemplos:*\n` +
           `  ﹒!qr https://google.com\n` +
           `  ﹒!qr Mi número: +52 123 456 7890\n` +

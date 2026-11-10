@@ -39,10 +39,10 @@ export class RespaldarDataCommand extends Command {
 
       let message = `˚₊· ͟͟͞͞➳ *tu respaldo* ˚₊· ͟͟͞͞➳\n`;
       message += `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n`;
-      message += `✿ *usuario:* ${ctx.sender.jid.split('@')[0]}\n`;
-      message += `✿ *dinero:* $${user.money.toLocaleString()}\n`;
-      message += `✿ *XP:* ${user.xp.toLocaleString()}\n`;
-      message += `✿ *nivel:* ${user.level}\n`;
+      message += `✦ *usuario:* ${ctx.sender.jid.split('@')[0]}\n`;
+      message += `✦ *dinero:* $${user.money.toLocaleString()}\n`;
+      message += `✦ *XP:* ${user.xp.toLocaleString()}\n`;
+      message += `✦ *nivel:* ${user.level}\n`;
       message += `✩ *comandos totales:* ${user.totalCommands.toLocaleString()} ✩\n\n`;
 
       if (user.inventory && user.inventory.length > 0) {

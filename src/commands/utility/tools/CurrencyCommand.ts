@@ -96,11 +96,11 @@ export class CurrencyCommand extends Command {
     if (ctx.args.length < 3) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *conversor de monedas* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usarlo:* !moneda <cantidad> <de> <a>\n\n` +
+          `✦ *cómo usarlo:* !moneda <cantidad> <de> <a>\n\n` +
           `✩ *monedas que manejo:*\n` +
           `  ﹒fiat: USD, EUR, MXN, ARS, COP, CLP, BRL, GBP, JPY...\n` +
           `  ﹒cripto: BTC, ETH, BNB, SOL, DOGE, XRP...\n\n` +
-          `♡ *ejemplitos:*\n` +
+          `✦ *ejemplitos:*\n` +
           `  ﹒!moneda 100 USD MXN\n` +
           `  ﹒!moneda 1 BTC USD\n` +
           `  ﹒!moneda 50 EUR MXN`,
@@ -135,7 +135,7 @@ export class CurrencyCommand extends Command {
           await ctx.react('❌');
           await ctx.reply(
             `˚₊· ͟͟͞͞➳ *oops, no conozco ${cryptoSymbol}* ˚₊· ͟͟͞͞➳\n\n` +
-              `✿ *mis criptos:* ${[...this.CRYPTO_SYMBOLS].join(', ')}`,
+              `✦ *mis criptos:* ${[...this.CRYPTO_SYMBOLS].join(', ')}`,
           );
           return;
         }

@@ -100,7 +100,7 @@ export class QuizTopCommand extends Command {
         await ctx.reply(
           category
             ? `˚₊· ͟͟͞͞➳ *todavía nadie ha jugado ${category}* ˚₊· ͟͟͞͞➳`
-            : `˚₊· ͟͟͞͞➳ *nadie ha hecho un quiz aquí todavía* ˚₊· ͟͟͞͞➳\n\n✿ prueba con *!quiz* [categoría] y empezamos a jugar ✿`,
+            : `˚₊· ͟͟͞͞➳ *nadie ha hecho un quiz aquí todavía* ˚₊· ͟͟͞͞➳\n\n✦ prueba con *!quiz* [categoría] y empezamos a jugar ✦`,
         );
         return;
       }

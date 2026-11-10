@@ -51,7 +51,7 @@ export class CuevanaCommand extends Command {
     if (!input) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *Cuevana* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  ﹒!cv <título>\n\n` +
           `✩ *ejemplos:*\n` +
           `  ﹒!cv avatar\n` +
@@ -101,7 +101,7 @@ export class CuevanaDLCommand extends Command {
     if (!slug) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *Cuevana DL* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  ﹒!cvdl <slug> [tipo]\n\n` +
           `✩ *tipos:* movie, series\n\n` +
           `Primero usa *!cv <título>* para buscar`,
@@ -160,7 +160,7 @@ export class CuevanaLinkCommand extends Command {
     if (!url) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *Cuevana Link* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  ﹒!cvlink <url>\n\n` +
           `Primero usa *!cvdl <slug>* para ver las opciones`,
       );

@@ -30,7 +30,7 @@ export class BuyCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ oops, dime qué número quieres ˚₊· ͟͟͞͞➳\n\n` +
           `✩ *!buy* <número>\n` +
-          `✿ Echa un vistazo a *!shop* para ver lo que tengo`,
+          `✦ Echa un vistazo a *!shop* para ver lo que tengo`,
       );
       return;
     }
@@ -42,7 +42,7 @@ export class BuyCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ oops, no encontré ese número ˚₊· ͟͟͞͞➳\n\n` +
           `✩ elige del *1* al *${shopService.getItems().length}*\n` +
-          `✿ mira *!shop* para ver lo que tengo`,
+          `✦ mira *!shop* para ver lo que tengo`,
       );
       return;
     }
@@ -53,8 +53,8 @@ export class BuyCommand extends Command {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ oops, faltan moneditas ˚₊· ͟͟͞͞➳\n\n` +
           `${item.emoji} *${item.name}*\n` +
-          `✿ vale: *$${item.price.toLocaleString()}*\n` +
-          `✿ tienes: *$${user.money.toLocaleString()}*\n` +
+          `✦ vale: *$${item.price.toLocaleString()}*\n` +
+          `✦ tienes: *$${user.money.toLocaleString()}*\n` +
           `✩ necesitas: *$${(item.price - user.money).toLocaleString()}* más`,
       );
       return;

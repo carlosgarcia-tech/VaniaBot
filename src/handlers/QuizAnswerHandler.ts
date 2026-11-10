@@ -147,7 +147,7 @@ class QuizAnswerHandler {
 
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *muy bien, ${player.pushName}!* ˚₊· ͟͟͞͞➳\n\n` +
-        `✿ +${coinsAwarded} moneditas\n` +
+        `✦ +${coinsAwarded} moneditas\n` +
         `✩ +${xpAwarded} XP ✩` +
         streakMsg +
         hintPenalty +

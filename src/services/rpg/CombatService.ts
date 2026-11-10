@@ -149,7 +149,7 @@ export class CombatService {
       : `⚔️ *DERROTA*\n\n${mob.emoji} *${mob.name}* te derrotó\n\n`;
 
     message += `💥 Daño hecho: ${result.mobDamage}\n`;
-    message += `❤️ Daño recibido: ${result.playerDamage}\n`;
+    message += `🚀 Daño recibido: ${result.playerDamage}\n`;
     message += `✨ XP: +${result.xpGained}\n`;
     message += `💰 Dinero: +$${result.moneyGained}`;
     message += itemDropsText;
@@ -228,7 +228,7 @@ export class CombatService {
       this.activeCombats.delete(jid);
 
       return {
-        message: `⚔️ *DERROTA*\n\n${combat.mob.emoji} *${combat.mob.name}* te derrotó\n\n✨ XP: +${xpReward}\n💰 Dinero: +$${moneyReward}\n\n❤️ Usa !heal para recuperarte`,
+        message: `⚔️ *DERROTA*\n\n${combat.mob.emoji} *${combat.mob.name}* te derrotó\n\n✨ XP: +${xpReward}\n💰 Dinero: +$${moneyReward}\n\n🚀 Usa !heal para recuperarte`,
         success: true,
       };
     }
@@ -237,7 +237,7 @@ export class CombatService {
 
     let message = `⚔️ *Turno ${combat.turns}*\n\n`;
     message += `👊 Atacas: ${playerDmg} dmg a ${combat.mob.name}\n`;
-    message += `❤️ Tu HP: ${newPlayerHp}\n`;
+    message += `🚀 Tu HP: ${newPlayerHp}\n`;
     message += `${combat.mob.emoji} HP ${combat.mob.name}: ${combat.mob.hp}\n`;
 
     if (mobDamage > 0) {
@@ -274,13 +274,13 @@ export class CombatService {
       if (combat.playerHp <= 0) {
         this.activeCombats.delete(jid);
         return {
-          message: `⚔️ *DERROTA*\n\nNo pudiste escapar y ${combat.mob.name} te derrotó\n\n❤️ Usa !heal para recuperarte`,
+          message: `⚔️ *DERROTA*\n\nNo pudiste escapar y ${combat.mob.name} te derrotó\n\n🚀 Usa !heal para recuperarte`,
           success: true,
         };
       }
 
       return {
-        message: `❌ ¡No pudiste escapar!\n\n💥 Daño recibido: ${damage}\n❤️ Tu HP: ${combat.playerHp}`,
+        message: `❌ ¡No pudiste escapar!\n\n💥 Daño recibido: ${damage}\n🚀 Tu HP: ${combat.playerHp}`,
         success: true,
       };
     }

@@ -43,7 +43,7 @@ export class RPGCommand extends Command {
 📊 Nivel: ${user.level || 1} | Clase: ${userClass?.name || 'Sin clase'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-❤️ *HP:* ${stats.hp}/${stats.maxHp}
+🚀 *HP:* ${stats.hp}/${stats.maxHp}
 ⚔️ *Ataque:* ${totalStats.atk || stats.atk}
 🛡️ *Defensa:* ${totalStats.def || stats.def}
 

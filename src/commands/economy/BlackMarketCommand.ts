@@ -94,7 +94,7 @@ export class BlackMarketCommand extends Command {
       const randomItems = blackMarketService.getRandomItems();
       await ctx.reply(
         `📦 *LISTAR EN EL MERCADO NEGRO*\n\n` +
-          `✿ *Cómo usar:*\n` +
+          `✦ *Cómo usar:*\n` +
           `!blackmarket listar [item] [precio]\n\n` +
           `📋 *Items que puedes vender:*\n\n` +
           randomItems

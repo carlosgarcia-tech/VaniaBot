@@ -49,10 +49,10 @@ export class MonthlyCommand extends Command {
 
       await ctx.reply(
         `🌟 *RECOMPENSA MENSUAL* 🌟\n\n` +
-          `✿ Ya tienes tu regalo mensual\n\n` +
+          `✦ Ya tienes tu regalo mensual\n\n` +
           `⏰ Próxima disponibles en:\n` +
           `*${days}d ${hours}h*\n\n` +
-          `♡ Te espero ♡`,
+          `✦ Te espero ✦`,
       );
       return;
     }

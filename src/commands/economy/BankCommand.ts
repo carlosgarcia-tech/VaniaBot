@@ -41,7 +41,7 @@ export class BankCommand extends Command {
       message += `🏦 *Banco:* $${formatNumber(bankBalance)}\n`;
       message += `📊 *Total:* $${formatNumber(totalBalance)}\n\n`;
 
-      message += `✿ *Comandos:*\n`;
+      message += `✦ *Comandos:*\n`;
       message += `• !deposit <cantidad> - Depositar\n`;
       message += `• !withdraw <cantidad> - Retirar\n`;
       message += `• !bank - Ver saldo\n\n`;

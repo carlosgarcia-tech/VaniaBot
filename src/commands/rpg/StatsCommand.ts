@@ -54,7 +54,7 @@ export class StatsCommand extends Command {
 ⚔️ *PERSONAJE - ${user.name}*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-❤️ *Salud:* ${stats.hp || 100}/${stats.maxHp || 100}
+🚀 *Salud:* ${stats.hp || 100}/${stats.maxHp || 100}
 ⚡ *Energía:* ${stats.energy || 100}/${stats.maxEnergy || 100}
 💪 *Resistencia:* ${stats.stamina || 100}/${stats.maxStamina || 100}
 
@@ -66,9 +66,9 @@ export class StatsCommand extends Command {
 📊 *Atributos*
 ━━━━━━━━━━━━━━━━
 💪 STR: ${totalStats.str || stats.str || 10}
-🧠 INT: ${totalStats.int || stats.int || 10}
+🔭 INT: ${totalStats.int || stats.int || 10}
 🏃 AGI: ${totalStats.agi || stats.agi || 10}
-❤️ VIT: ${totalStats.vit || stats.vit || 10}
+🚀 VIT: ${totalStats.vit || stats.vit || 10}
 🍀 SUERTE: ${totalStats.luck || stats.luck || 5}
 
 🎯 *Probabilidades*

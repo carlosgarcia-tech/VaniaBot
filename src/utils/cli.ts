@@ -29,7 +29,7 @@ export interface StartupProgress {
 }
 
 /** Orbit colour palette. Change a value here and it changes everywhere in the CLI. */
-const PALETTE = {
+export const PALETTE = {
   /** Indigo: main banner, titles and the first boot frame. */
   primary: '#818CF8',
   /** Sky blue: rules, the sub-banner and the closing line. */
@@ -40,8 +40,8 @@ const PALETTE = {
   star: '#FACC15',
 } as const;
 
-/** Ready-to-use chalk painters for {@link PALETTE}. */
-const ink = {
+/** Ready-to-use chalk painters for {@link PALETTE}. Exported so the rest of the codebase paints with the same orbit colours instead of hardcoding hex values. */
+export const ink = {
   primary: chalk.hex(PALETTE.primary),
   secondary: chalk.hex(PALETTE.secondary),
   glow: chalk.hex(PALETTE.glow),

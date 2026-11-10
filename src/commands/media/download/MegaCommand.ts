@@ -39,7 +39,7 @@ export class MegaCommand extends Command {
     if (!url) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *Mega Downloader* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  ﹒!mega <url de mega>\n\n` +
           `✩ *ejemplo:*\n` +
           `  ﹒!mega https://mega.nz/file/abc123`,

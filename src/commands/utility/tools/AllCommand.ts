@@ -40,7 +40,7 @@ export class AllCommand extends Command {
       const total = participants.length;
 
       let text = `¡Hola a todos! ✨\n\n`;
-      text += `Mencionando a los ${total} integrantes del grupo 💕\n\n`;
+      text += `Mencionando a los ${total} integrantes del grupo 🚀\n\n`;
 
       if (customMessage) {
         text += `*Mensaje:*\n`;
@@ -53,24 +53,24 @@ export class AllCommand extends Command {
       } else {
         admins.forEach(p => {
           const num = p.id.split('@')[0];
-          text += `🌸 @${num}\n`;
+          text += `🌌 @${num}\n`;
         });
       }
 
       text += `\n`;
 
-      text += `*Miembros* (${members.length}) 🌸\n`;
+      text += `*Miembros* (${members.length}) 🌌\n`;
       if (members.length === 0) {
         text += `- No hay miembros\n`;
       } else {
         members.forEach(p => {
           const num = p.id.split('@')[0];
-          text += `🌸 @${num}\n`;
+          text += `🌌 @${num}\n`;
         });
       }
 
-      text += `\nGracias por estar aquí ~ ❤️`;
-      text += `\n> _*I'm OrbitBot*_ ❤️`;
+      text += `\nGracias por estar aquí ~ 🚀`;
+      text += `\n> _*I'm OrbitBot*_ 🚀`;
 
       const mentions = participants.map(p => p.id);
 

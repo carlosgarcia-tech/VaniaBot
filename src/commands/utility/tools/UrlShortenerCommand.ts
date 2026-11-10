@@ -38,7 +38,7 @@ export class UrlShortenerCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *acortador de URLs* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usarlo:* !acortar <url>\n\n` +
+          `✦ *cómo usarlo:* !acortar <url>\n\n` +
           `✩ *ejemplo:*\n` +
           `  ﹒!acortar https://www.example.com/pagina?muy=larga&con=parametros ✩`,
       );

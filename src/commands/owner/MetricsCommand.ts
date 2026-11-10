@@ -46,7 +46,7 @@ export class MetricsCommand extends Command {
     message += `  ❌ Misses: ${cacheStats.misses.toLocaleString()}\n`;
 
     message += `\n*Sistema:*\n`;
-    message += `  🧠 Memoria: ${this.formatBytes(process.memoryUsage().heapUsed)}\n`;
+    message += `  🔭 Memoria: ${this.formatBytes(process.memoryUsage().heapUsed)}\n`;
     message += `  ⏰ Uptime: ${this.formatUptime(process.uptime())}\n`;
     message += `  📝 Comandos registrados: ${commandRegistry.size}\n`;
 

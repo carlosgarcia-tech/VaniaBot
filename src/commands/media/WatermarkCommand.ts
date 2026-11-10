@@ -75,7 +75,7 @@ export class WatermarkCommand extends Command {
     if (!hasQuoted) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *watermark* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usar:*\n` +
+          `✦ *cómo usar:*\n` +
           `  1. Responde a la imagen que quieres marcar\n` +
           `  2. Adjunta el logo en el caption con *!watermark*\n\n` +
           `✩ *posición:* br (default), bl, tr, tl, center\n` +

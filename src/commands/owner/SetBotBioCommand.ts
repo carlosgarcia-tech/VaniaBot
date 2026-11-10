@@ -18,7 +18,7 @@ export class SetBotBioCommand extends Command {
   category = CommandCategory.OWNER;
   aliases = ['botbio', 'setbio', 'biodat'];
   usage = '!setbotbio <texto>';
-  examples = ['!setbotbio 🌸 Tu bot favorito', '!setbotbio Online 24/7'];
+  examples = ['!setbotbio 🌌 Tu bot favorito', '!setbotbio Online 24/7'];
   permissions = {
     user: [PermissionLevel.OWNER],
   };
@@ -31,7 +31,7 @@ export class SetBotBioCommand extends Command {
         '*SETBOTBIO*\n\n' +
           'Cambia el estado o bio del bot (max 139 caracteres).\n\n' +
           'Uso: !setbotbio <texto>\n' +
-          'Ejemplo: !setbotbio 🌸 Tu bot favorito',
+          'Ejemplo: !setbotbio 🌌 Tu bot favorito',
       );
       return;
     }

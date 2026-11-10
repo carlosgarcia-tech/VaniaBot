@@ -64,7 +64,7 @@ export class DoxCommand extends Command {
     const targetJid = mentionedJid || quotedSender;
 
     if (!targetJid) {
-      await ctx.reply(`˚₊· ͟͟͞͞➳ *falta el usuario* ˚₊· ͟͟͞͞➳\n\n` + `✿ *!doxear* @usuario`);
+      await ctx.reply(`˚₊· ͟͟͞͞➳ *falta el usuario* ˚₊· ͟͟͞͞➳\n\n` + `✦ *!doxear* @usuario`);
       return;
     }
 

@@ -14,6 +14,7 @@
 
 import qrcode from 'qrcode-terminal';
 import chalk from 'chalk';
+import { ink } from './cli.js';
 
 const SEPARATOR = chalk.bold.cyan('═══════════════════════════════════════════════════');
 
@@ -21,7 +22,7 @@ const SEPARATOR = chalk.bold.cyan('═══════════════
 export function displayQR(qr: string): void {
   console.info('\n');
   console.info(SEPARATOR);
-  console.info(chalk.bold.magenta('            SCAN THE QR CODE '));
+  console.info(ink.primary.bold('            SCAN THE QR CODE '));
   console.info(SEPARATOR);
   console.info(chalk.yellow('\n1. Open WhatsApp on your phone'));
   console.info(chalk.yellow('2. Tap Menu (⋮) or Settings'));
@@ -43,7 +44,7 @@ export function displayPairingCode(code: string): void {
 
   console.info('\n');
   console.info(SEPARATOR);
-  console.info(chalk.bold.magenta('        🔢 PAIRING CODE 🔢'));
+  console.info(ink.primary.bold('        🔢 PAIRING CODE 🔢'));
   console.info(SEPARATOR);
   console.info(chalk.yellow('\n1. Open WhatsApp on your phone'));
   console.info(chalk.yellow('2. Tap Menu (⋮) or Settings'));

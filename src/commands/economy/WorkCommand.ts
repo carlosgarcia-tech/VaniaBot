@@ -74,9 +74,9 @@ export class WorkCommand extends Command {
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *bien ahí!* ˚₊· ͟͟͞͞➳\n\n` +
         `${job.emoji} *${job.name}* 💼\n` +
-        `✿ ganaste: *$${formatNumber(earned)}* moneditas${bonusText}\n` +
-        `✿ +${xpGained} XP\n\n` +
-        `♡ tu bolsita: *$${formatNumber(updatedUser.money)}* ♡`,
+        `✦ ganaste: *$${formatNumber(earned)}* moneditas${bonusText}\n` +
+        `✦ +${xpGained} XP\n\n` +
+        `✦ tu bolsita: *$${formatNumber(updatedUser.money)}* ✦`,
     );
   }
 }

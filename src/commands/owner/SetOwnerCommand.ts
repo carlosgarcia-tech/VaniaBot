@@ -42,7 +42,7 @@ export class SetOwnerCommand extends Command {
     if (args.length < 2) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, algo no está bien* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ así lo haces: ${this.usage}\n\n` +
+          `✦ así lo haces: ${this.usage}\n\n` +
           `✩ *ejemplos:*\n${this.examples.map(ex => `  ﹒${ex}`).join('\n')}`,
       );
       return;
@@ -91,10 +91,10 @@ export class SetOwnerCommand extends Command {
               `  ﹒stats al tope\n` +
               `  ﹒sin límites\n` +
               `  ﹒no recibe warns ni bans\n\n` +
-              `✿ *subió así:*\n` +
+              `✦ *subió así:*\n` +
               `  ﹒nivel: ${oldStats.level} → ${updatedUser.level}\n` +
               `  ﹒XP: ${oldStats.xp.toLocaleString()} → ${updatedUser.xp.toLocaleString()}\n` +
-              `  ﹒dinero: $${oldStats.money.toLocaleString()} → $${updatedUser.money.toLocaleString()} ✿`,
+              `  ﹒dinero: $${oldStats.money.toLocaleString()} → $${updatedUser.money.toLocaleString()} ✦`,
           );
           break;
 
@@ -122,7 +122,7 @@ export class SetOwnerCommand extends Command {
               `  ﹒nivel: ${beforeRemoval.level} → ${demotedUser.level}\n` +
               `  ﹒XP: ${beforeRemoval.xp.toLocaleString()} → ${demotedUser.xp.toLocaleString()}\n` +
               `  ﹒dinero: $${beforeRemoval.money.toLocaleString()} → $${demotedUser.money.toLocaleString()}\n\n` +
-              `♡ volvió a sus valores iniciales ♡`,
+              `✦ volvió a sus valores iniciales ✦`,
           );
           break;
 

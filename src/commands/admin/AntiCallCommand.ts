@@ -42,7 +42,7 @@ export class AntiCallCommand extends Command {
       antiCallService.enable();
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *anti-call* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ activado ✿\n\n` +
+          `✦ activado ✦\n\n` +
           `📵 las llamadas al bot serán rechazadas automáticamente`,
       );
       return;
@@ -52,7 +52,7 @@ export class AntiCallCommand extends Command {
       antiCallService.disable();
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *anti-call* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ desactivado ✿\n\n` +
+          `✦ desactivado ✦\n\n` +
           `📞 las llamadas ya no serán rechazadas`,
       );
       return;
@@ -60,8 +60,8 @@ export class AntiCallCommand extends Command {
 
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *anti-call* ˚₊· ͟͟͞͞➳\n\n` +
-        `✿ \`on/off\` para activar/desactivar\n` +
-        `✿ \`status\` para ver el estado actual`,
+        `✦ \`on/off\` para activar/desactivar\n` +
+        `✦ \`status\` para ver el estado actual`,
     );
   }
 
@@ -101,7 +101,7 @@ export class AntiCallBlockCommand extends Command {
     if (!target) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *blockcall* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ menciona a un usuario para bloquearlo ✿\n\n` +
+          `✦ menciona a un usuario para bloquearlo ✦\n\n` +
           `\`!anticallblock @usuario\``,
       );
       return;
@@ -114,7 +114,7 @@ export class AntiCallBlockCommand extends Command {
 
     antiCallService.blockUser(target.jid);
     await ctx.reply(
-      `˚₊· ͟͟͞͞➳ *bloqueado* ˚₊· ͟͟͞͞➳\n\n` + `✿ @${target.jid.split('@')[0]} no podrá llamar ✿`,
+      `˚₊· ͟͟͞͞➳ *bloqueado* ˚₊· ͟͟͞͞➳\n\n` + `✦ @${target.jid.split('@')[0]} no podrá llamar ✦`,
     );
   }
 }
@@ -137,7 +137,7 @@ export class AntiCallUnblockCommand extends Command {
     if (!target) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *unblockcall* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ menciona a un usuario para desbloquearlo ✿\n\n` +
+          `✦ menciona a un usuario para desbloquearlo ✦\n\n` +
           `\`!anticallunblock @usuario\``,
       );
       return;
@@ -150,7 +150,7 @@ export class AntiCallUnblockCommand extends Command {
 
     antiCallService.unblockUser(target.jid);
     await ctx.reply(
-      `˚₊· ͟͟͞͞➳ *desbloqueado* ˚₊· ͟͟͞͞➳\n\n` + `✿ @${target.jid.split('@')[0]} ya puede llamar ✿`,
+      `˚₊· ͟͟͞͞➳ *desbloqueado* ˚₊· ͟͟͞͞➳\n\n` + `✦ @${target.jid.split('@')[0]} ya puede llamar ✦`,
     );
   }
 }

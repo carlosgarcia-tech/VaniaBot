@@ -31,7 +31,7 @@ export class ListaTTLCommand extends Command {
         `˚₊· ͟͟͞͞➳ *tiempo de listas* ˚₊· ͟͟͞͞➳\n\n` +
           `✩ ahora: *${horasActuales} horas*\n` +
           `✩ predeterminado: *${horasDefault} horas*\n\n` +
-          `✿ para cambiarlo: *!listattl* <horas> ✿`,
+          `✦ para cambiarlo: *!listattl* <horas> ✦`,
       );
       return;
     }
@@ -40,9 +40,9 @@ export class ListaTTLCommand extends Command {
     if (isNaN(horas) || horas < 1 || horas > 48) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *ay, así se usa* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!listattl* <horas>\n` +
+          `✦ *!listattl* <horas>\n` +
           `✩ ejemplo: *!listattl 8* (8 horas)\n` +
-          `♡ vale de *1* a *48* horas ♡`,
+          `✦ vale de *1* a *48* horas ✦`,
       );
       return;
     }

@@ -44,7 +44,7 @@ export class Bola8Command extends Command {
 
     await ctx.reply(
       `˚₊· ͟͟͞͞➳ *bolita mágica* ˚₊· ͟͟͞͞➳\n\n` +
-        `✿ *tu pregunta:* ${pregunta}\n\n` +
+        `✦ *tu pregunta:* ${pregunta}\n\n` +
         `✩ *mi respuesta:* ${respuesta} ✩`,
     );
 

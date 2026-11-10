@@ -64,7 +64,7 @@ export class InstagramCommand extends Command {
     if (!ctx.args.length) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, necesito el enlace de Instagram* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *!instagram* <URL>\n` +
+          `✦ *!instagram* <URL>\n` +
           `✩ ejemplo: *!instagram https://www.instagram.com/reel/XXXXXXXXXX/* ✩`,
       );
       return;
@@ -75,7 +75,7 @@ export class InstagramCommand extends Command {
     if (!this.downloader.isValidUrl(url)) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *oops, ese enlace no me sirve* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ necesito un link válido de Instagram\n` +
+          `✦ necesito un link válido de Instagram\n` +
           `✩ acepto: */reel/*, */p/*, */tv/*, */stories/* ✩`,
       );
       return;
@@ -97,7 +97,7 @@ export class InstagramCommand extends Command {
           thumbnail: info?.thumbnailUrl,
           author: info?.author,
         },
-        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 🚀',
         isImage,
       );
 

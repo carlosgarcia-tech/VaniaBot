@@ -136,7 +136,7 @@ export class FightCommand extends Command {
 ⚔️ *COMBATE ACTIVO*
 ━━━━━━━━━━━━━━━━━━
 ${status.mob?.emoji} *${status.mob?.name}*
-❤️ HP: ${status.mob?.hp}/${status.mob?.maxHp}
+🚀 HP: ${status.mob?.hp}/${status.mob?.maxHp}
 🗡️ Ataque: ${status.mob?.atk}
 🛡️ Defensa: ${status.mob?.def}
 

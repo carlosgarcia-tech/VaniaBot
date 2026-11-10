@@ -36,7 +36,7 @@ export class ImageCompressCommand extends Command {
     if (!message || !(message.imageMessage || message.stickerMessage)) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *compresor de imágenes* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *uso:* !imgcompress [calidad | tamañoMaxKB]\n\n` +
+          `✦ *uso:* !imgcompress [calidad | tamañoMaxKB]\n\n` +
           `  ﹒!imgcompress         → calidad 70\n` +
           `  ﹒!imgcompress 50      → calidad 50\n` +
           `  ﹒!imgcompress 500     → máximo 500 KB\n\n` +

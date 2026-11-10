@@ -51,7 +51,7 @@ export class MuteCommand extends Command {
     if (!cleanArgs.length) {
       await ctx.reply(
         '˚₊· ͟͟͞͞➳ oops, necesito saber por cuánto tiempo ˚₊· ͟͟͞͞➳\n\n' +
-          '✿ así lo haces ✿\n' +
+          '✦ así lo haces ✦\n' +
           '`!mute @user <tiempo> [razón]`\n\n' +
           '✩ por ejemplo ✩\n' +
           '`10m` ﹒`1h` ﹒`2d`',
@@ -76,7 +76,7 @@ export class MuteCommand extends Command {
     if (duration === null) {
       await ctx.reply(
         '˚₊· ͟͟͞͞➳ oops, ese formato no lo conozco ˚₊· ͟͟͞͞➳\n\n' +
-          '✿ así me gusta ✿\n' +
+          '✦ así me gusta ✦\n' +
           '`10m` ﹒`1h` ﹒`2d`\n\n' +
           '✩ m — minutitos\n' +
           '✩ h — horitas\n' +

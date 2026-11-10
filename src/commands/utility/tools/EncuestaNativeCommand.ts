@@ -47,11 +47,11 @@ export class EncuestaNativeCommand extends Command {
     if (quoted.length < 2) {
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *encuesta nativa — WhatsApp* ˚₊· ͟͟͞͞➳\n\n` +
-          `✿ *cómo usarlo:* !sondaggio "Pregunta" "Opción1" "Opción2" ...\n\n` +
+          `✦ *cómo usarlo:* !sondaggio "Pregunta" "Opción1" "Opción2" ...\n\n` +
           `✩ *ejemplo:*\n` +
           `  ﹒!sondaggio "¿Pizza?" "Pepperoni" "Muzza" "Jamón"\n\n` +
           `💡 recuerda usar comillas para cada texto\n` +
-          `♡ *nota:* máximo 5 opciones para encuestas nativas ♡`,
+          `✦ *nota:* máximo 5 opciones para encuestas nativas ✦`,
       );
       return;
     }

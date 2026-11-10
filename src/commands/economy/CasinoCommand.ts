@@ -145,7 +145,7 @@ export class CasinoCommand extends Command {
       await ctx.reply(
         `🎰 *CASINO ORBIT* 🎰\n\n` +
           `👑 *Dueño del Casino*\n\n` +
-          `✿ Como owner, tienes acceso\n` +
+          `✦ Como owner, tienes acceso\n` +
           `   especial al casino.\n\n` +
           `🎮 *Juegos disponibles:*\n\n` +
           CASINO_GAMES.map(
@@ -163,7 +163,7 @@ export class CasinoCommand extends Command {
     if (!gameArg || !betArg) {
       await ctx.reply(
         `🎰 *CASINO ORBIT* 🎰\n\n` +
-          `✿ *Cómo jugar:*\n` +
+          `✦ *Cómo jugar:*\n` +
           `Elige un juego y apuesta.\n` +
           `Si ganas, duplicas (o más).\n` +
           `Si pierdes, pierdes la apuesta.\n\n` +

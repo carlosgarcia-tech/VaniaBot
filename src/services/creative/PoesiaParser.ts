@@ -238,10 +238,10 @@ _!historia [tema] [estilo]_
 };
 
 export const ESTILOS_LIST = [
-  '💕 romántico',
+  '🚀 romántico',
   '😢 melancólico',
   '🔥 apasionado',
-  '🌸 tierno',
+  '🌌 tierno',
   '😏 pícaro',
   '⚔️ épico',
   '🌌 místico',
@@ -253,7 +253,7 @@ export const ESTILOS_LIST = [
 ].join('  ');
 
 export const TEMAS_LIST = [
-  '❤️ amor',
+  '🚀 amor',
   '💔 desamor',
   '🌿 naturaleza',
   '👫 amistad',
@@ -267,5 +267,5 @@ export const TEMAS_LIST = [
   '🌕 luna',
   '🇲🇽 patria',
   '🕊️ nostalgia',
-  '🦋 libertad',
+  '🪐 libertad',
 ].join('  ');

@@ -236,7 +236,7 @@ export class SubBotInstance extends EventEmitter {
     this.pairingCodeRequested = false;
 
     logger.info(
-      `🌸 SubBot[${this.config.id}] starting (${this.config.name} | ${this.config.phoneNumber})`,
+      `🌌 SubBot[${this.config.id}] starting (${this.config.name} | ${this.config.phoneNumber})`,
     );
 
     try {
@@ -246,7 +246,7 @@ export class SubBotInstance extends EventEmitter {
       const hasExistingCreds = !!state.creds.registered;
 
       logger.debug(
-        `🌸 SubBot[${this.config.id}] session: ${hasExistingCreds ? 'existing ✅' : 'new 🆕'}` +
+        `🌌 SubBot[${this.config.id}] session: ${hasExistingCreds ? 'existing ✅' : 'new 🆕'}` +
           ` | versión WA: ${version.join('.')}`,
       );
 
@@ -431,7 +431,7 @@ export class SubBotInstance extends EventEmitter {
       active: true,
     });
 
-    logger.info(`✅ SubBot[${this.config.id}] (${this.config.name}) operational 🌸`);
+    logger.info(`✅ SubBot[${this.config.id}] (${this.config.name}) operational 🌌`);
     runtimeStateRepository.setStartupTimestamp(this.config.id);
     this.emit('status', 'connected');
 

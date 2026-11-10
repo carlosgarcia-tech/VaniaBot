@@ -109,7 +109,7 @@ ${isSelf ? '\n💡 !use [item] para usar' : ''}
       gold: '🪙',
       diamond: '💎',
 
-      health_potion: '❤️',
+      health_potion: '🚀',
       mana_potion: '💙',
       speed_potion: '⚡',
 

@@ -38,17 +38,17 @@ export class ListBotsCommand extends Command {
 
     if (all.length === 0) {
       await ctx.reply(
-        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+        `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
           `   *SubBots registradas*\n` +
           `\n` +
-          `🦋 Aún no hay subbots\n` +
+          `🪐 Aún no hay subbots\n` +
           `   registradas en este\n` +
           `   momento.\n` +
           `\n` +
           `✨ Cuando agregues una,\n` +
           `   aparecerá aquí.\n` +
           `\n` +
-          `   Estaré esperando 💗\n` +
+          `   Estaré esperando 🚀\n` +
           `╰━━━━━━━━━━━━━━━━━━━━╯`,
       );
       return;
@@ -65,7 +65,7 @@ export class ListBotsCommand extends Command {
     const connected = all.filter(s => s.status === 'connected').length;
 
     let text =
-      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
+      `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
       `   *SubBots registradas*\n` +
       `\n` +
       `Total: *${all.length}*\n` +
@@ -80,7 +80,7 @@ export class ListBotsCommand extends Command {
         `   🆔 \`${s.id}\`\n\n`;
     }
 
-    text += `_— OrbitBot 🌸_`;
+    text += `_— OrbitBot 🌌_`;
 
     await ctx.reply(text.trim());
   }

@@ -27,7 +27,7 @@ export class MailmessagesCommand extends Command {
 
     if (!email) {
       await ctx.reply(
-        '✿ *!mailmessages* 〃\n\n' +
+        '✦ *!mailmessages* 〃\n\n' +
           '✩ Uso: !mailmessages <email>\n' +
           '✩ Ejemplo: !mailmessages tu@email.com\n\n' +
           '💡 Primero crea un email con *!mailcreate*',

@@ -33,7 +33,7 @@ export class EnhanceCommand extends Command {
 
     if (!imageUrl) {
       await ctx.reply(
-        '✿ *!enhance* 〃\n\n' +
+        '✦ *!enhance* 〃\n\n' +
           '✩ Responde a una *imagen*\n' +
           '✩ O envíala junto al comando\n' +
           '✩ O usa una *URL*: !enhance <link>\n' +

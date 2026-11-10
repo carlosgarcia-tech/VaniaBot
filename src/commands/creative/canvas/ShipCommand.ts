@@ -30,7 +30,7 @@ export class ShipCommand extends Command {
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
-    await ctx.react('💕');
+    await ctx.react('🚀');
 
     const [image1, image2] = await ImageHelper.getTwoProfileImages(ctx);
 

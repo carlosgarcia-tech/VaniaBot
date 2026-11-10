@@ -110,7 +110,7 @@ export class RandomCommand extends Command {
       default:
         await ctx.reply(
           `˚₊· ͟͟͞͞➳ *oops, ese no está en mi lista* ˚₊· ͟͟͞͞➳\n\n` +
-            `✿ *mis tipos:*\n\n` +
+            `✦ *mis tipos:*\n\n` +
             `﹒num — número del 1 al 100\n` +
             `﹒emoji — emoji random\n` +
             `﹒dato — dato curioso\n` +
