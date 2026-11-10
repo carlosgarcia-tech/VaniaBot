@@ -63,7 +63,7 @@ export class PayRandomCommand extends Command {
         `💰 *Cantidad:* $${formatNumber(amount)}\n\n` +
         `🎯 *Ganador:* ${randomUser.name}\n` +
         `📱 *JID:* @${randomUser.jid.split('@')[0]}\n\n` +
-        `💝 *Enviado por:* ${sender.name}\n\n` +
+        `🌠 *Enviado por:* ${sender.name}\n\n` +
         `━━━━━━━━━━━━━━━━━━━━━\n` +
         `📊 *Total usuarios:* ${eligibleUsers.length}\n` +
         `🎲 *Probabilidad:* ${((1 / eligibleUsers.length) * 100).toFixed(2)}%`,
@@ -76,7 +76,7 @@ export class PayRandomCommand extends Command {
           `💰 *Cantidad:* $${formatNumber(amount)}\n\n` +
           `✨ *Te lo envía:* ${sender.name}\n\n` +
           `🎉 *¡Felicidades!*\n\n` +
-          `> _*OrbitBot💝*_`,
+          `> _*OrbitBot🪐*_`,
       });
     } catch (error) {
       // The payment already went through: only the payee notice fails. It is still logged.

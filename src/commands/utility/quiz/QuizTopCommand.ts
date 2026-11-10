@@ -123,7 +123,7 @@ export class QuizTopCommand extends Command {
         `˚₊· ͟͟͞͞➳ *top quiz${category ? ` — ${category}` : ''}* ˚₊· ͟͟͞͞➳\n` +
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
           rows +
-          `\n\n> _OrbitBot 💝 — tu compi de estudio_`,
+          `\n\n> _OrbitBot 🪐 — tu compi de estudio_`,
       );
     } catch (err) {
       logError('[QuizTopCommand] Error', err);

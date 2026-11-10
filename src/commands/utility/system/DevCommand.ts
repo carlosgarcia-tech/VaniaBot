@@ -75,11 +75,11 @@ export class DevCommand extends Command {
       `📱 ${toSmallCaps('whatsapp')}\n` +
       `   » +52 951 652 6675\n\n` +
       `⧼⋆꙳• *ENLACES* ⋆꙳•⧽\n\n` +
-      `💝 https://github.com/carlosgarcia-tech\n\n` +
-      `💝 https://www.instagram.com/carlos.gxv\n\n` +
-      `💝 https://www.tiktok.com/@carlos.grcia0\n\n` +
-      `💝 https://www.youtube.com/@carlos.dev01\n\n` +
-      `⌬ 𝗢𝗥𝗕𝗜𝗧 𝗕𝗢𝗧 💝`;
+      `🪐 https://github.com/carlosgarcia-tech\n\n` +
+      `🪐 https://www.instagram.com/carlos.gxv\n\n` +
+      `🪐 https://www.tiktok.com/@carlos.grcia0\n\n` +
+      `🪐 https://www.youtube.com/@carlos.dev01\n\n` +
+      `⌬ 𝗢𝗥𝗕𝗜𝗧 𝗕𝗢𝗧 🪐`;
 
     await ctx.sock.sendMessage(ctx.chat.jid, { text: devText }, { quoted: ctx.message });
   }

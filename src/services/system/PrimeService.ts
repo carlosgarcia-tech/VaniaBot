@@ -111,17 +111,17 @@ export class PrimeService {
    */
   async formatFooter(sock: WASocket, groupJid: string, isGroup: boolean): Promise<string> {
     if (!isGroup) {
-      return '> OrbitBot💝';
+      return '> OrbitBot🪐';
     }
 
     const primeEnabled = await this.isPrimeEnabled(groupJid);
 
     if (!primeEnabled) {
-      return '> OrbitBot💝';
+      return '> OrbitBot🪐';
     }
 
     const groupName = await this.getGroupName(sock, groupJid);
-    return `> ${groupName}💝`;
+    return `> ${groupName}🪐`;
   }
 
   /**

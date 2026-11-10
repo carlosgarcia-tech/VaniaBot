@@ -65,7 +65,7 @@ export class PrimeCommand extends Command {
         `${status}\n\n` +
         `📛 Grupo: *${groupName}*\n\n` +
         `_El modo Prime personaliza el bot con el nombre del grupo._\n\n` +
-        `> OrbitBot💝`,
+        `> OrbitBot🪐`,
     );
   }
 
@@ -76,7 +76,7 @@ export class PrimeCommand extends Command {
       await ctx.reply(
         `👑 *MODO PRICE YA ESTÁ ACTIVADO*\n\n` +
           `El bot ya está personalizado para este grupo.\n\n` +
-          `> OrbitBot💝`,
+          `> OrbitBot🪐`,
       );
       return;
     }
@@ -90,9 +90,9 @@ export class PrimeCommand extends Command {
     await ctx.reply(
       `👑 *MODO PRIME ACTIVADO* ✨\n\n` +
         `¡Listo! A partir de ahora el bot usará el nombre de este grupo.\n\n` +
-        `📛 *${groupName}* 💝\n\n` +
+        `📛 *${groupName}* 🪐\n\n` +
         `_Activado por @${ctx.sender.pushName || 'owner'}_\n\n` +
-        `> ${groupName}💝`,
+        `> ${groupName}🪐`,
     );
   }
 
@@ -103,7 +103,7 @@ export class PrimeCommand extends Command {
       await ctx.reply(
         `🔒 *MODO PRIME YA ESTÁ DESACTIVADO*\n\n` +
           `El bot ya usa su nombre oficial.\n\n` +
-          `> OrbitBot💝`,
+          `> OrbitBot🪐`,
       );
       return;
     }
@@ -116,7 +116,7 @@ export class PrimeCommand extends Command {
       `🔒 *MODO PRIME DESACTIVADO*\n\n` +
         `El bot vuelve a usar su nombre oficial.\n\n` +
         `_Desactivado por @${ctx.sender.pushName || 'owner'}_\n\n` +
-        `> OrbitBot💝`,
+        `> OrbitBot🪐`,
     );
   }
 }

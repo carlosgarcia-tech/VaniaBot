@@ -22,7 +22,7 @@ type AmorTipo = (typeof AMOR_TIPOS)[number];
 
 const EMOJIS: Record<AmorTipo, string> = {
   mensaje: '🚀',
-  carta: '💌',
+  carta: '🌠',
   poesia: '🌹',
   piropo: '😏',
   dedicatoria: '🎵',
@@ -72,7 +72,7 @@ export class AmorCommand extends Command {
       const header = paraNombre ? `🚀 *Para: ${paraNombre}* 🚀\n\n` : '🚀 *Mensaje de Amor* 🚀\n\n';
 
       await ctx.reply(header + response.right.trim());
-      await ctx.react('💝');
+      await ctx.react('🪐');
     } catch {
       await ctx.react('❌');
       await ctx.reply('Ocurrió un error generando el mensaje. Intenta de nuevo.');
@@ -142,7 +142,7 @@ export class ShipCommand extends Command {
     const message = this.getShipMessage(final, nombre1, nombre2, breakdown);
 
     await ctx.reply(hearts + '\n\n' + message);
-    await ctx.react('💝');
+    await ctx.react('🪐');
   }
 
   private calculateShip(
@@ -184,11 +184,11 @@ export class ShipCommand extends Command {
   }
 
   private getHearts(percentage: number): string {
-    if (percentage >= 90) return '💘💘💘💘💘';
-    if (percentage >= 70) return '💘💘💘💘';
-    if (percentage >= 50) return '💘💘💘';
-    if (percentage >= 30) return '💘💘';
-    return '💘';
+    if (percentage >= 90) return '🌠🌠🌠🌠🌠';
+    if (percentage >= 70) return '🌠🌠🌠🌠';
+    if (percentage >= 50) return '🌠🌠🌠';
+    if (percentage >= 30) return '🌠🌠';
+    return '🌠';
   }
 
   private getShipMessage(

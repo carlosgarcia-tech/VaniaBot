@@ -38,12 +38,12 @@ export const TIPO_EMOJI: Record<ContenidoTipo, string> = {
   [ContenidoTipo.POEMA]: '🌹',
   [ContenidoTipo.FRASE]: '✨',
   [ContenidoTipo.PIROPO]: '😏',
-  [ContenidoTipo.DEDICATORIA]: '💌',
+  [ContenidoTipo.DEDICATORIA]: '🌠',
   [ContenidoTipo.HAIKU]: '🍃',
   [ContenidoTipo.SONETO]: '📜',
   [ContenidoTipo.COPLA]: '🎶',
   [ContenidoTipo.ACROSTICO]: '🔤',
-  [ContenidoTipo.CARTA]: '💌',
+  [ContenidoTipo.CARTA]: '🌠',
   [ContenidoTipo.HISTORIA]: '📖',
 };
 
@@ -211,11 +211,11 @@ export class PoesiaService {
   formatEntry(entry: ContenidoEntry, showMeta = true, footer?: string): string {
     const emoji = TIPO_EMOJI[entry.tipo];
     const label = TIPO_LABEL[entry.tipo];
-    const defaultFooter = footer || '> _OrbitBot💝 — Poesía & Amor_';
+    const defaultFooter = footer || '> _OrbitBot🪐 — Poesía & Amor_';
 
     let cleanContent = entry.contenido;
-    cleanContent = cleanContent.replace(/>\s*OrbitBot[💝]*\s*[-–—]?\s*Poes[ií]a.*$/gim, '').trim();
-    cleanContent = cleanContent.replace(/>\s*OrbitBot[💝]*\s*$/gim, '').trim();
+    cleanContent = cleanContent.replace(/>\s*OrbitBot[🪐]*\s*[-–—]?\s*Poes[ií]a.*$/gim, '').trim();
+    cleanContent = cleanContent.replace(/>\s*OrbitBot[🪐]*\s*$/gim, '').trim();
 
     let msg = '';
 
@@ -224,7 +224,7 @@ export class PoesiaService {
       if (entry.tema) msg += ` — _${entry.tema}_`;
       if (entry.estilo) msg += ` _(${entry.estilo})_`;
       msg += '\n';
-      if (entry.dedicado) msg += `💝 _Para: ${entry.dedicado}_\n`;
+      if (entry.dedicado) msg += `🪐 _Para: ${entry.dedicado}_\n`;
       msg += `━━━━━━━━━━━━━\n\n`;
     }
 
@@ -249,7 +249,7 @@ export class PoesiaService {
 
     const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
     const titulo = tipo ? `${TIPO_EMOJI[tipo]} Top ${TIPO_LABEL[tipo]}` : '🏆 Top Poesía del Grupo';
-    const defaultFooter = footer || '> _OrbitBot💝 — Poesía & Amor_';
+    const defaultFooter = footer || '> _OrbitBot🪐 — Poesía & Amor_';
 
     let msg = `${titulo}\n━━━━━━━━━━━━\n\n`;
 

@@ -187,7 +187,7 @@ _!piropo [estilo] [para:nombre]_
 • !piropo pícaro para:Ana
 • !piropo tierno`,
 
-  [ContenidoTipo.DEDICATORIA]: `💌 *Dedicatoria*
+  [ContenidoTipo.DEDICATORIA]: `🌠 *Dedicatoria*
 _!dedicatoria [tema/ocasión] [estilo] [para:nombre]_
 
 • !dedicatoria para:Carlos
@@ -222,7 +222,7 @@ _!acrostico [NOMBRE] [tema] [estilo]_
 • !acrostico CARLOS amor romántico
 • !acrostico ANA vida tierno`,
 
-  [ContenidoTipo.CARTA]: `💌 *Carta de Amor*
+  [ContenidoTipo.CARTA]: `🌠 *Carta de Amor*
 _!carta [tema/motivo] [estilo] [para:nombre]_
 
 • !carta para:Ana

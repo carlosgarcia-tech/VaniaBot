@@ -253,19 +253,27 @@ export class PluginLoader {
    */
   private extractCommands(module: Record<string, unknown>, __filename: string): ICommand[] {
     const results: ICommand[] = [];
+    const seen = new Set<string>();
 
     for (const [, value] of Object.entries(module)) {
       if (!value) continue;
 
       if (typeof value === 'object' && isValidCommand(value)) {
-        results.push(value);
+        if (!seen.has(value.name)) {
+          seen.add(value.name);
+          results.push(value);
+        }
         continue;
       }
 
       if (isCommandClass(value)) {
         try {
           const instance = new value();
-          if (isValidCommand(instance)) {
+          if (isValidCommand(instance) && !seen.has(instance.name)) {
+            // Modules may export both the class and an instance (or a default
+            // class alias); without the name check one file yields two
+            // instances of the same command and the registry logs a collision.
+            seen.add(instance.name);
             results.push(instance);
           }
         } catch (error) {

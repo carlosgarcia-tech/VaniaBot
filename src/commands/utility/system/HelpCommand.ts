@@ -61,7 +61,7 @@ export class HelpCommand extends Command {
 
   async execute(ctx: MessageContext): Promise<void> {
     try {
-      await ctx.react('💝');
+      await ctx.react('🪐');
     } catch (error) {
       logger.debug('[HelpCommand] React failed:', error);
     }
@@ -94,7 +94,7 @@ export class HelpCommand extends Command {
       command.examples.forEach(ex => (helpText += `   • ${ex}\n`));
     }
     if (command.cooldown) helpText += `\n⏱️ *Cooldown:* ${command.cooldown / 1000}s\n`;
-    helpText += `\n⌬ 𝗢𝗥𝗕𝗜𝗧 𝗕𝗢𝗧 💝`;
+    helpText += `\n⌬ 𝗢𝗥𝗕𝗜𝗧 𝗕𝗢𝗧 🪐`;
 
     await ctx.reply(helpText);
   }
@@ -139,7 +139,7 @@ export class HelpCommand extends Command {
     const readmore = String.fromCharCode(8206).repeat(4001);
 
     let menu = `⧼⋆꙳• *REGISTRO ${botName}* ⋆꙳•⧽\n\n`;
-    menu += `> 💝 ɴᴏᴍʙʀᴇ   » ${userData.name}\n`;
+    menu += `> 🪐 ɴᴏᴍʙʀᴇ   » ${userData.name}\n`;
     menu += `> 🪐 ɴɪᴠᴇʟ     » ${userData.level}\n`;
     menu += `> ⚡ ᴇxᴘ        » ${progress.currentXP} / ${progress.requiredXP}\n`;
     menu += `> 🌐 ᴍᴏᴅᴏ      » ${isPrime ? 'Prime' : 'Público'}\n`;
@@ -211,11 +211,11 @@ export class HelpCommand extends Command {
       });
       if (!visible.length) return;
       menu += `\n⧼⋆꙳•〔 ${categoryIcons[category]} ${categoryNames[category]} 〕⋆꙳•⧽\n`;
-      visible.forEach(cmd => (menu += `> 💝 !${cmd.name}\n`));
+      visible.forEach(cmd => (menu += `> 🪐 !${cmd.name}\n`));
       menu += `╰⋆꙳•❅‧*₊⋆꙳︎‧*❆₊⋆╯\n`;
     });
 
-    menu += `\n⌬ ${botName} 𝗕𝗢𝗧 💝 - Sistema ejecutado con éxito.`;
+    menu += `\n⌬ ${botName} 𝗕𝗢𝗧 🪐 - Sistema ejecutado con éxito.`;
 
     await this.sendSimpleMenu(ctx, menu, isPrime);
   }
@@ -224,7 +224,23 @@ export class HelpCommand extends Command {
     try {
       let imageBuffer: Buffer | null = null;
 
-      if (ctx.chat.isGroup && isPrime) {
+      // User's own profile picture first, as they asked, then the prime-group
+      // picture, then the packaged logo.
+      try {
+        const userPicUrl = await ctx.sock.profilePictureUrl(ctx.sender.jid, 'image');
+        if (userPicUrl) {
+          try {
+            const response = await axios.get(userPicUrl, { responseType: 'arraybuffer' });
+            imageBuffer = Buffer.from(response.data);
+          } catch {
+            imageBuffer = null;
+          }
+        }
+      } catch {
+        imageBuffer = null;
+      }
+
+      if (!imageBuffer && ctx.chat.isGroup && isPrime) {
         const groupPicUrl = await primeService.getGroupPicUrl(ctx.sock, ctx.chat.jid);
         if (groupPicUrl) {
           try {

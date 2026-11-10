@@ -42,7 +42,7 @@ interface WelcomeConfigExtended extends WelcomeConfig {
 
 /** Fallback facts used when the remote source is unavailable. */
 const ORBITBOT_FACTS: string[] = [
-  '💌 El nombre OrbitBot nació en un dia cualquiera…',
+  '🌠 El nombre OrbitBot nació en un dia cualquiera…',
   '💭 OrbitBot no es solo un bot…',
   '🌙 «OrbitBot» empezó como un juego…',
 ];

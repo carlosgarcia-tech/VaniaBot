@@ -152,7 +152,7 @@ export class SubBotCommand extends Command {
         `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
           `   *Solicitar SubBot*\n` +
           `\n` +
-          `💝 Vincula tu número\n` +
+          `🪐 Vincula tu número\n` +
           `   para crear tu propia\n` +
           `   *SubBot*.\n` +
           `\n` +
@@ -203,7 +203,7 @@ export class SubBotCommand extends Command {
         `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
           `   *Slot #${slot.slot} reservado*\n` +
           `\n` +
-          `💝 Tu *pairing code*\n` +
+          `🪐 Tu *pairing code*\n` +
           `   está siendo generado...\n` +
           `\n` +
           `Enviaremos el código\n` +
@@ -270,7 +270,7 @@ export class SubBotCommand extends Command {
         `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
           `   *Slot #${result.slot.slot} reservado*\n` +
           `\n` +
-          `💝 Tu *pairing code*\n` +
+          `🪐 Tu *pairing code*\n` +
           `   está siendo generado...\n` +
           `\n` +
           `   Estaré aquí 🚀\n` +

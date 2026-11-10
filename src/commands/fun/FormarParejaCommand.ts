@@ -61,12 +61,12 @@ export class FormarParejaCommand extends Command {
         'Son dos pequeños tortolitos enamorados ✨',
         'Ya hasta familia deberían tener 🤱🧑‍🍼',
         'Ya se casaron en secreto 💍',
-        'Se están dando su luna de miel ✨🥵😍🚀',
+        'Se están dando su luna de miel ✨🥵🌠🚀',
       ];
 
       const result = `╭━━━〔 🚀 PAREJAS 〕━━━⬣
 ┃
-┃ 😍 *Las 5 mejores parejas del grupo:*
+┃ 🌠 *Las 5 mejores parejas del grupo:*
 ┃
 ${couples
   .map(

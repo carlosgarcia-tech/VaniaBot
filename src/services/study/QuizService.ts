@@ -82,7 +82,7 @@ export class QuizService {
       questionLog: [],
     };
 
-    session.footer = opts.footer || '> _OrbitBot💝 — Modo Estudio_';
+    session.footer = opts.footer || '> _OrbitBot🪐 — Modo Estudio_';
     this.sessions.set(opts.groupId, session);
 
     const starterStats = await opts.getUserStats(opts.startedBy);
@@ -400,7 +400,7 @@ export class QuizService {
       });
     }
 
-    const footer = session.footer || '> _OrbitBot💝 — Modo Estudio_';
+    const footer = session.footer || '> _OrbitBot🪐 — Modo Estudio_';
     summary += `\n${footer}`;
 
     await sendFn(session.groupId, summary);
@@ -444,7 +444,7 @@ export class QuizService {
       })
       .join('\n');
 
-    const defaultFooter = footer || '> _OrbitBot💝 — Modo Estudio_';
+    const defaultFooter = footer || '> _OrbitBot🪐 — Modo Estudio_';
     return (
       `*Stats de Quiz — ${pushName}*\n` +
       `━━━━━━━━━━━\n` +

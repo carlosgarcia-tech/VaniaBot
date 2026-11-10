@@ -90,7 +90,7 @@ export class FactoCommand extends Command {
   }
 
   private formatFactoMessage(facto: string, footer: string): string {
-    const cleanFacto = facto.replace(/>\s*OrbitBot[💝]*\s*$/i, '').trim();
+    const cleanFacto = facto.replace(/>\s*OrbitBot[🪐🌠]*\s*$/i, '').trim();
     return `┌─ ୨ৎ ──────┐
       ✦  *F A C T O*  ✦   
 

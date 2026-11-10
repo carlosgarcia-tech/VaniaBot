@@ -116,7 +116,7 @@ export class QuizCommand extends Command {
           `  ﹒!quiz stop\n\n` +
           `la dificultad sube solita mientras más aprendes\n` +
           `si te atoras, usa *!hint* para una pista (la recompensa baja un poquito)\n\n` +
-          `> _OrbitBot 💝 — tu compi de estudio_`,
+          `> _OrbitBot 🪐 — tu compi de estudio_`,
       );
       return;
     }

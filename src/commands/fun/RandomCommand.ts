@@ -44,7 +44,7 @@ export class RandomCommand extends Command {
       case 'emoji': {
         const emojis = [
           '😀',
-          '😍',
+          '🌠',
           '🥳',
           '🤩',
           '😎',
@@ -99,7 +99,7 @@ export class RandomCommand extends Command {
           '🟣 Morado',
           '⚫ Negro',
           '⚪ Blanco',
-          '🩷 Rosa',
+          '🌌 Rosa',
           '🩵 Cyan',
         ];
         const color = colores[Math.floor(Math.random() * colores.length)];

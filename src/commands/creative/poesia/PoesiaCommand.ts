@@ -56,7 +56,7 @@ async function ejecutarPoesia(
     return;
   }
 
-  await ctx.react('💝');
+  await ctx.react('🪐');
   const footer = await primeService.formatFooter(ctx.sock, ctx.chat.jid, ctx.chat.isGroup);
   const formattedFooter = footer.replace('>', '> _') + ' — Poesía & Amor_';
   await ctx.reply(poesiaService.formatEntry(result.right.entry, true, formattedFooter));
@@ -208,7 +208,7 @@ export class AcrosticoCommand extends Command {
           `﹒!acrostico Alejandra\n` +
           `﹒!acrostico Daniela amor romántico\n` +
           `﹒!acrostico Valeria vida tierno\n\n` +
-          `> _OrbitBot 💝 — versitos & ternura_`,
+          `> _OrbitBot 🪐 — versitos & ternura_`,
       );
       return;
     }
@@ -296,7 +296,7 @@ export class PoesiaMenuCommand extends Command {
         `_!piropo pícaro_\n` +
         `_!acrostico Valeria amor_\n` +
         `_!carta despedida melancólico para:Juan_\n\n` +
-        `> _OrbitBot 💝 — versitos con amorcito_`,
+        `> _OrbitBot 🪐 — versitos con amorcito_`,
     );
   }
 }

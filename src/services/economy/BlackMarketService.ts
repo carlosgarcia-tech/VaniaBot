@@ -141,7 +141,7 @@ class BlackMarketService {
 
     return {
       success: true,
-      message: `✅ *Purchase successful!*\n\n📦 ${listing.itemName}\n💰 Paid: $${listing.sellPrice}\n\n💝 Thanks for shopping at the Black Market!`,
+      message: `✅ *Purchase successful!*\n\n📦 ${listing.itemName}\n💰 Paid: $${listing.sellPrice}\n\n🪐 Thanks for shopping at the Black Market!`,
     };
   }
 

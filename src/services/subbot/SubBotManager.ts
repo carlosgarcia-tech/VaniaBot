@@ -531,7 +531,7 @@ export class SubBotManager extends EventEmitter {
               `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
               `   *Vincular SubBot*\n` +
               `\n` +
-              `💝 Tu SubBot está lista\n` +
+              `🪐 Tu SubBot está lista\n` +
               `   para conectarse.\n` +
               `\n` +
               `*Código de vinculación*\n` +
@@ -648,7 +648,7 @@ export class SubBotManager extends EventEmitter {
               `╭━━━ 🌌 *OrbitBot* ━━━╮\n` +
               `   🤖 *SubBot activada*\n` +
               `\n` +
-              `💝 ¡Tu SubBot ya está\n` +
+              `🪐 ¡Tu SubBot ya está\n` +
               `   lista para usarse!\n` +
               `\n` +
               `🏷️ Nombre:\n` +
