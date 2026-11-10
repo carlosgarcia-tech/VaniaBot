@@ -140,7 +140,8 @@ export class HealthCheckService {
       healthy,
       status,
       timestamp: new Date().toISOString(),
-      uptime: Date.now() - START_TIME,
+      // Seconds, like process.uptime() — the panel's formatUptime() expects seconds.
+      uptime: Math.round((Date.now() - START_TIME) / 1000),
       checks,
       summary,
       alerts,

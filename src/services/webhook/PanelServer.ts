@@ -113,7 +113,10 @@ export class PanelServer {
 
     const apiLimiter = rateLimit({
       windowMs: 15 * 60 * 1000,
-      max: 100,
+      // Each auto-refresh cycle (~30s) fires ~10 API calls; a normal session
+      // uses ~300 per window, so the cap must stay well above that or the
+      // panel freezes with 429s mid-session.
+      max: 600,
       message: { error: 'Too many requests, please try again later' },
       standardHeaders: true,
       legacyHeaders: false,

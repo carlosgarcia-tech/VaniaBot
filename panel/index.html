@@ -1507,7 +1507,9 @@
         document.getElementById('totalBots').textContent = subBots.length;
         document.getElementById('availableSlots').textContent = data.slots?.available || 0;
 
-        document.getElementById('uptimeValue').textContent = formatUptime(data.uptime);
+        // The uptime card is owned by loadHealth(), which re-renders it with
+        // system data; writing it here too would flip the card between the
+        // process uptime and the system uptime every poll.
 
         if (data.cache) {
           document.getElementById('cacheStats').innerHTML = `
@@ -1769,7 +1771,8 @@
           document.getElementById('uptimeStats').innerHTML = `
           <div class="stat-card">
             <div class="stat-label">Uptime</div>
-            <div class="stat-value">${formatUptime(data.uptime)}</div>
+            <!-- id must stay: loadStats() updates this same element every poll -->
+            <div class="stat-value" id="uptimeValue">${formatUptime(data.uptime)}</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Platform</div>
