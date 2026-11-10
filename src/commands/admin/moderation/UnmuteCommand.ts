@@ -1,7 +1,7 @@
 /**
  * UnmuteCommand.ts
  *
- * moderation command `unmute` — Quitar silencio a un usuario
+ * moderation command `unmute` — Unmute a user
  * Usage: !unmute @user
  *
  * @author **Carlos G**
@@ -20,7 +20,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 import { middlewareCache } from '@/middlewares/MiddlewareCache.js';
 
-/** Command handler for `!unmute`: Quitar silencio a un usuario. */
+/** Command handler for `!unmute`: Unmute a user. */
 export class UnmuteCommand extends Command {
   name = 'unmute';
   description = 'Quitar silencio a un usuario';

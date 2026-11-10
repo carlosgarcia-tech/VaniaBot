@@ -196,7 +196,7 @@ export class WebhookService {
       requestToken,
       status: 'pending',
       phoneNumber,
-      subbotName: subbotName || `VaniaBot-${freeSlot.slot}`,
+      subbotName: subbotName || `OrbitBot-${freeSlot.slot}`,
       ownerName: ownerName || 'Panel User',
       ownerJid: ownerJid || `${phoneNumber}@s.whatsapp.net`,
       createdAt: Date.now(),
@@ -380,7 +380,7 @@ export class WebhookService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'VaniaBot-Webhook/1.0',
+          'User-Agent': 'OrbitBot-Webhook/1.0',
         },
         body: JSON.stringify({
           event: 'pairingCodeReady',

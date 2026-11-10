@@ -1,7 +1,7 @@
 /**
  * PPTCommand.ts
  *
- * fun command `ppt` — Piedra, papel o tijera
+ * fun command `ppt` — Rock, paper, scissors
  * Usage: !ppt <piedra|papel|tijera>
  *
  * @author **Carlos G**
@@ -15,7 +15,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!ppt`: Piedra, papel o tijera. */
+/** Command handler for `!ppt`: Rock, paper, scissors. */
 export class PPTCommand extends Command {
   name = 'ppt';
   description = 'Piedra, papel o tijera';

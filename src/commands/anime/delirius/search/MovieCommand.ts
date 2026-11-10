@@ -1,7 +1,7 @@
 /**
  * MovieCommand.ts
  *
- * anime command `movie` — Busca información de películas
+ * anime command `movie` — Searches movie information
  * Usage: !movie <pelicula>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!movie`: Busca información de películas. */
+/** Command handler for `!movie`: Searches movie information. */
 export class MovieCommand extends Command {
   name = 'movie';
   description = 'Busca información de películas';

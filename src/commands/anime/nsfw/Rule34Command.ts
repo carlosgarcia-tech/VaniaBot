@@ -1,7 +1,7 @@
 /**
  * Rule34Command.ts
  *
- * VaniaBot commands module exposing `Rule34Command`.
+ * OrbitBot commands module exposing `Rule34Command`.
  *
  * @author **Carlos G**
  */

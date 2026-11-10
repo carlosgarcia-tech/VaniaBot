@@ -1,7 +1,7 @@
 /**
  * TextThunderCommand.ts
  *
- * creative command `thunder` — Crea un efecto de texto de rayos
+ * creative command `thunder` — Creates a lightning text effect
  * Usage: !thunder <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/thunder-text-effect-online-97.html';
 
-/** Command handler for `!thunder`: Crea un efecto de texto de rayos. */
+/** Command handler for `!thunder`: Creates a lightning text effect. */
 export class TextThunderCommand extends Command {
   name = 'thunder';
   description = 'Crea un efecto de texto de rayos';
@@ -27,14 +27,14 @@ export class TextThunderCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!thunder <texto>';
-  examples = ['!thunder VaniaBot'];
+  examples = ['!thunder OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !thunder <texto>\n_Ejemplo: !thunder VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !thunder <texto>\n_Ejemplo: !thunder OrbitBot_');
       return;
     }
 

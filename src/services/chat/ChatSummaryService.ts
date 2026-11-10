@@ -1,7 +1,7 @@
 /**
  * ChatSummaryService.ts
  *
- * VaniaBot services module exposing `ChatSummaryService`, `ChatMessage`, `ChatSummaryStore`, `TopKeyword`.
+ * OrbitBot services module exposing `ChatSummaryService`, `ChatMessage`, `ChatSummaryStore`, `TopKeyword`.
  *
  * @author **Carlos G**
  */

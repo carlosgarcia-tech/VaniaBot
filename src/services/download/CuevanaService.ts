@@ -1,7 +1,7 @@
 /**
  * CuevanaService.ts
  *
- * VaniaBot services module exposing `CuevanaService`, `CuevanaSearchResult`, `CuevanaSearchResponseInternal`, `CuevanaDetailInternal`.
+ * OrbitBot services module exposing `CuevanaService`, `CuevanaSearchResult`, `CuevanaSearchResponseInternal`, `CuevanaDetailInternal`.
  *
  * @author **Carlos G**
  */

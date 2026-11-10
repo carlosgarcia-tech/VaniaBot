@@ -1,7 +1,7 @@
 /**
  * PetService.ts
  *
- * VaniaBot services module exposing `PetService`, `PetData`, `petService`.
+ * OrbitBot services module exposing `PetService`, `PetData`, `petService`.
  *
  * @author **Carlos G**
  */

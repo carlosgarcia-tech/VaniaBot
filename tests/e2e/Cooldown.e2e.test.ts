@@ -1,16 +1,15 @@
 /**
  * Cooldown.e2e.test.ts
  *
- * Cooldown real de comandos (CooldownMiddleware) sobre el bot completo:
+ * Real command cooldown (CooldownMiddleware) on the full bot:
  *
- *   Primer uso → respuesta normal. Segundo uso dentro de los 3000 ms del
- *   cooldown por defecto de Command → "⏱️ Espera Ns..." sin ejecutar el
- *   comando. Tercer uso tras forzar el reloj 4 segundos hacia adelante →
- *   respuesta normal de nuevo.
+ *   First use → normal response. Second use within the 3000 ms default
+ *   cooldown of Command → "⏱️ Wait Ns..." without running the command. Third
+ *   use after forcing the clock 4 seconds forward → normal response again.
  *
- * El tercer caso usa vi.setSystemTime para saltar la ventana sin esperar
- * de verdad; el resto del pipeline sigue usando Date.now(), así que el
- * middleware ve el tiempo ya avanzado.
+ * The third case uses vi.setSystemTime to skip the window without truly
+ * waiting; the rest of the pipeline keeps using Date.now(), so the
+ * middleware sees the already-advanced time.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
@@ -28,7 +27,7 @@ vi.mock('@/services/external/AIService.js', () => ({
 
 const TIMEOUT = 30_000;
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('e2e: cooldown de comandos', () => {
@@ -60,7 +59,7 @@ describe('e2e: cooldown de comandos', () => {
 
       const texts = socket.texts();
       expect(texts.some(t => /^⏱️ Espera \d+s antes de usar este comando nuevamente$/.test(t))).toBe(true);
-      // Solo un Pong: el segundo no ejecutó el comando
+      // Only one Pong: the second one didn't run the command
       expect(texts.filter(t => t.startsWith('🏓 Pong!'))).toHaveLength(1);
     },
     TIMEOUT,
@@ -79,9 +78,9 @@ describe('e2e: cooldown de comandos', () => {
       await wait();
       expect(socket.texts().some(t => t.startsWith('⏱️ Espera'))).toBe(true);
 
-      // Adelantar el reloj 4s: supera el cooldown de 3000 ms del comando.
-      // Solo se falsifica Date: si también se falsificara setTimeout, el
-      // wait() del pipeline se congelaría y el test colgaría.
+      // Moving the clock 4s ahead: past the command's 3000 ms cooldown.
+      // Only Date is faked: if setTimeout were faked too, the pipeline's
+      // wait() would freeze and the test would hang.
       vi.useFakeTimers({ now: Date.now() + 4_000, toFake: ['Date'] });
 
       socket.receive(dmTextMessage('!ping', sender));

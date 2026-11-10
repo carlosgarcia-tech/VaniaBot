@@ -1,7 +1,7 @@
 /**
  * PoesiaParser.ts
  *
- * VaniaBot services module exposing `ParsedArgs`, `parsePoesiaArgs`, `ESTILO_ALIASES`, `TEMA_ALIASES`.
+ * OrbitBot services module exposing `ParsedArgs`, `parsePoesiaArgs`, `ESTILO_ALIASES`, `TEMA_ALIASES`.
  *
  * @author **Carlos G**
  */

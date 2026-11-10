@@ -1,7 +1,7 @@
 /**
  * armor.ts
  *
- * VaniaBot services module exposing `armor`.
+ * OrbitBot services module exposing `armor`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * DailyMissionService.ts
  *
- * VaniaBot services module exposing `DailyMission`, `dailyMissionService`.
+ * OrbitBot services module exposing `DailyMission`, `dailyMissionService`.
  *
  * @author **Carlos G**
  */

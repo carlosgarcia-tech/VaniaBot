@@ -1,7 +1,7 @@
 /**
  * GeniusCommand.ts
  *
- * anime command `genius` — Busca letras de canciones en Genius
+ * anime command `genius` — Searches song lyrics on Genius
  * Usage: !genius <cancion>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!genius`: Busca letras de canciones en Genius. */
+/** Command handler for `!genius`: Searches song lyrics on Genius. */
 export class GeniusCommand extends Command {
   name = 'genius';
   description = 'Busca letras de canciones en Genius';

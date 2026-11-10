@@ -1,8 +1,8 @@
 /**
  * TranslateCommand.ts
  *
- * utility command `traducirsimple` — Traduce texto a cualquier idioma.
- * Usage: !traducir <idioma> <texto> | responde un mensaje con !traducir <idioma>
+ * utility command `traducirsimple` — Translates text to any language.
+ * Usage: !traducir <language> <text> | reply to a message with !traducir <language>
  *
  * @author **Carlos G**
  */
@@ -20,12 +20,12 @@ interface TranslationResponse {
   };
 }
 
-/** Command handler for `!traducirsimple`: Traduce texto a cualquier idioma. */
+/** Command handler for `!traducirsimple`: Translates text to any language. */
 export class TranslateCommand extends Command {
   name = 'traducirsimple';
   description = 'Traduce texto a cualquier idioma.';
   category = CommandCategory.UTILITY;
-  // Sin alias 'traducir': es el name de TraductorCommand (traduccion contextual).
+  // No alias 'traducir': it is the name of TraductorCommand (contextual translation).
   aliases = ['tsimple'];
   usage = '!traducir <idioma> <texto> | responde un mensaje con !traducir <idioma>';
   examples = [

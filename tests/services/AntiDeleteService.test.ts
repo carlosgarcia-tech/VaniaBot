@@ -28,8 +28,8 @@ describe('AntiDeleteService config', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    // Rutas inyectadas: aisladas del data/ y tmp/ reales del bot.
-    dataDir = join(tmpdir(), `vania-antidelete-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    // Injected paths: isolated from the bot's real data/ and tmp/.
+    dataDir = join(tmpdir(), `orbit-antidelete-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     configPath = join(dataDir, 'antidelete.json');
     tmpDir = join(dataDir, 'media-tmp');
     service = new AntiDeleteService(configPath, tmpDir);
@@ -163,10 +163,10 @@ describe('AntiDeleteService config', () => {
   it('el cleanup timer elimina mensajes con mas de 24h', async () => {
     vi.useFakeTimers();
     try {
-      // La instancia debe construirse YA con fake timers para que el
-      // interval del cleanup sea controlable.
+      // The instance must be constructed ALREADY with fake timers so the
+      // cleanup interval is controllable.
       service = freshService();
-      service.enable(); // el default es disabled: sin esto no almacena
+      service.enable(); // default is disabled: without this it doesn't store
 
       const sock = {} as never;
       const message = {
@@ -177,7 +177,7 @@ describe('AntiDeleteService config', () => {
       await service.storeMessage(sock, message);
       expect(service.getMessage('msg-1')).toBeDefined();
 
-      // El interval corre cada hora; 25h después el mensaje expiró.
+      // The interval runs every hour; 25h later the message expired.
       await vi.advanceTimersByTimeAsync(25 * 60 * 60 * 1000);
       expect(service.getMessage('msg-1')).toBeUndefined();
     } finally {

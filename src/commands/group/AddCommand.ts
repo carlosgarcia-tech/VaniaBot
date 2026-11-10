@@ -1,7 +1,7 @@
 /**
  * AddCommand.ts
  *
- * group command `add` — Agregar usuario directamente al grupo
+ * group command `add` — Add a user directly to the group
  * Usage: !add <numero>
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!add`: Agregar usuario directamente al grupo. */
+/** Command handler for `!add`: Add a user directly to the group. */
 export class AddCommand extends Command {
   name = 'add';
   description = 'Agregar usuario directamente al grupo';

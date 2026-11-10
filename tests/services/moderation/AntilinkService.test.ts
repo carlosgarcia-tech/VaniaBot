@@ -122,7 +122,7 @@ describe('AntilinkService', () => {
     expect(service.getWhitelist(GROUP)).toEqual(['ejemplo.com']);
 
     expect(service.checkMessage(GROUP, 'va https://ejemplo.com/pagina')).toBeNull();
-    // Subdominio permitido vía endsWith('.ejemplo.com')
+    // Allowed via subdomain endsWith('.ejemplo.com')
     expect(service.checkMessage(GROUP, 'va https://docs.ejemplo.com/pagina')).toBeNull();
     // Otro dominio sigue bloqueado
     expect(service.checkMessage(GROUP, 'va https://otro.com')).not.toBeNull();
@@ -149,7 +149,7 @@ describe('AntilinkService', () => {
     service.setBlockType(GROUP, 'others', false);
 
     expect(service.checkMessage(GROUP, 'va https://ejemplo.com')).toBeNull();
-    // Los grupos de WhatsApp siguen bloqueados
+    // WhatsApp group links stay blocked
     expect(service.checkMessage(GROUP, 'va https://chat.whatsapp.com/XyZ')).not.toBeNull();
   });
 

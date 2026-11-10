@@ -1,7 +1,7 @@
 /**
  * RotationCache.ts
  *
- * VaniaBot commands module exposing `RotationCache`, `formatAnalysis`, `rotationCache`.
+ * OrbitBot commands module exposing `RotationCache`, `formatAnalysis`, `rotationCache`.
  *
  * @author **Carlos G**
  */

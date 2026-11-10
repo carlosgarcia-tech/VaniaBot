@@ -1,7 +1,7 @@
 /**
  * TextFireCommand.ts
  *
- * creative command `fire` — Crea un efecto de texto de fuego
+ * creative command `fire` — Creates a fire text effect
  * Usage: !fire <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/flame-lettering-effect-372.html';
 
-/** Command handler for `!fire`: Crea un efecto de texto de fuego. */
+/** Command handler for `!fire`: Creates a fire text effect. */
 export class TextFireCommand extends Command {
   name = 'fire';
   description = 'Crea un efecto de texto de fuego';
@@ -27,14 +27,14 @@ export class TextFireCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!fire <texto>';
-  examples = ['!fire VaniaBot'];
+  examples = ['!fire OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !fire <texto>\n_Ejemplo: !fire VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !fire <texto>\n_Ejemplo: !fire OrbitBot_');
       return;
     }
 

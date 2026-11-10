@@ -1,7 +1,7 @@
 /**
  * Minheap.ts
  *
- * VaniaBot commands module exposing `MinHeap`, `HeapItem`.
+ * OrbitBot commands module exposing `MinHeap`, `HeapItem`.
  *
  * @author **Carlos G**
  */

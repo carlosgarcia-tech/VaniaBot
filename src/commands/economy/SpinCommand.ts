@@ -1,7 +1,7 @@
 /**
  * SpinCommand.ts
  *
- * economy command `spin` — Ruleta diaria gratis
+ * economy command `spin` — Free daily roulette
  * Usage: !spin
  *
  * @author **Carlos G**
@@ -14,7 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 const spinCooldowns = new Map<string, number>();
 const SPIN_COOLDOWN = 4 * 60 * 60 * 1000;
 
-/** Command handler for `!spin`: Ruleta diaria gratis. */
+/** Command handler for `!spin`: Free daily roulette. */
 export class SpinCommand extends Command {
   name = 'spin';
   description = 'Ruleta diaria gratis';

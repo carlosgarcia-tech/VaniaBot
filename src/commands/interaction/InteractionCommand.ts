@@ -1,7 +1,7 @@
 /**
  * InteractionCommand.ts
  *
- * VaniaBot commands module exposing `agarrarnalgasCommand`, `chuparpataCommand`, `follarCommand`, `grabboobsCommand`.
+ * OrbitBot commands module exposing `agarrarnalgasCommand`, `chuparpataCommand`, `follarCommand`, `grabboobsCommand`.
  *
  * @author **Carlos G**
  */

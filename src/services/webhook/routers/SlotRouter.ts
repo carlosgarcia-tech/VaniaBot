@@ -1,7 +1,7 @@
 /**
  * SlotRouter.ts
  *
- * VaniaBot services module exposing `createSlotRouter`.
+ * OrbitBot services module exposing `createSlotRouter`.
  *
  * @author **Carlos G**
  */

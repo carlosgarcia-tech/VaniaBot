@@ -1,16 +1,16 @@
 /**
  * MessageForms.e2e.test.ts
  *
- * La matriz de formas de mensaje que MessageContext.extractText y los guards
- * del pipeline tienen que cubrir:
+ * The matrix of message shapes MessageContext.extractText and the pipeline
+ * guards must cover:
  *
- *   conversation            → texto plano
- *   extendedTextMessage     → texto con título (el texto sigue siendo válido)
- *   imageMessage.caption    → comando dentro del pie de foto
- *   stickerMessage          → sin texto: no debe extraer nada
- *   key.fromMe              → el bot no se responde a sí mismo
+ *   conversation            → plain text
+ *   extendedTextMessage     → text with a title (text still valid)
+ *   imageMessage.caption    → command inside the caption
+ *   stickerMessage          → no text: nothing must be extracted
+ *   key.fromMe              → the bot doesn't reply to itself
  *
- * Los comandos usados son locales y sin efectos externos (!ping).
+ * The commands used are local with no external effects (!ping).
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -49,7 +49,7 @@ describe('e2e: formas de mensaje', () => {
     const group = `1203630333333333${String(caseCounter).padStart(2, '0')}@g.us`;
 
     const { serviceManager } = await import('@/services/system/Servicemanager.js');
-    await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+    await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
     await setParticipants(socket, group, [botAdmin(), member(senderJid(500 + caseCounter))]);
 
     return group;

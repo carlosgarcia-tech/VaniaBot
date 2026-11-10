@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-shot documentation header generator for VaniaBot src.
+"""One-shot documentation header generator for OrbitBot src.
 
 For every .ts file under src without an '@author' header:
 - command classes (extends Command): header built from their own
@@ -128,11 +128,11 @@ for dp, ds, fs in os.walk(ROOT):
                 exps = exports_of(t)[:4]
                 if exps:
                     what = ", ".join("`" + e + "`" for e in exps)
-                    line = "VaniaBot " + lyr + " module exposing " + what + "."
+                    line = "OrbitBot " + lyr + " module exposing " + what + "."
                 elif re.search(r"^export\s*\{", t, re.M):
                     line = "Barrel module re-exporting the " + lyr + " layer's public API."
                 else:
-                    line = "VaniaBot " + lyr + " module (internal helpers)."
+                    line = "OrbitBot " + lyr + " module (internal helpers)."
             hdr = ["/**", " * " + f, " *", " * " + line, " *",
                    " * @author " + AUTHOR, " */"]
             header = "\n".join(hdr)

@@ -1,7 +1,7 @@
 /**
  * MongoDatabase.ts
  *
- * VaniaBot services module exposing `MongoDatabase`.
+ * OrbitBot services module exposing `MongoDatabase`.
  *
  * @author **Carlos G**
  */
@@ -19,7 +19,7 @@ export class MongoDatabase extends Database {
   private uri: string;
   private dbName: string;
 
-  constructor(uri: string, dbName: string = 'vaniabot') {
+  constructor(uri: string, dbName: string = 'orbit') {
     super();
     this.uri = uri;
     this.dbName = dbName;

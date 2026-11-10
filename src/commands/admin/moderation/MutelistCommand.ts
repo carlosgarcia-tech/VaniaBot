@@ -1,7 +1,7 @@
 /**
  * MutelistCommand.ts
  *
- * moderation command `mutelist` — Ver lista de usuarios muteados en el grupo
+ * moderation command `mutelist` — View the group's muted users
  * Usage: !mutelist [@user]
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { getTargetUser, getErrorMessage } from '@/utils/moderationUtils.js';
 
-/** Command handler for `!mutelist`: Ver lista de usuarios muteados en el grupo. */
+/** Command handler for `!mutelist`: View the group's muted users. */
 export class MutelistCommand extends Command {
   name = 'mutelist';
   description = 'Ver lista de usuarios muteados en el grupo';

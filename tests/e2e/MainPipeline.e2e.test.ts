@@ -1,17 +1,17 @@
 /**
  * MainPipeline.e2e.test.ts
  *
- * Primer test e2e del pipeline principal con socket falso. Recorre el
- * recorrido completo de un mensaje entrante:
+ * First e2e test of the main pipeline with a fake socket. Walks the full
+ * journey of an incoming message:
  *
  *   messages.upsert (FakeWASocket) → isProcessableMessage → echo filter →
- *   guards de grupo (no aplican en DM) → MessageContext (parsing con
- *   prefijo real) → checkRateLimits → resolución en commandRegistry →
- *   cadena de middlewares reales → PingCommand.execute → ctx.reply +
+ *   group guards (n/a in DMs) → MessageContext (parsing with the real
+ *   prefix) → checkRateLimits → resolution in commandRegistry → real
+ *   middleware chain → PingCommand.execute → ctx.reply +
  *   ctx.sock.sendMessage → FakeWASocket.sent
  *
- * No se mockea ningún comando, middleware ni servicio: solo la capa de
- * transporte (WASocketFactory) y el aislamiento del filesystem (cwd temp).
+ * No command, middleware or service is mocked: only the transport layer
+ * (WASocketFactory) and filesystem isolation (temp cwd).
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -29,7 +29,7 @@ vi.mock('@/services/external/AIService.js', () => ({
 
 const TIMEOUT = 30_000;
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('e2e: pipeline principal con socket falso', () => {
@@ -39,8 +39,8 @@ describe('e2e: pipeline principal con socket falso', () => {
     ({ socket } = await bootBot());
   }, TIMEOUT);
 
-  // Boot compartido (singletons de módulo): limpiar el registro de envíos
-  // entre tests para que las afirmaciones sean independientes.
+  // Shared boot (module singletons): clear the sent-message log between
+  // tests so assertions stay independent.
   beforeEach(() => {
     socket?.reset();
   });
@@ -56,7 +56,7 @@ describe('e2e: pipeline principal con socket falso', () => {
       expect(texts.some(t => t.startsWith('🏓 Pong!'))).toBe(true);
       expect(texts.some(t => /⏱️ Latencia: \d+ms/.test(t))).toBe(true);
 
-      // Ambos mensajes van dirigidos al chat del remitente (DM)
+      // Both messages go to the sender's own chat (DM)
       expect(socket.sent.every(m => m.jid === '861234567890123456@s.whatsapp.net')).toBe(true);
     },
     TIMEOUT,
@@ -78,7 +78,7 @@ describe('e2e: pipeline principal con socket falso', () => {
     async () => {
       const msg = dmTextMessage('!ping', senderJid(3));
       socket.receive(msg);
-      socket.receive(msg); // mismo WAMessage (mismo key.id): dedupe
+      socket.receive(msg); // same WAMessage (same key.id): deduped
       await wait(400);
 
       const pingCount = socket.texts().filter(t => t === '🏓 Calculando...').length;
@@ -90,10 +90,10 @@ describe('e2e: pipeline principal con socket falso', () => {
   it(
     'un mensaje con timestamp anterior al arranque se descarta como eco offline',
     async () => {
-      // El pipeline registró el startup timestamp al recibir connection open
-      // durante el boot; un timestamp del pasado debe caer en isPreStartupEcho.
+      // The pipeline recorded the startup timestamp when connection open
+      // arrived during boot; a past timestamp must land in isPreStartupEcho.
       const old = dmTextMessage('!ping', senderJid(4));
-      old.messageTimestamp = 1_000; // año 1970: siempre anterior al arranque
+      old.messageTimestamp = 1_000; // year 1970: always before startup
       socket.receive(old);
       await wait();
 

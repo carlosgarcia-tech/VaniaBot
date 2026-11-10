@@ -1,7 +1,7 @@
 /**
  * MegaDownloader.ts
  *
- * VaniaBot services module exposing `MegaDownloader`, `MegaFileInfo`, `megaDownloader`.
+ * OrbitBot services module exposing `MegaDownloader`, `MegaFileInfo`, `megaDownloader`.
  *
  * @author **Carlos G**
  */
@@ -23,7 +23,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-mega');
+const TMP_DIR = path.join(os.tmpdir(), 'orbit-mega');
 
 export interface MegaFileInfo {
   name: string;

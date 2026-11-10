@@ -1,7 +1,7 @@
 /**
  * AIService.ts
  *
- * VaniaBot services module exposing `AIService`, `aiService`.
+ * OrbitBot services module exposing `AIService`, `aiService`.
  *
  * @author **Carlos G**
  */
@@ -225,7 +225,7 @@ export class AIService {
             return await client.chat.completions.create({
               model: GROQ_MODELS.chat,
               messages: [
-                { role: 'system', content: 'Eres VaniaBot, el bot más perfecto e inteligente.' },
+                { role: 'system', content: 'Eres OrbitBot, el bot más perfecto e inteligente.' },
                 { role: 'user', content: prompt },
               ],
               max_tokens: maxTokens,

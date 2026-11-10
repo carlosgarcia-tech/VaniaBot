@@ -1,7 +1,7 @@
 /**
  * HuntCommand.ts
  *
- * economy command `hunt` — Cazar animales para ganar dinero
+ * economy command `hunt` — Hunt animals to earn money
  * Usage: !hunt
  *
  * @author **Carlos G**
@@ -14,7 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 const huntCooldowns = new Map<string, number>();
 const HUNT_COOLDOWN = 3 * 60 * 1000;
 
-/** Command handler for `!hunt`: Cazar animales para ganar dinero. */
+/** Command handler for `!hunt`: Hunt animals to earn money. */
 export class HuntCommand extends Command {
   name = 'hunt';
   description = 'Cazar animales para ganar dinero';

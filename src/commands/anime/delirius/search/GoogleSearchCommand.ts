@@ -1,7 +1,7 @@
 /**
  * GoogleSearchCommand.ts
  *
- * anime command `google` — Busca en Google
+ * anime command `google` — Searches Google
  * Usage: !google <busqueda>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!google`: Busca en Google. */
+/** Command handler for `!google`: Searches Google. */
 export class GoogleSearchCommand extends Command {
   name = 'google';
   description = 'Busca en Google';

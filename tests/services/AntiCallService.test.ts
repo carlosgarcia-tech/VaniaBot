@@ -23,8 +23,8 @@ describe('AntiCallService config', () => {
   let configPath: string;
 
   beforeEach(() => {
-    // Config path inyectado: aislado del data/ real del bot.
-    dataDir = join(tmpdir(), `vania-anticall-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    // Injected config path: isolated from the bot's real data/.
+    dataDir = join(tmpdir(), `orbit-anticall-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     configPath = join(dataDir, 'anticall.json');
     service = new AntiCallService(configPath);
   });

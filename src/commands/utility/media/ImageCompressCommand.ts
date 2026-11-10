@@ -1,8 +1,8 @@
 /**
  * ImageCompressCommand.ts
  *
- * utility command `imgcompress` — Comprime una imagen para reducir su tamaño.
- * Usage: !imgcompress [calidad 1-100 | tamañoMaxKB]
+ * utility command `imgcompress` — Compress an image to reduce its size.
+ * Usage: !imgcompress [quality 1-100 | maxSizeKB]
  *
  * @author **Carlos G**
  */
@@ -15,7 +15,7 @@ import { logError } from '@/utils/logger.js';
 
 const converterService = new ConverterService();
 
-/** Command handler for `!imgcompress`: Comprime una imagen para reducir su tamaño. */
+/** Command handler for `!imgcompress`: Compress an image to reduce its size. */
 export class ImageCompressCommand extends Command {
   name = 'imgcompress';
   description = 'Comprime una imagen para reducir su tamaño.';

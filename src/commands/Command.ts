@@ -1,7 +1,7 @@
 /**
  * Command.ts
  *
- * VaniaBot commands module exposing `Command`.
+ * OrbitBot commands module exposing `Command`.
  *
  * @author **Carlos G**
  */

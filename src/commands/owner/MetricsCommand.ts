@@ -1,7 +1,7 @@
 /**
  * MetricsCommand.ts
  *
- * owner command `metrics` — Muestra métricas y estadísticas del bot
+ * owner command `metrics` — Shows bot metrics and statistics
  * Usage: !metrics
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import { commandRegistry } from '@/core/CommandRegistry.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { cacheManager } from '@/core/CacheManager.js';
 
-/** Command handler for `!metrics`: Muestra métricas y estadísticas del bot. */
+/** Command handler for `!metrics`: Shows bot metrics and statistics. */
 export class MetricsCommand extends Command {
   name = 'metrics';
   description = 'Muestra métricas y estadísticas del bot';
@@ -35,7 +35,7 @@ export class MetricsCommand extends Command {
 
     const cacheStats = cacheManager.getStats();
 
-    let message = `📊 *Métricas de VaniaBot*\n`;
+    let message = `📊 *Métricas de OrbitBot*\n`;
     message += `━━━━━━━━━━━━━━━━\n\n`;
 
     message += `*Cache:*\n`;

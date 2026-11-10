@@ -1,7 +1,7 @@
 /**
  * EncryptedAuthState.ts
  *
- * VaniaBot services module (internal helpers).
+ * OrbitBot services module (internal helpers).
  *
  * @author **Carlos G**
  */

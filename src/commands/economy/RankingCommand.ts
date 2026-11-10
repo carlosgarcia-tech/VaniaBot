@@ -1,7 +1,7 @@
 /**
  * RankingCommand.ts
  *
- * economy command `ranking` — Ver ranking de usuarios
+ * economy command `ranking` — View the user ranking
  * Usage: !ranking [money|xp|level|networth]
  *
  * @author **Carlos G**
@@ -12,13 +12,13 @@ import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 
-/** Command handler for `!ranking`: Ver ranking de usuarios. */
+/** Command handler for `!ranking`: View the user ranking. */
 export class RankingCommand extends Command {
   name = 'ranking';
   description = 'Ver ranking de usuarios';
   category = CommandCategory.ECONOMY;
   requiresRegistration = true;
-  // Sin alias 'top': es el name de TopCommand (leaderboards).
+  // No alias 'top': it is the name of TopCommand (leaderboards).
   aliases = ['rank', 'ranking'];
   usage = '!ranking [money|xp|level|networth]';
   examples = ['!ranking', '!top xp', '!top networth'];

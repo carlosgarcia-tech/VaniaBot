@@ -1,8 +1,8 @@
 /**
  * GofileCommand.ts
  *
- * media command `gofile` — Sube un archivo a Gofile
- * Usage: !gofile [responder a archivo]
+ * media command `gofile` — Uploads a file to Gofile
+ * Usage: !gofile (reply to a file)
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!gofile`: Sube un archivo a Gofile. */
+/** Command handler for `!gofile`: Uploads a file to Gofile. */
 export class GofileCommand extends Command {
   name = 'gofile';
   description = 'Sube un archivo a Gofile';

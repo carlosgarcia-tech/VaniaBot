@@ -1,8 +1,8 @@
 /**
  * CuevanaCommand.ts
  *
- * media command `cuevana` — Busca y descarga películas/series de Cuevana
- * Usage: !cv <título>
+ * media command `cuevana` — Searches and downloads movies/series from Cuevana
+ * Usage: !cv <title>
  *
  * @author **Carlos G**
  */
@@ -25,9 +25,9 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-cuevana');
+const TMP_DIR = path.join(os.tmpdir(), 'orbit-cuevana');
 
-/** Command handler for `!cuevana`: Busca y descarga películas/series de Cuevana. */
+/** Command handler for `!cuevana`: Searches and downloads movies/series from Cuevana. */
 export class CuevanaCommand extends Command {
   name = 'cuevana';
   description = 'Busca y descarga películas/series de Cuevana';

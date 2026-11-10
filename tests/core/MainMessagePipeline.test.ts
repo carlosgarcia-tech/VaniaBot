@@ -3,7 +3,7 @@
  *
  * Unit tests for the MainMessagePipeline core module.
  * Covers message filtering, pre-startup echo detection, the guard chain
- * (mutes, vania toggle, quiz/mention), rate limits, command resolution
+ * (mutes, orbit toggle, quiz/mention), rate limits, command resolution
  * (registry + lazy plugin loading), availability gates (disabled/NSFW),
  * timeout and error handling, middleware orchestration and stats tracking.
  *
@@ -54,7 +54,7 @@ const mockIsOwner = vi.fn();
 
 vi.mock('../../src/services/system/Servicemanager.js', () => ({
   serviceManager: {
-    vaniaToggleService: {
+    orbitToggleService: {
       isAllowedForMain: (...args: unknown[]) => mockIsAllowedForMain(...args),
     },
     nsfwToggleService: {
@@ -517,7 +517,7 @@ describe('MainMessagePipeline', () => {
       expect(execute).not.toHaveBeenCalled();
     });
 
-    it('swallows messages when the vania toggle guard denies them', async () => {
+    it('swallows messages when the orbit toggle guard denies them', async () => {
       mockIsAllowedForMain.mockResolvedValue(false);
       const { fire, sock } = createPipeline();
       const { execute } = registerCommand('pipeping');

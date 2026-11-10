@@ -1,7 +1,7 @@
 /**
  * FreeFireMenuCommand.ts
  *
- * freefire command `freefiremenu` — Menú de comandos Free Fire
+ * freefire command `freefiremenu` — Free Fire command menu
  * Usage: !freefiremenu
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { freeFireService } from '@/services/games/FreeFireService.js';
 
-/** Command handler for `!freefiremenu`: Menú de comandos Free Fire. */
+/** Command handler for `!freefiremenu`: Free Fire command menu. */
 export class FreeFireMenuCommand extends Command {
   name = 'freefiremenu';
   description = 'Menú de comandos Free Fire';

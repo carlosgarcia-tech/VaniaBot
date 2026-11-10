@@ -1,7 +1,7 @@
 /**
  * MediafireDownloader.ts
  *
- * VaniaBot services module exposing `MediafireDownloader`, `MediafireInfo`, `mediafireDownloader`.
+ * OrbitBot services module exposing `MediafireDownloader`, `MediafireInfo`, `mediafireDownloader`.
  *
  * @author **Carlos G**
  */
@@ -23,7 +23,7 @@ import path from 'path';
 import os from 'os';
 import axios from 'axios';
 
-const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-mediafire');
+const TMP_DIR = path.join(os.tmpdir(), 'orbit-mediafire');
 
 export interface MediafireInfo {
   filename: string;

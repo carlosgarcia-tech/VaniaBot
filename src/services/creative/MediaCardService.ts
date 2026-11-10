@@ -1,7 +1,7 @@
 /**
  * MediaCardService.ts
  *
- * VaniaBot services module exposing `MediaCardService`, `MediaCardOptions`.
+ * OrbitBot services module exposing `MediaCardService`, `MediaCardOptions`.
  *
  * @author **Carlos G**
  */
@@ -210,13 +210,13 @@ export class MediaCardService {
   }
 
   /**
-   * Draws a pill/badge containing the platform logo and the VaniaBot logo side
+   * Draws a pill/badge containing the platform logo and the OrbitBot logo side
    * by side. Both logos are rendered from real image assets so they look crisp.
    *
    * Sizes are larger than the old hand-drawn version so the logos are clearly
    * legible at a glance.
    */
-  private static async drawPlatformAndVaniaLogos(
+  private static async drawPlatformAndOrbitLogos(
     ctx: ReturnType<ReturnType<typeof createCanvas>['getContext']>,
     platform: Platform,
     /** right-edge X of the badge */
@@ -225,7 +225,7 @@ export class MediaCardService {
     y: number,
     /** logo square size (each logo) */
     logoSize: number,
-    vaniaLogo: Awaited<ReturnType<typeof loadImage>> | null,
+    orbitLogo: Awaited<ReturnType<typeof loadImage>> | null,
     platformLogo: Awaited<ReturnType<typeof loadImage>> | null,
   ) {
     const gap = 6;
@@ -257,13 +257,13 @@ export class MediaCardService {
       ctx.restore();
     }
 
-    const vaniaX = platX + logoSize + gap;
-    if (vaniaLogo) {
+    const orbitX = platX + logoSize + gap;
+    if (orbitLogo) {
       ctx.save();
       ctx.beginPath();
-      ctx.roundRect(vaniaX, imgY, logoSize, logoSize, radius);
+      ctx.roundRect(orbitX, imgY, logoSize, logoSize, radius);
       ctx.clip();
-      ctx.drawImage(vaniaLogo, vaniaX, imgY, logoSize, logoSize);
+      ctx.drawImage(orbitLogo, orbitX, imgY, logoSize, logoSize);
       ctx.restore();
     }
   }
@@ -273,7 +273,7 @@ export class MediaCardService {
     const ctx = canvas.getContext('2d');
     const { bg, accent, text, secondary } = PLATFORM_COLORS.youtube;
 
-    const [vaniaLogo, platformLogo] = await Promise.all([
+    const [orbitLogo, platformLogo] = await Promise.all([
       this.loadLogoAsset('logo.png'),
       this.loadLogoAsset(PLATFORM_LOGO_FILES.youtube),
     ]);
@@ -330,13 +330,13 @@ export class MediaCardService {
     ctx.fillText(meta.join(' • '), textX, textY);
 
     const LOGO_SIZE = 48;
-    await this.drawPlatformAndVaniaLogos(
+    await this.drawPlatformAndOrbitLogos(
       ctx,
       'youtube',
       WIDTH - 12,
       HEIGHT - 8 - LOGO_SIZE - 8,
       LOGO_SIZE,
-      vaniaLogo,
+      orbitLogo,
       platformLogo,
     );
 
@@ -348,7 +348,7 @@ export class MediaCardService {
     const ctx = canvas.getContext('2d');
     const { bg, text } = PLATFORM_COLORS.tiktok;
 
-    const [vaniaLogo, platformLogo] = await Promise.all([
+    const [orbitLogo, platformLogo] = await Promise.all([
       this.loadLogoAsset('logo.png'),
       this.loadLogoAsset(PLATFORM_LOGO_FILES.tiktok),
     ]);
@@ -448,13 +448,13 @@ export class MediaCardService {
     }
 
     const LOGO_SIZE = 48;
-    await this.drawPlatformAndVaniaLogos(
+    await this.drawPlatformAndOrbitLogos(
       ctx,
       'tiktok',
       WIDTH - 12,
       HEIGHT - 8 - LOGO_SIZE - 8,
       LOGO_SIZE,
-      vaniaLogo,
+      orbitLogo,
       platformLogo,
     );
 
@@ -466,7 +466,7 @@ export class MediaCardService {
     const canvas = createCanvas(WIDTH, HEIGHT);
     const ctx = canvas.getContext('2d');
 
-    const [vaniaLogo, platformLogo] = await Promise.all([
+    const [orbitLogo, platformLogo] = await Promise.all([
       this.loadLogoAsset('logo.png'),
       this.loadLogoAsset(PLATFORM_LOGO_FILES.instagram),
     ]);
@@ -554,13 +554,13 @@ export class MediaCardService {
     ctx.fillRect(cardX + 12, HEIGHT - 36, cardW - 24, 1);
 
     const LOGO_SIZE = 48;
-    await this.drawPlatformAndVaniaLogos(
+    await this.drawPlatformAndOrbitLogos(
       ctx,
       'instagram',
       cardX + cardW - 12,
       HEIGHT - 8 - LOGO_SIZE - 8,
       LOGO_SIZE,
-      vaniaLogo,
+      orbitLogo,
       platformLogo,
     );
 
@@ -572,7 +572,7 @@ export class MediaCardService {
     const ctx = canvas.getContext('2d');
     const { bg, accent: _accent, text, secondary } = PLATFORM_COLORS.facebook;
 
-    const [vaniaLogo, platformLogo] = await Promise.all([
+    const [orbitLogo, platformLogo] = await Promise.all([
       this.loadLogoAsset('logo.png'),
       this.loadLogoAsset(PLATFORM_LOGO_FILES.facebook),
     ]);
@@ -692,13 +692,13 @@ export class MediaCardService {
     ctx.stroke();
 
     const LOGO_SIZE = 48;
-    await this.drawPlatformAndVaniaLogos(
+    await this.drawPlatformAndOrbitLogos(
       ctx,
       'facebook',
       WIDTH - 12,
       HEIGHT - 8 - LOGO_SIZE - 8,
       LOGO_SIZE,
-      vaniaLogo,
+      orbitLogo,
       platformLogo,
     );
 
@@ -710,7 +710,7 @@ export class MediaCardService {
     const ctx = canvas.getContext('2d');
     const { bg, text, secondary } = PLATFORM_COLORS.twitter;
 
-    const [vaniaLogo, platformLogo] = await Promise.all([
+    const [orbitLogo, platformLogo] = await Promise.all([
       this.loadLogoAsset('logo.png'),
       this.loadLogoAsset(PLATFORM_LOGO_FILES.twitter),
     ]);
@@ -783,13 +783,13 @@ export class MediaCardService {
     ctx.fillText(domain, WIDTH - ctx.measureText(domain).width - 56, statsY + 20);
 
     const LOGO_SIZE = 48;
-    await this.drawPlatformAndVaniaLogos(
+    await this.drawPlatformAndOrbitLogos(
       ctx,
       'twitter',
       WIDTH - 12,
       HEIGHT - 8 - LOGO_SIZE - 8,
       LOGO_SIZE,
-      vaniaLogo,
+      orbitLogo,
       platformLogo,
     );
 

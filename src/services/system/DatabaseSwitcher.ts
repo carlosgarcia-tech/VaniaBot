@@ -1,9 +1,9 @@
 /**
  * DatabaseSwitcher.ts
  *
- * Sistema dual SQLite/Redis para VaniaBot.
- * - Docker: usa Redis + SQLite (para sesiones)
- * - Normal: usa SQLite solo
+ * Dual SQLite/Redis system for OrbitBot.
+ * - Docker: uses Redis + SQLite (for sessions)
+ * - Normal: uses SQLite only
  *
  * @author **Carlos G**
  * @created 2026-04-11
@@ -33,7 +33,7 @@ const DEFAULT_CONFIG: SwitcherConfig = {
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
   redisHost: process.env.REDIS_HOST || 'localhost',
   redisPort: parseInt(process.env.REDIS_PORT || '6379'),
-  dbPath: process.env.DB_PATH || './storage/database/vania.db',
+  dbPath: process.env.DB_PATH || './storage/database/orbit.db',
 };
 
 let redisClient: RedisClientType | null = null;
@@ -75,7 +75,7 @@ export class DatabaseSwitcher {
       let url = this.config.redisUrl;
 
       if (!url && this.config.useRedis) {
-        const possibleHosts = ['vania-redis', 'redis', 'localhost'];
+        const possibleHosts = ['orbit-redis', 'redis', 'localhost'];
 
         for (const host of possibleHosts) {
           try {

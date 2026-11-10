@@ -1,8 +1,8 @@
 /**
  * QuizCommand.ts
  *
- * utility command `quiz` — Modo estudio — responde preguntas y gana monedas
- * Usage: !quiz [categoría] [preguntas?] | !quiz stop
+ * utility command `quiz` — Study mode — answer questions and earn coins
+ * Usage: !quiz [category] [questions?] | !quiz stop
  *
  * @author **Carlos G**
  */
@@ -70,7 +70,7 @@ const DEFAULT_STATS: UserQuizStats = {
   sessionsPlayed: 0,
 };
 
-/** Command handler for `!quiz`: Modo estudio — responde preguntas y gana monedas. */
+/** Command handler for `!quiz`: Study mode — answer questions and earn coins. */
 export class QuizCommand extends Command {
   name = 'quiz';
   description = 'Modo estudio — responde preguntas y gana monedas';
@@ -106,7 +106,7 @@ export class QuizCommand extends Command {
 
     if (!first) {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *modo estudio — VaniaBot* ˚₊· ͟͟͞͞➳\n` +
+        `˚₊· ͟͟͞͞➳ *modo estudio — OrbitBot* ˚₊· ͟͟͞͞➳\n` +
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
           `✿ *cómo lo usas:* !quiz [categoría] [preguntas]\n\n` +
           `✩ *categorías:*\n${CATEGORIES_LIST}\n\n` +
@@ -116,7 +116,7 @@ export class QuizCommand extends Command {
           `  ﹒!quiz stop\n\n` +
           `la dificultad sube solita mientras más aprendes\n` +
           `si te atoras, usa *!hint* para una pista (la recompensa baja un poquito)\n\n` +
-          `> _VaniaBot 💝 — tu compi de estudio_`,
+          `> _OrbitBot 💝 — tu compi de estudio_`,
       );
       return;
     }

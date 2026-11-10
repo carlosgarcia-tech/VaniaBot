@@ -1,7 +1,7 @@
 /**
  * AITypes.ts
  *
- * VaniaBot services module exposing `AIMessage`, `ConversationSession`, `GroqError`, `GROQ_MODELS`.
+ * OrbitBot services module exposing `AIMessage`, `ConversationSession`, `GroqError`, `GROQ_MODELS`.
  *
  * @author **Carlos G**
  */

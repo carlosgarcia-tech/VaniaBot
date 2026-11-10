@@ -1,7 +1,7 @@
 /**
  * TTPCommand.ts
  *
- * creative command `ttp` — Genera texto en imagen estilo TTP
+ * creative command `ttp` — Generates TTP-style text as an image
  * Usage: !ttp <texto> [color]
  *
  * @author **Carlos G**
@@ -16,7 +16,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!ttp`: Genera texto en imagen estilo TTP. */
+/** Command handler for `!ttp`: Generates TTP-style text as an image. */
 export class TTPCommand extends Command {
   name = 'ttp';
   description = 'Genera texto en imagen estilo TTP';

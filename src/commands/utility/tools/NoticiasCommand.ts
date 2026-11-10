@@ -1,8 +1,8 @@
 /**
  * NoticiasCommand.ts
  *
- * utility command `noticias` — Consulta las últimas noticias
- * Usage: !noticias [categoría]
+ * utility command `noticias` — Get the latest news
+ * Usage: !noticias [category]
  *
  * @author **Carlos G**
  */
@@ -23,7 +23,7 @@ const CATEGORIES = [
   { id: 'health', name: 'Salud', emoji: '🏥' },
 ];
 
-/** Command handler for `!noticias`: Consulta las últimas noticias. */
+/** Command handler for `!noticias`: Get the latest news. */
 export class NoticiasCommand extends Command {
   name = 'noticias';
   description = 'Consulta las últimas noticias';
@@ -79,7 +79,7 @@ export class NoticiasCommand extends Command {
   }
 
   private async showHelp(ctx: MessageContext): Promise<void> {
-    let msg = `📰 *Noticias - VaniaBot*\n\n`;
+    let msg = `📰 *Noticias - OrbitBot*\n\n`;
     msg += `*Categorías disponibles:*\n\n`;
 
     for (const cat of CATEGORIES) {

@@ -1,7 +1,7 @@
 /**
  * AudioEffectCommand.ts
  *
- * media command `audiofx` — Aplicar efectos de audio
+ * media command `audiofx` — Apply audio effects
  * Usage: !<efecto> responde a un audio
  *
  * @author **Carlos G**
@@ -20,7 +20,7 @@ import { logger } from '@/utils/logger.js';
 
 const execAsync = promisify(exec);
 const getRandom = (ext: string) => `${Math.floor(Math.random() * 10000)}${ext}`;
-const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-audio');
+const TMP_DIR = path.join(os.tmpdir(), 'orbit-audio');
 
 const EFFECTS: Record<string, { filter: string; description: string }> = {
   bass: { filter: '-af equalizer=f=94:width_type=o:width=2:g=30', description: 'Bass' },
@@ -40,7 +40,7 @@ const EFFECTS: Record<string, { filter: string; description: string }> = {
   fat: { filter: '-filter:a "atempo=1.6,asetrate=22100"', description: 'Fat' },
 };
 
-/** Command handler for `!audiofx`: Aplicar efectos de audio. */
+/** Command handler for `!audiofx`: Apply audio effects. */
 export class AudioEffectCommand extends Command {
   name = 'audiofx';
   description = 'Aplicar efectos de audio';

@@ -1,7 +1,7 @@
 /**
  * BuyRPGCommand.ts
  *
- * rpg command `buyrpg` — Compra items de la tienda RPG
+ * rpg command `buyrpg` — Buy items from the RPG shop
  * Usage: !buyrpg [item] [cantidad]
  *
  * @author **Carlos G**
@@ -13,7 +13,7 @@ import { itemRegistry, type RPGItem } from '@/services/rpg/ItemRegistry.js';
 import { itemService } from '@/services/rpg/ItemService.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
-/** Command handler for `!buyrpg`: Compra items de la tienda RPG. */
+/** Command handler for `!buyrpg`: Buy items from the RPG shop. */
 export class BuyRPGCommand extends Command {
   name = 'buyrpg';
   description = 'Compra items de la tienda RPG';

@@ -1,7 +1,7 @@
 /**
  * APKSearchService.ts
  *
- * VaniaBot services module exposing `APKSearchService`, `APKApp`, `APKSearchResponseInternal`, `apkSearchService`.
+ * OrbitBot services module exposing `APKSearchService`, `APKApp`, `APKSearchResponseInternal`, `apkSearchService`.
  *
  * @author **Carlos G**
  */

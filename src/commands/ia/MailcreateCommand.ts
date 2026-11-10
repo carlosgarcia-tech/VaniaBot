@@ -1,7 +1,7 @@
 /**
  * MailcreateCommand.ts
  *
- * media command `mailcreate` — Crea un email temporal
+ * media command `mailcreate` — Creates a temporary email
  * Usage: !mailcreate
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 
-/** Command handler for `!mailcreate`: Crea un email temporal. */
+/** Command handler for `!mailcreate`: Creates a temporary email. */
 export class MailcreateCommand extends Command {
   name = 'mailcreate';
   description = 'Crea un email temporal';

@@ -1,7 +1,7 @@
 /**
  * BalcardCommand.ts
  *
- * creative command `balcard` — Genera tarjeta de balance
+ * creative command `balcard` — Generates a balance card
  * Usage: !balcard [accentColor]
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 } from '@/types/index.js';
 import { ProfileCardService } from '@services/canvas/ProfileCardService.js';
 
-/** Command handler for `!balcard`: Genera tarjeta de balance. */
+/** Command handler for `!balcard`: Generates a balance card. */
 export class BalcardCommand extends Command {
   name = 'balcard';
   description = 'Genera tarjeta de balance';

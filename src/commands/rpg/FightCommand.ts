@@ -1,7 +1,7 @@
 /**
  * FightCommand.ts
  *
- * rpg command `fight` — Lucha contra un mobs
+ * rpg command `fight` — Fight a mob
  * Usage: !fight [mob] | !fight flee
  *
  * @author **Carlos G**
@@ -16,7 +16,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 const fightCooldowns = new Map<string, number>();
 const FIGHT_COOLDOWN = 5000;
 
-/** Command handler for `!fight`: Lucha contra un mobs. */
+/** Command handler for `!fight`: Fight a mob. */
 export class FightCommand extends Command {
   name = 'fight';
   description = 'Lucha contra un mobs';

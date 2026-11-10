@@ -1,7 +1,7 @@
 /**
  * TiktokCommand.ts
  *
- * VaniaBot commands module exposing `TiktokCommand`.
+ * OrbitBot commands module exposing `TiktokCommand`.
  *
  * @author **Carlos G**
  */

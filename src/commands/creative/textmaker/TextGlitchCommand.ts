@@ -1,7 +1,7 @@
 /**
  * TextGlitchCommand.ts
  *
- * creative command `glitch` — Crea un efecto de texto glitch
+ * creative command `glitch` — Creates a glitch text effect
  * Usage: !glitch <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-digital-glitch-text-effects-online-767.html';
 
-/** Command handler for `!glitch`: Crea un efecto de texto glitch. */
+/** Command handler for `!glitch`: Creates a glitch text effect. */
 export class TextGlitchCommand extends Command {
   name = 'glitch';
   description = 'Crea un efecto de texto glitch';
@@ -27,14 +27,14 @@ export class TextGlitchCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!glitch <texto>';
-  examples = ['!glitch VaniaBot'];
+  examples = ['!glitch OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !glitch <texto>\n_Ejemplo: !glitch VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !glitch <texto>\n_Ejemplo: !glitch OrbitBot_');
       return;
     }
 

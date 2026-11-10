@@ -1,8 +1,8 @@
 /**
  * FacepalmCommand.ts
  *
- * creative command `facepalm` — Genera imagen con facepalm
- * Usage: !facepalm [@usuario]
+ * creative command `facepalm` — Generates a facepalm image
+ * Usage: !facepalm [@user]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!facepalm`: Genera imagen con facepalm. */
+/** Command handler for `!facepalm`: Generates a facepalm image. */
 export class FacepalmCommand extends Command {
   name = 'facepalm';
   description = 'Genera imagen con facepalm';

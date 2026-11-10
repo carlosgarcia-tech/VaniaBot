@@ -1,7 +1,7 @@
 /**
  * ImageService.ts
  *
- * VaniaBot services module exposing `ImageService`, `imageService`.
+ * OrbitBot services module exposing `ImageService`, `imageService`.
  *
  * @author **Carlos G**
  */
@@ -58,13 +58,13 @@ interface AxiosWithResponseUrl extends AxiosResponse {
 }
 
 /**
- * ImageService — búsqueda de imágenes sin APIs de pago.
+ * ImageService — image search without paid APIs.
  *
- * Cadena de fallback (orden de prioridad):
- *   1. Pixabay         — si PIXABAY_API_KEY está definida (gratis, 500 req/hora)
- *   2. Pexels          — si PEXELS_API_KEY está definida (gratis, 200 req/hora)
- *   3. Unsplash Source — sin key, URL directa (deprecated pero aún funciona)
- *   4. Lorem Picsum    — imágenes placeholder si todo lo demás falla
+ * Fallback chain (priority order):
+ *   1. Pixabay         — if PIXABAY_API_KEY is set (free, 500 req/hour)
+ *   2. Pexels          — if PEXELS_API_KEY is set (free, 200 req/hour)
+ *   3. Unsplash Source — no key, direct URL (deprecated but still works)
+ *   4. Lorem Picsum    — placeholder images if everything else fails
  */
 export class ImageService {
   private static instance: ImageService;
@@ -213,7 +213,7 @@ export class ImageService {
   }
 
   /**
-   * Unsplash Source redirige a una imagen real de Unsplash sin necesitar key.
+   * Unsplash Source redirects to a real Unsplash image without needing a key.
    */
   private async searchUnsplashSource(query: string, count: number): Promise<ImageResult[]> {
     const results: ImageResult[] = [];
@@ -245,7 +245,7 @@ export class ImageService {
           });
         }
       } catch (error) {
-        // Fuente de imágenes caída: se devuelve lo acumulado con fallbacks.
+        // Image source is down: return what accumulated, with fallbacks.
         logger.debug(`[ImageService] Unsplash query failed for "${query}":`, error);
       }
     }

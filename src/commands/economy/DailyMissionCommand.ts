@@ -1,7 +1,7 @@
 /**
  * DailyMissionCommand.ts
  *
- * economy command `misiones` — Misiones diarias con recompensas
+ * economy command `misiones` — Daily missions with rewards
  * Usage: !misiones [reclamar id]
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { dailyMissionService } from '@/services/rpg/DailyMissionService.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
-/** Command handler for `!misiones`: Misiones diarias con recompensas. */
+/** Command handler for `!misiones`: Daily missions with rewards. */
 export class DailyMissionCommand extends Command {
   name = 'misiones';
   description = 'Misiones diarias con recompensas';

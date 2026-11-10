@@ -1,7 +1,7 @@
 /**
  * TextNeonCommand.ts
  *
- * creative command `neon` — Crea un efecto de texto neon
+ * creative command `neon` — Creates a neon text effect
  * Usage: !neon <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-colorful-neon-light-text-effects-online-797.html';
 
-/** Command handler for `!neon`: Crea un efecto de texto neon. */
+/** Command handler for `!neon`: Creates a neon text effect. */
 export class TextNeonCommand extends Command {
   name = 'neon';
   description = 'Crea un efecto de texto neon';
@@ -27,14 +27,14 @@ export class TextNeonCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!neon <texto>';
-  examples = ['!neon VaniaBot'];
+  examples = ['!neon OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !neon <texto>\n_Ejemplo: !neon VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !neon <texto>\n_Ejemplo: !neon OrbitBot_');
       return;
     }
 

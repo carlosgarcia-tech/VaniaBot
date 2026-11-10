@@ -1,7 +1,7 @@
 /**
  * FallbackAPIService.ts
  *
- * VaniaBot services module exposing `FallbackAPIService`, `fallbackAPIService`.
+ * OrbitBot services module exposing `FallbackAPIService`, `fallbackAPIService`.
  *
  * @author **Carlos G**
  */

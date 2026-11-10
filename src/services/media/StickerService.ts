@@ -1,7 +1,7 @@
 /**
  * StickerService.ts
  *
- * VaniaBot services module exposing `StickerService`, `StickerOptions`.
+ * OrbitBot services module exposing `StickerService`, `StickerOptions`.
  *
  * @author **Carlos G**
  */
@@ -231,8 +231,8 @@ export class StickerService {
       const ffmpeg = spawn('ffmpeg', ['-version']);
       ffmpeg.on('close', code => resolve(code === 0));
       ffmpeg.on('error', error => {
-        // checkFFmpeg devuelve false por diseño, pero el motivo (no existe,
-        // sin permisos) quedaba totalmente invisible.
+        // checkFFmpeg returns false by design, but the reason (missing binary,
+        // lack of permissions) used to be completely invisible.
         logger.debug(`[StickerService] ffmpeg probe failed: ${error.message}`);
         resolve(false);
       });

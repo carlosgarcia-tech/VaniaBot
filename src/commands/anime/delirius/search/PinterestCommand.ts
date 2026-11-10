@@ -1,7 +1,7 @@
 /**
  * PinterestCommand.ts
  *
- * anime command `pinterestsrc` — Busca imágenes en Pinterest
+ * anime command `pinterestsrc` — Searches images on Pinterest
  * Usage: !pinterest <busqueda>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!pinterestsrc`: Busca imágenes en Pinterest. */
+/** Command handler for `!pinterestsrc`: Searches images on Pinterest. */
 export class PinterestCommand extends Command {
   name = 'pinterestsrc';
   description = 'Busca imágenes en Pinterest';

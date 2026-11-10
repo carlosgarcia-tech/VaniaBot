@@ -1,8 +1,8 @@
 /**
  * VerdadRetoCommand.ts
  *
- * fun command `verdad` — Juego de verdad o reto
- * Usage: !verdad [numero]
+ * fun command `verdad` — Truth-or-dare game
+ * Usage: !verdad [number]
  *
  * @author **Carlos G**
  */
@@ -18,7 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!verdad`: Juego de verdad o reto. */
+/** Command handler for `!verdad`: Truth-or-dare game. */
 export class VerdadRetoCommand extends Command {
   name = 'verdad';
   description = 'Juego de verdad o reto';

@@ -1,7 +1,7 @@
 /**
  * weapons.ts
  *
- * VaniaBot services module exposing `weapons`.
+ * OrbitBot services module exposing `weapons`.
  *
  * @author **Carlos G**
  */

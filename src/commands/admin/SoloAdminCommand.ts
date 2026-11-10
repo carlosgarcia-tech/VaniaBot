@@ -60,7 +60,7 @@ export class SoloAdminCommand extends Command {
       case 'activar':
         await serviceManager.groupService.setOnlyAdmin(ctx.chat.jid, true);
         await ctx.reply(
-          `╭━━━ 🌸  *VaniaBot*  ━━━╮\n` +
+          `╭━━━ 🌸  *OrbitBot*  ━━━╮\n` +
             `   *Modo Solo Admin* activado\n` +
             `\n` +
             `Ahora solo los *admins del grupo*\n` +
@@ -80,7 +80,7 @@ export class SoloAdminCommand extends Command {
       case 'desactivar':
         await serviceManager.groupService.setOnlyAdmin(ctx.chat.jid, false);
         await ctx.reply(
-          `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+          `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
             `   *Modo Solo Admin desactivado*\n` +
             `\n` +
             `Todos los miembros del grupo\n` +
@@ -107,7 +107,7 @@ export class SoloAdminCommand extends Command {
             `• \`.soloadmin on\` — Enable admin-only mode\n` +
             `• \`.soloadmin off\` — Disable admin-only mode\n` +
             `• \`.soloadmin status\` — Show current status\n\n` +
-            `_— VaniaBot 🌸_`,
+            `_— OrbitBot 🌸_`,
         );
     }
   }
@@ -122,7 +122,7 @@ export class SoloAdminCommand extends Command {
     const onlyAdmin = await serviceManager.groupService.getOnlyAdmin(ctx.chat.jid);
 
     await ctx.reply(
-      `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
         `   ⚙️ *Modo Solo Admin*\n` +
         `\n` +
         `*Estado actual:* ${onlyAdmin ? '✅ Activado' : '❌ Desactivado'}\n` +

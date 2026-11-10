@@ -1,8 +1,10 @@
 /**
  * WatermarkCommand.ts
  *
- * media command `watermark` — Marca una imagen con un logo (watermark). Responde a la imagen y adjunta el logo en el caption.
- * Usage: !watermark [posición|tile] [opacidad%] [filasxcolumnas] [nobg] (responde a imagen + adjunta logo en caption)
+ * media command `watermark` — Watermarks an image with a logo. Reply to
+ * the image and attach the logo in the caption.
+ * Usage: !watermark [position|tile] [opacity%] [rowsxcolumns] [nobg]
+ *   (reply to an image + attach the logo in the caption)
  *
  * @author **Carlos G**
  */
@@ -39,7 +41,8 @@ const POSITION_MAP: Record<string, OverlayPosition> = {
   medio: 'center',
 };
 
-/** Command handler for `!watermark`: Marca una imagen con un logo (watermark). Responde a la imagen y adjunta el logo en el caption. */
+/** Command handler for `!watermark`: Watermarks an image with a logo.
+ * Reply to the image and attach the logo in the caption. */
 export class WatermarkCommand extends Command {
   name = 'watermark';
   description =

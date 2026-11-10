@@ -1,7 +1,7 @@
 /**
  * CharacterlistCommand.ts
  *
- * VaniaBot commands module exposing `CharacterlistCommand`.
+ * OrbitBot commands module exposing `CharacterlistCommand`.
  *
  * @author **Carlos G**
  */

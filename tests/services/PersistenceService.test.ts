@@ -71,8 +71,8 @@ describe('PersistenceService', () => {
       Promise.resolve(service.addReminder(makeReminder())),
     ).resolves.toBeUndefined();
 
-    // Espera al fire-and-forget: el fallo debe capturarse y loguearse,
-    // nunca convertirse en unhandled rejection.
+    // Waits for the fire-and-forget: the failure must be caught and logged,
+    // never become an unhandled rejection.
     await vi.waitFor(() => {
       expect(mockLogError).toHaveBeenCalledWith(
         'PersistenceService.saveReminders',
@@ -94,7 +94,7 @@ describe('PersistenceService', () => {
       );
     });
 
-    // Aunque el envío falló, el recordatorio se saca del mapa (no se reintenta)
+    // Even though the send failed, the reminder is removed from the map (no retry)
     await vi.waitFor(() => {
       expect(service.getReminder('R-1')).toBeUndefined();
     });

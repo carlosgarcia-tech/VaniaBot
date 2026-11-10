@@ -1,7 +1,7 @@
 /**
  * Database.ts
  *
- * SQLite Database wrapper for VaniaBot multi-bot architecture.
+ * SQLite Database wrapper for OrbitBot multi-bot architecture.
  * Provides connection management, migrations, and query helpers.
  *
  * NO Redis dependency - SQLite as single source of truth.
@@ -18,10 +18,10 @@ import { join } from 'path';
 import { logger, logError } from '@/utils/logger.js';
 
 const DB_DIR = './storage/database';
-const DB_PATH: string = join(DB_DIR, 'vania.db');
+const DB_PATH: string = join(DB_DIR, 'orbit.db');
 
 export interface DatabaseConfig {
-  /** File path of the database; defaults to ./storage/database/vania.db. */
+  /** File path of the database; defaults to ./storage/database/orbit.db. */
   path?: string;
   /** When true, initialization fails instead of creating a missing file. */
   mustExist?: boolean;
@@ -338,9 +338,9 @@ const MIGRATIONS: Migration[] = [
   },
   {
     version: 17,
-    name: 'create_vania_toggle_table',
+    name: 'create_orbit_toggle_table',
     up: `
-      CREATE TABLE IF NOT EXISTS vania_toggle (
+      CREATE TABLE IF NOT EXISTS orbit_toggle (
         key TEXT PRIMARY KEY,
         chatJid TEXT NOT NULL,
         botId TEXT NOT NULL,
@@ -352,8 +352,8 @@ const MIGRATIONS: Migration[] = [
         createdAt INTEGER,
         updatedAt INTEGER
       );
-      CREATE INDEX IF NOT EXISTS idx_vania_toggle_chat ON vania_toggle(chatJid);
-      CREATE INDEX IF NOT EXISTS idx_vania_toggle_bot ON vania_toggle(botId);
+      CREATE INDEX IF NOT EXISTS idx_orbit_toggle_chat ON orbit_toggle(chatJid);
+      CREATE INDEX IF NOT EXISTS idx_orbit_toggle_bot ON orbit_toggle(botId);
     `,
   },
   {

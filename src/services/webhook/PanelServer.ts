@@ -1,13 +1,13 @@
 /**
  * PanelServer.ts
  *
- * VaniaBot services module exposing `PanelServer`, `PanelConfig`, `panelServer`.
+ * OrbitBot services module exposing `PanelServer`, `PanelConfig`, `panelServer`.
  *
  * @author **Carlos G**
  */
 
 /**
- * @fileoverview PanelServer.ts - Express server for VaniaBot web dashboard
+ * @fileoverview PanelServer.ts - Express server for OrbitBot web dashboard
  */
 
 import express from 'express';
@@ -159,7 +159,7 @@ export class PanelServer {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VaniaBot Panel</title>
+  <title>OrbitBot Panel</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -193,7 +193,7 @@ export class PanelServer {
 <body>
   <div class="container">
     <div class="emoji">🌸</div>
-    <h1>VaniaBot Panel</h1>
+    <h1>OrbitBot Panel</h1>
     <p>
       El servidor del panel está funcionando correctamente.<br><br>
       API endpoints disponibles:<br>
@@ -214,7 +214,7 @@ export class PanelServer {
       this.server = http.createServer(this.app);
 
       this.server.listen(this.config.port, this.config.host, () => {
-        logger.info(`🌸 VaniaBot Panel running at http://${this.config.host}:${this.config.port}`);
+        logger.info(`🌸 OrbitBot Panel running at http://${this.config.host}:${this.config.port}`);
         logger.info(`📊 API: http://${this.config.host}:${this.config.port}/api/stats`);
         resolve();
       });
@@ -235,7 +235,7 @@ export class PanelServer {
           });
           this.server.listen(this.config.port + 1, this.config.host, () => {
             logger.info(
-              `🌸 VaniaBot Panel running at http://${this.config.host}:${this.config.port + 1}`,
+              `🌸 OrbitBot Panel running at http://${this.config.host}:${this.config.port + 1}`,
             );
             resolve();
           });
@@ -250,7 +250,7 @@ export class PanelServer {
     return new Promise(resolve => {
       if (this.server) {
         this.server.close(() => {
-          logger.info('🌸 VaniaBot Panel stopped');
+          logger.info('🌸 OrbitBot Panel stopped');
           resolve();
         });
       } else {

@@ -1,7 +1,7 @@
 /**
  * NewsService.ts
  *
- * VaniaBot services module exposing `NewsService`, `newsService`.
+ * OrbitBot services module exposing `NewsService`, `newsService`.
  *
  * @author **Carlos G**
  */

@@ -97,7 +97,7 @@ export class InstagramCommand extends Command {
           thumbnail: info?.thumbnailUrl,
           author: info?.author,
         },
-        '> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
         isImage,
       );
 

@@ -40,7 +40,7 @@ const mockGetGroup = vi.fn();
 
 vi.mock('../../../src/services/system/Servicemanager.js', () => ({
   serviceManager: {
-    vaniaToggleService: {
+    orbitToggleService: {
       isAllowedForSubbot: (...args: unknown[]) => mockIsAllowedForSubbot(...args),
       isEnabled: (...args: unknown[]) => mockIsAllowedForSubbot(...args),
     },
@@ -287,16 +287,16 @@ describe('SubBotMessageHandler', () => {
       expect(execute).not.toHaveBeenCalled();
     });
 
-    it('skips bare vania-toggle commands (they belong to the main bot)', async () => {
-      const { execute } = registerCommand('vaniaon');
+    it('skips bare orbit-toggle commands (they belong to the main bot)', async () => {
+      const { execute } = registerCommand('orbiton');
 
-      await handler.handleMessage(makeMessage('.vaniaon'), sock, subConfig);
+      await handler.handleMessage(makeMessage('.orbiton'), sock, subConfig);
 
       expect(execute).not.toHaveBeenCalled();
       expect(mockIsAllowedForSubbot).not.toHaveBeenCalled();
     });
 
-    it('drops messages when the vania toggle guard denies the subbot', async () => {
+    it('drops messages when the orbit toggle guard denies the subbot', async () => {
       const { execute } = registerCommand('subping');
       mockIsAllowedForSubbot.mockResolvedValue(false);
 

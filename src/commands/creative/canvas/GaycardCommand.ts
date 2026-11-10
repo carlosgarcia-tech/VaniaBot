@@ -1,8 +1,8 @@
 /**
  * GaycardCommand.ts
  *
- * creative command `gaycard` — Genera tarjeta gay
- * Usage: !gaycard [@usuario]
+ * creative command `gaycard` — Generates a gay card
+ * Usage: !gaycard [@user]
  *
  * @author **Carlos G**
  */
@@ -27,7 +27,7 @@ function generateRank(jid: string): string {
   return String(Math.min(base + jitter, 10));
 }
 
-/** Command handler for `!gaycard`: Genera tarjeta gay. */
+/** Command handler for `!gaycard`: Generates a gay card. */
 export class GaycardCommand extends Command {
   name = 'gaycard';
   description = 'Genera tarjeta gay';

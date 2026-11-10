@@ -1,7 +1,7 @@
 /**
  * MonthlyCommand.ts
  *
- * economy command `monthly` — Recompensa mensual exclusiva
+ * economy command `monthly` — Exclusive monthly reward
  * Usage: !monthly
  *
  * @author **Carlos G**
@@ -13,7 +13,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { formatNumber } from '@/utils/helpers.js';
 
-/** Command handler for `!monthly`: Recompensa mensual exclusiva. */
+/** Command handler for `!monthly`: Exclusive monthly reward. */
 export class MonthlyCommand extends Command {
   name = 'monthly';
   description = 'Recompensa mensual exclusiva';

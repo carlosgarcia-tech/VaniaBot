@@ -149,8 +149,8 @@ export class ImageProcessor {
     this.fontPath = null;
     logger.warn(
       '[ImageProcessor] ⚠️ Sin fuente TTF.\n' +
-        '  Opción A: pon cualquier .ttf en data/assets/font.ttf\n' +
-        '  Opción B (Termux): pkg install font-dejavu',
+        '  Option A: put any .ttf at data/assets/font.ttf\n' +
+        '  Option B (Termux): pkg install font-dejavu',
     );
     return null;
   }
@@ -221,14 +221,14 @@ export class ImageProcessor {
         const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: width } });
         return Buffer.from(resvg.render().asPng());
       } catch (err) {
-        logger.warn('[ImageProcessor] resvg-js falló:', err);
+        logger.warn('[ImageProcessor] resvg-js failed:', err);
       }
     }
 
     try {
       return await this.svgToBufferCanvas(svgContent, width, height);
     } catch (err) {
-      logger.warn('[ImageProcessor] canvas SVG render falló:', err);
+      logger.warn('[ImageProcessor] canvas SVG render failed:', err);
     }
 
     throw new Error('No hay renderer SVG disponible. Ejecuta: npm install @resvg/resvg-js');
@@ -276,7 +276,7 @@ export class ImageProcessor {
       return await this.compositeTextFFmpegDrawtext(imagePath, svgContent);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      logger.warn(`[ImageProcessor] FFmpeg drawtext falló: ${msg}`);
+      logger.warn(`[ImageProcessor] FFmpeg drawtext failed: ${msg}`);
     }
 
     if (await this.isResvgAvailable()) {
@@ -290,7 +290,7 @@ export class ImageProcessor {
         return await base.getBuffer('image/png');
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        logger.warn(`[ImageProcessor] resvg+Jimp falló: ${msg}`);
+        logger.warn(`[ImageProcessor] resvg+Jimp failed: ${msg}`);
       }
     }
 
@@ -298,10 +298,10 @@ export class ImageProcessor {
       return await this.compositeTextCanvas(imagePath, svgContent);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      logger.warn(`[ImageProcessor] Canvas falló: ${msg}`);
+      logger.warn(`[ImageProcessor] Canvas failed: ${msg}`);
     }
 
-    logger.error('[ImageProcessor] Todos los métodos fallaron, enviando imagen base sin texto');
+    logger.error('[ImageProcessor] All methods failed, sending base image without text');
     return (await Jimp.read(imagePath)).getBuffer('image/png');
   }
 

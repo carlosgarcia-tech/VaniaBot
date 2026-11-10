@@ -1,7 +1,7 @@
 /**
  * CasinoCommand.ts
  *
- * economy command `casino` — Juega en el casino
+ * economy command `casino` — Play at the casino
  * Usage: !casino [juego] [apuesta]
  *
  * @author **Carlos G**
@@ -123,7 +123,7 @@ const CASINO_GAMES: CasinoGame[] = [
   },
 ];
 
-/** Command handler for `!casino`: Juega en el casino. */
+/** Command handler for `!casino`: Play at the casino. */
 export class CasinoCommand extends Command {
   name = 'casino';
   description = 'Juega en el casino';
@@ -143,7 +143,7 @@ export class CasinoCommand extends Command {
 
     if (user.isOwner) {
       await ctx.reply(
-        `🎰 *CASINO VANIA* 🎰\n\n` +
+        `🎰 *CASINO ORBIT* 🎰\n\n` +
           `👑 *Dueño del Casino*\n\n` +
           `✿ Como owner, tienes acceso\n` +
           `   especial al casino.\n\n` +
@@ -162,7 +162,7 @@ export class CasinoCommand extends Command {
 
     if (!gameArg || !betArg) {
       await ctx.reply(
-        `🎰 *CASINO VANIA* 🎰\n\n` +
+        `🎰 *CASINO ORBIT* 🎰\n\n` +
           `✿ *Cómo jugar:*\n` +
           `Elige un juego y apuesta.\n` +
           `Si ganas, duplicas (o más).\n` +

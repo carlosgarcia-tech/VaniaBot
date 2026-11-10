@@ -1,7 +1,7 @@
 /**
  * CombatService.ts
  *
- * VaniaBot services module exposing `CombatService`, `CombatResult`, `CombatLog`, `combatService`.
+ * OrbitBot services module exposing `CombatService`, `CombatResult`, `CombatLog`, `combatService`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * materials.ts
  *
- * VaniaBot services module exposing `materials`.
+ * OrbitBot services module exposing `materials`.
  *
  * @author **Carlos G**
  */

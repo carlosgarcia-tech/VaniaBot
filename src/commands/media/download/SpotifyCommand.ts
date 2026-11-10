@@ -1,7 +1,7 @@
 /**
  * SpotifyCommand.ts
  *
- * media command `spotify` — Descarga música de Spotify
+ * media command `spotify` — Downloads music from Spotify
  * Usage: !spotify <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!spotify`: Descarga música de Spotify. */
+/** Command handler for `!spotify`: Downloads music from Spotify. */
 export class SpotifyCommand extends Command {
   name = 'spotify';
   description = 'Descarga música de Spotify';

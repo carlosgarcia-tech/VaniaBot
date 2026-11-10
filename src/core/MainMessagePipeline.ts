@@ -9,7 +9,7 @@
  * 1. Synchronous filters inline in the `messages.upsert` handler
  *    (self-messages, missing payload, already-processed IDs, pre-startup
  *    offline echoes).
- * 2. Guards that may short-circuit the whole message (mute, vania toggle,
+ * 2. Guards that may short-circuit the whole message (mute, orbit toggle,
  *    antilink, quiz answers, AI mentions, PIN confirmation).
  * 3. The middleware chain plus command execution, run through
  *    RealTimeMessageProcessor so concurrency is bounded per message.
@@ -249,12 +249,12 @@ export class MainMessagePipeline {
 
   /**
    * Sequential guard chain run before command resolution. Each guard can
-   * short-circuit processing (mute, vania toggle, quiz/mention interception).
+   * short-circuit processing (mute, orbit toggle, quiz/mention interception).
    */
   private async runGuards(ctx: MessageContext, messageId: string): Promise<GuardResult> {
     if (ctx.chat.isGroup) {
       if (await this.handleMutedUser(ctx, messageId)) return GuardResult.Stop;
-      if (await this.handleVaniaToggle(ctx, messageId)) return GuardResult.Stop;
+      if (await this.handleOrbitToggle(ctx, messageId)) return GuardResult.Stop;
       if (await this.handleAntilink(ctx, messageId)) return GuardResult.Stop;
       if (!ctx.command) {
         // Buffer non-command group chatter for !resumirchat (chat summary).
@@ -366,15 +366,15 @@ export class MainMessagePipeline {
   }
 
   /**
-   * Applies the per-chat vania toggle via the shared guard in
-   * VaniaToggleService. Bare toggle commands pass through (the main bot
+   * Applies the per-chat orbit toggle via the shared guard in
+   * OrbitToggleService. Bare toggle commands pass through (the main bot
    * executes them against itself); slot-addressed toggles are swallowed
    * here (the subbot instance handles them via its own socket) and
    * everything else in a disabled chat is dropped. Returns true when the
    * message was handled (stop processing).
    */
-  private async handleVaniaToggle(ctx: MessageContext, messageId: string): Promise<boolean> {
-    const allowed = await serviceManager.vaniaToggleService.isAllowedForMain(
+  private async handleOrbitToggle(ctx: MessageContext, messageId: string): Promise<boolean> {
+    const allowed = await serviceManager.orbitToggleService.isAllowedForMain(
       ctx.chat.jid,
       ctx.command,
       ctx.args,

@@ -1,7 +1,7 @@
 /**
  * LidResolver.ts
  *
- * VaniaBot services module exposing `LidResolver`.
+ * OrbitBot services module exposing `LidResolver`.
  *
  * @author **Carlos G**
  */

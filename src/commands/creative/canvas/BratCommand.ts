@@ -1,8 +1,8 @@
 /**
  * BratCommand.ts
  *
- * creative command `brat` — Genera imagen estilo Brat
- * Usage: !brat <texto | @usuario>
+ * creative command `brat` — Generates a Brat-style image
+ * Usage: !brat <texto | @user>
  *
  * @author **Carlos G**
  */
@@ -18,7 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!brat`: Genera imagen estilo Brat. */
+/** Command handler for `!brat`: Generates a Brat-style image. */
 export class BratCommand extends Command {
   name = 'brat';
   description = 'Genera imagen estilo Brat';
@@ -27,7 +27,7 @@ export class BratCommand extends Command {
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!brat <texto | @usuario>';
-  examples = ['!brat VaniaBot', '!brat @usuario'];
+  examples = ['!brat OrbitBot', '!brat @usuario'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
@@ -46,7 +46,7 @@ export class BratCommand extends Command {
     }
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !brat <texto | @usuario>\n_Ejemplo: !brat VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !brat <texto | @usuario>\n_Ejemplo: !brat OrbitBot_');
       return;
     }
 

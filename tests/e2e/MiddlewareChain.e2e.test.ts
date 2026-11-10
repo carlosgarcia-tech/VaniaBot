@@ -1,13 +1,13 @@
 /**
  * MiddlewareChain.e2e.test.ts
  *
- * Caracterización de la cadena de middlewares con efectos observables:
- * LoggerMiddleware incrementa los contadores de comandos del usuario y del
- * grupo, y ValidationMiddleware corta la ejecución cuando el contexto no
- * aplica (cubierto en CommandContexts.e2e.test.ts).
+ * Characterization of the middleware chain via observable effects:
+ * LoggerMiddleware increments the user's and the group's command counters,
+ * and ValidationMiddleware stops execution when the context doesn't apply
+ * (covered in CommandContexts.e2e.test.ts).
  *
- * Estos contadores no tenían ninguna cobertura: son estado escrito en la
- * base a través de la cadena real de middlewares.
+ * These counters had no coverage at all: they are state written to the
+ * database through the real middleware chain.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -63,7 +63,7 @@ describe('e2e: cadena de middlewares', () => {
       const jid = senderJid(641);
 
       const { serviceManager } = await import('@/services/system/Servicemanager.js');
-      await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+      await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
       await setParticipants(socket, group, [botAdmin(), member(jid)]);
       await serviceManager.groupService.getGroup(group);
 

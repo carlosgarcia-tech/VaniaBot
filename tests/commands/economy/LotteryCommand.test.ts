@@ -78,9 +78,9 @@ vi.mock('@/utils/logger', () => ({
 }));
 
 // --- Imports under test (after mocks) ---------------------------------------
-// El comando guarda su estado a nivel de módulo (se carga del store al
-// inicializar), así que cada test re-importa el módulo tras resetear el
-// registro: es exactamente la semántica de un reinicio del proceso.
+// The command stores its state at module level (loaded from the store at
+// init time), so each test re-imports the module after resetting the
+// registry: exactly the semantics of a process restart.
 
 type LotteryCommandModule = typeof import('@/commands/economy/LotteryCommand');
 let LotteryCommand: LotteryCommandModule['LotteryCommand'];
@@ -147,7 +147,7 @@ describe('LotteryCommand', () => {
 
   beforeEach(async () => {
     users.clear();
-    backing.clear(); // estado persistido limpio en cada test
+    backing.clear(); // clean persisted state per test
     vi.clearAllMocks();
     LotteryCommand = (await importCommandModule()).LotteryCommand;
     command = new LotteryCommand();
@@ -172,7 +172,7 @@ describe('LotteryCommand', () => {
     const ctx = makeCtx({ args: ['noexiste'] });
     await command.execute(ctx);
 
-    expect(lastReply(ctx)).toContain('LOTERÍA VANIA');
+    expect(lastReply(ctx)).toContain('LOTERÍA ORBIT');
     expect(lastReply(ctx)).toContain('Cómo funciona');
     expect(lastReply(ctx)).toContain('!loteria reiniciar (owner)');
   });
@@ -188,7 +188,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('$3');
     expect(ctx.react).toHaveBeenCalledWith('🎫');
 
-    // Persistido en el store mockeado
+    // Persisted to the mocked store
     expect(rawState()['tickets']).toHaveLength(3);
     expect(rawState()['prizePool']).toBe(2400);
   });
@@ -222,12 +222,12 @@ describe('LotteryCommand', () => {
   it('compra parcial: cobra solo los tickets efectivamente entregados', async () => {
     (await mockUserService.getUser(USER)).money = 150_000;
 
-    // Comprar 10 tickets en cada iteración hasta llenar el máximo (100)
+    // Buy 10 tickets per iteration until the max (100) fills up
     for (let i = 0; i < 10; i++) {
       const ctx = makeCtx({ args: ['comprar', '10'] });
       await command.execute(ctx);
     }
-    // El pozo está lleno: quedan 0 slots
+    // The pool is full: 0 slots left
     expect(mockUserService.removeMoney).toHaveBeenCalledTimes(10);
     expect(rawState()['tickets']).toHaveLength(100);
 
@@ -331,8 +331,8 @@ describe('LotteryCommand', () => {
     const buyCtx = makeCtx({ args: ['comprar', '2'] });
     await command.execute(buyCtx);
 
-    // Simula un reinicio del proceso: re-importa el módulo desde cero. El
-    // nuevo lotteryState debe cargarse desde el store persistido.
+    // Simulates a process restart: re-imports the module from scratch. The
+    // new lotteryState must load from the persisted store.
     const fresh = await importCommandModule();
     const ctx = makeCtx({ args: ['estado'] });
     await new fresh.LotteryCommand().execute(ctx);
@@ -342,8 +342,8 @@ describe('LotteryCommand', () => {
   });
 
   it('un archivo corrupto cae a defaults en lugar de romper el comando', async () => {
-    // El JsonFileStore real resetea con defaults ante JSON inválido; el mock
-    // replica el contrato validando formas inválidas hacia defaults.
+    // The real JsonFileStore resets to defaults on invalid JSON; the mock
+    // replicates that contract by validating malformed shapes into defaults.
     backing.set(LOTTERY_FILE, { tickets: 'no-soy-un-array', prizePool: -50 });
 
     const ctx = makeCtx({ args: ['estado'] });
@@ -395,8 +395,8 @@ describe('LotteryCommand', () => {
 
     await resetAsOwner();
 
-    // Simula un reinicio del proceso: el nuevo lotteryState debe leer el
-    // estado ya reseteado desde el store persistido.
+    // Simulates a process restart: the new lotteryState must read the
+    // already-reset state from the persisted store.
     const fresh = await importCommandModule();
     const ctx = makeCtx({ args: ['estado'] });
     await new fresh.LotteryCommand().execute(ctx);

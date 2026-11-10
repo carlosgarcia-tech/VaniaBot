@@ -1,7 +1,7 @@
 /**
  * RPGCommand.ts
  *
- * rpg command `rpg` — Panel principal del sistema RPG
+ * rpg command `rpg` — Main RPG system panel
  * Usage: !rpg
  *
  * @author **Carlos G**
@@ -13,7 +13,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { itemService } from '@/services/rpg/ItemService.js';
 import { classService } from '@/services/rpg/ClassService.js';
 
-/** Command handler for `!rpg`: Panel principal del sistema RPG. */
+/** Command handler for `!rpg`: Main RPG system panel. */
 export class RPGCommand extends Command {
   name = 'rpg';
   description = 'Panel principal del sistema RPG';
@@ -36,7 +36,7 @@ export class RPGCommand extends Command {
       const userClass = user.currentClass ? classService.getClass(user.currentClass) : null;
 
       const message = `
-⚔️ *VANIABOT RPG*
+⚔️ *ORBITBOT RPG*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 👤 *${user.name}*

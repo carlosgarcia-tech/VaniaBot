@@ -1,7 +1,7 @@
 /**
  * DiceCommand.ts
  *
- * game command `dice` — Juega a los dados
+ * game command `dice` — Play dice
  * Usage: !dice <1-6> <cantidad>
  *
  * @author **Carlos G**
@@ -13,7 +13,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { validateBetAmount } from '@/utils/validators.js';
 import { config } from '@/config/index.js';
 
-/** Command handler for `!dice`: Juega a los dados. */
+/** Command handler for `!dice`: Play dice. */
 export class DiceCommand extends Command {
   name = 'dice';
   description = 'Juega a los dados';

@@ -1,14 +1,14 @@
 /**
  * PrefixParsing.e2e.test.ts
  *
- * Recorrido completo del parsing de prefijos con el bot real:
+ * Full pass through prefix parsing with the real bot:
  *
  *   messages.upsert (FakeWASocket) → matchCommandPrefix (config.prefix, '.',
- *   '!') → MessageContext.parseCommand (lowercase del nombre) → registro de
- *   comandos (nombre o alias) → middlewares → PingCommand → respuesta.
+ *   '!') → MessageContext.parseCommand (lowercased name) → command registry
+ *   (name or alias) → middlewares → PingCommand → reply.
  *
- * Casos cubiertos: prefijo punto, prefijo exclamación, alias del comando,
- * normalización a minúsculas y comando desconocido (silencio, sin 404s).
+ * Cases covered: dot prefix, bang prefix, command alias, lowercasing, and
+ * unknown command (silence, no 404s).
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -26,7 +26,7 @@ vi.mock('@/services/external/AIService.js', () => ({
 
 const TIMEOUT = 30_000;
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('e2e: parsing de prefijos y resolución de comandos', () => {
@@ -74,7 +74,7 @@ describe('e2e: parsing de prefijos y resolución de comandos', () => {
 
       const texts = socket.texts();
       expect(texts.some(t => t.startsWith('🏓 Pong!'))).toBe(true);
-      // Todo va dirigido al chat del remitente (DM)
+      // Everything goes to the sender's own chat (DM)
       expect(socket.sent.every(m => m.jid === senderJid(3))).toBe(true);
     },
     TIMEOUT,

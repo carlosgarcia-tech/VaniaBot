@@ -1,7 +1,7 @@
 /**
  * AnswerValidator.ts
  *
- * VaniaBot services module exposing `AnswerValidator`, `answerValidator`.
+ * OrbitBot services module exposing `AnswerValidator`, `answerValidator`.
  *
  * @author **Carlos G**
  */

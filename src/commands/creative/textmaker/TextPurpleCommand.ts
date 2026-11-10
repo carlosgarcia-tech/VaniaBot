@@ -1,7 +1,7 @@
 /**
  * TextPurpleCommand.ts
  *
- * creative command `purple` — Crea un efecto de texto morado
+ * creative command `purple` — Creates a purple text effect
  * Usage: !purple <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/purple-text-effect-online-100.html';
 
-/** Command handler for `!purple`: Crea un efecto de texto morado. */
+/** Command handler for `!purple`: Creates a purple text effect. */
 export class TextPurpleCommand extends Command {
   name = 'purple';
   description = 'Crea un efecto de texto morado';
@@ -27,14 +27,14 @@ export class TextPurpleCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!purple <texto>';
-  examples = ['!purple VaniaBot'];
+  examples = ['!purple OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !purple <texto>\n_Ejemplo: !purple VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !purple <texto>\n_Ejemplo: !purple OrbitBot_');
       return;
     }
 

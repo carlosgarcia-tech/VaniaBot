@@ -1,8 +1,8 @@
 /**
  * GitHubSearchCommand.ts
  *
- * media command `githubsearch` — Buscar repositorios en GitHub
- * Usage: !githubsearch <búsqueda>
+ * media command `githubsearch` — Search repositories on GitHub
+ * Usage: !githubsearch <query>
  *
  * @author **Carlos G**
  */
@@ -22,7 +22,7 @@ const formatDate = (dateStr: string): string => {
   });
 };
 
-/** Command handler for `!githubsearch`: Buscar repositorios en GitHub. */
+/** Command handler for `!githubsearch`: Search repositories on GitHub. */
 export class GitHubSearchCommand extends Command {
   name = 'githubsearch';
   description = 'Buscar repositorios en GitHub';

@@ -51,7 +51,7 @@ export class WorkCommand extends Command {
       await achievementService.trackWork(ctx.sender.jid);
       await achievementService.checkLevelAchievements(ctx.sender.jid);
     } catch (error) {
-      // El pago del trabajo ya se hizo: los logros son secundarios.
+      // The work payment already went through: achievements are secondary.
       logError(`[WorkCommand] Achievement tracking failed for ${ctx.sender.jid}`, error);
     }
 

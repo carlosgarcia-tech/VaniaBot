@@ -2,7 +2,7 @@
  * ToAnimeCommand.ts
  *
  * media command `toanime` — Convertir imagen a estilo anime
- * Usage: !toanime (responde a imagen)
+ * Usage: !toanime (reply to an image)
  *
  * @author **Carlos G**
  */

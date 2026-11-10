@@ -1,8 +1,8 @@
 /**
  * SleepCommand.ts
  *
- * fun command `sleep` — Dormir
- * Usage: !sleep [@usuario]
+ * fun command `sleep` — Sleep
+ * Usage: !sleep [@user]
  *
  * @author **Carlos G**
  */
@@ -24,7 +24,7 @@ const SLEEP_VIDEOS = [
   'https://telegra.ph/file/6b8e6cc26de052d4018ba.mp4',
 ];
 
-/** Command handler for `!sleep`: Dormir. */
+/** Command handler for `!sleep`: Sleep. */
 export class SleepCommand extends Command {
   name = 'sleep';
   description = 'Dormir';

@@ -2,8 +2,8 @@
 # entrypoint.sh
 set -e
 
-if [ -d "/app/vaniasession" ] && [ ! -w "/app/vaniasession" ]; then
-  echo "⚠️  Corrigiendo permisos de vaniasession..."
+if [ -d "/app/orbitsession" ] && [ ! -w "/app/orbitsession" ]; then
+  echo "⚠️  Fixing orbitsession permissions..."
 fi
 
 exec "$@"

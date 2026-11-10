@@ -102,7 +102,7 @@ export class SubBotCommand extends Command {
     const maxSlots = subBotDatabase.getMaxSlots();
 
     let helpText =
-      `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
       `   *Sistema de SubBots*\n` +
       `   ${usedSlots}/${maxSlots} slots en uso\n` +
       `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
@@ -149,7 +149,7 @@ export class SubBotCommand extends Command {
 
     if (!phone) {
       await ctx.reply(
-        `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
           `   *Solicitar SubBot*\n` +
           `\n` +
           `💝 Vincula tu número\n` +
@@ -200,7 +200,7 @@ export class SubBotCommand extends Command {
       const { slot } = result;
 
       await ctx.reply(
-        `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
           `   *Slot #${slot.slot} reservado*\n` +
           `\n` +
           `💝 Tu *pairing code*\n` +
@@ -267,7 +267,7 @@ export class SubBotCommand extends Command {
       );
 
       await ctx.reply(
-        `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
           `   *Slot #${result.slot.slot} reservado*\n` +
           `\n` +
           `💝 Tu *pairing code*\n` +
@@ -329,7 +329,7 @@ export class SubBotCommand extends Command {
     const { emoji, label } = formatSlotStatus(slot.status);
 
     let info =
-      `╭━━━ 🌸 *VaniaBot* ━━━╮\n` + `   *Slot #${slot.slot}*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
+      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` + `   *Slot #${slot.slot}*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
 
     info += `${emoji} Estado: *${label}*\n\n`;
 
@@ -428,7 +428,7 @@ export class SubBotsCommand extends Command {
     const usedSlots = slots.filter(s => s.status !== 'free').length;
 
     let text =
-      `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
       `   *Slots SubBot*\n` +
       `   ${usedSlots}/${maxSlots} en uso\n` +
       `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
@@ -487,7 +487,7 @@ export class SubBotOffCommand extends Command {
 
 export class DelBotCommand extends Command {
   name = 'delbot';
-  description = 'Delete your VaniaBot subbot';
+  description = 'Delete your OrbitBot subbot';
   category = CommandCategory.SUBBOT;
   aliases = ['removebot', 'unserbot'];
   usage = '.delbot';
@@ -506,7 +506,7 @@ export class DelBotCommand extends Command {
     }
 
     if (slots.length > 1) {
-      let text = `╭━━━ 🌸 *VaniaBot* ━━━╮\n` + `   *Tus SubBots*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
+      let text = `╭━━━ 🌸 *OrbitBot* ━━━╮\n` + `   *Tus SubBots*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
 
       for (const slot of slots) {
         const { emoji, label } = formatSlotStatus(slot.status);
@@ -523,7 +523,7 @@ export class DelBotCommand extends Command {
     try {
       await subBotManager.deleteSubBot(ctx.sender.jid, slot.slot);
       await ctx.reply(
-        `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
           `   *SubBot eliminada*\n` +
           `\n` +
           `Tu subbot del slot #${slot.slot}\n` +
@@ -559,7 +559,7 @@ export class StatusBotCommand extends Command {
       return;
     }
 
-    let text = `╭━━━ 🌸 *VaniaBot* ━━━╮\n` + `   *Tus SubBots*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
+    let text = `╭━━━ 🌸 *OrbitBot* ━━━╮\n` + `   *Tus SubBots*\n` + `╰━━━━━━━━━━━━━━━━━━━━╯\n\n`;
 
     for (const slot of slots) {
       const { emoji, label } = formatSlotStatus(slot.status);

@@ -1,7 +1,7 @@
 /**
  * RandomCommand.ts
  *
- * fun command `random` — Genera un número, emoji o dato aleatorio
+ * fun command `random` — Generates a random number, emoji or fact
  * Usage: !random <num|emoji|dato|coin>
  *
  * @author **Carlos G**
@@ -15,7 +15,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!random`: Genera un número, emoji o dato aleatorio. */
+/** Command handler for `!random`: Generates a random number, emoji or fact. */
 export class RandomCommand extends Command {
   name = 'random';
   description = 'Genera un número, emoji o dato aleatorio';

@@ -100,7 +100,7 @@ export class TiktokCommand extends Command {
           thumbnail: info?.thumbnailUrl,
           duration: info?.duration,
         },
-        '\n> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '\n> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
         quality,
       );
 

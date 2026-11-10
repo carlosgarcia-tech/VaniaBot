@@ -1,7 +1,7 @@
 /**
  * PayRandomCommand.ts
  *
- * economy command `payrandom` — Envía una cantidad aleatoria a un usuario aleatorio (Solo Owner)
+ * economy command `payrandom` — Sends a random amount to a random user (owner only)
  * Usage: !payrandom <cantidad>
  *
  * @author **Carlos G**
@@ -14,7 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!payrandom`: Envía una cantidad aleatoria a un usuario aleatorio (Solo Owner). */
+/** Command handler for `!payrandom`: Sends a random amount to a random user (owner only). */
 export class PayRandomCommand extends Command {
   name = 'payrandom';
   description = 'Envía una cantidad aleatoria a un usuario aleatorio (Solo Owner)';
@@ -76,10 +76,10 @@ export class PayRandomCommand extends Command {
           `💰 *Cantidad:* $${formatNumber(amount)}\n\n` +
           `✨ *Te lo envía:* ${sender.name}\n\n` +
           `🎉 *¡Felicidades!*\n\n` +
-          `> _*VaniaBot💝*_`,
+          `> _*OrbitBot💝*_`,
       });
     } catch (error) {
-      // El pago ya se hizo: solo falla el aviso al receptor. Queda registrado.
+      // The payment already went through: only the payee notice fails. It is still logged.
       logError(`[PayRandomCommand] Could not notify winner ${randomUser.jid}`, error);
     }
   }

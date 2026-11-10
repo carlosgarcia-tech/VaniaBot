@@ -1,5 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*", "vania.ts"],
+  "include": ["src/**/*", "orbit.ts"],
   "exclude": ["node_modules", "dist"]
 }

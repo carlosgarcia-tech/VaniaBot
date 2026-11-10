@@ -1,7 +1,7 @@
 /**
- * VaniaToggleService.ts
+ * OrbitToggleService.ts
  *
- * Per-chat, per-bot enable/disable gate for the "Vania" (bot active) state.
+ * Per-chat, per-bot enable/disable gate for the "Orbit" (bot active) state.
  *
  * Each bot — the main one plus every sub-bot slot — is toggled independently
  * within a chat, keyed by `${chatJid}|${botId}`. A chat that has never been
@@ -17,7 +17,7 @@
 
 import type { IDatabase } from '../database/Database';
 import { normalizeJid } from '../PermissionService.js';
-import { VANIA_TOGGLE_COMMANDS } from '@/config/index.js';
+import { ORBIT_TOGGLE_COMMANDS } from '@/config/index.js';
 import { logError } from '@/utils/logger.js';
 
 /** Stored toggle state, including who enabled/disabled it and when. */
@@ -32,9 +32,9 @@ export interface ToggleRecord {
   disabledAt: number;
 }
 
-export class VaniaToggleService {
+export class OrbitToggleService {
   private db!: IDatabase;
-  private readonly COLLECTION = 'vania_toggle';
+  private readonly COLLECTION = 'orbit_toggle';
 
   /** Injected by ServiceManager during startup. */
   setDatabase(db: IDatabase): void {
@@ -72,10 +72,10 @@ export class VaniaToggleService {
    * runs it for every group message (command or not) before the middleware
    * chain, which no longer repeats the check.
    *
-   * Toggle commands (`vaniaon/off/status`) are routed here:
+   * Toggle commands (`orbiton/off/status`) are routed here:
    * - Bare (or non-numeric/<=0 slot) toggles pass through so the main bot
    *   executes them against itself.
-   * - Slot-addressed toggles (`!vaniaon 2`) are swallowed: the subbot
+   * - Slot-addressed toggles (`!orbiton 2`) are swallowed: the subbot
    *   instance receives the same group message through its own socket and
    *   handles its own toggle.
    *
@@ -84,7 +84,7 @@ export class VaniaToggleService {
    * every group; commands will surface their own DB errors anyway).
    */
   async isAllowedForMain(chatJid: string, command: string, args: string[] = []): Promise<boolean> {
-    if (VANIA_TOGGLE_COMMANDS.includes(command)) {
+    if (ORBIT_TOGGLE_COMMANDS.includes(command)) {
       return !this.hasValidSlotArg(args);
     }
     return this.checkEnabled(chatJid, 'main');
@@ -104,7 +104,7 @@ export class VaniaToggleService {
    * chain, which no longer repeats the check.
    */
   async isAllowedForSubbot(chatJid: string, botId: string, command: string): Promise<boolean> {
-    if (VANIA_TOGGLE_COMMANDS.includes(command)) {
+    if (ORBIT_TOGGLE_COMMANDS.includes(command)) {
       return true;
     }
     return this.checkEnabled(chatJid, botId);
@@ -122,7 +122,7 @@ export class VaniaToggleService {
     try {
       return await this.isEnabled(chatJid, botId);
     } catch (error) {
-      logError('[VaniaToggleService] guard', error);
+      logError('[OrbitToggleService] guard', error);
       return true;
     }
   }

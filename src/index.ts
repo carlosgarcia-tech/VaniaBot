@@ -100,7 +100,7 @@ process.on('unhandledRejection', reason => {
 
 main().catch(error => {
   logError('main', error);
-  // Fatal startup error: exit non-zero so the vania.ts supervisor restarts us.
+  // Fatal startup error: exit non-zero so the orbit.ts supervisor restarts us.
   // Staying alive here would leave a zombie bot with no connection and no panel.
   void logger.flush().finally(() => {
     process.exit(1);

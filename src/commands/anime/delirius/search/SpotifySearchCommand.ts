@@ -1,7 +1,7 @@
 /**
  * SpotifySearchCommand.ts
  *
- * anime command `spotifysrc` — Busca canciones en Spotify
+ * anime command `spotifysrc` — Searches songs on Spotify
  * Usage: !spotify <busqueda>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!spotifysrc`: Busca canciones en Spotify. */
+/** Command handler for `!spotifysrc`: Searches songs on Spotify. */
 export class SpotifySearchCommand extends Command {
   name = 'spotifysrc';
   description = 'Busca canciones en Spotify';

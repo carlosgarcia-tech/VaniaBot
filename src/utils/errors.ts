@@ -216,7 +216,7 @@ export class NotAdminError extends VBotError {
 
 export class InvalidURLError extends VBotError {
   constructor(url: string, reason?: string) {
-    super(`URL inválida: ${url}${reason ? ` - ${reason}` : ''}`, ErrorCode.INVALID_URL, true, {
+    super(`Invalid URL: ${url}${reason ? ` - ${reason}` : ''}`, ErrorCode.INVALID_URL, true, {
       url,
       reason,
     });
@@ -226,7 +226,7 @@ export class InvalidURLError extends VBotError {
 
 export class InvalidInputError extends VBotError {
   constructor(input: string, expected: string) {
-    super(`Input inválido: '${input}' - esperado: ${expected}`, ErrorCode.INVALID_INPUT, true, {
+    super(`Invalid input: '${input}' - expected: ${expected}`, ErrorCode.INVALID_INPUT, true, {
       input,
       expected,
     });
@@ -255,7 +255,7 @@ export class AuthError extends VBotError {
  */
 export class SessionExpiredError extends AuthError {
   constructor() {
-    super('Sesión expirada', { requiresReauth: true });
+    super('Session expired', { requiresReauth: true });
     this.name = 'SessionExpiredError';
   }
 }

@@ -1,7 +1,7 @@
 /**
  * AvatarRandomCommand.ts
  *
- * anime command `avatarrandom` — Obtiene un avatar aleatorio con estilo
+ * anime command `avatarrandom` — Gets a random styled avatar
  * Usage: !avatarrandom [estilo]
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!avatarrandom`: Obtiene un avatar aleatorio con estilo. */
+/** Command handler for `!avatarrandom`: Gets a random styled avatar. */
 export class AvatarRandomCommand extends Command {
   name = 'avatarrandom';
   description = 'Obtiene un avatar aleatorio con estilo';

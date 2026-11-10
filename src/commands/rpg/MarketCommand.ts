@@ -1,7 +1,7 @@
 /**
  * MarketCommand.ts
  *
- * rpg command `market` — Ver el mercado de items
+ * rpg command `market` — View the item market
  * Usage: !market [pagina] | !market my
  *
  * @author **Carlos G**
@@ -11,7 +11,7 @@ import { Command } from '../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { tradeService } from '@/services/rpg/TradeService.js';
 
-/** Command handler for `!market`: Ver el mercado de items. */
+/** Command handler for `!market`: View the item market. */
 export class MarketCommand extends Command {
   name = 'market';
   description = 'Ver el mercado de items';

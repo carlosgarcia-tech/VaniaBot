@@ -1,19 +1,20 @@
 /**
  * GroupAntiSpam.e2e.test.ts
  *
- * AntiSpamMiddleware sobre el bot real: el moderador por grupo de
- * GroupService (10 mensajes / 60 s por usuario, escalado en tres avisos).
+ * AntiSpamMiddleware against the real bot: the per-group moderator of
+ * GroupService (10 messages / 60 s per user, escalating across three
+ * warnings).
  *
- *   - 1er exceso → "⚠️ *Advertencia:* No hagas spam".
- *   - 2º exceso  → "⚠️ *Última advertencia:* Deja de hacer spam o serás expulsado".
- *   - 3er exceso → con el bot admin: expulsión vía groupParticipantsUpdate;
- *                  sin admin: aviso de que no se puede expulsar.
+ *   - 1st excess → "⚠️ *Advertencia:* No hagas spam".
+ *   - 2nd excess → "⚠️ *Última advertencia:* Deja de hacer spam o serás expulsado".
+ *   - 3rd excess → with the bot as admin: removal via groupParticipantsUpdate;
+ *                  without admin: warning that it can't remove.
  *
- * El contador del middleware es por usuario, así que los mensajes van
- * espaciados 1.2 s de reloj para no chocar antes con el límite por segundo
- * de AntiSpamService. El cooldown de !ping no interfiere: AntiSpamMiddleware
- * corre antes que CooldownMiddleware, así que cuenta el mensaje aunque luego
- * el comando no se ejecute.
+ * The middleware's counter is per user, so messages are spaced 1.2 s of wall
+ * clock apart to avoid tripping the per-second limit of AntiSpamService
+ * first. The !ping cooldown doesn't interfere: AntiSpamMiddleware runs
+ * before CooldownMiddleware, so it counts the message even if the command
+ * then doesn't execute.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
@@ -36,13 +37,13 @@ const WARNING_1 = '⚠️ *Advertencia:* No hagas spam';
 const WARNING_2 = '⚠️ *Última advertencia:* Deja de hacer spam o serás expulsado';
 const WARNING_3_NO_ADMIN = '❌ Spam detectado. Serías expulsado si el bot fuera administrador.';
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
- * Envía `count` mensajes del mismo remitente con ~1.2 s de reloj entre ellos
- * (ventana de un minuto del moderador, por encima del límite por segundo) y
- * devuelve los textos enviados.
+ * Sends `count` messages from the same sender with ~1.2 s of wall clock
+ * between them (inside the moderator's one-minute window, above the
+ * per-second limit) and returns the texts sent.
  */
 async function spamFrom(
   socket: BootState['socket'],
@@ -65,16 +66,16 @@ describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
   let groupCounter = 0;
 
   /**
-   * Grupo nuevo por test: el límite de carga del grupo (30/min, compartido
-   * en todo el proceso) cortaría los mensajes antes de llegar al moderador si
-   * se reutilizara el mismo grupo entre casos.
+   * Fresh group per test: the group load limit (30/min, shared across the
+   * whole process) would cut the messages before reaching the moderator if
+   * the same group were reused across cases.
    */
   async function freshGroup(): Promise<string> {
     groupCounter++;
     const group = `1203630333333333${String(groupCounter).padStart(2, '0')}@g.us`;
 
     const { serviceManager } = await import('@/services/system/Servicemanager.js');
-    await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+    await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
 
     return group;
   }
@@ -100,7 +101,7 @@ describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
       const texts = await spamFrom(socket, group, senderJid(1), 11);
 
       expect(texts).toContain(WARNING_1);
-      // Los 10 primeros no generan ningún aviso.
+      // The first 10 produce no warning.
       expect(texts.filter(t => t.startsWith('⚠️'))).toHaveLength(1);
     },
     TIMEOUT,
@@ -162,8 +163,8 @@ describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
       await spamFrom(socket, group, first, 12);
       socket.reset();
 
-      // El segundo usuario empieza con su contador limpio: 10 mensajes sin
-      // avisos y el undécimo ya le avisa (a él, no una repetición del primero).
+      // The second user starts with a clean counter: 10 messages with no
+      // warnings, and the eleventh warns him (him, not a repeat of the first).
       const texts = await spamFrom(socket, group, second, 11);
 
       expect(texts.filter(t => t === WARNING_1)).toHaveLength(1);

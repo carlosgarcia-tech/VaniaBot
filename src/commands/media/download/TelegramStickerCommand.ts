@@ -1,7 +1,7 @@
 /**
  * TelegramStickerCommand.ts
  *
- * media command `telegramsticker` — Descarga sticker de Telegram
+ * media command `telegramsticker` — Downloads a Telegram sticker
  * Usage: !telegramsticker <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!telegramsticker`: Descarga sticker de Telegram. */
+/** Command handler for `!telegramsticker`: Downloads a Telegram sticker. */
 export class TelegramStickerCommand extends Command {
   name = 'telegramsticker';
   description = 'Descarga sticker de Telegram';

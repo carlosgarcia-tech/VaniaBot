@@ -1,7 +1,7 @@
 /**
  * NhentaiCommand.ts
  *
- * VaniaBot commands module exposing `NhentaiCommand`.
+ * OrbitBot commands module exposing `NhentaiCommand`.
  *
  * @author **Carlos G**
  */

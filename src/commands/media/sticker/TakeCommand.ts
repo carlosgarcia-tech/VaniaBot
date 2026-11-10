@@ -20,7 +20,7 @@ export class TakeCommand extends Command {
   category = CommandCategory.MEDIA;
   aliases = ['tomar', 'robarsticker'];
   usage = '!take <packname>|<author>';
-  examples = ['!take VaniaBot|Carlos', '!take MyPack|MyName'];
+  examples = ['!take OrbitBot|Carlos', '!take MyPack|MyName'];
   cooldown = 3000;
 
   private stickerService: StickerService;
@@ -41,8 +41,8 @@ export class TakeCommand extends Command {
     }
 
     const text = ctx.args.join(' ');
-    const [packname = 'VaniaBot', ...authorParts] = text.split('|');
-    const author = authorParts.join('|') || 'VaniaBot';
+    const [packname = 'OrbitBot', ...authorParts] = text.split('|');
+    const author = authorParts.join('|') || 'OrbitBot';
 
     await ctx.react('⏳');
 

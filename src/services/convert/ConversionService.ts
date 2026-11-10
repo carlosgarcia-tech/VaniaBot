@@ -1,7 +1,7 @@
 /**
  * ConversionService.ts
  *
- * VaniaBot services module exposing `ConversionService`.
+ * OrbitBot services module exposing `ConversionService`.
  *
  * @author **Carlos G**
  */

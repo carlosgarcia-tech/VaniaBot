@@ -1,7 +1,7 @@
 /**
  * MangaSearchCommand.ts
  *
- * anime command `mangasearch` — Busca manga
+ * anime command `mangasearch` — Searches manga
  * Usage: !mangasearch <manga>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!mangasearch`: Busca manga. */
+/** Command handler for `!mangasearch`: Searches manga. */
 export class MangaSearchCommand extends Command {
   name = 'mangasearch';
   description = 'Busca manga';

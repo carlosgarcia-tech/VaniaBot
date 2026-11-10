@@ -67,7 +67,7 @@ const {
     mockValidatePhoneNumber: vi.fn((phone: string) => phone),
     mockClearSessionFiles: vi.fn(() => 0),
     mockConfig: {
-      sessionPath: '/tmp/vaniabot-auth-test-session',
+      sessionPath: '/tmp/orbit-auth-test-session',
       auth: {
         usePairingCode: false,
         phoneNumber: undefined as string | undefined,
@@ -112,10 +112,10 @@ vi.mock('../../src/core/WASocketFactory.js', () => ({
   buildWASocketOptions: (opts: unknown) => opts,
   createCacheableKeyStore: (keys: unknown) => keys,
   WA_BROWSER_PAIRING: ['WhatsApp', 'Chrome', '10.15.3'],
-  WA_BROWSER_QR: ['VaniaBot', 'Chrome', '10.15.3'],
+  WA_BROWSER_QR: ['OrbitBot', 'Chrome', '10.15.3'],
   createWASocket: (opts?: { auth?: { creds?: { registered?: boolean } } }) => {
-    // El socket mock hereda el flag de registro del auth state que AuthManager
-    // le pasa (igual que hace el createWASocket real de Baileys)
+    // The mock socket inherits the registration flag from the auth state
+    // AuthManager passes it (same as Baileys' real createWASocket does)
     const registered = Boolean(opts?.auth?.creds?.registered);
     const sock = makeMockSock(registered);
     createdSockets.push(sock);
@@ -144,8 +144,8 @@ import {
 } from '../../src/core/WADisconnectPolicy.js';
 import { DisconnectReason } from 'baileys';
 
-// AuthManager llama process.send('ready') al conectar; dentro del worker de
-// vitest eso corrompe el canal IPC del runner. Se neutraliza durante el run.
+// AuthManager calls process.send('ready') on connect; inside the vitest
+// worker that corrupts the runner's IPC channel. Neutralized for the run.
 const originalProcessSend = process.send;
 process.send = undefined;
 afterAll(() => {
@@ -187,8 +187,8 @@ describe('WADisconnectPolicy (política de reconexión compartida)', () => {
       expect(classifyDisconnect(DisconnectReason.restartRequired)).toBe('restartRequired');
       expect(classifyDisconnect(515)).toBe('restartRequired');
       expect(classifyDisconnect(DisconnectReason.timedOut)).toBe('timedOut');
-      // En esta versión de Baileys connectionLost == 408 (mismo código que
-      // timedOut), así que classifyDisconnect lo reporta como timedOut
+      // In this Baileys version connectionLost == 408 (same code as
+      // timedOut), so classifyDisconnect reports it as timedOut
       expect(classifyDisconnect(DisconnectReason.connectionLost)).toBe('timedOut');
       expect(classifyDisconnect(DisconnectReason.connectionClosed)).toBe('network');
       expect(classifyDisconnect(502)).toBe('network');
@@ -245,7 +245,7 @@ describe('WADisconnectPolicy (política de reconexión compartida)', () => {
         typeof import('../../src/core/WADisconnectPolicy.js')
       >('../../src/core/WADisconnectPolicy.js');
 
-      const dir = mkdtempSync(join(tmpdir(), 'vania-session-'));
+      const dir = mkdtempSync(join(tmpdir(), 'orbit-session-'));
       try {
         writeFileSync(join(dir, 'creds.json'), '{}');
         writeFileSync(join(dir, 'session-1.json'), '{}');
@@ -253,9 +253,9 @@ describe('WADisconnectPolicy (política de reconexión compartida)', () => {
 
         expect(clearSessionFiles(dir)).toBe(3);
         expect(readdirSync(dir)).toEqual([]);
-        // Directorio existente pero vacío
+        // Existing but empty directory
         expect(clearSessionFiles(dir)).toBe(0);
-        // Directorio inexistente
+        // Nonexistent directory
         expect(clearSessionFiles(join(dir, 'no-existe'))).toBe(0);
       } finally {
         rmSync(dir, { recursive: true, force: true });
@@ -276,7 +276,7 @@ describe('AuthManager', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
-    tempSessionDir = mkdtempSync(join(tmpdir(), 'vania-auth-session-'));
+    tempSessionDir = mkdtempSync(join(tmpdir(), 'orbit-auth-session-'));
     mockConfig.sessionPath = tempSessionDir;
     mockConfig.auth.usePairingCode = false;
     mockConfig.auth.phoneNumber = undefined;
@@ -323,11 +323,11 @@ describe('AuthManager', () => {
 
     expect(manager.isConnected()).toBe(true);
 
-    // Ping cada 15s
+    // Ping every 15s
     await vi.advanceTimersByTimeAsync(15_000);
     expect(sock.sendPresenceUpdate).toHaveBeenCalledWith('available', 'status@broadcast');
 
-    // Health check: socket vivo (readyState 1 + user) → sigue conectado
+    // Health check: live socket (readyState 1 + user) → stays connected
     await vi.advanceTimersByTimeAsync(60_000);
     expect(manager.isConnected()).toBe(true);
   });
@@ -348,7 +348,7 @@ describe('AuthManager', () => {
     await flush();
     expect(manager.isConnected()).toBe(false);
 
-    // Primer intento: delay inicial de 1s
+    // First attempt: 1s initial delay
     await vi.advanceTimersByTimeAsync(999);
     expect(recreateMock).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(1);
@@ -405,14 +405,14 @@ describe('AuthManager', () => {
     });
     await flush();
 
-    // A los 1s y 3s todavía no hubo intento (la espera del 515 es de 3s y
-    // luego la reconexión agendada usa su propio delay de 1s)
+    // At 1s and 3s there was still no attempt (the 515 wait is 3s and then
+    // the scheduled reconnection uses its own 1s delay)
     await vi.advanceTimersByTimeAsync(1000);
     expect(recreateMock).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(2000);
     expect(recreateMock).not.toHaveBeenCalled();
 
-    // 3s (espera del 515) + 1s (delay de reconexión) = 4s
+    // 3s (515 wait) + 1s (reconnect delay) = 4s
     await vi.advanceTimersByTimeAsync(1000);
     expect(recreateMock).toHaveBeenCalledTimes(1);
   });
@@ -484,7 +484,7 @@ describe('AuthManager', () => {
     await flush();
     expect(manager.isConnected()).toBe(true);
 
-    // El socket se queda half-open/closed sin evento close
+    // The socket stays half-open/closed with no close event
     sock.ws.readyState = 3;
 
     await vi.advanceTimersByTimeAsync(60_000);
@@ -513,7 +513,7 @@ describe('AuthManager', () => {
     await vi.advanceTimersByTimeAsync(1000);
     expect(failingRecreate).toHaveBeenCalledTimes(1);
 
-    // El fallo reagenda la reconexión con backoff (1.5s)
+    // The failure re-schedules the reconnection with backoff (1.5s)
     await vi.advanceTimersByTimeAsync(1500);
     expect(failingRecreate).toHaveBeenCalledTimes(2);
   });
@@ -530,7 +530,7 @@ describe('AuthManager', () => {
     expect(mockDisplayQR).toHaveBeenCalledTimes(10);
     expect(mockClearSessionFiles).not.toHaveBeenCalled();
 
-    // QR #11: demasiados intentos → limpiar + reconectar
+    // QR #11: too many attempts → reset + reconnect
     emitConnection(sock, { qr: 'qr-payload-11' });
     await flush();
     expect(mockDisplayQR).toHaveBeenCalledTimes(10);

@@ -1,7 +1,7 @@
 /**
  * ConverterService.ts
  *
- * VaniaBot services module exposing `ConverterService`, `normalizeFormat`, `getFormatMime`, `getFormatExt`.
+ * OrbitBot services module exposing `ConverterService`, `normalizeFormat`, `getFormatMime`, `getFormatExt`.
  *
  * @author **Carlos G**
  */
@@ -89,10 +89,10 @@ function overlayCoords(position: OverlayPosition, padding: number): { x: string;
 }
 
 /**
- * Samplea las 4 esquinas del logo para determinar si tiene un fondo sólido
- * blanco o negro (caso típico de logos exportados sin transparencia).
- * Si el logo ya tiene transparencia real, o las esquinas no son uniformes,
- * devuelve 'none' y no se toca nada.
+ * Samples the 4 corners of the logo to determine whether it has a solid
+ * white or black background (typical for logos exported without transparency).
+ * If the logo already has real transparency, or the corners are not uniform,
+ * returns 'none' and nothing is touched.
  */
 async function detectBackgroundColor(buffer: Buffer): Promise<'white' | 'black' | 'none'> {
   try {
@@ -386,14 +386,14 @@ export class ConverterService {
   }
 
   /**
-   * Superpone `logo` sobre `background`.
+   * Superimposes `logo` over `background`.
    *
-   * @param options.mode          'single' (default) coloca un solo logo. 'tile' lo repite
-   *                              en una grilla por toda la imagen.
-   * @param options.tileRows/tileCols  tamaño de la grilla en modo 'tile' (default 3x3).
-   * @param options.opacity       0 a 1 (default 0.85 en 'single', 0.35 en 'tile').
-   * @param options.removeBackground  'auto' (default) detecta y quita fondo blanco/negro sólido,
-   *                                  'white' | 'black' fuerzan ese color, 'none' lo desactiva.
+   * @param options.mode          'single' (default) places one logo. 'tile' repeats it
+   *                              in a grid across the whole image.
+   * @param options.tileRows/tileCols  grid size in 'tile' mode (default 3x3).
+   * @param options.opacity       0 to 1 (default 0.85 in 'single', 0.35 in 'tile').
+   * @param options.removeBackground  'auto' (default) detects and removes a solid white/black background;
+   *                                  'white' | 'black' force that color, 'none' disables it.
    */
   async overlayImage(
     background: Buffer,
@@ -567,11 +567,11 @@ export class ConverterService {
   }
 
   /**
-   * Repite el logo en una grilla (rows x cols) por toda la imagen usando ffmpeg.
-   * Procesa el logo UNA vez (resize + colorkey + opacidad) y lo duplica con
-   * `split` para poder pegarlo en cada celda de la grilla con `overlay` encadenados.
-   * Las posiciones usan fracciones de W/H (resueltas por ffmpeg), así que no
-   * hace falta conocer el tamaño real del fondo desde JS.
+   * Repeats the logo in a (rows x cols) grid across the whole image using ffmpeg.
+   * Processes the logo ONCE (resize + colorkey + opacity) and duplicates it with
+   * `split` so it can be pasted into every grid cell via chained `overlay` filters.
+   * Positions use W/H fractions (resolved by ffmpeg), so JS does not
+   * need to know the actual background size.
    */
   private async ffmpegTileOverlay(
     background: Buffer,
@@ -637,8 +637,8 @@ export class ConverterService {
   }
 
   /**
-   * Fallback sin ffmpeg: procesa el logo una vez (resize + key + opacidad) y lo
-   * pega repetidas veces en una grilla usando las dimensiones reales del fondo.
+   * Fallback without ffmpeg: processes the logo once (resize + key + opacity) and
+   * pastes it repeatedly in a grid using the background's real dimensions.
    */
   private async jimpTileOverlay(
     background: Buffer,
@@ -677,9 +677,9 @@ export class ConverterService {
   }
 
   /**
-   * Recorre los píxeles del logo (ya redimensionado) y:
-   *  1. Pone alpha=0 en los píxeles que coincidan con el fondo sólido a remover.
-   *  2. Multiplica el alpha restante por `opacity` para bajar la opacidad general.
+   * Walks the pixels of the logo (already resized) and:
+   *  1. Sets alpha=0 on pixels matching the solid background being removed.
+   *  2. Multiplies the remaining alpha by `opacity` to lower the overall opacity.
    */
   private applyBackgroundKeyAndOpacity(
     image: { bitmap: { data: Buffer; width: number; height: number } },

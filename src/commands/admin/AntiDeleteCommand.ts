@@ -1,7 +1,7 @@
 /**
  * AntiDeleteCommand.ts
  *
- * admin command `antidelete` — Activar/desactivar sistema anti-delete
+ * admin command `antidelete` — Enable/disable the anti-delete system
  * Usage: !antidelete [on|off|status]
  *
  * @author **Carlos G**
@@ -16,7 +16,7 @@ import {
 } from '@/types/index.js';
 import { antiDeleteService } from '@/services/system/AntiDeleteService.js';
 
-/** Command handler for `!antidelete`: Activar/desactivar sistema anti-delete. */
+/** Command handler for `!antidelete`: Enable/disable the anti-delete system. */
 export class AntiDeleteCommand extends Command {
   name = 'antidelete';
   description = 'Activar/desactivar sistema anti-delete';

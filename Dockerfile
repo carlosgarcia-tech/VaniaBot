@@ -16,7 +16,7 @@ RUN npm ci
 
 FROM node:20-bookworm-slim AS runner
 
-LABEL org.opencontainers.image.title="VaniaBot IA"
+LABEL org.opencontainers.image.title="OrbitBot IA"
 LABEL org.opencontainers.image.authors="Carlos Garcia"
 LABEL org.opencontainers.image.licenses="MIT"
 
@@ -50,10 +50,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV TZ=America/Mexico_City
 
-RUN groupadd --system --gid 1001 vaniabot \
-    && useradd --system --uid 1001 --gid vaniabot --create-home vaniabot \
-    && mkdir -p /home/vaniabot/.cache/fontconfig /var/cache/fontconfig \
-    && chown -R vaniabot:vaniabot /home/vaniabot/.cache \
+RUN groupadd --system --gid 1001 orbit \
+    && useradd --system --uid 1001 --gid orbit --create-home orbit \
+    && mkdir -p /home/orbit/.cache/fontconfig /var/cache/fontconfig \
+    && chown -R orbit:orbit /home/orbit/.cache \
     && chmod 777 /var/cache/fontconfig \
     && fc-cache -f
 
@@ -65,19 +65,19 @@ COPY data/ ./data/
 
 COPY data/assets/ ./static/assets/
 
-RUN mkdir -p vaniasession data/temp logs \
-    && chown -R vaniabot:vaniabot /app
+RUN mkdir -p orbitsession data/temp logs \
+    && chown -R orbit:orbit /app
 
-USER vaniabot
+USER orbit
 
 # Build arguments for environment customization
 ARG USE_REDIS=false
-ARG REDIS_HOST=vania-redis
+ARG REDIS_HOST=orbit-redis
 ARG REDIS_PORT=6379
 
 ENV NODE_ENV=production \
     AUTH_MODE=qr \
-    FONTCONFIG_CACHE=/home/vaniabot/.cache/fontconfig \
+    FONTCONFIG_CACHE=/home/orbit/.cache/fontconfig \
     DOCKER_MODE=true \
     USE_REDIS=${USE_REDIS} \
     REDIS_HOST=${REDIS_HOST} \
@@ -89,4 +89,4 @@ ENV ASSETS_DIR=/app/data/assets
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:3000/api/health || exit 1
 
-CMD ["node_modules/.bin/tsx", "src/vania.ts", "qr"]
+CMD ["node_modules/.bin/tsx", "src/orbit.ts", "qr"]

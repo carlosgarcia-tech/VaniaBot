@@ -1,7 +1,7 @@
 /**
  * LoanService.ts
  *
- * VaniaBot services module exposing `Loan`, `loanService`.
+ * OrbitBot services module exposing `Loan`, `loanService`.
  *
  * @author **Carlos G**
  */

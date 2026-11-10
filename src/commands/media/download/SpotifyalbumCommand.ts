@@ -1,7 +1,7 @@
 /**
  * SpotifyalbumCommand.ts
  *
- * media command `spotifyalbum` — Descarga albums completos de Spotify
+ * media command `spotifyalbum` — Downloads full Spotify albums
  * Usage: !spotifyalbum <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!spotifyalbum`: Descarga albums completos de Spotify. */
+/** Command handler for `!spotifyalbum`: Downloads full Spotify albums. */
 export class SpotifyalbumCommand extends Command {
   name = 'spotifyalbum';
   description = 'Descarga albums completos de Spotify';

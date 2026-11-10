@@ -1,7 +1,7 @@
 /**
  * env.ts
  *
- * Environment configuration for VaniaBot using Zod validation.
+ * Environment configuration for OrbitBot using Zod validation.
  * All configuration values can be set via .env file.
  *
  * @author **Carlos G**
@@ -68,7 +68,7 @@ const envSchema = z.object({
     .default('50000'),
 
   /** Bot display name */
-  BOT_NAME: z.string().default('VaniaBot'),
+  BOT_NAME: z.string().default('OrbitBot'),
 
   /** Command prefix */
   PREFIX: z.string().default('.'),
@@ -93,7 +93,7 @@ const envSchema = z.object({
     .transform(val => (val ? val.split(',').filter(Boolean) : [])),
 
   /** Session storage directory path */
-  SESSION_PATH: z.string().default('./vaniasession'),
+  SESSION_PATH: z.string().default('./orbitsession'),
 
   /** Encryption key for SubBot sessions (AES-256-GCM).
    * Format: 32 chars salt + password. Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex') + require('crypto').randomBytes(32).toString('hex'))" */
@@ -177,7 +177,7 @@ const envSchema = z.object({
     .transform(val => parseInt(val) || 25000)
     .default('25000'),
 
-  /** Maximum quick restarts before forced delay (vania.ts) */
+  /** Maximum quick restarts before forced delay (orbit.ts) */
   MAX_QUICK_RESTARTS: z
     .string()
     .transform(val => parseInt(val) || 5)

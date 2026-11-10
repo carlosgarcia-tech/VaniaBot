@@ -1,7 +1,7 @@
 /**
  * QuizTypes.ts
  *
- * VaniaBot services module exposing `QuizQuestion`, `QuizPlayer`, `QuizSession`, `QuestionLogEntry`.
+ * OrbitBot services module exposing `QuizQuestion`, `QuizPlayer`, `QuizSession`, `QuestionLogEntry`.
  *
  * @author **Carlos G**
  */

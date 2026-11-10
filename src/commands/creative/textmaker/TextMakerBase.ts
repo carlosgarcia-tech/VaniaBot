@@ -1,7 +1,7 @@
 /**
  * TextMakerBase.ts
  *
- * VaniaBot commands module exposing `TextMakerBase`.
+ * OrbitBot commands module exposing `TextMakerBase`.
  *
  * @author **Carlos G**
  */
@@ -10,7 +10,7 @@ import * as mumaker from 'mumaker';
 import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 
-const BOT_CAPTION = 'VaniaBot';
+const BOT_CAPTION = 'OrbitBot';
 
 export class TextMakerBase {
   async generateImage(pageUrl: string, text: string): Promise<string> {

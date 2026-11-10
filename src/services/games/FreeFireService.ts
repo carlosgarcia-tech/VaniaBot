@@ -1,7 +1,7 @@
 /**
  * FreeFireService.ts
  *
- * VaniaBot services module exposing `FreeFireService`, `freeFireService`.
+ * OrbitBot services module exposing `FreeFireService`, `freeFireService`.
  *
  * @author **Carlos G**
  */

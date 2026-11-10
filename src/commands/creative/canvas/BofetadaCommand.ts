@@ -1,8 +1,8 @@
 /**
  * BofetadaCommand.ts
  *
- * creative command `bofetada` — Genera imagen de bofetada
- * Usage: !bofetada [@usuario]
+ * creative command `bofetada` — Generates a slap image
+ * Usage: !bofetada [@user]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!bofetada`: Genera imagen de bofetada. */
+/** Command handler for `!bofetada`: Generates a slap image. */
 export class BofetadaCommand extends Command {
   name = 'bofetada';
   description = 'Genera imagen de bofetada';

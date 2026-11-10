@@ -1,7 +1,7 @@
 /**
  * PingCommand.ts
  *
- * utility command `ping` — Verifica la latencia del bot
+ * utility command `ping` — Checks the bot's latency
  * Usage: !ping
  *
  * @author **Carlos G**
@@ -11,7 +11,7 @@ import { Command } from '../../Command.js';
 import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 
-/** Command handler for `!ping`: Verifica la latencia del bot. */
+/** Command handler for `!ping`: Checks the bot's latency. */
 export class PingCommand extends Command {
   name = 'ping';
   description = 'Verifica la latencia del bot';

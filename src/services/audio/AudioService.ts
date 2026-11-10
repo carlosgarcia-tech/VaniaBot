@@ -1,7 +1,7 @@
 /**
  * AudioService.ts
  *
- * VaniaBot services module exposing `AudioInfo`, `AudioAnalisis`, `TranscripcionCompletaSuccess`, `audioService`.
+ * OrbitBot services module exposing `AudioInfo`, `AudioAnalisis`, `TranscripcionCompletaSuccess`, `audioService`.
  *
  * @author **Carlos G**
  */
@@ -348,7 +348,7 @@ class AudioService {
       }
 
       msg += `📄 *Transcripción completa:*\n${success.texto}\n\n`;
-      msg += `> _VaniaBot🎙️ — Transcriptor IA_`;
+      msg += `> _OrbitBot🎙️ — Transcriptor IA_`;
       return msg;
     }
 
@@ -375,7 +375,7 @@ class AudioService {
     if (info?.comprimido) msg += ` _(comprimido)_`;
     msg += '\n';
 
-    msg += `\n> _VaniaBot🎙️ — Transcriptor IA_`;
+    msg += `\n> _OrbitBot🎙️ — Transcriptor IA_`;
     return msg;
   }
 }

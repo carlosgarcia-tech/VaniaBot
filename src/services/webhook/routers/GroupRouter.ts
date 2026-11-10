@@ -1,7 +1,7 @@
 /**
  * GroupRouter.ts
  *
- * VaniaBot services module exposing `createGroupRouter`.
+ * OrbitBot services module exposing `createGroupRouter`.
  *
  * @author **Carlos G**
  */

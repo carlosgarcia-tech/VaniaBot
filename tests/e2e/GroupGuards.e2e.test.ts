@@ -1,18 +1,18 @@
 /**
  * GroupGuards.e2e.test.ts
  *
- * Guards de grupo sobre el bot real, con FakeWASocket que responde
- * groupMetadata como el harness:
+ * Group guards against the real bot, with a FakeWASocket that answers
+ * groupMetadata like the harness does:
  *
- *   - Grupo habilitado (se activa vía VaniaToggleService real en el setup):
- *     los comandos se ejecutan y las respuestas van al grupo.
- *   - Los prefijos alternativos funcionan igual en grupo que en DM.
- *   - Grupo nunca habilitado: el guard de vania-toggle traga el mensaje en
- *     silencio (semántica de producción: el bot está apagado en el chat
- *     hasta que un owner ejecuta !vaniaon).
+ *   - Enabled group (activated via the real OrbitToggleService in setup):
+ *     commands execute and replies go to the group.
+ *   - Alternative prefixes work the same in groups as in DMs.
+ *   - Never-enabled group: the orbit-toggle guard swallows the message
+ *     silently (production semantics: the bot is off in that chat until an
+ *     owner runs !orbiton).
  *
- * Estos tests ejercitan el tramo de guards que los tests de DM no cubren:
- * handleMutedUser → handleVaniaToggle → handleAntilink sobre ctx.chat.isGroup.
+ * These tests exercise the guard stretch the DM tests don't cover:
+ * handleMutedUser → handleOrbitToggle → handleAntilink on ctx.chat.isGroup.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -30,9 +30,9 @@ vi.mock('@/services/external/AIService.js', () => ({
 
 const TIMEOUT = 30_000;
 const GROUP = '120363025555555555@g.us';
-const OTHER_GROUP = '120363026666666666@g.us'; // nunca se habilita
+const OTHER_GROUP = '120363026666666666@g.us'; // never enabled
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('e2e: guards de grupo', () => {
@@ -41,11 +41,11 @@ describe('e2e: guards de grupo', () => {
   beforeAll(async () => {
     ({ socket } = await bootBot());
 
-    // El bot arranca deshabilitado en cualquier grupo (sin registro toggle).
-    // Habilitamos uno de los grupos de prueba con el servicio real, igual
-    // que haría !vaniaon desde el chat.
+    // The bot starts disabled in every group (no toggle record).
+    // We enable one of the test groups with the real service, exactly as
+    // !orbiton would from the chat.
     const { serviceManager } = await import('@/services/system/Servicemanager.js');
-    await serviceManager.vaniaToggleService.enable(GROUP, 'e2e-setup');
+    await serviceManager.orbitToggleService.enable(GROUP, 'e2e-setup');
   }, TIMEOUT);
 
   beforeEach(() => {
@@ -61,7 +61,7 @@ describe('e2e: guards de grupo', () => {
       const texts = socket.texts();
       expect(texts).toContain('🏓 Calculando...');
       expect(texts.some(t => t.startsWith('🏓 Pong!'))).toBe(true);
-      // La respuesta va al grupo, no al remitente
+      // The reply goes to the group, not the sender
       expect(socket.sent.every(m => m.jid === GROUP)).toBe(true);
     },
     TIMEOUT,
@@ -84,8 +84,8 @@ describe('e2e: guards de grupo', () => {
       socket.receive(groupTextMessage('!ping', OTHER_GROUP, senderJid(3)));
       await wait();
 
-      // El guard de vania-toggle descarta el mensaje sin responder: no hay
-      // Pong ni ningún otro envío al grupo.
+      // The orbit-toggle guard drops the message without replying: no
+      // Pong or any other send to the group.
       expect(socket.sent).toHaveLength(0);
     },
     TIMEOUT,

@@ -1,8 +1,8 @@
 /**
  * ReportCommand.ts
  *
- * utility command `report` — Enviar un reporte al owner del bot
- * Usage: !report <mensaje>
+ * utility command `report` — Send a report to the bot's owner
+ * Usage: !report <message>
  *
  * @author **Carlos G**
  */
@@ -15,7 +15,7 @@ import { env } from '@/config/env.js';
 import { logError } from '@/utils/logger.js';
 import type { Report } from '@/services/system/ReportService.js';
 
-/** Command handler for `!report`: Enviar un reporte al owner del bot. */
+/** Command handler for `!report`: Send a report to the bot's owner. */
 export class ReportCommand extends Command {
   name = 'report';
   description = 'Enviar un reporte al owner del bot';
@@ -416,7 +416,7 @@ export class ResolveReportCommand extends Command {
 
         await ctx.sock.sendMessage(report.fromJid, { text: resolvedMsg });
       } catch (error) {
-        // El reporte ya se resolvió: fallar el aviso al autor es secundario.
+        // The report was already resolved: failing to notify the author is secondary.
         logError(`[ResolveReportCommand] Could not notify reporter ${report.fromJid}`, error);
       }
     } catch (error) {

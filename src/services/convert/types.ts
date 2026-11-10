@@ -1,7 +1,7 @@
 /**
  * types.ts
  *
- * VaniaBot services module exposing `ConvertOptions`, `ConversionResult`.
+ * OrbitBot services module exposing `ConvertOptions`, `ConversionResult`.
  *
  * @author **Carlos G**
  */

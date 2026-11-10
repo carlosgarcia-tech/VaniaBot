@@ -88,8 +88,8 @@ export async function handleMention(ctx: MessageContext, botJid: string): Promis
   // question, then trim the punctuation left behind by the removal.
   const cleanText = rawText
     .replace(/@\d+/g, '')
-    .replace(/@vania/gi, '')
-    .replace(/\bvania\b/gi, '')
+    .replace(/@orbit/gi, '')
+    .replace(/\borbit\b/gi, '')
     .replace(/[,:\s]+$/, '')
     .trim();
 

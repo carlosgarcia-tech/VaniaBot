@@ -1,7 +1,7 @@
 /**
  * InstagramDownloader.ts
  *
- * VaniaBot services module exposing `InstagramDownloader`, `InstagramMedia`.
+ * OrbitBot services module exposing `InstagramDownloader`, `InstagramMedia`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * PythonBridge.ts
  *
- * VaniaBot services module exposing `ScannedPdfError`, `TooManyPagesError`, `PythonBridge`, `BridgeResult`.
+ * OrbitBot services module exposing `ScannedPdfError`, `TooManyPagesError`, `PythonBridge`, `BridgeResult`.
  *
  * @author **Carlos G**
  */
@@ -19,13 +19,13 @@ const BRIDGE_SCRIPT = join(__dirname, 'scripts', 'bridge.py');
 
 export interface BridgeResult {
   data: Buffer;
-  /** Cantidad de items producidos (ej. páginas) */
+  /** Number of items produced (e.g. pages) */
   count: number;
-  /** Tipo de salida: 'zip' | 'jpg' | 'png' | 'pdf' | 'docx' | 'pptx' */
+  /** Output type: 'zip' | 'jpg' | 'png' | 'pdf' | 'docx' | 'pptx' */
   outputType: string;
 }
 
-/** El PDF no tiene texto extraíble (probablemente escaneado) */
+/** The PDF has no extractable text (likely scanned) */
 export class ScannedPdfError extends Error {
   constructor() {
     super('El PDF no contiene texto extraíble (parece escaneado)');
@@ -33,7 +33,7 @@ export class ScannedPdfError extends Error {
   }
 }
 
-/** El documento excede el límite de páginas soportado */
+/** The document exceeds the supported page limit */
 export class TooManyPagesError extends Error {
   constructor() {
     super('El documento excede el límite de páginas soportado');
@@ -101,8 +101,8 @@ export class PythonBridge {
   }
 
   /**
-   * Parsea la última línea "OK:<count>:<type>" impresa por bridge.py.
-   * Si no se puede parsear, cae a valores por defecto conservadores.
+   * Parses the last "OK:<count>:<type>" line printed by bridge.py.
+   * If it cannot be parsed, falls back to conservative defaults.
    */
   private parseStdout(
     stdout: string,

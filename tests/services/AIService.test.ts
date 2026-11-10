@@ -88,14 +88,14 @@ describe('AIService', () => {
   });
 
   describe('system prompt', () => {
-    it('should define VaniaBot personality', () => {
-      const prompt = `Eres VaniaBot, un bot super dotada`;
+    it('should define OrbitBot personality', () => {
+      const prompt = `Eres OrbitBot, un bot super dotada`;
 
-      expect(prompt).toContain('VaniaBot');
+      expect(prompt).toContain('OrbitBot');
     });
 
     it('should include response format guidelines', () => {
-      const prompt = `Eres VaniaBot`;
+      const prompt = `Eres OrbitBot`;
 
       expect(prompt).toBeDefined();
     });

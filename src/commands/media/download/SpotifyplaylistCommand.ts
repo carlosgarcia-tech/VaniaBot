@@ -1,7 +1,7 @@
 /**
  * SpotifyplaylistCommand.ts
  *
- * media command `spotifyplaylist` — Descarga playlists completas de Spotify
+ * media command `spotifyplaylist` — Downloads full Spotify playlists
  * Usage: !spotifyplaylist <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!spotifyplaylist`: Descarga playlists completas de Spotify. */
+/** Command handler for `!spotifyplaylist`: Downloads full Spotify playlists. */
 export class SpotifyplaylistCommand extends Command {
   name = 'spotifyplaylist';
   description = 'Descarga playlists completas de Spotify';

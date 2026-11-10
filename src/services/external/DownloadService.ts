@@ -1,7 +1,7 @@
 /**
  * DownloadService.ts
  *
- * VaniaBot services module exposing `DownloadService`, `downloadService`.
+ * OrbitBot services module exposing `DownloadService`, `downloadService`.
  *
  * @author **Carlos G**
  */

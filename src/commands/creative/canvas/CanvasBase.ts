@@ -1,7 +1,7 @@
 /**
  * CanvasBase.ts
  *
- * VaniaBot commands module exposing `CanvasBase`.
+ * OrbitBot commands module exposing `CanvasBase`.
  *
  * @author **Carlos G**
  */
@@ -18,8 +18,8 @@ import type { MessageContext } from '@/types/index.js';
 const execFileAsync = promisify(execFile);
 
 /**
- * Convierte un buffer WebM a WebP animado usando ffmpeg.
- * WhatsApp solo acepta stickers animados en formato WebP.
+ * Converts a WebM buffer to animated WebP using ffmpeg.
+ * WhatsApp only accepts animated stickers in WebP format.
  */
 async function webmToAnimatedWebP(webmBuffer: Buffer): Promise<Buffer> {
   const id = `canvas_${Date.now()}_${Math.random().toString(36).slice(2)}`;

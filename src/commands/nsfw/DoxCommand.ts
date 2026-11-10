@@ -1,8 +1,8 @@
 /**
  * DoxCommand.ts
  *
- * fun command `doxear` — Doxxeo falso (simulación)
- * Usage: !doxear @usuario
+ * fun command `doxear` — Fake doxxing (simulation)
+ * Usage: !doxear @user
  *
  * @author **Carlos G**
  */
@@ -32,7 +32,7 @@ const ISP_NAMES = ['Ucom Universal', 'Telecom', 'Claro', 'Movistar', 'AT&T', 'Ve
 const ROUTER_VENDORS = ['ERICSSON', 'TP-LINK', 'NETGEAR', 'CISCO', 'ASUS', 'D-LINK'];
 const DEVICE_VENDORS = ['WIN32-X', 'Linux', 'MacOS', 'Android', 'iOS'];
 
-/** Command handler for `!doxear`: Doxxeo falso (simulación). */
+/** Command handler for `!doxear`: Fake doxxing (simulation). */
 export class DoxCommand extends Command {
   name = 'doxear';
   description = 'Doxxeo falso (simulación)';

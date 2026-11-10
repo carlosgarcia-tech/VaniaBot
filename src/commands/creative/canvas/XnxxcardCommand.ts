@@ -1,7 +1,7 @@
 /**
  * XnxxcardCommand.ts
  *
- * creative command `xnxxcard` — Genera tarjeta estilo XNXX
+ * creative command `xnxxcard` — Generates an XNXX-style card
  * Usage: !xnxxcard <titulo>
  *
  * @author **Carlos G**
@@ -32,7 +32,7 @@ async function getDefaultImageUrl(): Promise<string | null> {
   return url;
 }
 
-/** Command handler for `!xnxxcard`: Genera tarjeta estilo XNXX. */
+/** Command handler for `!xnxxcard`: Generates an XNXX-style card. */
 export class XnxxcardCommand extends Command {
   name = 'xnxxcard';
   description = 'Genera tarjeta estilo XNXX';

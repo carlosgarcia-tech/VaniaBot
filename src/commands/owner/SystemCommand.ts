@@ -1,8 +1,8 @@
 /**
  * SystemCommand.ts
  *
- * owner command `broadcast` — Enviar mensaje a todos los grupos
- * Usage: .broadcast <mensaje>
+ * owner command `broadcast` — Send a message to all groups
+ * Usage: .broadcast <message>
  *
  * @author **Carlos G**
  */
@@ -32,7 +32,7 @@ function sanitizeBroadcastMessage(message: string): string {
   return sanitized;
 }
 
-/** Command handler for `!broadcast`: Enviar mensaje a todos los grupos. */
+/** Command handler for `!broadcast`: Send a message to all groups. */
 export class BroadcastCommand extends Command {
   name = 'broadcast';
   description = 'Enviar mensaje a todos los grupos';
@@ -89,7 +89,7 @@ export class BackupCommand extends Command {
   name = 'backup';
   description = 'Crear respaldo de la sesión (sesión del bot, no datos de usuario)';
   category = CommandCategory.OWNER;
-  // Sin alias 'respaldar': es el name de RespaldarDataCommand (datos de usuario).
+  // No alias 'respaldar': it is the name of RespaldarDataCommand (user data).
   aliases = [];
   permissions = {
     user: [PermissionLevel.OWNER],

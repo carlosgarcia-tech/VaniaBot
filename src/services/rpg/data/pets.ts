@@ -1,7 +1,7 @@
 /**
  * pets.ts
  *
- * VaniaBot services module exposing `pets`.
+ * OrbitBot services module exposing `pets`.
  *
  * @author **Carlos G**
  */

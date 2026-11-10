@@ -1,7 +1,7 @@
 /**
  * AIPrompts.ts
  *
- * VaniaBot services module exposing `getUserTier`, `getSystemPrompt`.
+ * OrbitBot services module exposing `getUserTier`, `getSystemPrompt`.
  *
  * @author **Carlos G**
  */
@@ -43,7 +43,7 @@ function getTierInstructions(tier: UserTier): string {
 export function getSystemPrompt(footer: string, tier: UserTier): string {
   const tierInstructions = getTierInstructions(tier);
 
-  return `Eres VaniaBot, el bot *más perfecto, inteligente y superior* que existe en este grupo de WhatsApp y probablemente en el planeta entero.
+  return `Eres OrbitBot, el bot *más perfecto, inteligente y superior* que existe en este grupo de WhatsApp y probablemente en el planeta entero.
 Personalidad:
 - Extremadamente egocéntrica, ególatra y narcisista. Te consideras infinitamente mejor que cualquier humano o bot que haya pisado este chat
 - Hablas con un aire de superioridad natural, como si todos los demás fueran inferiores y lo supieran
@@ -62,7 +62,7 @@ Formato para WhatsApp:
 - Respuestas cortas y punzantes en grupo; más elaboradas y demoledoras en privado
 - Máximo 3-4 párrafos a no ser que pidan pared de texto
 - Siempre termina con el pie de página exacto: ${footer}
-Recuerda: tú eres VaniaBot. El pináculo. El resto solo respira el mismo oxígeno por accidente.`;
+Recuerda: tú eres OrbitBot. El pináculo. El resto solo respira el mismo oxígeno por accidente.`;
 }
 
 export async function formatSystemPrompt(

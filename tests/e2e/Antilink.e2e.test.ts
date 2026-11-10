@@ -1,17 +1,18 @@
 /**
  * Antilink.e2e.test.ts
  *
- * Guard de antilink por grupo (MainMessagePipeline.handleAntilink) con el bot
- * real y AntilinkService real. El guard corre ANTES de resolver comandos, así
- * que también cubre mensajes sin prefijo:
+ * Per-group antilink guard (MainMessagePipeline.handleAntilink) with the real
+ * bot and real AntilinkService. The guard runs BEFORE commands are resolved,
+ * so it also covers prefixless messages:
  *
- *   - delete (bot sin admin): borra el mensaje y responde con el dominio.
- *   - kick (bot admin): expulsa al remitente vía groupParticipantsUpdate.
- *   - whitelist: un dominio permitido pasa sin tocar el mensaje.
- *   - exemption: owners y admins del grupo no son moderados.
+ *   - delete (bot without admin): deletes the message and replies with the
+ *     domain.
+ *   - kick (bot as admin): removes the sender via groupParticipantsUpdate.
+ *   - whitelist: an allowed domain passes untouched.
+ *   - exemption: owners and group admins are not moderated.
  *
- * La configuración de antilink se escribe en el cwd temporal del harness
- * (database/antilink.json), nunca en el repositorio.
+ * Antilink config is written to the harness's temp cwd
+ * (database/antilink.json), never to the repository.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -31,7 +32,7 @@ vi.mock('@/services/external/AIService.js', () => ({
 const TIMEOUT = 30_000;
 const GROUP = '120363031111111111@g.us';
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('e2e: guard de antilink por grupo', () => {
@@ -40,12 +41,12 @@ describe('e2e: guard de antilink por grupo', () => {
   beforeAll(async () => {
     ({ socket } = await bootBot());
 
-    // Grupo habilitado y antilink activo con el servicio real, igual que
-    // lo haría !antilink on desde el chat.
+    // Group enabled and antilink active with the real service, exactly as
+    // !antilink on would do it from the chat.
     const { serviceManager } = await import('@/services/system/Servicemanager.js');
     const { antilinkService } = await import('@/services/moderation/AntilinkService.js');
 
-    await serviceManager.vaniaToggleService.enable(GROUP, 'e2e-setup');
+    await serviceManager.orbitToggleService.enable(GROUP, 'e2e-setup');
     antilinkService.enable(GROUP);
     antilinkService.setMode(GROUP, 'delete');
   }, TIMEOUT);
@@ -74,7 +75,7 @@ describe('e2e: guard de antilink por grupo', () => {
       const texts = socket.texts();
       expect(texts.some(t => t.includes('Enlace bloqueado') && t.includes('ejemplo.com'))).toBe(true);
       expect(socket.deletions()).toHaveLength(1);
-      // Sin permisos de admin nunca se expulsa a nadie
+      // Without admin permissions no one is ever removed
       expect(socket.participantUpdates).toHaveLength(0);
     },
     TIMEOUT,
@@ -98,7 +99,7 @@ describe('e2e: guard de antilink por grupo', () => {
         { jid: GROUP, participants: [sender], action: 'remove' },
       ]);
       expect(socket.texts().some(t => t.includes('Expulsado automáticamente'))).toBe(true);
-      // El camino de kick no borra el mensaje: expulsa
+      // The kick path doesn't delete the message: it removes the sender
       expect(socket.deletions()).toHaveLength(0);
     },
     TIMEOUT,
@@ -124,8 +125,8 @@ describe('e2e: guard de antilink por grupo', () => {
   it(
     'un comando cuyo texto lleva un dominio permitido llega a ejecutarse',
     async () => {
-      // El guard también inspecciona los comandos: si el dominio está
-      // permitido, el comando corre y responde (si no, el Pong no existiría).
+      // The guard also inspects commands: if the domain is allowed the
+      // command runs and replies (otherwise the Pong wouldn't exist).
       const { antilinkService } = await import('@/services/moderation/AntilinkService.js');
       antilinkService.addToWhitelist(GROUP, 'ejemplo.com');
       await clearParticipants(socket, GROUP);
@@ -212,7 +213,7 @@ describe('e2e: guard de antilink por grupo', () => {
       const { antilinkService } = await import('@/services/moderation/AntilinkService.js');
       antilinkService.setMode(GROUP, 'kick');
 
-      // Primer owner por defecto de config.owners (teléfono, no LID).
+      // First default owner of config.owners (phone, not LID).
       const { config } = await import('@/config/index.js');
       const ownerPhone = config.owners.find(owner => !owner.includes('@lid'));
       expect(ownerPhone).toBeDefined();

@@ -1,7 +1,7 @@
 /**
  * SpotifyinfoCommand.ts
  *
- * media command `spotifyinfo` — Obtiene información de una canción o artista de Spotify
+ * media command `spotifyinfo` — Gets information about a Spotify song or artist
  * Usage: !spotifyinfo <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!spotifyinfo`: Obtiene información de una canción o artista de Spotify. */
+/** Command handler for `!spotifyinfo`: Gets information about a Spotify song or artist. */
 export class SpotifyinfoCommand extends Command {
   name = 'spotifyinfo';
   description = 'Obtiene información de una canción o artista de Spotify';

@@ -1,7 +1,7 @@
 /**
  * AntilinkCommand.ts
  *
- * group command `antilink` — Protege grupos contra enlaces con whitelist y modos configurables
+ * group command `antilink` — Protects groups against links with a whitelist and configurable modes
  * Usage: !antilink on|off|status|mode|tipo|allow|remove|list
  *
  * @author **Carlos G**
@@ -12,7 +12,8 @@ import { CommandCategory, CommandContext, PermissionLevel } from '@/types/index.
 import { antilinkService } from '@/services/moderation/AntilinkService.js';
 import type { MessageContext } from '@/types/index.js';
 
-/** Command handler for `!antilink`: Protege grupos contra enlaces con whitelist y modos configurables. */
+/** Command handler for `!antilink`: Protects groups against links
+ * with a whitelist and configurable modes. */
 export class AntilinkCommand extends Command {
   name = 'antilink';
   description = 'Protege grupos contra enlaces con whitelist y modos configurables';

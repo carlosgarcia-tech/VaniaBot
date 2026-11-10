@@ -134,7 +134,7 @@ function makeConfig(sessionPath: string, registered = false): SubBotConfig {
     phoneNumber: '5215599998888',
     sessionPath,
     prefix: '!',
-    name: 'VaniaBot-Test',
+    name: 'OrbitBot-Test',
     active: true,
     createdAt: Date.now(),
     status: registered ? 'connected' : 'connecting',
@@ -175,7 +175,7 @@ describe('SubBotInstance', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
-    tempSessionDir = mkdtempSync(join(tmpdir(), 'vania-subbot-session-'));
+    tempSessionDir = mkdtempSync(join(tmpdir(), 'orbit-subbot-session-'));
     createdSockets.length = 0;
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: false } },
@@ -267,7 +267,7 @@ describe('SubBotInstance', () => {
     await vi.advanceTimersByTimeAsync(30_000);
     expect(sock.sendPresenceUpdate).toHaveBeenCalledWith('available', 'status@broadcast');
 
-    // Segundo open (sin close intermedio): ready sigue en 1
+    // Second open (no close in between): ready still 1
     emitConnection(sock, { connection: 'open' });
     await flush();
     expect(readyEvents).toBe(1);
@@ -492,7 +492,7 @@ describe('SubBotInstance', () => {
     await vi.advanceTimersByTimeAsync(60_000);
     expect(sock.sendPresenceUpdate.mock.calls.length).toBe(pings);
 
-    // start() sobre instancia destruida es no-op
+    // start() on a destroyed instance is a no-op
     await instance.start();
     expect(createdSockets).toHaveLength(1);
   });

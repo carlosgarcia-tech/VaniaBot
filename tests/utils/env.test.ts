@@ -15,7 +15,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { z } from 'zod';
 
 const testSchema = z.object({
-  BOT_NAME: z.string().default('VaniaBot'),
+  BOT_NAME: z.string().default('OrbitBot'),
   BOT_PREFIX: z.string().default('.'),
   OWNERS: z
     .string()
@@ -53,7 +53,7 @@ describe('Environment Schema Validation', () => {
 
     const result = testSchema.parse(process.env);
 
-    expect(result.BOT_NAME).toBe('VaniaBot');
+    expect(result.BOT_NAME).toBe('OrbitBot');
     expect(result.BOT_PREFIX).toBe('.');
     expect(result.DB_TYPE).toBe('json');
     expect(result.MAX_RECONNECT_ATTEMPTS).toBe(10);

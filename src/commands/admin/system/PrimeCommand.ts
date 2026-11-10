@@ -1,7 +1,7 @@
 /**
  * PrimeCommand.ts
  *
- * admin command `prime` — Activa el modo Prime para este grupo
+ * admin command `prime` — Activate Prime mode for this group
  * Usage: !prime [on/off/status]
  *
  * @author **Carlos G**
@@ -16,7 +16,7 @@ import {
 } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
-/** Command handler for `!prime`: Activa el modo Prime para este grupo. */
+/** Command handler for `!prime`: Activate Prime mode for this group. */
 export class PrimeCommand extends Command {
   name = 'prime';
   description = 'Activa el modo Prime para este grupo';
@@ -65,7 +65,7 @@ export class PrimeCommand extends Command {
         `${status}\n\n` +
         `📛 Grupo: *${groupName}*\n\n` +
         `_El modo Prime personaliza el bot con el nombre del grupo._\n\n` +
-        `> VaniaBot💝`,
+        `> OrbitBot💝`,
     );
   }
 
@@ -76,7 +76,7 @@ export class PrimeCommand extends Command {
       await ctx.reply(
         `👑 *MODO PRICE YA ESTÁ ACTIVADO*\n\n` +
           `El bot ya está personalizado para este grupo.\n\n` +
-          `> VaniaBot💝`,
+          `> OrbitBot💝`,
       );
       return;
     }
@@ -103,7 +103,7 @@ export class PrimeCommand extends Command {
       await ctx.reply(
         `🔒 *MODO PRIME YA ESTÁ DESACTIVADO*\n\n` +
           `El bot ya usa su nombre oficial.\n\n` +
-          `> VaniaBot💝`,
+          `> OrbitBot💝`,
       );
       return;
     }
@@ -116,7 +116,7 @@ export class PrimeCommand extends Command {
       `🔒 *MODO PRIME DESACTIVADO*\n\n` +
         `El bot vuelve a usar su nombre oficial.\n\n` +
         `_Desactivado por @${ctx.sender.pushName || 'owner'}_\n\n` +
-        `> VaniaBot💝`,
+        `> OrbitBot💝`,
     );
   }
 }

@@ -1,7 +1,7 @@
 /**
  * AntiArabCommand.ts
  *
- * group command `antiarab` — Bloquea usuarios con números de países árabes
+ * group command `antiarab` — Blocks users with phone numbers from Arab countries
  * Usage: !antiarab on|off|status|prefix
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext, PermissionLevel } from '@/types/index.
 import { antiArabService } from '@/services/moderation/AntiArabService.js';
 import type { MessageContext } from '@/types/index.js';
 
-/** Command handler for `!antiarab`: Bloquea usuarios con números de países árabes. */
+/** Command handler for `!antiarab`: Blocks users with phone numbers from Arab countries. */
 export class AntiArabCommand extends Command {
   name = 'antiarab';
   description = 'Bloquea usuarios con números de países árabes';

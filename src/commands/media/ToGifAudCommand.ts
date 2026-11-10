@@ -19,7 +19,7 @@ import os from 'os';
 import { logger } from '@/utils/logger.js';
 
 const execAsync = promisify(exec);
-const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-togif');
+const TMP_DIR = path.join(os.tmpdir(), 'orbit-togif');
 
 /** Command handler for `!togifaud`: Convertir video a GIF. */
 export class ToGifAudCommand extends Command {

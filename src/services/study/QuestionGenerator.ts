@@ -1,7 +1,7 @@
 /**
  * QuestionGenerator.ts
  *
- * VaniaBot services module exposing `QuestionGenerator`, `questionGenerator`.
+ * OrbitBot services module exposing `QuestionGenerator`, `questionGenerator`.
  *
  * @author **Carlos G**
  */
@@ -43,12 +43,12 @@ export class QuestionGenerator {
   private cache = new Map<string, CacheEntry>();
 
   /**
-   * Obtiene la siguiente pregunta para una sesión.
-   * Primero busca en caché, si no genera una nueva.
+   * Gets the next question for a session.
+   * Checks the cache first; generates a new one if not found.
    *
-   * @param category    - Tema del quiz
-   * @param difficulty  - Dificultad calculada por DifficultyEngine
-   * @param usedQuestions - Preguntas ya hechas en esta sesión (para evitar repetir)
+   * @param category    - Quiz topic
+   * @param difficulty  - Difficulty computed by DifficultyEngine
+   * @param usedQuestions - Questions already asked in this session (to avoid repeats)
    */
   async getQuestion(
     category: string,
@@ -71,7 +71,7 @@ export class QuestionGenerator {
     return batch.find(q => !usedQuestions.includes(q.question)) ?? batch[0];
   }
 
-  /** Genera un lote de N preguntas en una sola llamada a la IA */
+  /** Generates a batch of N questions in a single AI call */
   private async generateBatch(
     category: string,
     difficulty: QuizDifficulty,

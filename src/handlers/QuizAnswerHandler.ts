@@ -75,8 +75,8 @@ class QuizAnswerHandler {
         const user = (await serviceManager.userService.getUser(jid)) as UserWithQuizStats | null;
         return user?.quizStats ?? null;
       } catch (error) {
-        // El caller trata null como "sin stats previas": una lectura fallida
-        // degrada silenciosamente la respuesta. Debug, no ruido.
+        // The caller treats null as "no previous stats": a failed read
+        // degrades the reply silently. Debug, not noise.
         logger.debug(`[QuizAnswerHandler] getUserStats(${jid}) failed:`, error);
         return null;
       }

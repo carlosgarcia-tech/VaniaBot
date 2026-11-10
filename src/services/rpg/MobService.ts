@@ -1,7 +1,7 @@
 /**
  * MobService.ts
  *
- * VaniaBot services module exposing `MobService`, `Mob`, `mobService`.
+ * OrbitBot services module exposing `MobService`, `Mob`, `mobService`.
  *
  * @author **Carlos G**
  */

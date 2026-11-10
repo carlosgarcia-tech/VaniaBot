@@ -1,7 +1,7 @@
 /**
  * PinterestDownloader.ts
  *
- * VaniaBot services module exposing `PinterestDownloader`, `PinterestMedia`, `pinterestDownloader`.
+ * OrbitBot services module exposing `PinterestDownloader`, `PinterestMedia`, `pinterestDownloader`.
  *
  * @author **Carlos G**
  */
@@ -21,7 +21,7 @@ import path from 'path';
 import os from 'os';
 import { left, right, type Either } from '@/utils/either.js';
 
-const TMP_DIR = path.join(os.tmpdir(), 'vaniabot-pinterest');
+const TMP_DIR = path.join(os.tmpdir(), 'orbit-pinterest');
 
 export interface PinterestMedia {
   type: 'image' | 'video';

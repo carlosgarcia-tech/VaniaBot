@@ -128,7 +128,7 @@ export class SubBotDatabase {
       phoneNumber: slot.phoneNumber || '',
       sessionPath: `${SUBBOT_CONFIG.SESSION_BASE_PATH}/${slot.id}`,
       prefix: '.',
-      name: slot.name || `VaniaBot-${slot.slot}`,
+      name: slot.name || `OrbitBot-${slot.slot}`,
       active: slot.status === 'connected',
       createdAt: slot.requestedAt || Date.now(),
       connectedAt: slot.connectedAt,

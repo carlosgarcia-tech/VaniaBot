@@ -1,7 +1,7 @@
 /**
  * QrCommand.ts
  *
- * utility command `qr` — Genera un código QR de cualquier texto o URL.
+ * utility command `qr` — Generates a QR code for any text or URL.
  * Usage: !qr <texto o URL>
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { logError } from '@/utils/logger.js';
 import { isValidUrl } from '@/utils/validators.js';
 
-/** Command handler for `!qr`: Genera un código QR de cualquier texto o URL. */
+/** Command handler for `!qr`: Generates a QR code for any text or URL. */
 export class QrCommand extends Command {
   name = 'qr';
   description = 'Genera un código QR de cualquier texto o URL.';
@@ -20,7 +20,7 @@ export class QrCommand extends Command {
   aliases = ['qrcode', 'genqr'];
   usage = '!qr <texto o URL>';
   examples = [
-    '!qr https://github.com/VaniaBot',
+    '!qr https://github.com/OrbitBot',
     '!qr Hola, este es mi contacto: +52 1234567890',
     '!qr https://wa.me/521234567890',
   ];

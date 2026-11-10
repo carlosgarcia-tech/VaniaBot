@@ -1,8 +1,8 @@
 /**
  * LogsCommand.ts
  *
- * owner command `logs` — Ver los últimos logs del bot
- * Usage: !logs [número]
+ * owner command `logs` — View the bot's latest logs
+ * Usage: !logs [count]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
 import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
 
-/** Command handler for `!logs`: Ver los últimos logs del bot. */
+/** Command handler for `!logs`: View the bot's latest logs. */
 export class LogsCommand extends Command {
   name = 'logs';
   description = 'Ver los últimos logs del bot';

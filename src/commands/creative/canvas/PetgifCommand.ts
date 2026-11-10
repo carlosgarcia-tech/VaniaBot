@@ -1,8 +1,8 @@
 /**
  * PetgifCommand.ts
  *
- * creative command `petgif` — Genera GIF de mascota
- * Usage: !petgif [@usuario] [resolucion] [retraso]
+ * creative command `petgif` — Generates a pet GIF
+ * Usage: !petgif [@user] [resolution] [delay]
  *
  * @author **Carlos G**
  */
@@ -18,7 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!petgif`: Genera GIF de mascota. */
+/** Command handler for `!petgif`: Generates a pet GIF. */
 export class PetgifCommand extends Command {
   name = 'petgif';
   description = 'Genera GIF de mascota';

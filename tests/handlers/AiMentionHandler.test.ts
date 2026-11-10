@@ -11,24 +11,24 @@ import { describe, it, expect, vi } from 'vitest';
 
 describe('AiMentionHandler', () => {
   describe('mention detection', () => {
-    const BOT_NAMES = ['vania', 'vania bot', 'vaniabot', 'bot'];
+    const BOT_NAMES = ['orbit', 'orbit bot', 'orbit', 'bot'];
 
     const mentionsBot = (text: string): boolean => {
       const lowerText = text.toLowerCase();
       return BOT_NAMES.some(name => lowerText.includes(name));
     };
 
-    it('should detect vania mention', () => {
-      expect(mentionsBot('@vania hola')).toBe(true);
-      expect(mentionsBot('hola vania')).toBe(true);
+    it('should detect orbit mention', () => {
+      expect(mentionsBot('@orbit hola')).toBe(true);
+      expect(mentionsBot('hola orbit')).toBe(true);
     });
 
-    it('should detect vania bot mention', () => {
-      expect(mentionsBot('hey vania bot')).toBe(true);
+    it('should detect orbit bot mention', () => {
+      expect(mentionsBot('hey orbit bot')).toBe(true);
     });
 
     it('should detect vanibot mention', () => {
-      expect(mentionsBot('vaniabot responde')).toBe(true);
+      expect(mentionsBot('orbit responde')).toBe(true);
     });
 
     it('should detect bot keyword', () => {
@@ -85,8 +85,8 @@ describe('AiMentionHandler', () => {
     });
 
     it('should remove mention', () => {
-      expect(extractMessageText('@vania hola')).toBe('hola');
-      expect(extractMessageText('@vaniabot que tal')).toBe('que tal');
+      expect(extractMessageText('@orbit hola')).toBe('hola');
+      expect(extractMessageText('@orbit que tal')).toBe('que tal');
     });
   });
 
@@ -101,7 +101,7 @@ describe('AiMentionHandler', () => {
     };
 
     it('should generate response for mentions', () => {
-      const response = generateResponse('hola vania', true, true);
+      const response = generateResponse('hola orbit', true, true);
       expect(response).toContain('Simulated AI response');
     });
 

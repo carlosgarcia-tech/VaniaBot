@@ -1,7 +1,7 @@
 /**
  * TextIceCommand.ts
  *
- * creative command `ice` — Crea un efecto de texto de hielo
+ * creative command `ice` — Creates an ice text effect
  * Usage: !ice <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/ice-text-effect-online-101.html';
 
-/** Command handler for `!ice`: Crea un efecto de texto de hielo. */
+/** Command handler for `!ice`: Creates an ice text effect. */
 export class TextIceCommand extends Command {
   name = 'ice';
   description = 'Crea un efecto de texto de hielo';
@@ -27,14 +27,14 @@ export class TextIceCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!ice <texto>';
-  examples = ['!ice VaniaBot'];
+  examples = ['!ice OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !ice <texto>\n_Ejemplo: !ice VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !ice <texto>\n_Ejemplo: !ice OrbitBot_');
       return;
     }
 

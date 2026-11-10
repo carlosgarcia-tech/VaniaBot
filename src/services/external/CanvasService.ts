@@ -1,7 +1,7 @@
 /**
  * CanvasService.ts
  *
- * VaniaBot services module exposing `CanvasService`, `canvasService`.
+ * OrbitBot services module exposing `CanvasService`, `canvasService`.
  *
  * @author **Carlos G**
  */

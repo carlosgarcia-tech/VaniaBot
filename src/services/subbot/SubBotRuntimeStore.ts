@@ -10,13 +10,13 @@
  * which a hand-edited or partially-written file could poison with.
  *
  * Contract:
- * - load(): null for missing files, JSON inválido, TTL vencido o id que
- *   no coincida con el bot pedido (evita mezclar estados entre bots).
+ * - load(): null for missing files, invalid JSON, expired TTL, or an id that
+ *   does not match the requested bot (avoids mixing state between bots).
  * - Entries older than their TTL are pruned on load AND on save, so a
  *   state never grows unbounded from files that skip writes.
  * - save() is atomic: temp file in the same dir + rename.
- * - Every failure is silent-but-logged: runtime state es best-effort,
- *   nunca debe romper el arranque de un subbot.
+ * - Every failure is silent-but-logged: runtime state is best-effort, and
+ *   must never break a subbot's startup.
  *
  * @author **Carlos G**
  */
@@ -50,7 +50,7 @@ function sanitizeMessageIds(raw: unknown, now: number): [string, number][] {
     if (typeof key !== 'string' || key.length === 0) continue;
     const savedAt = nonNegativeNumber(ts);
     if (savedAt === undefined) continue;
-    // TTL en carga: las entradas viejas no reviven un dedup envenenado.
+    // TTL on load: stale entries must not revive a poisoned dedup.
     if (now - savedAt > SUBBOT_CONFIG.MESSAGE_DEDUP_TTL_MS) continue;
     out.push([key, savedAt]);
   }
@@ -96,7 +96,7 @@ export class SubBotRuntimeStore {
   /**
    * @param dir overrides the runtime dir. By default it reads
    *   SUBBOT_CONFIG.RUNTIME_STATE_DIR on every access, so config changes
-   *   (o tests que redirigen el dir) aplican sin recrear el store.
+   *   (or tests that redirect the dir) apply without recreating the store.
    */
   constructor(dir?: string) {
     this.dirOverride = dir;
@@ -107,8 +107,8 @@ export class SubBotRuntimeStore {
   }
 
   private fileFor(botId: string): string {
-    // El id se genera con randomBytes(8).hex internamente, pero el path
-    // nunca debe poder salirse del dir de runtime.
+    // The id is generated internally as randomBytes(8).hex, but the path
+    // must never be able to escape the runtime dir.
     if (!/^[A-Za-z0-9_-]+$/.test(botId)) {
       throw new Error(`Invalid subbot id for runtime state: ${botId}`);
     }
@@ -128,7 +128,7 @@ export class SubBotRuntimeStore {
   /**
    * Loads and validates the runtime state for a bot. Returns null when the
    * file is missing, unreadable, expired (TTL), has a mismatched id or is
-   * not a JSON object: el llamador crea un estado fresco en ese caso.
+   * not a JSON object: the caller creates a fresh state in that case.
    */
   load(botId: string): BotRuntimeState | null {
     let file: string;
@@ -149,8 +149,8 @@ export class SubBotRuntimeStore {
         return null;
       }
 
-      // El id del archivo debe coincidir con el bot pedido: un archivo
-      // copiado/renombrado entre bots no debe contaminar otro runtime.
+      // The file's id must match the requested bot: a file copied/renamed
+      // between bots must not contaminate another runtime.
       if (data.id !== botId) return null;
 
       return buildState(botId, data, Date.now());

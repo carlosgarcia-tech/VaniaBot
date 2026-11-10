@@ -1,7 +1,7 @@
 /**
  * BuyItemCommand.ts
  *
- * rpg command `buyitem` — Compra un item del mercado
+ * rpg command `buyitem` — Buy an item from the market
  * Usage: !buyitem [id]
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { tradeService } from '@/services/rpg/TradeService.js';
 import { isRight } from '@/utils/either.js';
 
-/** Command handler for `!buyitem`: Compra un item del mercado. */
+/** Command handler for `!buyitem`: Buy an item from the market. */
 export class BuyItemCommand extends Command {
   name = 'buyitem';
   description = 'Compra un item del mercado';

@@ -1,7 +1,7 @@
 /**
  * AntilinkService.ts
  *
- * VaniaBot services module exposing `AntilinkService`, `AntilinkConfig`, `AntilinkStore`, `ExtractedLink`.
+ * OrbitBot services module exposing `AntilinkService`, `AntilinkConfig`, `AntilinkStore`, `ExtractedLink`.
  *
  * @author **Carlos G**
  */

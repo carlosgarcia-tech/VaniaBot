@@ -1,7 +1,7 @@
 /**
  * AnimeCommand.ts
  *
- * VaniaBot commands module exposing `hugCommand`, `patCommand`, `kissCommand`, `cryCommand`.
+ * OrbitBot commands module exposing `hugCommand`, `patCommand`, `kissCommand`, `cryCommand`.
  *
  * @author **Carlos G**
  */
@@ -429,8 +429,8 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
   {
     name: 'patear',
     description: 'Muestra una imagen de anime pateando',
-    // Sin alias 'kick': es el name de KickCommand (moderación) y el registro
-    // lo remapeaba, dejando la expulsion inalcanzable por su nombre propio.
+    // No alias 'kick': it is the name of KickCommand (moderation) and the registry
+    // remapped it, leaving the kick unreachable by its own name.
     aliases: [],
     react: '🦶',
     endpoint: 'kick',

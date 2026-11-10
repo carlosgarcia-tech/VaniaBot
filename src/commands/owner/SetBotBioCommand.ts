@@ -1,7 +1,7 @@
 /**
  * SetBotBioCommand.ts
  *
- * owner command `setbotbio` — Cambia el estado/bio del bot
+ * owner command `setbotbio` — Change the bot's status/bio
  * Usage: !setbotbio <texto>
  *
  * @author **Carlos G**
@@ -11,7 +11,7 @@ import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 
-/** Command handler for `!setbotbio`: Cambia el estado/bio del bot. */
+/** Command handler for `!setbotbio`: Change the bot's status/bio. */
 export class SetBotBioCommand extends Command {
   name = 'setbotbio';
   description = 'Cambia el estado/bio del bot';

@@ -1,7 +1,7 @@
 /**
  * YoutubeSearchCommand.ts
  *
- * anime command `ytsearch` — Busca videos en YouTube
+ * anime command `ytsearch` — Searches videos on YouTube
  * Usage: !ytsearch <busqueda>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!ytsearch`: Busca videos en YouTube. */
+/** Command handler for `!ytsearch`: Searches videos on YouTube. */
 export class YoutubeSearchCommand extends Command {
   name = 'ytsearch';
   description = 'Busca videos en YouTube';

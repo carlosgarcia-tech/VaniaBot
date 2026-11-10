@@ -2,7 +2,7 @@
  * TemperaturaCommand.ts
  *
  * utility command `clima` — Consulta el clima de una ciudad
- * Usage: !clima <ciudad>
+ * Usage: !clima <city>
  *
  * @author **Carlos G**
  */
@@ -27,7 +27,7 @@ export class TemperaturaCommand extends Command {
 
     if (!city) {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *clima — VaniaBot* ˚₊· ͟͟͞͞➳\n\n` +
+        `˚₊· ͟͟͞͞➳ *clima — OrbitBot* ˚₊· ͟͟͞͞➳\n\n` +
           `✿ *cómo usarlo:* !clima <ciudad>\n\n` +
           `✩ *ejemplos:*\n` +
           `  ﹒!clima Ciudad de México\n` +

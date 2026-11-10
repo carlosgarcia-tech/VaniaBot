@@ -1,7 +1,7 @@
 /**
  * BuscarCommand.ts
  *
- * media command `buscar` — Busca en la web
+ * media command `buscar` — Searches the web
  * Usage: !buscar <consulta>
  *
  * @author **Carlos G**
@@ -20,7 +20,7 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { webSearchService } from '@/services/download/WebSearchService.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!buscar`: Busca en la web. */
+/** Command handler for `!buscar`: Searches the web. */
 export class BuscarCommand extends Command {
   name = 'buscar';
   description = 'Busca en la web';

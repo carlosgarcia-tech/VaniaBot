@@ -1,8 +1,8 @@
 /**
  * DeleteCommand.ts
  *
- * creative command `delete` — Efecto de imagen borrosa (delete)
- * Usage: !delete [@usuario]
+ * creative command `delete` — Blurred image effect (delete)
+ * Usage: !delete [@user]
  *
  * @author **Carlos G**
  */
@@ -18,7 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!delete`: Efecto de imagen borrosa (delete). */
+/** Command handler for `!delete`: Blurred image effect (delete). */
 export class DeleteCommand extends Command {
   name = 'delete';
   description = 'Efecto de imagen borrosa (delete)';

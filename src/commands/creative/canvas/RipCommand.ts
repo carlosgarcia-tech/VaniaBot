@@ -1,8 +1,8 @@
 /**
  * RipCommand.ts
  *
- * creative command `rip` — Genera imagen RIP
- * Usage: !rip [@usuario]
+ * creative command `rip` — Generates a RIP image
+ * Usage: !rip [@user]
  *
  * @author **Carlos G**
  */
@@ -18,7 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!rip`: Genera imagen RIP. */
+/** Command handler for `!rip`: Generates a RIP image. */
 export class RipCommand extends Command {
   name = 'rip';
   description = 'Genera imagen RIP';

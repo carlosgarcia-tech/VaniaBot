@@ -1,7 +1,7 @@
 /**
  * XvideosCommand.ts
  *
- * media command `xvideos` — Descarga video de XVideos
+ * media command `xvideos` — Downloads XVideos video
  * Usage: !xvideos <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!xvideos`: Descarga video de XVideos. */
+/** Command handler for `!xvideos`: Downloads XVideos video. */
 export class XvideosCommand extends Command {
   name = 'xvideos';
   description = 'Descarga video de XVideos';

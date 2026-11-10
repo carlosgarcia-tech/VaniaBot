@@ -1,7 +1,7 @@
 /**
  * ImageToPdfService.ts
  *
- * VaniaBot services module exposing `ImageToPdfService`.
+ * OrbitBot services module exposing `ImageToPdfService`.
  *
  * @author **Carlos G**
  */

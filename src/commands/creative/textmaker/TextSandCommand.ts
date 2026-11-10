@@ -1,7 +1,7 @@
 /**
  * TextSandCommand.ts
  *
- * creative command `sand` — Crea un efecto de texto en la arena
+ * creative command `sand` — Creates a text effect in the sand
  * Usage: !sand <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/write-names-and-messages-on-the-sand-online-582.html';
 
-/** Command handler for `!sand`: Crea un efecto de texto en la arena. */
+/** Command handler for `!sand`: Creates a text effect in the sand. */
 export class TextSandCommand extends Command {
   name = 'sand';
   description = 'Crea un efecto de texto en la arena';
@@ -27,14 +27,14 @@ export class TextSandCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!sand <texto>';
-  examples = ['!sand VaniaBot'];
+  examples = ['!sand OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !sand <texto>\n_Ejemplo: !sand VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !sand <texto>\n_Ejemplo: !sand OrbitBot_');
       return;
     }
 

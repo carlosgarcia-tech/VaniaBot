@@ -1,7 +1,7 @@
 /**
  * QuoteCommand.ts
  *
- * creative command `quote` — Genera imagen de cita famosa
+ * creative command `quote` — Generates a famous quote image
  * Usage: !quote <texto>
  *
  * @author **Carlos G**
@@ -16,7 +16,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!quote`: Genera imagen de cita famosa. */
+/** Command handler for `!quote`: Generates a famous quote image. */
 export class QuoteCommand extends Command {
   name = 'quote';
   description = 'Genera imagen de cita famosa';
@@ -40,7 +40,7 @@ export class QuoteCommand extends Command {
     await new CanvasBase().sendImage(ctx, 'quote', {
       image: 'https://i.imgur.com/bcQmM4S.jpeg',
       text: text.substring(0, 100),
-      footer: 'VaniaBot',
+      footer: 'OrbitBot',
     });
   }
 }

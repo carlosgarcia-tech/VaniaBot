@@ -1,7 +1,7 @@
 /**
  * MemeCommand.ts
  *
- * fun command `meme` — Muestra un meme o chiste de programador
+ * fun command `meme` — Shows a programmer meme or joke
  * Usage: !meme
  *
  * @author **Carlos G**
@@ -39,7 +39,7 @@ const MEMES = [
   '¿Por qué los zombies no pueden comer brains? ¡Porque ya están brains!',
 ];
 
-/** Command handler for `!meme`: Muestra un meme o chiste de programador. */
+/** Command handler for `!meme`: Shows a programmer meme or joke. */
 export class MemeCommand extends Command {
   name = 'meme';
   description = 'Muestra un meme o chiste de programador';

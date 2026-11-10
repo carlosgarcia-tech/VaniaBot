@@ -1,7 +1,7 @@
 /**
  * WASocketFactory.ts
  *
- * VaniaBot core module exposing `ErrorWithStatus`, `BuildWASocketOptionsArgs`, `getWAVersion`, `buildWASocketOptions`.
+ * OrbitBot core module exposing `ErrorWithStatus`, `BuildWASocketOptionsArgs`, `getWAVersion`, `buildWASocketOptions`.
  *
  * @author **Carlos G**
  */
@@ -39,7 +39,7 @@ let _cachedVersion: [number, number, number] | null = null;
 export const SILENT_WA_LOGGER = pino({ level: 'silent' });
 
 /** Browser identity advertised when pairing via QR code. */
-export const WA_BROWSER_QR: [string, string, string] = ['VaniaBot', 'Chrome', '131.0.6778.0'];
+export const WA_BROWSER_QR: [string, string, string] = ['OrbitBot', 'Chrome', '131.0.6778.0'];
 /** Browser identity advertised when pairing via pairing code (needs a desktop-ish UA). */
 export const WA_BROWSER_PAIRING: [string, string, string] = ['Ubuntu', 'Chrome', '131.0.6778.0'];
 

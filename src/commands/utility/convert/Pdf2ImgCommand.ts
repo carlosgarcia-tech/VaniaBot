@@ -1,8 +1,8 @@
 /**
  * Pdf2ImgCommand.ts
  *
- * utility command `pdf2img` — Convierte un PDF a imágenes (jpg o png)
- * Usage: !pdf2img [jpg|png] (responder a un PDF)
+ * utility command `pdf2img` — Converts a PDF to images (jpg or png)
+ * Usage: !pdf2img [jpg|png] (reply to a PDF)
  *
  * @author **Carlos G**
  */
@@ -14,7 +14,7 @@ import { ConversionService } from '@/services/convert/ConversionService.js';
 import type { ImageFormat } from '@/services/convert/types.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!pdf2img`: Convierte un PDF a imágenes (jpg o png). */
+/** Command handler for `!pdf2img`: Converts a PDF to images (jpg or png). */
 export class Pdf2ImgCommand extends Command {
   name = 'pdf2img';
   description = 'Convierte un PDF a imágenes (jpg o png)';

@@ -1,8 +1,9 @@
 /**
  * GayCanvasCommand.ts
  *
- * creative command `gay` — Calcula el porcentaje gay y genera imagen con efecto arcoíris
- * Usage: !gay [@usuario]
+ * creative command `gay` — Calculates your gay percentage and generates
+ * an image with a rainbow effect
+ * Usage: !gay [@user]
  *
  * @author **Carlos G**
  */
@@ -19,7 +20,8 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!gay`: Calcula el porcentaje gay y genera imagen con efecto arcoíris. */
+/** Command handler for `!gay`: Calculates your gay percentage and
+ * generates an image with a rainbow effect. */
 export class GayCommand extends Command {
   name = 'gay';
   description = 'Calcula el porcentaje gay y genera imagen con efecto arcoíris';

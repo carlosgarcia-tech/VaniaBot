@@ -1,7 +1,7 @@
 /**
  * ResumirChatCommand.ts
  *
- * group command `resumirchat` — Resume conversación reciente del grupo
+ * group command `resumirchat` — Summarizes the group's recent conversation
  * Usage: !resumirchat [cantidad]
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { chatSummaryService } from '@/services/chat/ChatSummaryService.js';
 
-/** Command handler for `!resumirchat`: Resume conversación reciente del grupo. */
+/** Command handler for `!resumirchat`: Summarizes the group's recent conversation. */
 export class ResumirChatCommand extends Command {
   name = 'resumirchat';
   description = 'Resume conversación reciente del grupo';

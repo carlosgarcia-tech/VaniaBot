@@ -1,7 +1,7 @@
 /**
  * BegCommand.ts
  *
- * economy command `beg` — Pide limosna (sin cooldown)
+ * economy command `beg` — Beg for money (no cooldown)
  * Usage: !beg
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 
-/** Command handler for `!beg`: Pide limosna (sin cooldown). */
+/** Command handler for `!beg`: Beg for money (no cooldown). */
 export class BegCommand extends Command {
   name = 'beg';
   description = 'Pide limosna (sin cooldown)';

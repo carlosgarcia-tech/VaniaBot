@@ -1,7 +1,7 @@
 /**
  * SpeedtestCommand.ts
  *
- * owner command `speedtest` — Mide ping, descarga y subida del internet del bot
+ * owner command `speedtest` — Measures the bot's ping, download and upload speed
  * Usage: !speedtest
  *
  * @author **Carlos G**
@@ -380,7 +380,7 @@ function buildResultMessage(
   );
 }
 
-/** Command handler for `!speedtest`: Mide ping, descarga y subida del internet del bot. */
+/** Command handler for `!speedtest`: Measures the bot's ping, download and upload speed. */
 export class SpeedtestCommand extends Command {
   name = 'speedtest';
   description = 'Mide ping, descarga y subida del internet del bot';

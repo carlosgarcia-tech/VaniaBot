@@ -1,7 +1,7 @@
 /**
  * Pathfinding.ts
  *
- * VaniaBot commands module exposing `PathStep`, `PathResult`, `findPath`, `findTopKPaths`.
+ * OrbitBot commands module exposing `PathStep`, `PathResult`, `findPath`, `findTopKPaths`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * PokeviewCommand.ts
  *
- * creative command `pokeview` — Genera vista de Pokemon
+ * creative command `pokeview` — Generates a Pokemon view
  * Usage: !pokeview <pokemon> [vista]
  *
  * @author **Carlos G**
@@ -16,7 +16,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!pokeview`: Genera vista de Pokemon. */
+/** Command handler for `!pokeview`: Generates a Pokemon view. */
 export class PokeviewCommand extends Command {
   name = 'pokeview';
   description = 'Genera vista de Pokemon';

@@ -1,7 +1,7 @@
 /**
  * SetBotNameCommand.ts
  *
- * owner command `setbotname` — Cambia el nombre del bot
+ * owner command `setbotname` — Change the bot's name
  * Usage: !setbotname <nombre>
  *
  * @author **Carlos G**
@@ -11,14 +11,14 @@ import { Command } from '../Command.js';
 import { CommandCategory, PermissionLevel } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 
-/** Command handler for `!setbotname`: Cambia el nombre del bot. */
+/** Command handler for `!setbotname`: Change the bot's name. */
 export class SetBotNameCommand extends Command {
   name = 'setbotname';
   description = 'Cambia el nombre del bot';
   category = CommandCategory.OWNER;
   aliases = ['botname', 'setnamebot', 'setnombrebot'];
   usage = '!setbotname <nombre>';
-  examples = ['!setbotname Vania Bot', '!setbotname Mi Bot'];
+  examples = ['!setbotname Orbit Bot', '!setbotname Mi Bot'];
   permissions = {
     user: [PermissionLevel.OWNER],
   };
@@ -31,7 +31,7 @@ export class SetBotNameCommand extends Command {
         '*SETBOTNAME*\n\n' +
           'Cambia el nombre del bot.\n\n' +
           'Uso: !setbotname <nombre>\n' +
-          'Ejemplo: !setbotname Vania Bot',
+          'Ejemplo: !setbotname Orbit Bot',
       );
       return;
     }

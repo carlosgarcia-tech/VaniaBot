@@ -1,7 +1,7 @@
 /**
  * PhubCommand.ts
  *
- * creative command `phub` — Genera imagen estilo Pornhub
+ * creative command `phub` — Generates a Pornhub-style image
  * Usage: !phub <texto>
  *
  * @author **Carlos G**
@@ -34,7 +34,7 @@ async function getDefaultImageUrl(): Promise<string | null> {
   return url;
 }
 
-/** Command handler for `!phub`: Genera imagen estilo Pornhub. */
+/** Command handler for `!phub`: Generates a Pornhub-style image. */
 export class PhubCommand extends Command {
   name = 'phub';
   description = 'Genera imagen estilo Pornhub';

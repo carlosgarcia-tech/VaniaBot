@@ -1,7 +1,7 @@
 /**
  * TelegramStoriesCommand.ts
  *
- * media command `telegramstories` — Descarga stories de Telegram
+ * media command `telegramstories` — Downloads Telegram stories
  * Usage: !telegramstories <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!telegramstories`: Descarga stories de Telegram. */
+/** Command handler for `!telegramstories`: Downloads Telegram stories. */
 export class TelegramStoriesCommand extends Command {
   name = 'telegramstories';
   description = 'Descarga stories de Telegram';

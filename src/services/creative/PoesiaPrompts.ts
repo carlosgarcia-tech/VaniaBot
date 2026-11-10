@@ -1,14 +1,14 @@
 /**
  * PoesiaPrompts.ts
  *
- * VaniaBot services module exposing `buildPoemaPrompt`, `buildFrasePrompt`, `buildPiropopPrompt`, `buildDedicatoriaPrompt`.
+ * OrbitBot services module exposing `buildPoemaPrompt`, `buildFrasePrompt`, `buildPiropopPrompt`, `buildDedicatoriaPrompt`.
  *
  * @author **Carlos G**
  */
 
 import { ContenidoTipo, EstiloPoema, type GenerarOpts } from './PoesiaTypes.js';
 
-const PERSONALIDAD_BASE = `Eres un poeta y escritor creativo de VaniaBot.
+const PERSONALIDAD_BASE = `Eres un poeta y escritor creativo de OrbitBot.
 Tu escritura es fresca, emotiva y en español mexicano/latinoamericano.
 Usa lenguaje natural, no cursi en exceso. Evita clichés como "tus ojos son dos luceros".
 Responde ÚNICAMENTE con el contenido pedido, sin introducción, sin "aquí tienes tu poema", sin comillas alrededor.`;

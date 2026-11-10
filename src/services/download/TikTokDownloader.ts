@@ -1,7 +1,7 @@
 /**
  * TikTokDownloader.ts
  *
- * VaniaBot services module exposing `TikTokDownloader`, `TikTokVideo`.
+ * OrbitBot services module exposing `TikTokDownloader`, `TikTokVideo`.
  *
  * @author **Carlos G**
  */

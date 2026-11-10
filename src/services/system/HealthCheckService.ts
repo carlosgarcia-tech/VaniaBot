@@ -237,7 +237,7 @@ export class HealthCheckService {
   private checkSession(): HealthCheck {
     const start = Date.now();
     try {
-      const sessionPath = join(process.cwd(), 'vaniasession', 'creds.json');
+      const sessionPath = join(process.cwd(), 'orbitsession', 'creds.json');
 
       if (!existsSync(sessionPath)) {
         return {

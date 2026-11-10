@@ -1,8 +1,8 @@
 /**
  * ImgurCommand.ts
  *
- * media command `imgur` — Sube una imagen a Imgur
- * Usage: !imgur [responder a imagen]
+ * media command `imgur` — Uploads an image to Imgur
+ * Usage: !imgur (reply to an image)
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!imgur`: Sube una imagen a Imgur. */
+/** Command handler for `!imgur`: Uploads an image to Imgur. */
 export class ImgurCommand extends Command {
   name = 'imgur';
   description = 'Sube una imagen a Imgur';

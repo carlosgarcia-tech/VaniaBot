@@ -36,7 +36,7 @@ const TABLE_NAME_MAP: Record<string, string> = {
 const COLLECTION_KEY_COLUMN: Record<string, string> = {
   users: 'jid',
   groups: 'jid',
-  vania_toggle: 'key',
+  orbit_toggle: 'key',
   reports: 'id',
   reminders: 'key',
   polls: 'key',

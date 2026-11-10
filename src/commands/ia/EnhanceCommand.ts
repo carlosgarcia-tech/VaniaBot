@@ -1,8 +1,8 @@
 /**
  * EnhanceCommand.ts
  *
- * media command `enhance` — Mejora y enlarge una imagen con IA
- * Usage: !enhance (responde a imagen) [scale] o !enhance <url> [scale]
+ * media command `enhance` — Enhances and enlarges an image with AI
+ * Usage: !enhance (reply to an image) [scale] or !enhance <url> [scale]
  *
  * @author **Carlos G**
  */
@@ -14,7 +14,7 @@ import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import axios from 'axios';
 
-/** Command handler for `!enhance`: Mejora y enlarge una imagen con IA. */
+/** Command handler for `!enhance`: Enhances and enlarges an image with AI. */
 export class EnhanceCommand extends Command {
   name = 'enhance';
   description = 'Mejora y enlarge una imagen con IA';

@@ -1,7 +1,7 @@
 /**
  * TwitterCommand.ts
  *
- * media command `twitter` — Descarga videos de Twitter/X
+ * media command `twitter` — Downloads Twitter/X videos
  * Usage: !twitter <url>
  *
  * @author **Carlos G**
@@ -31,7 +31,7 @@ class TwitterPreview extends MediaPreviewBase {
   }
 }
 
-/** Command handler for `!twitter`: Descarga videos de Twitter/X. */
+/** Command handler for `!twitter`: Downloads Twitter/X videos. */
 export class TwitterCommand extends Command {
   name = 'twitter';
   description = 'Descarga videos de Twitter/X';
@@ -82,7 +82,7 @@ export class TwitterCommand extends Command {
           thumbnail: info?.thumbnailUrl,
           author: info?.author,
         },
-        '> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
+        '> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕',
       );
 
       await ctx.react('⬇️');

@@ -1,7 +1,7 @@
 /**
  * AchievementService.ts
  *
- * VaniaBot services module exposing `Achievement`, `achievementService`.
+ * OrbitBot services module exposing `Achievement`, `achievementService`.
  *
  * @author **Carlos G**
  */

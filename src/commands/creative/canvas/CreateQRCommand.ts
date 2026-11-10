@@ -1,7 +1,7 @@
 /**
  * CreateQRCommand.ts
  *
- * creative command `createqr` — Genera un código QR con tu texto
+ * creative command `createqr` — Generates a QR code from your text
  * Usage: !createqr <texto>
  *
  * @author **Carlos G**
@@ -16,7 +16,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!createqr`: Genera un código QR con tu texto. */
+/** Command handler for `!createqr`: Generates a QR code from your text. */
 export class CreateQRCommand extends Command {
   name = 'createqr';
   description = 'Genera un código QR con tu texto';

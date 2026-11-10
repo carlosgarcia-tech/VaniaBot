@@ -1,7 +1,7 @@
 /**
  * WikiCommand.ts
  *
- * anime command `wiki` — Busca en Wikipedia
+ * anime command `wiki` — Searches Wikipedia
  * Usage: !wiki <busqueda>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!wiki`: Busca en Wikipedia. */
+/** Command handler for `!wiki`: Searches Wikipedia. */
 export class WikiCommand extends Command {
   name = 'wiki';
   description = 'Busca en Wikipedia';

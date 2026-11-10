@@ -1,7 +1,7 @@
 /**
  * GimageCommand.ts
  *
- * anime command `gimage` — Busca imágenes en Google
+ * anime command `gimage` — Searches images on Google
  * Usage: !gimage <busqueda>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!gimage`: Busca imágenes en Google. */
+/** Command handler for `!gimage`: Searches images on Google. */
 export class GimageCommand extends Command {
   name = 'gimage';
   description = 'Busca imágenes en Google';

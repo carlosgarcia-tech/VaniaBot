@@ -1,7 +1,7 @@
 /**
  * RestartCommand.ts
  *
- * owner command `restart` — Reinicia el bot
+ * owner command `restart` — Restart the bot
  * Usage: !restart
  *
  * @author **Carlos G**
@@ -25,7 +25,7 @@ import {
 import { logger } from '@/utils/logger.js';
 import { checkPinVerification } from '@/utils/pinVerificationHelper.js';
 
-/** Command handler for `!restart`: Reinicia el bot. */
+/** Command handler for `!restart`: Restart the bot. */
 export class RestartCommand extends Command {
   name = 'restart';
   description = 'Reinicia el bot';

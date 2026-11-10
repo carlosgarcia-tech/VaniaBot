@@ -1,7 +1,7 @@
 /**
  * Ytmp3v2Command.ts
  *
- * media command `ytmp3v2` — Descarga audio de YouTube (v2)
+ * media command `ytmp3v2` — Downloads YouTube audio (v2)
  * Usage: !ytmp3v2 <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!ytmp3v2`: Descarga audio de YouTube (v2). */
+/** Command handler for `!ytmp3v2`: Downloads YouTube audio (v2). */
 export class Ytmp3v2Command extends Command {
   name = 'ytmp3v2';
   description = 'Descarga audio de YouTube (v2)';
@@ -38,7 +38,7 @@ export class Ytmp3v2Command extends Command {
     }
 
     await ctx.react('🎵');
-    await ctx.reply('> 𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕');
+    await ctx.reply('> 𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩 𝘿𝙚𝙨𝙘𝙖𝙧𝙜𝙖𝙨 💕');
 
     try {
       const data = (await deliriusService.getJson('download', 'ytmp3v2', { url })) as {

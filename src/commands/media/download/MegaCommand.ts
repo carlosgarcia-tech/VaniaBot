@@ -1,8 +1,8 @@
 /**
  * MegaCommand.ts
  *
- * media command `mega` — Descarga archivos de Mega.nz
- * Usage: !mega <url de mega>
+ * media command `mega` — Downloads files from Mega.nz
+ * Usage: !mega <mega url>
  *
  * @author **Carlos G**
  */
@@ -21,7 +21,7 @@ import { megaDownloader } from '@/services/download/MegaDownloader.js';
 import { isRight } from '@/utils/either.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!mega`: Descarga archivos de Mega.nz. */
+/** Command handler for `!mega`: Downloads files from Mega.nz. */
 export class MegaCommand extends Command {
   name = 'mega';
   description = 'Descarga archivos de Mega.nz';

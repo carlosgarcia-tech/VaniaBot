@@ -1,10 +1,10 @@
 /**
  * fixtures.ts
  *
- * Construcción de WAMessage válidos (forma Baileys real) para el harness
- * e2e. Los timestamps van en segundos —como los manda WhatsApp— y son
- * posteriores al arranque del bot para no caer en el filtro de ecos
- * offline de MainMessagePipeline.isPreStartupEcho.
+ * Building valid WAMessages (real Baileys shape) for the e2e harness.
+ * Timestamps are in seconds —as WhatsApp sends them— and postdate the bot's
+ * startup so they don't fall into MainMessagePipeline.isPreStartupEcho's
+ * offline-echo filter.
  */
 
 import type { proto, WAMessage } from 'baileys';
@@ -12,7 +12,7 @@ import type { proto, WAMessage } from 'baileys';
 const BOT_CREATION_MS = Date.now();
 let messageCounter = 0;
 
-/** Marca de tiempo (s) posterior al arranque: pasará el filtro de ecos. */
+/** Timestamp (s) after startup: passes the echo filter. */
 function timestampSeconds(): number {
   return Math.floor((BOT_CREATION_MS + 60_000) / 1000);
 }
@@ -32,35 +32,34 @@ function baseMessage(jid: string): WAMessage {
   };
 }
 
-/** JID del usuario que "escribe" al bot en los tests. */
+/** JID of the user "messaging" the bot in the tests. */
 export const SENDER_JID = '861234567890123456@s.whatsapp.net';
-/** DM directo bot↔usuario (los guards de grupo no aplican). */
+/** Direct bot↔user DM (group guards don't apply). */
 export const DM_JID = SENDER_JID;
 
 /**
- * JID de remitente único por índice: cada test usa el suyo para no
- * dispararse entre sí el anti-spam/anti-flood (que limita por remitente
- * y comparte estado durante todo el boot). Acepta índices de hasta 4
- * dígitos.
+ * Sender JID unique per index: each test uses its own so they don't
+ * trigger each other's anti-spam/anti-flood (which limits per sender and
+ * shares state for the whole boot). Accepts indexes up to 4 digits.
  */
 export function senderJid(n: number): string {
   return `86123456789${String(n).padStart(6, '0')}@s.whatsapp.net`;
 }
 
-/** Nombre push configurable, por si un test lo necesita. */
+/** Configurable push name, in case a test needs one. */
 function withPushName(msg: WAMessage, pushName: string): WAMessage {
   return { ...msg, pushName };
 }
 
-/** Mensaje de texto entrante en un chat privado. */
+/** Incoming text message in a private chat. */
 export function dmTextMessage(text: string, sender: string = SENDER_JID): WAMessage {
   const msg = baseMessage(sender);
   return { ...msg, message: { conversation: text } };
 }
 
 /**
- * Mensaje de texto simple en grupo. El remitente (participant) es
- * configurable para aislar cooldowns y anti-spam entre tests.
+ * Simple text message in a group. The sender (participant) is configurable
+ * to isolate cooldowns and anti-spam between tests.
  */
 export function groupTextMessage(
   text: string,
@@ -75,7 +74,7 @@ export function groupTextMessage(
   };
 }
 
-/** Variante de grupo con nombre push distinto (lo usa el kick por spam). */
+/** Group variant with a distinct push name (used by the spam kick). */
 export function groupMessageFrom(
   groupJid: string,
   sender: string,
@@ -93,7 +92,7 @@ export function groupMessageFrom(
   );
 }
 
-/** Mention JID con el texto de referencia en un grupo. */
+/** Mention JID with reference text in a group. */
 export function groupMentionMessage(
   text: string,
   groupJid: string,
@@ -117,7 +116,7 @@ export function groupMentionMessage(
   );
 }
 
-/** Texto extendido en DM (respuesta a otro mensaje, como el de WhatsApp). */
+/** Extended text in a DM (reply to another message, like WhatsApp's). */
 export function dmExtendedTextMessage(text: string, sender: string = SENDER_JID): WAMessage {
   const msg = baseMessage(sender);
   return {
@@ -126,7 +125,7 @@ export function dmExtendedTextMessage(text: string, sender: string = SENDER_JID)
   };
 }
 
-/** Texto extendido en grupo, con contexto de mención. */
+/** Extended text in a group, with mention context. */
 export function groupExtendedTextMessage(
   text: string,
   groupJid: string,
@@ -141,7 +140,7 @@ export function groupExtendedTextMessage(
   };
 }
 
-/** Imagen con caption: MessageContext extrae el caption como texto. */
+/** Image with caption: MessageContext extracts the caption as text. */
 export function dmImageCaptionMessage(caption: string, sender: string = SENDER_JID): WAMessage {
   const msg = baseMessage(sender);
   return {
@@ -150,7 +149,7 @@ export function dmImageCaptionMessage(caption: string, sender: string = SENDER_J
   };
 }
 
-/** Sticker sin texto: no debe ejecutar ningún comando. */
+/** Sticker with no text: must not run any command. */
 export function dmStickerMessage(sender: string = SENDER_JID): WAMessage {
   const msg = baseMessage(sender);
   return {
@@ -159,7 +158,7 @@ export function dmStickerMessage(sender: string = SENDER_JID): WAMessage {
   };
 }
 
-/** Mensaje marcado como propio (key.fromMe): el pipeline lo ignora. */
+/** Message marked as own (key.fromMe): the pipeline ignores it. */
 export function dmFromMeMessage(text: string, sender: string = SENDER_JID): WAMessage {
   const msg = baseMessage(sender);
   return {
@@ -169,7 +168,7 @@ export function dmFromMeMessage(text: string, sender: string = SENDER_JID): WAMe
   };
 }
 
-/** Reacción a un mensaje previo: entra por handleReaccion, no por comandos. */
+/** Reaction to a previous message: enters via handleReaccion, not commands. */
 export function dmReactionMessage(
   sender: string,
   targetId: string,

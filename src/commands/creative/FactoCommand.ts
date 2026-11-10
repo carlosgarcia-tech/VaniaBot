@@ -1,7 +1,7 @@
 /**
  * FactoCommand.ts
  *
- * fun command `facto` — Envía una verdad incómoda y elegante
+ * fun command `facto` — Sends an uncomfortable but elegant truth
  * Usage: !facto [tema]
  *
  * @author **Carlos G**
@@ -31,7 +31,7 @@ const FACTOS_PREDEFINED = [
   'Los que siempre dicen "yo soy diferente" son los más predecibles del grupo.',
 ];
 
-const PROMPT_BASE = `Eres Vania, una bot fascinante. Genera UN SOLO "facto" - una verdad incómoda, fría, precisa y elegante.
+const PROMPT_BASE = `Eres Orbit, una bot fascinante. Genera UN SOLO "facto" - una verdad incómoda, fría, precisa y elegante.
 
 Un facto es:
 - Una verdad incómoda pero precisa
@@ -47,7 +47,7 @@ Ejemplos de estilo:
 
 Genera solo el facto, sin introducción ni explicación. Sé creativo y diferente cada vez.`;
 
-/** Command handler for `!facto`: Envía una verdad incómoda y elegante. */
+/** Command handler for `!facto`: Sends an uncomfortable but elegant truth. */
 export class FactoCommand extends Command {
   name = 'facto';
   description = 'Envía una verdad incómoda y elegante';
@@ -90,7 +90,7 @@ export class FactoCommand extends Command {
   }
 
   private formatFactoMessage(facto: string, footer: string): string {
-    const cleanFacto = facto.replace(/>\s*VaniaBot[💝]*\s*$/i, '').trim();
+    const cleanFacto = facto.replace(/>\s*OrbitBot[💝]*\s*$/i, '').trim();
     return `┌─ ୨ৎ ──────┐
       ✿  *F A C T O*  ✿   
 

@@ -1,7 +1,7 @@
 /**
  * FishCommand.ts
  *
- * economy command `fish` — Pescar para ganar dinero
+ * economy command `fish` — Fish to earn money
  * Usage: !fish
  *
  * @author **Carlos G**
@@ -14,7 +14,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 const fishCooldowns = new Map<string, number>();
 const FISH_COOLDOWN = 2 * 60 * 1000;
 
-/** Command handler for `!fish`: Pescar para ganar dinero. */
+/** Command handler for `!fish`: Fish to earn money. */
 export class FishCommand extends Command {
   name = 'fish';
   description = 'Pescar para ganar dinero';

@@ -1,7 +1,7 @@
 /**
  * ProfileCardService.ts
  *
- * VaniaBot services module exposing `ProfileCardService`, `ProfileCardOptions`.
+ * OrbitBot services module exposing `ProfileCardService`, `ProfileCardOptions`.
  *
  * @author **Carlos G**
  */

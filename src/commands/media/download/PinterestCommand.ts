@@ -1,8 +1,8 @@
 /**
  * PinterestCommand.ts
  *
- * media command `pinterest` — Descarga imágenes/videos de Pinterest
- * Usage: !pin <url de pinterest>
+ * media command `pinterest` — Downloads Pinterest images/videos
+ * Usage: !pin <pinterest url>
  *
  * @author **Carlos G**
  */
@@ -20,7 +20,7 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { pinterestDownloader } from '@/services/download/PinterestDownloader.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!pinterest`: Descarga imágenes/videos de Pinterest. */
+/** Command handler for `!pinterest`: Downloads Pinterest images/videos. */
 export class PinterestCommand extends Command {
   name = 'pinterest';
   description = 'Descarga imágenes/videos de Pinterest';

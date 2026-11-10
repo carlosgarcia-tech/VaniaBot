@@ -1,7 +1,7 @@
 /**
  * JidService.ts
  *
- * VaniaBot services module exposing `normalizeJid`, `getBotJid`, `getBotLid`, `getBotPhone`.
+ * OrbitBot services module exposing `normalizeJid`, `getBotJid`, `getBotLid`, `getBotPhone`.
  *
  * @author **Carlos G**
  */

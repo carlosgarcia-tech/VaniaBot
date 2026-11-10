@@ -1,7 +1,7 @@
 /**
  * SystemRouter.ts
  *
- * VaniaBot services module exposing `createSystemRouter`.
+ * OrbitBot services module exposing `createSystemRouter`.
  *
  * @author **Carlos G**
  */
@@ -64,7 +64,7 @@ export function createSystemRouter(webhookToken: string): Router {
     const mainBotConnected = getClient()?.isClientReady() ?? false;
     bots.push({
       id: 'main',
-      name: 'VaniaBot',
+      name: 'OrbitBot',
       connected: mainBotConnected,
       uptime: process.uptime(),
     });
@@ -82,7 +82,7 @@ export function createSystemRouter(webhookToken: string): Router {
 
     res.json({
       bots: [
-        { id: 'main', name: 'VaniaBot', connected: mainBotConnected, uptime: process.uptime() },
+        { id: 'main', name: 'OrbitBot', connected: mainBotConnected, uptime: process.uptime() },
       ],
       memory: { rss: memory.rss, heapTotal: memory.heapTotal, heapUsed: memory.heapUsed },
       memorySystem: {

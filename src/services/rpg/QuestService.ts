@@ -1,7 +1,7 @@
 /**
  * QuestService.ts
  *
- * VaniaBot services module exposing `QuestService`, `Quest`, `QuestObjective`, `QuestReward`.
+ * OrbitBot services module exposing `QuestService`, `Quest`, `QuestObjective`, `QuestReward`.
  *
  * @author **Carlos G**
  */

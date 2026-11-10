@@ -1,7 +1,7 @@
 /**
  * LoremFlickrCommand.ts
  *
- * anime command `loremflickr` — Obtiene una imagen de LoremFlickr
+ * anime command `loremflickr` — Gets an image from LoremFlickr
  * Usage: !loremflickr <tags>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!loremflickr`: Obtiene una imagen de LoremFlickr. */
+/** Command handler for `!loremflickr`: Gets an image from LoremFlickr. */
 export class LoremFlickrCommand extends Command {
   name = 'loremflickr';
   description = 'Obtiene una imagen de LoremFlickr';

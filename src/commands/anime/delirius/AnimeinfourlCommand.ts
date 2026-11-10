@@ -1,7 +1,7 @@
 /**
  * AnimeinfourlCommand.ts
  *
- * anime command `animeinfourl` — Muestra información de anime por URL
+ * anime command `animeinfourl` — Shows anime information by URL
  * Usage: !animeinfourl <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!animeinfourl`: Muestra información de anime por URL. */
+/** Command handler for `!animeinfourl`: Shows anime information by URL. */
 export class AnimeinfourlCommand extends Command {
   name = 'animeinfourl';
   description = 'Muestra información de anime por URL';

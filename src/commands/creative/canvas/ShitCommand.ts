@@ -1,8 +1,8 @@
 /**
  * ShitCommand.ts
  *
- * creative command `shit` — Genera imagen con mierda
- * Usage: !shit [@usuario]
+ * creative command `shit` — Generates a pooped-on image
+ * Usage: !shit [@user]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!shit`: Genera imagen con mierda. */
+/** Command handler for `!shit`: Generates a pooped-on image. */
 export class ShitCommand extends Command {
   name = 'shit';
   description = 'Genera imagen con mierda';

@@ -1,7 +1,7 @@
 /**
  * AntiArabService.ts
  *
- * VaniaBot services module exposing `AntiArabService`, `AntiArabConfig`, `AntiArabStore`, `antiArabService`.
+ * OrbitBot services module exposing `AntiArabService`, `AntiArabConfig`, `AntiArabStore`, `antiArabService`.
  *
  * @author **Carlos G**
  */
@@ -96,8 +96,8 @@ export class AntiArabService {
 
   addPrefix(groupId: string, prefix: string): void {
     const config = this.getOrCreateConfig(groupId);
-    // Solo dígitos: shouldBlockNumber compara contra números normalizados sin '+',
-    // conservar el '+' haría el prefijo imposible de matchear
+    // Digits only: shouldBlockNumber compares against normalized numbers without '+',
+    // keeping the '+' would make the prefix impossible to match
     const cleanPrefix = prefix.replace(/[^\d]/g, '');
     if (cleanPrefix && !config.prefixes.includes(cleanPrefix)) {
       config.prefixes.push(cleanPrefix);

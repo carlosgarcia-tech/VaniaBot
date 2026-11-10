@@ -8,7 +8,7 @@
  * substituted before sending. Each group can override the template or opt into
  * showing the participant's profile picture.
  *
- * Every send is gated twice — the per-chat vania toggle and the group's own
+ * Every send is gated twice — the per-chat orbit toggle and the group's own
  * welcome/goodbye setting — and all failures are swallowed: a greeting must
  * never break the participant-update handler.
  *
@@ -41,10 +41,10 @@ interface WelcomeConfigExtended extends WelcomeConfig {
 }
 
 /** Fallback facts used when the remote source is unavailable. */
-const VANIABOT_FACTS: string[] = [
-  '💌 El nombre VaniaBot nació en un dia cualquiera…',
-  '💭 VaniaBot no es solo un bot…',
-  '🌙 «VaniaBot» empezó como un juego…',
+const ORBITBOT_FACTS: string[] = [
+  '💌 El nombre OrbitBot nació en un dia cualquiera…',
+  '💭 OrbitBot no es solo un bot…',
+  '🌙 «OrbitBot» empezó como un juego…',
 ];
 
 const cachedFacts: string[] = [];
@@ -113,7 +113,7 @@ async function getRandomFact(): Promise<string> {
     return cachedFacts[Math.floor(Math.random() * cachedFacts.length)];
   }
 
-  return VANIABOT_FACTS[Math.floor(Math.random() * VANIABOT_FACTS.length)];
+  return ORBITBOT_FACTS[Math.floor(Math.random() * ORBITBOT_FACTS.length)];
 }
 
 /** Wraps a fact in the decorative frame used by the default templates. */
@@ -128,14 +128,14 @@ export class WelcomeService {
 ✧･ﾟ:*  𝙚𝙮, 𝙣𝙪𝙚𝙫𝙖 𝙘𝙖𝙧𝙖  *:･ﾟ✧
 hola @user ♡
 @fact
-✧･ﾟ:*  𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩  *:･ﾟ✧
+✧･ﾟ:*  𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩  *:･ﾟ✧
   `.trim();
 
   private readonly DEFAULT_GOODBYE = `
 ✧･ﾟ:*  𝙎𝙚 𝙡@ 𝙡𝙡𝙚𝙫@ 𝙡𝙖 𝙫𝙚𝙧𝙜𝙖  *:･ﾟ✧
 @user dijo adiós
 @count seguimos aquí
-✧･ﾟ:*  𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩  *:･ﾟ✧
+✧･ﾟ:*  𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩  *:･ﾟ✧
   `.trim();
 
   /**
@@ -155,13 +155,13 @@ hola @user ♡
   /**
    * Sends the welcome message for a joining participant.
    *
-   * Gated on the vania toggle and the group's welcome setting; sends as text when
+   * Gated on the orbit toggle and the group's welcome setting; sends as text when
    * no image can be resolved. All errors are logged, never thrown.
    */
   async handleNewParticipant(sock: WASocket, groupJid: string, userJid: string): Promise<void> {
     try {
-      const isVaniaEnabled = await serviceManager.vaniaToggleService.isEnabled(groupJid, 'main');
-      if (!isVaniaEnabled) return;
+      const isOrbitEnabled = await serviceManager.orbitToggleService.isEnabled(groupJid, 'main');
+      if (!isOrbitEnabled) return;
 
       const group = await serviceManager.groupService.getGroup(groupJid);
       if (!group.welcome.enabled) return;
@@ -222,8 +222,8 @@ hola @user ♡
     botId: string = 'main',
   ): Promise<void> {
     try {
-      const isVaniaEnabled = await serviceManager.vaniaToggleService.isEnabled(groupJid, botId);
-      if (!isVaniaEnabled) return;
+      const isOrbitEnabled = await serviceManager.orbitToggleService.isEnabled(groupJid, botId);
+      if (!isOrbitEnabled) return;
 
       const group = await serviceManager.groupService.getGroup(groupJid);
       if (!group.goodbye.enabled) return;

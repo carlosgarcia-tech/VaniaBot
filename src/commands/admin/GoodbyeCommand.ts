@@ -1,7 +1,7 @@
 /**
  * GoodbyeCommand.ts
  *
- * admin command `goodbye` — Configura mensajes de despedida
+ * admin command `goodbye` — Configure goodbye messages
  * Usage: !goodbye [on/off/set/test/reset]
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext, PermissionLevel } from '@/types/index.
 import type { MessageContext } from '@/types/index.js';
 import { welcomeService } from '@/services/system/WelcomeService.js';
 
-/** Command handler for `!goodbye`: Configura mensajes de despedida. */
+/** Command handler for `!goodbye`: Configure goodbye messages. */
 export class GoodbyeCommand extends Command {
   name = 'goodbye';
   description = 'Configura mensajes de despedida';

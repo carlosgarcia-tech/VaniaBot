@@ -1,7 +1,7 @@
 /**
  * RotationSimulator.ts
  *
- * VaniaBot commands module exposing `EnemyRotation`, `ConflictZone`, `ScoredRoute`, `TacticalAnalysis`.
+ * OrbitBot commands module exposing `EnemyRotation`, `ConflictZone`, `ScoredRoute`, `TacticalAnalysis`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * AnimeSearchCommand.ts
  *
- * anime command `animesearch` — Busca anime en AniList
+ * anime command `animesearch` — Searches anime on AniList
  * Usage: !animesearch <anime>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!animesearch`: Busca anime en AniList. */
+/** Command handler for `!animesearch`: Searches anime on AniList. */
 export class AnimeSearchCommand extends Command {
   name = 'animesearch';
   description = 'Busca anime en AniList';

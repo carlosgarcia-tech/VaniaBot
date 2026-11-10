@@ -1,7 +1,7 @@
 /**
  * BlackMarketCommand.ts
  *
- * economy command `blackmarket` — Mercado negro de items
+ * economy command `blackmarket` — Item black market
  * Usage: !blackmarket [listar|comprar|cancelar]
  *
  * @author **Carlos G**
@@ -13,7 +13,7 @@ import { blackMarketService } from '@/services/economy/BlackMarketService.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 
-/** Command handler for `!blackmarket`: Mercado negro de items. */
+/** Command handler for `!blackmarket`: Item black market. */
 export class BlackMarketCommand extends Command {
   name = 'blackmarket';
   description = 'Mercado negro de items';

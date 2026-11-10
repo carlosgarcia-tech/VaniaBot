@@ -1,8 +1,8 @@
 /**
  * VerCommand.ts
  *
- * utility command `ver` — Envía una imagen del chat como imagen normal
- * Usage: !ver (responder a una imagen)
+ * utility command `ver` — Sends a chat image as a normal image
+ * Usage: !ver (reply to an image)
  *
  * @author **Carlos G**
  */
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { logger } from '@/utils/logger.js';
 
-/** Command handler for `!ver`: Envía una imagen del chat como imagen normal. */
+/** Command handler for `!ver`: Sends a chat image as a normal image. */
 export class VerCommand extends Command {
   name = 'ver';
   description = 'Envía una imagen del chat como imagen normal';

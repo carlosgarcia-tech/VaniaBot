@@ -1,7 +1,8 @@
 /**
  * TranscribeCommand.ts
  *
- * utility command `transcribe` — Transcribe audio/notas de voz a texto con IA, compresión y resumen
+ * utility command `transcribe` — Transcribes audio/voice notes to text
+ * with AI, compression and summary
  * Usage: !transcribe [resumen|completo|idioma]
  *
  * @author **Carlos G**
@@ -137,7 +138,8 @@ export async function extractAudio(ctx: MessageContext): Promise<AudioData | nul
   return null;
 }
 
-/** Command handler for `!transcribe`: Transcribe audio/notas de voz a texto con IA, compresión y resumen. */
+/** Command handler for `!transcribe`: Transcribes audio/voice notes to
+ * text with AI, compression and summary. */
 export class TranscribeCommand extends Command {
   name = 'transcribe';
   description = 'Transcribe audio/notas de voz a texto con IA, compresión y resumen';
@@ -163,7 +165,7 @@ export class TranscribeCommand extends Command {
 
     if (!audioData) {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *transcriptor de voz — VaniaBot* ˚₊· ͟͟͞͞➳\n` +
+        `˚₊· ͟͟͞͞➳ *transcriptor de voz — OrbitBot* ˚₊· ͟͟͞͞➳\n` +
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
           `✿ mándame un audio con *!transcribe* y te lo escribo\n\n` +
           `✩ *cómo usarme:*\n` +
@@ -179,7 +181,7 @@ export class TranscribeCommand extends Command {
           `  • compresión automática para audios grandes\n` +
           `  • filtros de voz (menos ruido, más claridad)\n` +
           `  • detecto si es voz, música o silencio\n\n` +
-          `> _VaniaBot 🎙️ — tu transcriptora favorita_`,
+          `> _OrbitBot 🎙️ — tu transcriptora favorita_`,
       );
       return;
     }

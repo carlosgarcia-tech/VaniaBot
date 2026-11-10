@@ -1,7 +1,7 @@
 /**
  * WebhookRouter.ts
  *
- * VaniaBot services module exposing `createWebhookRouter`.
+ * OrbitBot services module exposing `createWebhookRouter`.
  *
  * @author **Carlos G**
  */

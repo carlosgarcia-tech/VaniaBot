@@ -1,7 +1,7 @@
 /**
  * WADisconnectPolicy.ts
  *
- * VaniaBot core module exposing `DisconnectInfo`, `extractDisconnectInfo`, `classifyDisconnect`, `computeReconnectDelayMs`.
+ * OrbitBot core module exposing `DisconnectInfo`, `extractDisconnectInfo`, `classifyDisconnect`, `computeReconnectDelayMs`.
  *
  * @author **Carlos G**
  */

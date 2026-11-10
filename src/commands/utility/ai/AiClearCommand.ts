@@ -1,8 +1,8 @@
 /**
  * AiClearCommand.ts
  *
- * utility command `aiclear` — Limpia tu historial de conversación con Vania IA
- * Usage: !aiclear  |  !aiclear all (solo admins)
+ * utility command `aiclear` — Clears your Orbit AI chat history
+ * Usage: !aiclear  |  !aiclear all (admins only)
  *
  * @author **Carlos G**
  */
@@ -11,10 +11,10 @@ import { Command } from '../../Command.js';
 import { CommandCategory, CommandContext, type MessageContext } from '@/types/index.js';
 import { aiService } from '@/services/external/AIService.js';
 
-/** Command handler for `!aiclear`: Limpia tu historial de conversación con Vania IA. */
+/** Command handler for `!aiclear`: Clears your Orbit AI chat history. */
 export class AiClearCommand extends Command {
   name = 'aiclear';
-  description = 'Limpia tu historial de conversación con Vania IA';
+  description = 'Limpia tu historial de conversación con Orbit IA';
   category = CommandCategory.UTILITY;
   aliases = ['clearchat', 'aiborrar', 'airestart'];
   usage = '!aiclear  |  !aiclear all (solo admins)';

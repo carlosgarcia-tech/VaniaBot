@@ -1,7 +1,7 @@
 /**
  * DeliriusService.ts
  *
- * VaniaBot services module exposing `DeliriusService`, `deliriusService`.
+ * OrbitBot services module exposing `DeliriusService`, `deliriusService`.
  *
  * @author **Carlos G**
  */

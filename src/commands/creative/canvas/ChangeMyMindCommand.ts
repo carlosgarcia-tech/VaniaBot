@@ -1,7 +1,7 @@
 /**
  * ChangeMyMindCommand.ts
  *
- * creative command `changemymind` — Genera imagen "Change My Mind"
+ * creative command `changemymind` — Generates a "Change My Mind" image
  * Usage: !changemymind <texto>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!changemymind`: Genera imagen "Change My Mind". */
+/** Command handler for `!changemymind`: Generates a "Change My Mind" image. */
 export class ChangeMyMindCommand extends Command {
   name = 'changemymind';
   description = 'Genera imagen "Change My Mind"';

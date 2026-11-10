@@ -1,7 +1,7 @@
 /**
  * RouletteCommand.ts
  *
- * game command `roulette` — Juega a la ruleta
+ * game command `roulette` — Play roulette
  * Usage: !roulette <rojo|negro|verde|par|impar> <cantidad>
  *
  * @author **Carlos G**
@@ -13,7 +13,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { validateBetAmount } from '@/utils/validators.js';
 import { config } from '@/config/index.js';
 
-/** Command handler for `!roulette`: Juega a la ruleta. */
+/** Command handler for `!roulette`: Play roulette. */
 export class RouletteCommand extends Command {
   name = 'roulette';
   description = 'Juega a la ruleta';

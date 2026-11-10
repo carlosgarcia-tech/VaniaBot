@@ -6,11 +6,11 @@
  * including authentication, reconnection, and event management.
  *
  * KEY BEHAVIORS:
- * - 440 (conflict): cierra el socket viejo, espera 15s y reconecta UNA sola vez
- * - Nunca pide código de pareamiento si ya existe sesión
- * - 401 (loggedOut): limpia sesión solo tras N confirmaciones reales
- * - 'ready' solo se emite una vez por sesión (no en cada reconexión)
- * - No hay spam de notificaciones al owner durante reconexiones
+ * - 440 (conflict): closes the old socket, waits 15s and reconnects ONCE
+ * - Never requests a pairing code if a session already exists
+ * - 401 (loggedOut): clears the session only after N real confirmations
+ * - 'ready' is emitted only once per session (not on every reconnect)
+ * - No notification spam to the owner during reconnects
  *
  * @author **Carlos G**
  * @github carlosgarcia-tech
@@ -70,8 +70,8 @@ export class SubBotInstance extends EventEmitter {
   private lastDisconnectTime = 0;
 
   /**
-   * true = el owner ya recibió "SubBot activada".
-   * Solo se resetea en clearSession() para re-vincular.
+   * true = the owner already received "SubBot activada" (activation notice).
+   * Reset only in clearSession() to re-link.
    */
   private hasNotifiedReady = false;
 
@@ -81,7 +81,7 @@ export class SubBotInstance extends EventEmitter {
   }
 
   /**
-   * Obtiene la versión de WhatsApp Web a usar (delegada al factory compartido).
+   * Gets the WhatsApp Web version to use (delegated to the shared factory).
    */
   private getWAVersion(): [number, number, number] {
     const version = getWAVersion();

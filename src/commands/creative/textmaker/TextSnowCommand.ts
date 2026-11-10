@@ -1,7 +1,7 @@
 /**
  * TextSnowCommand.ts
  *
- * creative command `snow` — Crea un efecto de texto de nieve
+ * creative command `snow` — Creates a snow text effect
  * Usage: !snow <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-a-snow-3d-text-effect-free-online-621.html';
 
-/** Command handler for `!snow`: Crea un efecto de texto de nieve. */
+/** Command handler for `!snow`: Creates a snow text effect. */
 export class TextSnowCommand extends Command {
   name = 'snow';
   description = 'Crea un efecto de texto de nieve';
@@ -27,14 +27,14 @@ export class TextSnowCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!snow <texto>';
-  examples = ['!snow VaniaBot'];
+  examples = ['!snow OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !snow <texto>\n_Ejemplo: !snow VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !snow <texto>\n_Ejemplo: !snow OrbitBot_');
       return;
     }
 

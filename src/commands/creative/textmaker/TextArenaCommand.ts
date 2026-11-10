@@ -1,7 +1,7 @@
 /**
  * TextArenaCommand.ts
  *
- * creative command `arena` — Crea un efecto de texto estilo Arena of Valor
+ * creative command `arena` — Creates an Arena of Valor-style text effect
  * Usage: !arena <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-cover-arena-of-valor-by-mastering-360.html';
 
-/** Command handler for `!arena`: Crea un efecto de texto estilo Arena of Valor. */
+/** Command handler for `!arena`: Creates an Arena of Valor-style text effect. */
 export class TextArenaCommand extends Command {
   name = 'arena';
   description = 'Crea un efecto de texto estilo Arena of Valor';
@@ -27,14 +27,14 @@ export class TextArenaCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!arena <texto>';
-  examples = ['!arena VaniaBot'];
+  examples = ['!arena OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !arena <texto>\n_Ejemplo: !arena VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !arena <texto>\n_Ejemplo: !arena OrbitBot_');
       return;
     }
 

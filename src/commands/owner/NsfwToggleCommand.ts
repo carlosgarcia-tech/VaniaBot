@@ -1,7 +1,7 @@
 /**
  * NsfwToggleCommand.ts
  *
- * owner command `nsfw` — Habilitar/deshabilitar comandos NSFW
+ * owner command `nsfw` — Enable/disable NSFW commands
  * Usage: !nsfw <on/off/status>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!nsfw`: Habilitar/deshabilitar comandos NSFW. */
+/** Command handler for `!nsfw`: Enable/disable NSFW commands. */
 export class NsfwToggleCommand extends Command {
   name = 'nsfw';
   description = 'Habilitar/deshabilitar comandos NSFW';

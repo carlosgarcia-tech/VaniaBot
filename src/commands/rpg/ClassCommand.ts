@@ -1,7 +1,7 @@
 /**
  * ClassCommand.ts
  *
- * rpg command `class` — Selecciona o ve las clases disponibles
+ * rpg command `class` — Select or view the available classes
  * Usage: !class [nombre] | !class list
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { classService } from '@/services/rpg/ClassService.js';
 
-/** Command handler for `!class`: Selecciona o ve las clases disponibles. */
+/** Command handler for `!class`: Select or view the available classes. */
 export class ClassCommand extends Command {
   name = 'class';
   description = 'Selecciona o ve las clases disponibles';

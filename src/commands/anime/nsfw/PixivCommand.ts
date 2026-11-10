@@ -1,7 +1,7 @@
 /**
  * PixivCommand.ts
  *
- * VaniaBot commands module exposing `PixivCommand`.
+ * OrbitBot commands module exposing `PixivCommand`.
  *
  * @author **Carlos G**
  */

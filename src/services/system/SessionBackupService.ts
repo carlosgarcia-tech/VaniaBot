@@ -57,7 +57,7 @@ export class SessionBackupService {
   private lastBackupTime: number | null = null;
   private isRunning = false;
 
-  private readonly sessionDir = './vaniasession';
+  private readonly sessionDir = './orbitsession';
   private readonly sessionFiles = ['creds.json', 'pre-key-*', 'session-*', 'app-state-*'];
 
   private constructor(options: Partial<BackupOptions> = {}) {
@@ -164,7 +164,7 @@ export class SessionBackupService {
         timestamp,
         version: '1.0.0',
         files,
-        botVersion: process.env.BOT_NAME || 'VaniaBot',
+        botVersion: process.env.BOT_NAME || 'OrbitBot',
       };
 
       writeFileSync(join(backupDir, 'backup_metadata.json'), JSON.stringify(metadata, null, 2));

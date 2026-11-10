@@ -1,8 +1,8 @@
 /**
  * CircleCommand.ts
  *
- * creative command `circle` — Genera imagen circular
- * Usage: !circle [@usuario]
+ * creative command `circle` — Generates a circular image
+ * Usage: !circle [@user]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!circle`: Genera imagen circular. */
+/** Command handler for `!circle`: Generates a circular image. */
 export class CircleCommand extends Command {
   name = 'circle';
   description = 'Genera imagen circular';

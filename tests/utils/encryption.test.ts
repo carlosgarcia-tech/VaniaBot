@@ -118,7 +118,7 @@ describe('encryption', () => {
     let filePath: string;
 
     beforeEach(() => {
-      tempDir = mkdtempSync(join(tmpdir(), 'vania-enc-test-'));
+      tempDir = mkdtempSync(join(tmpdir(), 'orbit-enc-test-'));
       filePath = join(tempDir, 'nested', 'creds.json');
     });
 

@@ -226,7 +226,7 @@ export class DashboardService {
       (global as { client?: { isClientReady(): boolean } }).client?.isClientReady() ?? false;
     bots.push({
       id: 'main',
-      name: 'VaniaBot',
+      name: 'OrbitBot',
       connected: mainBotConnected,
       uptime: process.uptime(),
     });

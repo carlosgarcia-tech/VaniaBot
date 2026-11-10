@@ -1,8 +1,8 @@
 /**
  * AnimeCommand.ts
  *
- * fun command `anime` — Recomienda un anime
- * Usage: !anime [género]
+ * fun command `anime` — Recommends an anime
+ * Usage: !anime [genre]
  *
  * @author **Carlos G**
  */
@@ -19,7 +19,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!anime`: Recomienda un anime. */
+/** Command handler for `!anime`: Recommends an anime. */
 export class AnimeCommand extends Command {
   name = 'anime';
   description = 'Recomienda un anime';

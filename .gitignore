@@ -2,7 +2,7 @@ dist
 node_modules
 .env
 check-and-clean.sh
-vaniasession
+orbitsession
 .vscode
 data/database.json
 dest
@@ -43,10 +43,10 @@ Thumbs.db
 coverage/
 *.tgz
 
-.vania-session
+.orbit-session
 data/runtime/bot-states
 redis-data/
-vaniasession/
+orbitsession/
 subbots/
-.vania-session
+.orbit-session
 cards-test

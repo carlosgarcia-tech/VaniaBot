@@ -45,7 +45,7 @@ if (IS_PRODUCTION && !existsSync(LOG_DIR)) {
 
 /**
  * Builds a pino instance for a category.
- * Production writes to logs/vania[-<category>].log; development uses pino-pretty.
+ * Production writes to logs/orbit[-<category>].log; development uses pino-pretty.
  */
 const createPinoLogger = (category?: string) => {
   const categoryLevel = category
@@ -54,8 +54,8 @@ const createPinoLogger = (category?: string) => {
 
   if (IS_PRODUCTION) {
     const stream = category
-      ? createWriteStream(join(LOG_DIR, `vania-${category}.log`), { flags: 'a' })
-      : createWriteStream(join(LOG_DIR, 'vania.log'), { flags: 'a' });
+      ? createWriteStream(join(LOG_DIR, `orbit-${category}.log`), { flags: 'a' })
+      : createWriteStream(join(LOG_DIR, 'orbit.log'), { flags: 'a' });
 
     return pino(
       {
@@ -226,7 +226,7 @@ export const structuredLogger = new MainLogger();
 const CONSOLE_LOG_ENABLED = process.env.CONSOLE_LOG !== 'false';
 
 const logStream = IS_PRODUCTION
-  ? createWriteStream(join(process.cwd(), 'logs', 'vania.log'), { flags: 'a' })
+  ? createWriteStream(join(process.cwd(), 'logs', 'orbit.log'), { flags: 'a' })
   : process.stdout;
 
 const fileLogger = IS_PRODUCTION

@@ -1,7 +1,7 @@
 /**
  * consumables.ts
  *
- * VaniaBot services module exposing `consumables`.
+ * OrbitBot services module exposing `consumables`.
  *
  * @author **Carlos G**
  */

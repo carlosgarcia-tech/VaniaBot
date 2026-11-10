@@ -91,7 +91,7 @@ jobs:
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
-          # Para repos privados: añade el secret CODECOV_TOKEN y descomenta:
+          # For private repos: add the CODECOV_TOKEN secret and uncomment:
           # token: ${{ secrets.CODECOV_TOKEN }}
 
   e2e:
@@ -122,7 +122,7 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
           shellcheck --version
-          shellcheck -S warning deploy.sh entrypoint.sh install-termux.sh stop.sh VaniaBot.sh
+          shellcheck -S warning deploy.sh entrypoint.sh install-termux.sh stop.sh OrbitBot.sh
 
   docker:
     runs-on: ubuntu-latest

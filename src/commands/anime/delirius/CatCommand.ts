@@ -1,7 +1,7 @@
 /**
  * CatCommand.ts
  *
- * anime command `cat` — Obtiene una imagen de gato aleatoria
+ * anime command `cat` — Gets a random cat image
  * Usage: !cat [texto]
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!cat`: Obtiene una imagen de gato aleatoria. */
+/** Command handler for `!cat`: Gets a random cat image. */
 export class CatCommand extends Command {
   name = 'cat';
   description = 'Obtiene una imagen de gato aleatoria';

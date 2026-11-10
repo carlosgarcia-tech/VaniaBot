@@ -1,7 +1,7 @@
 /**
  * GroupMetadataCache.ts
  *
- * VaniaBot services module exposing `GroupMetadataCache`.
+ * OrbitBot services module exposing `GroupMetadataCache`.
  *
  * @author **Carlos G**
  */

@@ -1,29 +1,29 @@
 /**
  * RateLimits.e2e.test.ts
  *
- * Límites de tasa del pipeline (MainMessagePipeline.checkRateLimits) con el
- * bot real y los servicios reales de anti-spam:
+ * Pipeline rate limits (MainMessagePipeline.checkRateLimits) with the real bot
+ * and the real anti-spam services:
  *
- *   - AntiSpamService: 3 mensajes/segundo y 20 por minuto (con baneo de
- *     5 minutos) tanto en DM como en grupo.
- *   - RateLimitService.checkFlood: 3/segundo por usuario (solo grupo).
- *   - RateLimitService.checkGroupRateLimit: 30 por minuto y escalado de
- *     avisos a bloqueo del grupo.
+ *   - AntiSpamService: 3 messages/second and 20 per minute (with a 5-minute
+ *     ban) in both DMs and groups.
+ *   - RateLimitService.checkFlood: 3/second per user (groups only).
+ *   - RateLimitService.checkGroupRateLimit: 30 per minute with escalation
+ *     from warnings to blocking the whole group.
  *
- * Dos detalles del orden de ejecución que los tests respetan:
+ * Two execution-order details that these tests respect:
  *
- *   1. checkRateLimits corre DESPUÉS de runGuards. En grupo, la charla sin
- *      comando se la traga handleGroupConversation, así que los límites de
- *      tasa solo se ven sobre comandos.
- *   2. AntiSpamService se consulta antes que RateLimitService.checkFlood y
- *      ambos comparten el umbral de 3/segundo: el corte por segundo lo
- *      reporta siempre AntiSpamService, y checkFlood queda cubierto por su
- *      test unitario (tests/services/RateLimitService.test.ts).
+ *   1. checkRateLimits runs AFTER runGuards. In groups, commandless chatter
+ *      is swallowed by handleGroupConversation, so the rate limits only ever
+ *      apply to commands.
+ *   2. AntiSpamService is consulted before RateLimitService.checkFlood and
+ *      both share the 3/second threshold: the per-second cut is always
+ *      reported by AntiSpamService, and checkFlood is covered by its own
+ *      unit test (tests/services/RateLimitService.test.ts).
  *
- * Cada test usa un grupo distinto porque el contador de carga es por grupo y
- * vive durante todo el boot del proceso. Para los contadores por minuto se
- * adelanta el reloj con vi.setSystemTime (toFake: ['Date']): sin eso, el
- * límite por segundo cortaría antes de llegar al de minutos.
+ * Each test uses a distinct group because the load counter is per group and
+ * lives for the entire process boot. For per-minute counters the clock is
+ * advanced with vi.setSystemTime (toFake: ['Date']): without it, the
+ * per-second limit would cut first, before the per-minute one.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
@@ -49,12 +49,12 @@ const GROUP_BUSY = '⚠️ El grupo está enviando muchos mensajes. Reduce la ve
 const GROUP_SLOWER = '⚠️ Demasiados mensajes del grupo';
 const GROUP_BLOCKED = '⛔ Grupo bloqueado temporalmente por spam';
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
- * Envía un comando cada ~1.2 s de reloj (bajo el límite por segundo, dentro
- * de la ventana de un minuto) y devuelve los textos enviados.
+ * Sends a command every ~1.2 s of wall clock (under the per-second limit,
+ * inside the one-minute window) and returns the texts sent.
  */
 async function sendSpaced(
   socket: BootState['socket'],
@@ -94,9 +94,9 @@ describe('e2e: límites de tasa del pipeline', () => {
       await wait(500);
 
       const texts = socket.texts();
-      // El límite es 3 por segundo: solo el cuarto mensaje se corta.
+      // The limit is 3 per second: only the fourth message gets cut.
       expect(texts.filter(t => t === FAST_WRITE)).toHaveLength(1);
-      // Y el corte ocurre antes de la cadena de middlewares: un solo Pong.
+      // The cut happens before the middleware chain: a single Pong.
       expect(texts.filter(t => t.startsWith('🏓 Pong!'))).toHaveLength(1);
     },
     TIMEOUT,
@@ -111,7 +111,7 @@ describe('e2e: límites de tasa del pipeline', () => {
       await wait(500);
       expect(socket.texts().filter(t => t === FAST_WRITE)).toHaveLength(1);
 
-      // 4 s adelante: superan tanto la ventana por segundo como el cooldown.
+      // 4 s ahead: past both the per-second window and the cooldown.
       vi.useFakeTimers({ now: Date.now() + 4_000, toFake: ['Date'] });
       socket.reset();
 
@@ -129,11 +129,11 @@ describe('e2e: límites de tasa del pipeline', () => {
     async () => {
       const sender = senderJid(3);
 
-      // 25 intentos: el baneo debe ocurrir dentro del rango del minuto.
+      // 25 attempts: the ban must happen within the minute window.
       const texts = await sendSpaced(socket, () => socket.receive(dmTextMessage('!ping', sender)), 25);
 
       expect(texts).toContain(BAN_WARNING);
-      // El baneo corta la ejecución: tras el aviso no vuelve a responder el comando.
+      // The ban stops execution: after the warning the command stops replying.
       expect(texts.filter(t => t.startsWith('🏓 Pong!')).length).toBeGreaterThan(0);
 
       socket.reset();
@@ -150,7 +150,7 @@ describe('e2e: límites de tasa del pipeline', () => {
     async () => {
       const group = '120363032222222201@g.us';
       const { serviceManager } = await import('@/services/system/Servicemanager.js');
-      await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+      await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
       await clearParticipants(socket, group);
 
       const sender = senderJid(4);
@@ -171,10 +171,10 @@ describe('e2e: límites de tasa del pipeline', () => {
     async () => {
       const group = '120363032222222202@g.us';
       const { serviceManager } = await import('@/services/system/Servicemanager.js');
-      await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+      await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
       await clearParticipants(socket, group);
 
-      // Un remitente por mensaje: ningún límite por usuario se cruza antes.
+      // One sender per message: no per-user limit is crossed first.
       const texts = await sendSpaced(
         socket,
         i => socket.receive(groupMessageFrom(group, senderJid(100 + i), '!ping', `Tester${i}`)),
@@ -183,7 +183,7 @@ describe('e2e: límites de tasa del pipeline', () => {
 
       const notPong = texts.filter(t => !t.startsWith('🏓'));
       expect(notPong).toEqual([GROUP_BUSY, GROUP_SLOWER, GROUP_BLOCKED, GROUP_BLOCKED]);
-      // 30 comandos llegaron a ejecutarse antes del bloqueo.
+      // 30 commands made it through execution before the block.
       expect(texts.filter(t => t.startsWith('🏓 Pong!'))).toHaveLength(30);
     },
     TIMEOUT,
@@ -194,7 +194,7 @@ describe('e2e: límites de tasa del pipeline', () => {
     async () => {
       const group = '120363032222222203@g.us';
       const { serviceManager } = await import('@/services/system/Servicemanager.js');
-      await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+      await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
       await clearParticipants(socket, group);
 
       const flooder = senderJid(5);

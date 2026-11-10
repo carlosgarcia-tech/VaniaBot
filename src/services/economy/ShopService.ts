@@ -1,7 +1,7 @@
 /**
  * ShopService.ts
  *
- * VaniaBot services module exposing `ShopService`, `ShopItem`, `shopService`.
+ * OrbitBot services module exposing `ShopService`, `ShopItem`, `shopService`.
  *
  * @author **Carlos G**
  */

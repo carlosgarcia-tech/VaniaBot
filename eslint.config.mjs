@@ -2,14 +2,14 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
-import vaniaPlugin from './eslint-plugin-vania/index.js';
+import orbitPlugin from './eslint-plugin-orbit/index.js';
 
 export default [
   {
     ignores: [
       'node_modules/**',
       'dist/**',
-      'vaniasession/**',
+      'orbitsession/**',
       'data/temp/**',
       'logs/**',
       'redis-data/**',
@@ -17,7 +17,7 @@ export default [
     ],
   },
   {
-    files: ['src/**/*.ts', 'vania.ts'],
+    files: ['src/**/*.ts', 'orbit.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -57,12 +57,12 @@ export default [
     },
   },
   {
-    // Command permission conventions (see eslint-plugin-vania/index.js).
+    // Command permission conventions (see eslint-plugin-orbit/index.js).
     files: ['src/commands/**/*.ts'],
-    plugins: { vania: vaniaPlugin },
+    plugins: { orbit: orbitPlugin },
     rules: {
-      'vania/no-permission-typo': 'error',
-      'vania/owner-requires-owner-permission': 'error',
+      'orbit/no-permission-typo': 'error',
+      'orbit/owner-requires-owner-permission': 'error',
     },
   },
 ];

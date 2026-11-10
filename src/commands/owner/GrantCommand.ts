@@ -1,7 +1,7 @@
 /**
  * GrantCommand.ts
  *
- * owner command `grant` — Concede recursos a un usuario (solo owners)
+ * owner command `grant` — Grant resources to a user (owners only)
  * Usage: !grant <money|xp|item> <@usuario> <cantidad>
  *
  * @author **Carlos G**
@@ -15,7 +15,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber } from '@/utils/helpers.js';
 import { checkPinVerification } from '@/utils/pinVerificationHelper.js';
 
-/** Command handler for `!grant`: Concede recursos a un usuario (solo owners). */
+/** Command handler for `!grant`: Grant resources to a user (owners only). */
 export class GrantCommand extends Command {
   name = 'grant';
   description = 'Concede recursos a un usuario (solo owners)';

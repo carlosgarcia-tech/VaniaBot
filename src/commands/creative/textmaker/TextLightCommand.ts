@@ -1,7 +1,7 @@
 /**
  * TextLightCommand.ts
  *
- * creative command `light` — Crea un efecto de texto de luz futurista
+ * creative command `light` — Creates a futuristic light text effect
  * Usage: !light <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/light-text-effect-futuristic-technology-style-648.html';
 
-/** Command handler for `!light`: Crea un efecto de texto de luz futurista. */
+/** Command handler for `!light`: Creates a futuristic light text effect. */
 export class TextLightCommand extends Command {
   name = 'light';
   description = 'Crea un efecto de texto de luz futurista';
@@ -27,14 +27,14 @@ export class TextLightCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!light <texto>';
-  examples = ['!light VaniaBot'];
+  examples = ['!light OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !light <texto>\n_Ejemplo: !light VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !light <texto>\n_Ejemplo: !light OrbitBot_');
       return;
     }
 

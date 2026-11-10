@@ -1,7 +1,7 @@
 /**
  * RulesclkCommand.ts
  *
- * freefire command `rules clk` — Reglas CLK
+ * freefire command `rules clk` — CLK rules
  * Usage: !rules clk
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { sendAssetImage } from '@/utils/assetHelper.js';
 
-/** Command handler for `!rules clk`: Reglas CLK. */
+/** Command handler for `!rules clk`: CLK rules. */
 export class RulesCLKCommand extends Command {
   name = 'rules clk';
   description = 'Reglas CLK';

@@ -1,7 +1,7 @@
 /**
  * PermissionService.ts
  *
- * VaniaBot services module exposing `GroupMetadataLike`, `PermissionService`.
+ * OrbitBot services module exposing `GroupMetadataLike`, `PermissionService`.
  *
  * @author **Carlos G**
  */

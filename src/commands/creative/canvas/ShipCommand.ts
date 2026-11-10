@@ -1,7 +1,7 @@
 /**
  * ShipCommand.ts
  *
- * creative command `shipsrc` — Genera imagen de ship
+ * creative command `shipsrc` — Generates a ship image
  * Usage: !ship [nombre1] [nombre2] [%] [texto]
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!shipsrc`: Genera imagen de ship. */
+/** Command handler for `!shipsrc`: Generates a ship image. */
 export class ShipCommand extends Command {
   name = 'shipsrc';
   description = 'Genera imagen de ship';

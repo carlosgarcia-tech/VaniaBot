@@ -1,7 +1,7 @@
 /**
  * AnimeBase.ts
  *
- * VaniaBot commands module exposing `AnimeBase`.
+ * OrbitBot commands module exposing `AnimeBase`.
  *
  * @author **Carlos G**
  */

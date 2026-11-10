@@ -1,11 +1,11 @@
 /**
  * CommandContexts.e2e.test.ts
  *
- * ValidationMiddleware.contexts en producción: qué comandos se rechazan
- * fuera de su contexto y qué comandos de owner sí oyen a su owner.
+ * ValidationMiddleware.contexts in production: which commands are rejected
+ * outside their context, and which owner commands do listen to their owner.
  *
- * El filtro se hace con el CommandRegistry real, así que los nombres usados
- * en el test son los que el bot registra de verdad.
+ * The filter uses the real CommandRegistry, so the names used in the test
+ * are the ones the bot actually registers.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -25,7 +25,7 @@ vi.mock('@/services/external/AIService.js', () => ({
 const TIMEOUT = 30_000;
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-/** Primer owner de configuración como JID de WhatsApp. */
+/** First configured owner as a WhatsApp JID. */
 async function ownerJid(): Promise<string> {
   const { config } = await import('@/config/index.js');
   const ownerPhone = config.owners.find(owner => !owner.includes('@lid'));
@@ -36,14 +36,14 @@ describe('e2e: contextos de comando (grupo vs privado)', () => {
   let socket: BootState['socket'];
   let caseCounter = 0;
 
-  /** Grupo nuevo por caso: los contadores de carga viven todo el boot. */
+  /** Fresh group per case: the load counters live for the whole boot. */
   async function freshGroup(): Promise<string> {
     caseCounter++;
     const group = `1203630377777777${String(caseCounter).padStart(2, '0')}@g.us`;
     const memberJid = senderJid(600 + caseCounter);
 
     const { serviceManager } = await import('@/services/system/Servicemanager.js');
-    await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+    await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
     await setParticipants(socket, group, [botAdmin(), member(memberJid)]);
 
     return group;
@@ -60,13 +60,13 @@ describe('e2e: contextos de comando (grupo vs privado)', () => {
   it(
     'un comando de grupo se rechaza en privado con el nombre del contexto',
     async () => {
-      // !sleep es GROUP-only.
+      // !sleep is GROUP-only.
       socket.receive(dmTextMessage('!sleep 5m', senderJid(610)));
 
       await wait();
 
       expect(socket.texts()).toEqual(['❌ Este comando solo funciona en grupos']);
-      // Y el comando no llegó a ejecutarse: SleepCommand reacciona con 😴.
+      // And the command never executed: SleepCommand reacts with 😴.
       expect(socket.reactions()).not.toContain('😴');
     },
     TIMEOUT,
@@ -77,13 +77,13 @@ describe('e2e: contextos de comando (grupo vs privado)', () => {
     async () => {
       const group = await freshGroup();
 
-      // !metrics es PRIVATE-only y además OWNER.
+      // !metrics is PRIVATE-only and also OWNER.
       socket.receive(groupTextMessage('!metrics', group, await ownerJid()));
 
       await wait();
 
-      // Solo el aviso de contexto: si ValidationMiddleware no cortara la
-      // cadena, las métricas se imprimirían también en el grupo.
+      // Only the context warning: if ValidationMiddleware didn't stop the
+      // chain, the metrics would print in the group too.
       expect(socket.texts()).toEqual(['❌ Este comando solo funciona en chats privados']);
       expect(socket.texts().some(t => t.includes('Métricas'))).toBe(false);
     },

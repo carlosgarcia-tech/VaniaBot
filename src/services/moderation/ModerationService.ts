@@ -1,7 +1,7 @@
 /**
  * ModerationService.ts
  *
- * VaniaBot services module exposing `ModerationService`, `ModerationAction`, `BanRecord`, `MuteRecord`.
+ * OrbitBot services module exposing `ModerationService`, `ModerationAction`, `BanRecord`, `MuteRecord`.
  *
  * @author **Carlos G**
  */

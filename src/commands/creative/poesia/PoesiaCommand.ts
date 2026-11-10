@@ -1,8 +1,8 @@
 /**
  * PoesiaCommand.ts
  *
- * fun command `poema` — Genera un poema sobre cualquier tema
- * Usage: !poema [tema] [estilo] [para:nombre]
+ * fun command `poema` — Generates a poem on any topic
+ * Usage: !poema [topic] [style] [for:name]
  *
  * @author **Carlos G**
  */
@@ -62,12 +62,12 @@ async function ejecutarPoesia(
   await ctx.reply(poesiaService.formatEntry(result.right.entry, true, formattedFooter));
 }
 
-/** Command handler for `!poema`: Genera un poema sobre cualquier tema. */
+/** Command handler for `!poema`: Generates a poem on any topic. */
 export class PoemaCommand extends Command {
   name = 'poema';
   description = 'Genera un poema sobre cualquier tema';
   category = CommandCategory.FUN;
-  // Sin alias 'poesia': es el name del menu PoesiaMenuCommand.
+  // No alias 'poesia': it is the name of the PoesiaMenuCommand menu.
   aliases = ['poem', 'poesía', 'verso'];
   cooldown = 5000;
   contexts = [CommandContext.BOTH];
@@ -99,7 +99,7 @@ export class PiropopCommand extends Command {
   name = 'piropo';
   description = 'Genera piropos creativos y originales';
   category = CommandCategory.FUN;
-  // Sin alias 'flirt': es el name de FlirtCommand.
+  // No alias 'flirt': it is the name of FlirtCommand.
   aliases = ['piropos', 'ligar', 'requiebro'];
   cooldown = 5000;
   contexts = [CommandContext.BOTH];
@@ -208,7 +208,7 @@ export class AcrosticoCommand extends Command {
           `﹒!acrostico Alejandra\n` +
           `﹒!acrostico Daniela amor romántico\n` +
           `﹒!acrostico Valeria vida tierno\n\n` +
-          `> _VaniaBot 💝 — versitos & ternura_`,
+          `> _OrbitBot 💝 — versitos & ternura_`,
       );
       return;
     }
@@ -261,7 +261,7 @@ export class PoesiaMenuCommand extends Command {
   name = 'poesia';
   description = 'Menú del sistema de poesía y contenido creativo';
   category = CommandCategory.FUN;
-  // Sin alias 'amor': es el name de AmorCommand.
+  // No alias 'amor': it is the name of AmorCommand.
   aliases = ['poetry', 'enamorado', 'creative'];
   cooldown = 3000;
   contexts = [CommandContext.BOTH];
@@ -271,7 +271,7 @@ export class PoesiaMenuCommand extends Command {
 
   async execute(ctx: MessageContext): Promise<void> {
     await ctx.reply(
-      `˚₊· ͟͟͞͞➳ *VaniaBot — poesía para el alma* ˚₊· ͟͟͞͞➳\n` +
+      `˚₊· ͟͟͞͞➳ *OrbitBot — poesía para el alma* ˚₊· ͟͟͞͞➳\n` +
         `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
         `✿ *mis poemitas:*\n` +
         `﹒!poema [tema] [estilo] [para:nombre]\n` +
@@ -296,7 +296,7 @@ export class PoesiaMenuCommand extends Command {
         `_!piropo pícaro_\n` +
         `_!acrostico Valeria amor_\n` +
         `_!carta despedida melancólico para:Juan_\n\n` +
-        `> _VaniaBot 💝 — versitos con amorcito_`,
+        `> _OrbitBot 💝 — versitos con amorcito_`,
     );
   }
 }

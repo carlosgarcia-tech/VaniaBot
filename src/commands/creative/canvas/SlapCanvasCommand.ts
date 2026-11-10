@@ -1,8 +1,8 @@
 /**
  * SlapCanvasCommand.ts
  *
- * creative command `slapcanvas` — Genera imagen de slap
- * Usage: !slapcanvas [@usuario]
+ * creative command `slapcanvas` — Generates a slap image
+ * Usage: !slapcanvas [@user]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!slapcanvas`: Genera imagen de slap. */
+/** Command handler for `!slapcanvas`: Generates a slap image. */
 export class SlapCanvasCommand extends Command {
   name = 'slapcanvas';
   description = 'Genera imagen de slap';

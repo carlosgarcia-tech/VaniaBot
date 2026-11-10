@@ -83,9 +83,9 @@ describe('BlackMarketService', () => {
   beforeEach(() => {
     service = blackMarketService;
     users.clear();
-    // Reset del estado interno del singleton (la lista es privada)
+    // Reset of the singleton's internal state (the list is private)
     (service as unknown as { listings: unknown[] }).listings = [];
-    vi.spyOn(Math, 'random').mockReturnValue(0.0); // descuento mínimo sugerido
+    vi.spyOn(Math, 'random').mockReturnValue(0.0); // minimum suggested discount
   });
 
   afterEach(() => {
@@ -211,7 +211,7 @@ describe('BlackMarketService', () => {
     await service.listItem(SELLER, 'iron', 100);
     expect(service.getListings()).toHaveLength(1);
 
-    // 25 horas después: expiró
+    // 25 hours later: it expired
     vi.advanceTimersByTime(25 * 60 * 60 * 1000);
     expect(service.getListings()).toHaveLength(0);
 

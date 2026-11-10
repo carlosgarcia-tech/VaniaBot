@@ -1,7 +1,7 @@
 /**
  * GroupCommand.ts
  *
- * admin command `group` — Administrar configuración del grupo
+ * admin command `group` — Manage group configuration
  * Usage: .group [lock/unlock/info/settings]
  *
  * @author **Carlos G**
@@ -21,7 +21,7 @@ type GroupSocket = WASocket & {
   groupRevokeInvite(jid: string): Promise<string>;
 };
 
-/** Command handler for `!group`: Administrar configuración del grupo. */
+/** Command handler for `!group`: Manage group configuration. */
 export class GroupCommand extends Command {
   name = 'group';
   description = 'Administrar configuración del grupo';

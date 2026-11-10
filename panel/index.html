@@ -3,7 +3,7 @@
     <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VaniaBot Dashboard</title>
+    <title>OrbitBot Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
@@ -1657,7 +1657,7 @@
       <form class="token-card" id="tokenForm" autocomplete="off">
         <div class="token-emoji">🔐</div>
         <h2>Acceso al Dashboard</h2>
-        <p>Ingresa el token del panel para ver los datos.<br><span class="token-hint">Es el valor de <code>PANEL_WEBHOOK_TOKEN</code> en tu <code>.env</code>.</span></p>
+        <p>Enter the panel token to see the data.<br><span class="token-hint">It is the value of <code>PANEL_WEBHOOK_TOKEN</code> in your <code>.env</code>.</span></p>
         <input
           type="password"
           id="tokenInput"
@@ -1674,7 +1674,7 @@
       <header>
         <div class="logo">
           <span class="logo-emoji">🌸</span>
-          <h1>VaniaBot Dashboard</h1>
+          <h1>OrbitBot Dashboard</h1>
         </div>
         <div class="header-status">
           <div class="status-badge">
@@ -1683,16 +1683,16 @@
           </div>
           <button class="refresh-btn" onclick="refreshAll()">
             <span class="loading" id="refreshLoading" style="display: none"></span>
-            <span id="refreshText">Actualizar</span>
+            <span id="refreshText">Refresh</span>
           </button>
-          <button class="logout-btn" id="logoutBtn" title="Cerrar sesión">Salir</button>
+          <button class="logout-btn" id="logoutBtn" title="Log out">Logout</button>
         </div>
       </header>
 
       <div class="grid">
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-label">Mensajes/min</span>
+            <span class="stat-label">Msgs/min</span>
             <span class="stat-icon">💬</span>
           </div>
           <div class="stat-value" id="msgsPerMin">-</div>
@@ -1700,7 +1700,7 @@
         </div>
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-label">Comandos/min</span>
+            <span class="stat-label">Cmds/min</span>
             <span class="stat-icon">⚡</span>
           </div>
           <div class="stat-value" id="cmdsPerMin">-</div>
@@ -1745,8 +1745,8 @@
 
       <div class="tabs">
         <button class="tab active" data-tab="overview">📊 Overview</button>
-        <button class="tab" data-tab="commands">⚡ Comandos</button>
-        <button class="tab" data-tab="moderation">🛡️ Moderación</button>
+        <button class="tab" data-tab="commands">⚡ Commands</button>
+        <button class="tab" data-tab="moderation">🛡️ Moderation</button>
         <button class="tab" data-tab="groups">👥 Grupos</button>
         <button class="tab" data-tab="subbots">🤖 SubBots</button>
         <button class="tab" data-tab="system">💻 Sistema</button>
@@ -1757,7 +1757,7 @@
         <div class="two-col">
           <div class="section">
             <div class="section-header">
-              <h3 class="section-title">📈 Actividad en Tiempo Real</h3>
+              <h3 class="section-title">📈 Real-time Activity</h3>
             </div>
             <div class="chart-container">
               <canvas id="activityChart"></canvas>
@@ -1765,7 +1765,7 @@
           </div>
           <div class="section">
             <div class="section-header">
-              <h3 class="section-title">🧠 Uso de Memoria</h3>
+              <h3 class="section-title">🧠 Memory Usage</h3>
             </div>
             <div class="chart-container">
               <canvas id="memoryChart"></canvas>
@@ -1774,7 +1774,7 @@
         </div>
         <div class="section">
           <div class="section-header">
-            <h3 class="section-title">🏆 Top Comandos</h3>
+            <h3 class="section-title">🏆 Top Commands</h3>
           </div>
           <div class="top-commands" id="topCommands">
             <div class="empty-state">
@@ -1788,16 +1788,16 @@
       <div id="tab-commands" class="tab-content">
         <div class="section">
           <div class="section-header">
-            <h3 class="section-title">⚡ Estadísticas de Comandos</h3>
+            <h3 class="section-title">⚡ Command Stats</h3>
           </div>
           <div class="table-container">
             <table id="commandsTable">
               <thead>
                 <tr>
-                  <th>Comando</th>
+                  <th>Command</th>
                   <th>Ejecuciones</th>
-                  <th>Tiempo Total</th>
-                  <th>Tiempo Promedio</th>
+                  <th>Total Time</th>
+                  <th>Avg Time</th>
                   <th>Errores</th>
                 </tr>
               </thead>
@@ -1814,16 +1814,16 @@
       <div id="tab-moderation" class="tab-content">
         <div class="section">
           <div class="section-header">
-            <h3 class="section-title">🛡️ Acciones de Moderación</h3>
+            <h3 class="section-title">🛡️ Moderation Actions</h3>
           </div>
           <div class="table-container">
             <table>
               <thead>
                 <tr>
                   <th>Usuario</th>
-                  <th>Acción</th>
+                  <th>Action</th>
                   <th>Moderador</th>
-                  <th>Razón</th>
+                  <th>Reason</th>
                   <th>Fecha</th>
                 </tr>
               </thead>
@@ -1888,7 +1888,7 @@
         <div class="two-col">
           <div class="section">
             <div class="section-header">
-              <h3 class="section-title">📊 Caché</h3>
+              <h3 class="section-title">📊 Cache</h3>
             </div>
             <div id="cacheStats"><div class="empty-state">Cargando...</div></div>
           </div>
@@ -1898,7 +1898,7 @@
             </div>
             <div id="uptimeStats">
               <div class="stat-card">
-                <div class="stat-label">Tiempo Activo</div>
+                <div class="stat-label">Uptime</div>
                 <div class="stat-value" id="uptimeValue">-</div>
               </div>
             </div>
@@ -1925,13 +1925,13 @@
       </div>
 
       <footer>
-        <p>VaniaBot Dashboard • Desarrollado con 💜</p>
+        <p>OrbitBot Dashboard • Desarrollado con 💜</p>
       </footer>
     </div>
 
     <script>
       const API_BASE = '';
-      const TOKEN_STORAGE_KEY = 'vania_panel_token';
+      const TOKEN_STORAGE_KEY = 'orbit_panel_token';
       let activityChart, memoryChart;
       let refreshInterval;
       let counterAnimations = {};
@@ -1991,7 +1991,7 @@
         const input = document.getElementById('tokenInput');
         const token = (input?.value || '').trim();
         if (!token) {
-          showTokenOverlay('Ingresa el token del panel (PANEL_WEBHOOK_TOKEN).');
+          showTokenOverlay('Enter the panel token (PANEL_WEBHOOK_TOKEN).');
           return;
         }
         storeToken(token);
@@ -2014,7 +2014,7 @@
         if (res.status === 401) {
           clearToken();
           stopAutoRefresh();
-          showTokenOverlay('Token inv\u00e1lido o expirado. Ingresa el token nuevamente.');
+          showTokenOverlay('Invalid or expired token. Enter the token again.');
           throw new Error('Unauthorized (401): ' + url);
         }
         return res;
@@ -2139,7 +2139,7 @@
             labels: [],
             datasets: [
               {
-                label: 'Mensajes',
+                label: 'Messages',
                 data: [],
                 borderColor: '#00d4aa',
                 backgroundColor: 'rgba(0, 212, 170, 0.1)',
@@ -2148,7 +2148,7 @@
                 borderWidth: 2,
               },
               {
-                label: 'Comandos',
+                label: 'Commands',
                 data: [],
                 borderColor: '#00b4d8',
                 backgroundColor: 'rgba(0, 180, 216, 0.1)',
@@ -2351,7 +2351,7 @@
               .join('');
           } else {
             tbody.innerHTML =
-              '<tr><td colspan="5" class="empty-state">Sin comandos ejecutados</td></tr>';
+              '<tr><td colspan="5" class="empty-state">No commands executed</td></tr>';
           }
         } catch (err) {
           console.error('Commands error:', err);
@@ -2387,7 +2387,7 @@
               .join('');
           } else {
             actionsBody.innerHTML =
-              '<tr><td colspan="5" class="empty-state">Sin acciones de moderación</td></tr>';
+              '<tr><td colspan="5" class="empty-state">No moderation actions</td></tr>';
           }
 
           const bansList = document.getElementById('bansList');
@@ -2399,7 +2399,7 @@
             <div class="health-item">
               <div class="health-info">
                 <h4>${b.userName || b.userId}</h4>
-                <p>${b.reason || 'Sin razón'}</p>
+                <p>${b.reason || 'No reason'}</p>
               </div>
               <span class="badge badge-danger">Baneado</span>
             </div>
@@ -2531,7 +2531,7 @@
           if (data.system) {
             document.getElementById('uptimeStats').innerHTML = `
             <div class="stat-card">
-              <div class="stat-label">Tiempo Activo</div>
+              <div class="stat-label">Uptime</div>
               <div class="stat-value">${formatUptime(data.uptime)}</div>
             </div>
             <div class="stat-card">

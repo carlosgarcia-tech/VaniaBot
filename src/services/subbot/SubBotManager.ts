@@ -1,7 +1,7 @@
 /**
  * SubBotManager.ts
  *
- * Main manager for VaniaBot's subbot system.
+ * Main manager for OrbitBot's subbot system.
  * Handles the lifecycle of multiple subbot instances with slot system.
  *
  * Features:
@@ -79,7 +79,7 @@ export class SubBotManager extends EventEmitter {
   }
 
   async initialize(): Promise<void> {
-    logger.debug('🌸 Iniciando SubBotManager (VaniaBot)...');
+    logger.debug('🌸 Iniciando SubBotManager (OrbitBot)...');
 
     this.messageHandler = new SubBotMessageHandler(
       id => this.middlewaresPerInstance.get(id) ?? [],
@@ -271,7 +271,7 @@ export class SubBotManager extends EventEmitter {
     }
 
     const subBotId = randomBytes(8).toString('hex');
-    const name = `VaniaBot-${ownerName.slice(0, 10)}`;
+    const name = `OrbitBot-${ownerName.slice(0, 10)}`;
 
     const subConfig = subBotDatabase.activateSlot(
       targetSlot.slot,
@@ -309,8 +309,8 @@ export class SubBotManager extends EventEmitter {
       { middleware: new AutoRegisterMiddleware(), priority: 1, canRunParallel: false },
       { middleware: new MuteMiddleware(), priority: 3, canRunParallel: false },
       { middleware: new LoggerMiddleware(), priority: 4, canRunParallel: true },
-      // Un rechazo de ValidationMiddleware debe cortar la cadena, y en el lote
-      // paralelo no puede hacerlo.
+      // A ValidationMiddleware rejection must cut the chain, and in the
+      // parallel batch it cannot do so.
       { middleware: new ValidationMiddleware(commandRegistry), priority: 5, canRunParallel: false },
       { middleware: new PermissionMiddleware(commandRegistry), priority: 6, canRunParallel: false },
       { middleware: new AntiSpamMiddleware(), priority: 7, canRunParallel: false },
@@ -452,8 +452,8 @@ export class SubBotManager extends EventEmitter {
     const subConfig = subBotDatabase.get(subBotId);
     if (!botState || !subConfig || !sock?.user?.id) return;
 
-    const desiredName = subConfig.name || `VaniaBot`;
-    const desiredBio = subConfig.bio || `VaniaBot Subbot activo ✨`;
+    const desiredName = subConfig.name || `OrbitBot`;
+    const desiredBio = subConfig.bio || `OrbitBot Subbot activo ✨`;
     const desiredPhoto = subConfig.photo || null;
 
     const signature = JSON.stringify({ desiredName, desiredBio, desiredPhoto });
@@ -528,7 +528,7 @@ export class SubBotManager extends EventEmitter {
         try {
           await this.mainSock.sendMessage(subConfig.ownerJid, {
             text:
-              `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+              `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
               `   *Vincular SubBot*\n` +
               `\n` +
               `💝 Tu SubBot está lista\n` +
@@ -568,7 +568,7 @@ export class SubBotManager extends EventEmitter {
                 try {
                   await this.mainSock.sendMessage(subConfig.ownerJid, {
                     text:
-                      `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+                      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
                       `   *Recordatorio SubBot*\n` +
                       `\n` +
                       `⏰ El código anterior\n` +
@@ -645,7 +645,7 @@ export class SubBotManager extends EventEmitter {
         try {
           await this.mainSock.sendMessage(subConfig.ownerJid, {
             text:
-              `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+              `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
               `   🤖 *SubBot activada*\n` +
               `\n` +
               `💝 ¡Tu SubBot ya está\n` +
@@ -692,7 +692,7 @@ export class SubBotManager extends EventEmitter {
         try {
           await this.mainSock.sendMessage(subConfig.ownerJid, {
             text:
-              `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+              `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
               `   *SubBot desconectada*\n` +
               `\n` +
               `Parece que tu SubBot\n` +

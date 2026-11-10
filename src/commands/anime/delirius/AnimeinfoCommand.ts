@@ -1,7 +1,7 @@
 /**
  * AnimeinfoCommand.ts
  *
- * anime command `animeinfo` — Muestra información de un anime
+ * anime command `animeinfo` — Shows information about an anime
  * Usage: !animeinfo <nombre>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!animeinfo`: Muestra información de un anime. */
+/** Command handler for `!animeinfo`: Shows information about an anime. */
 export class AnimeinfoCommand extends Command {
   name = 'animeinfo';
   description = 'Muestra información de un anime';

@@ -1,7 +1,7 @@
 /**
  * TextHackerCommand.ts
  *
- * creative command `hacker` — Crea un efecto de texto estilo hacker
+ * creative command `hacker` — Creates a hacker-style text effect
  * Usage: !hacker <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-anonymous-hacker-avatars-cyan-neon-677.html';
 
-/** Command handler for `!hacker`: Crea un efecto de texto estilo hacker. */
+/** Command handler for `!hacker`: Creates a hacker-style text effect. */
 export class TextHackerCommand extends Command {
   name = 'hacker';
   description = 'Crea un efecto de texto estilo hacker';
@@ -27,14 +27,14 @@ export class TextHackerCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!hacker <texto>';
-  examples = ['!hacker VaniaBot'];
+  examples = ['!hacker OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !hacker <texto>\n_Ejemplo: !hacker VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !hacker <texto>\n_Ejemplo: !hacker OrbitBot_');
       return;
     }
 

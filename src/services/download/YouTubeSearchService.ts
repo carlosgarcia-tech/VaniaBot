@@ -1,7 +1,7 @@
 /**
  * YouTubeSearchService.ts
  *
- * VaniaBot services module exposing `YouTubeVideo`.
+ * OrbitBot services module exposing `YouTubeVideo`.
  *
  * @author **Carlos G**
  */

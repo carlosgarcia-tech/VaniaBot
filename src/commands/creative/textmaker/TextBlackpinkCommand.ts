@@ -1,7 +1,7 @@
 /**
  * TextBlackpinkCommand.ts
  *
- * creative command `blackpink` — Crea un efecto de texto estilo Blackpink
+ * creative command `blackpink` — Creates a Blackpink-style text effect
  * Usage: !blackpink <texto>
  *
  * @author **Carlos G**
@@ -19,7 +19,7 @@ import {
 const PAGE_URL =
   'https://en.ephoto360.com/create-a-blackpink-style-logo-with-members-signatures-810.html';
 
-/** Command handler for `!blackpink`: Crea un efecto de texto estilo Blackpink. */
+/** Command handler for `!blackpink`: Creates a Blackpink-style text effect. */
 export class TextBlackpinkCommand extends Command {
   name = 'blackpink';
   description = 'Crea un efecto de texto estilo Blackpink';
@@ -28,14 +28,14 @@ export class TextBlackpinkCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!blackpink <texto>';
-  examples = ['!blackpink VaniaBot'];
+  examples = ['!blackpink OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !blackpink <texto>\n_Ejemplo: !blackpink VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !blackpink <texto>\n_Ejemplo: !blackpink OrbitBot_');
       return;
     }
 

@@ -1,7 +1,7 @@
 /**
  * NpmCommand.ts
  *
- * anime command `npm` — Busca paquetes en NPM
+ * anime command `npm` — Searches packages on NPM
  * Usage: !npm <paquete>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!npm`: Busca paquetes en NPM. */
+/** Command handler for `!npm`: Searches packages on NPM. */
 export class NpmCommand extends Command {
   name = 'npm';
   description = 'Busca paquetes en NPM';

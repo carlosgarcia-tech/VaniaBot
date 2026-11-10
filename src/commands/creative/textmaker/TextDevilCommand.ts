@@ -1,7 +1,7 @@
 /**
  * TextDevilCommand.ts
  *
- * creative command `devil` — Crea un efecto de texto estilo demonio
+ * creative command `devil` — Creates a devil-style text effect
  * Usage: !devil <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/neon-devil-wings-text-effect-online-683.html';
 
-/** Command handler for `!devil`: Crea un efecto de texto estilo demonio. */
+/** Command handler for `!devil`: Creates a devil-style text effect. */
 export class TextDevilCommand extends Command {
   name = 'devil';
   description = 'Crea un efecto de texto estilo demonio';
@@ -27,14 +27,14 @@ export class TextDevilCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!devil <texto>';
-  examples = ['!devil VaniaBot'];
+  examples = ['!devil OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !devil <texto>\n_Ejemplo: !devil VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !devil <texto>\n_Ejemplo: !devil OrbitBot_');
       return;
     }
 

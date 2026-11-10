@@ -1,7 +1,7 @@
 /**
  * FacebookDownloader.ts
  *
- * VaniaBot services module exposing `FacebookDownloader`, `FacebookVideo`.
+ * OrbitBot services module exposing `FacebookDownloader`, `FacebookVideo`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * CraftService.ts
  *
- * VaniaBot services module exposing `CraftService`, `CraftRecipe`, `CraftResult`, `craftService`.
+ * OrbitBot services module exposing `CraftService`, `CraftRecipe`, `CraftResult`, `craftService`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * TraductorCommand.ts
  *
- * utility command `traducir` — Traductor contextual inteligente — detecta idioma y preserva tono
+ * utility command `traducir` — Smart contextual translator — detects language and preserves tone
  * Usage: !tr [idioma] [texto] | !tr [origen]>[destino] [texto] | !tr idiomas
  *
  * @author **Carlos G**
@@ -32,7 +32,7 @@ function getQuotedText(ctx: MessageContext): string | null {
 
 function buildHelp(): string {
   return (
-    `🌐 *Traductor Contextual — VaniaBot*\n` +
+    `🌐 *Traductor Contextual — OrbitBot*\n` +
     `━━━━━━━━━━━━\n\n` +
     `📖 *Uso básico:*\n` +
     `• *!tr [idioma] [texto]*\n` +
@@ -55,11 +55,12 @@ function buildHelp(): string {
     `📋 *Ver idiomas disponibles:*\n` +
     `• *!tr idiomas*\n\n` +
     `💡 *Atajos:* !traducir · !translate · !trad · !tr\n\n` +
-    `> _VaniaBot🌐 — Traductor contextual_`
+    `> _OrbitBot🌐 — Traductor contextual_`
   );
 }
 
-/** Command handler for `!traducir`: Traductor contextual inteligente — detecta idioma y preserva tono. */
+/** Command handler for `!traducir`: Smart contextual translator —
+ * detects language and preserves tone. */
 export class TraductorCommand extends Command {
   name = 'traducir';
   description = 'Traductor contextual inteligente — detecta idioma y preserva tono';
@@ -94,7 +95,7 @@ export class TraductorCommand extends Command {
         `˚₊· ͟͟͞͞➳ *idiomas que entiendo* ˚₊· ͟͟͞͞➳\n\n${idiomasDisponibles()}\n\n` +
           `✩ *cómo pedírmelos:* nombre, código ISO, o como los digas en español/inglés\n` +
           `♡ *ejemplo:* "inglés", "en", "english" — los entiendo todos ♡\n\n` +
-          `> _VaniaBot 🌸 — tu traductora favorita_`,
+          `> _OrbitBot 🌸 — tu traductora favorita_`,
       );
       return;
     }
@@ -130,7 +131,7 @@ export class TraductorCommand extends Command {
         `🔍 *Idioma detectado:*\n\n` +
           `${detected.bandOrigen} *${detected.idiomaOrigen}*\n\n` +
           `_"${texto.slice(0, 100)}${texto.length > 100 ? '...' : ''}"_\n\n` +
-          `> _VaniaBot🌐 — Traductor contextual_`,
+          `> _OrbitBot🌐 — Traductor contextual_`,
       );
       return;
     }

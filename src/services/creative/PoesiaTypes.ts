@@ -1,7 +1,7 @@
 /**
  * PoesiaTypes.ts
  *
- * VaniaBot services module exposing `ContenidoEntry`, `GenerarOpts`, `GenerarSuccess`, `VotoResult`.
+ * OrbitBot services module exposing `ContenidoEntry`, `GenerarOpts`, `GenerarSuccess`, `VotoResult`.
  *
  * @author **Carlos G**
  */

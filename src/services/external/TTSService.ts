@@ -1,7 +1,7 @@
 /**
  * TTSService.ts
  *
- * VaniaBot services module exposing `TTSService`, `ttsService`.
+ * OrbitBot services module exposing `TTSService`, `ttsService`.
  *
  * @author **Carlos G**
  */

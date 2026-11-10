@@ -1,8 +1,8 @@
 /**
  * APKCommand.ts
  *
- * media command `apk` — Busca aplicaciones Android
- * Usage: !apk <nombre de app>
+ * media command `apk` — Searches Android apps
+ * Usage: !apk <app name>
  *
  * @author **Carlos G**
  */
@@ -20,7 +20,7 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { apkSearchService } from '@/services/download/APKSearchService.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!apk`: Busca aplicaciones Android. */
+/** Command handler for `!apk`: Searches Android apps. */
 export class APKCommand extends Command {
   name = 'apk';
   description = 'Busca aplicaciones Android';

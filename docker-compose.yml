@@ -1,14 +1,14 @@
-name: vaniabot
+name: orbit
 
 services:
-  vania-redis:
+  orbit-redis:
     image: redis:7-alpine
-    container_name: vania-redis
+    container_name: orbit-redis
     restart: always
     networks:
-      - vania-network
+      - orbit-network
     volumes:
-      - vania-redis-data:/data
+      - orbit-redis-data:/data
     command: >
       redis-server
       --appendonly yes
@@ -21,12 +21,12 @@ services:
       retries: 5
       start_period: 10s
 
-  vaniabot:
+  orbit:
     build:
       context: .
       dockerfile: Dockerfile
       target: runner
-    container_name: vaniabot
+    container_name: orbit
     restart: always
     user: '1001:1001'
 
@@ -42,26 +42,26 @@ services:
       - AUTH_MODE=${AUTH_MODE:-qr}
       - DOCKER_MODE=true
       - USE_REDIS=true
-      - REDIS_HOST=vania-redis
+      - REDIS_HOST=orbit-redis
       - REDIS_PORT=6379
-      - SESSION_PATH=/app/vaniasession
+      - SESSION_PATH=/app/orbitsession
       - NODE_OPTIONS=--max-old-space-size=512
 
     depends_on:
-      vania-redis:
+      orbit-redis:
         condition: service_healthy
 
     ports:
       - "3000:3000"
 
     networks:
-      - vania-network
+      - orbit-network
 
     volumes:
-      - vaniabot_session:/app/vaniasession
-      - vaniabot_subbots:/app/data/subbot-sessions
-      - vaniabot_database:/app/data
-      - vaniabot_temp:/app/data/temp
+      - orbit_session:/app/orbitsession
+      - orbit_subbots:/app/data/subbot-sessions
+      - orbit_database:/app/data
+      - orbit_temp:/app/data/temp
       - ./panel:/app/panel:ro,Z
 
     deploy:
@@ -90,26 +90,26 @@ services:
     stop_grace_period: 30s
 
 networks:
-  vania-network:
+  orbit-network:
     driver: bridge
 
 volumes:
-  vaniabot_session:
-    name: vaniabot_session
+  orbit_session:
+    name: orbit_session
     driver: local
 
-  vaniabot_subbots:
-    name: vaniabot_subbots
+  orbit_subbots:
+    name: orbit_subbots
     driver: local
 
-  vaniabot_database:
-    name: vaniabot_database
+  orbit_database:
+    name: orbit_database
     driver: local
 
-  vaniabot_temp:
-    name: vaniabot_temp
+  orbit_temp:
+    name: orbit_temp
     driver: local
 
-  vania-redis-data:
-    name: vania-redis-data
+  orbit-redis-data:
+    name: orbit-redis-data
     driver: local

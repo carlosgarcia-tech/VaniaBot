@@ -1,7 +1,7 @@
 /**
  * DevCommand.ts
  *
- * utility command `dev` — Creador del bot
+ * utility command `dev` — Bot creator
  * Usage: !dev
  *
  * @author **Carlos G**
@@ -44,7 +44,7 @@ const charset: Record<string, string> = {
 const toSmallCaps = (text: string): string =>
   text.toLowerCase().replace(/[a-z]/g, c => charset[c] || c);
 
-/** Command handler for `!dev`: Creador del bot. */
+/** Command handler for `!dev`: Bot creator. */
 export class DevCommand extends Command {
   name = 'dev';
   description = 'Creador del bot';
@@ -79,7 +79,7 @@ export class DevCommand extends Command {
       `💝 https://www.instagram.com/carlos.gxv\n\n` +
       `💝 https://www.tiktok.com/@carlos.grcia0\n\n` +
       `💝 https://www.youtube.com/@carlos.dev01\n\n` +
-      `⌬ 𝗩𝗔𝗡𝗜𝗔 𝗕𝗢𝗧 💝`;
+      `⌬ 𝗢𝗥𝗕𝗜𝗧 𝗕𝗢𝗧 💝`;
 
     await ctx.sock.sendMessage(ctx.chat.jid, { text: devText }, { quoted: ctx.message });
   }

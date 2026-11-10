@@ -1,7 +1,7 @@
 /**
  * LotteryCommand.ts
  *
- * economy command `loteria` — Compra tickets de lotería
+ * economy command `loteria` — Buy lottery tickets
  * Usage: !loteria [comprar|estado|resultado|reiniciar]
  *
  * @author **Carlos G**
@@ -77,14 +77,14 @@ const lotteryStore = new JsonFileStore<LotteryState>({
   validate: validateLotteryState,
 });
 
-/** Estado persistido: sobrevive reinicios (el sorteo es por wall-clock). */
+/** Persisted state: survives restarts (draw is wall-clock based). */
 const lotteryState: LotteryState = lotteryStore.load();
 
 function persistLotteryState(): void {
   try {
     lotteryStore.save(lotteryState);
   } catch {
-    // JsonFileStore ya logueó el error: el juego continúa con el estado en memoria.
+    // JsonFileStore already logged the error: the game continues with the in-memory state.
   }
 }
 
@@ -93,7 +93,7 @@ function generateTicketNumber(): string {
   return randomBytes(3).toString('hex').toUpperCase().slice(0, 5);
 }
 
-/** Command handler for `!loteria`: Compra tickets de lotería. */
+/** Command handler for `!loteria`: Buy lottery tickets. */
 export class LotteryCommand extends Command {
   name = 'loteria';
   description = 'Compra tickets de lotería';
@@ -106,7 +106,7 @@ export class LotteryCommand extends Command {
 
   async execute(ctx: MessageContext): Promise<void> {
     const action = ctx.args[0]?.toLowerCase() || 'estado';
-    // Solo el valor omitido defaultea a 1: un '0' explícito se rechaza abajo
+    // Only an omitted value defaults to 1: an explicit '0' is rejected below
     const parsedAmount = parseInt(ctx.args[1]);
     const amount = Number.isNaN(parsedAmount) ? 1 : parsedAmount;
 
@@ -134,7 +134,7 @@ export class LotteryCommand extends Command {
         break;
       default:
         await ctx.reply(
-          `🎫 *LOTERÍA VANIA* 🎫\n\n` +
+          `🎫 *LOTERÍA ORBIT* 🎫\n\n` +
             `✿ *Cómo funciona:*\n` +
             `Compra tickets y participa\n` +
             `en el sorteo semanal.\n\n` +
@@ -181,8 +181,8 @@ export class LotteryCommand extends Command {
       );
     }
 
-    // Solo se cobra lo efectivamente comprado: si quedaban menos slots
-    // libres que tickets pedidos, cobrar el total perdería dinero del usuario.
+    // Only charge for what was actually bought: if there were fewer free
+    // slots than requested tickets, charging the full amount would cost the user money.
     const actualCost = ticketsToBuy * LOTTERY_CONFIG.ticketPrice;
     await serviceManager.userService.removeMoney(ctx.sender.jid, actualCost);
 
@@ -265,7 +265,7 @@ export class LotteryCommand extends Command {
     persistLotteryState();
   }
 
-  /** Owner-only: descarta tickets y pozo sin pagar y reinicia el ciclo del sorteo. */
+  /** Owner-only: discards tickets and the unpaid pot and resets the draw cycle. */
   private async resetLottery(ctx: MessageContext): Promise<void> {
     const removedTickets = lotteryState.tickets.length;
     const discardedPool = lotteryState.prizePool;

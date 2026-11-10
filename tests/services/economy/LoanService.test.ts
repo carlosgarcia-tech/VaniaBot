@@ -62,7 +62,7 @@ describe('LoanService', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-09-27T12:00:00Z'));
     service = loanService;
-    // Reset del estado interno del singleton vía la misma vía de persistencia
+    // Reset of the singleton's internal state via the same persistence path
     mockGameStateService.getLoans.mockReturnValue([]);
     service.loadFromPersistence();
     mockUserService.getUser.mockResolvedValue({ jid: 'x', money: 0 });
@@ -152,7 +152,7 @@ describe('LoanService', () => {
     const loan = service.getLoanById(loanId!);
     expect(loan?.status).toBe('active');
     expect(loan?.remaining).toBe(5500);
-    // Vence en 7 días
+    // Due in 7 days
     expect(loan?.dueDate).toBe(Date.now() + 7 * 24 * 60 * 60 * 1000);
   });
 
@@ -174,7 +174,7 @@ describe('LoanService', () => {
     userWith(LENDER, 50_000);
     await service.acceptLoan(BORROWER, loanId!);
 
-    // El borrower recibió 5000 y ahorró 5500 para pagar
+    // The borrower received 5000 and saved up 5500 to repay
     userWith(BORROWER, 6000);
 
     const result = await service.repayLoan(BORROWER, loanId!);
@@ -219,7 +219,7 @@ describe('LoanService', () => {
     userWith(LENDER, 50_000);
     await service.acceptLoan(BORROWER, loanId!);
 
-    // Avanza 8 días: el préstamo vence
+    // Advance 8 days: the loan is due
     vi.advanceTimersByTime(8 * 24 * 60 * 60 * 1000);
 
     const overdue = service.checkOverdueLoans();
@@ -228,7 +228,7 @@ describe('LoanService', () => {
     expect(overdue[0].id).toBe(loanId);
     expect(overdue[0].status).toBe('defaulted');
 
-    // Segunda llamada: ya no hay cambios pendientes
+    // Second call: no more pending changes
     expect(service.checkOverdueLoans()).toHaveLength(0);
   });
 
@@ -280,7 +280,7 @@ describe('LoanService', () => {
 
     expect(service.getLoanById('PR-0041')).toBeDefined();
 
-    // El siguiente ID continúa desde el mayor cargado
+    // The next ID continues from the highest loaded one
     mockUserService.getUser.mockResolvedValue({ jid: 'x', money: 999_999 });
     return service.requestLoan(LENDER, BORROWER, 1000).then(r => {
       expect(r.loanId).toBe('PR-0042');

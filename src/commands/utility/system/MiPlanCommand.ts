@@ -1,7 +1,7 @@
 /**
  * MiPlanCommand.ts
  *
- * utility command `miplan` — Ver información de tu licencia actual
+ * utility command `miplan` — View your current license information
  *
  * @author **Carlos G**
  */
@@ -10,7 +10,7 @@ import { Command } from '../../Command.js';
 import { CommandCategory, PermissionLevel, type MessageContext } from '@/types/index.js';
 import { licenseService } from '@/services/system/LicenseService.js';
 
-/** Command handler for `!miplan`: Ver información de tu licencia actual. */
+/** Command handler for `!miplan`: View your current license information. */
 export class MiPlanCommand extends Command {
   name = 'miplan';
   description = 'Ver información de tu licencia actual';

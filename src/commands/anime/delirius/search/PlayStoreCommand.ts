@@ -1,7 +1,7 @@
 /**
  * PlayStoreCommand.ts
  *
- * anime command `playstore` — Busca aplicaciones en Google Play Store
+ * anime command `playstore` — Searches apps on Google Play Store
  * Usage: !playstore <app>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!playstore`: Busca aplicaciones en Google Play Store. */
+/** Command handler for `!playstore`: Searches apps on Google Play Store. */
 export class PlayStoreCommand extends Command {
   name = 'playstore';
   description = 'Busca aplicaciones en Google Play Store';

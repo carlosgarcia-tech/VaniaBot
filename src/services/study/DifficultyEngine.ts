@@ -1,7 +1,7 @@
 /**
  * DifficultyEngine.ts
  *
- * VaniaBot services module exposing `DifficultyEngine`, `COIN_REWARDS`, `XP_REWARDS`, `STREAK_BONUS_COINS`.
+ * OrbitBot services module exposing `DifficultyEngine`, `COIN_REWARDS`, `XP_REWARDS`, `STREAK_BONUS_COINS`.
  *
  * @author **Carlos G**
  */
@@ -42,11 +42,11 @@ export const HINT_OFFER_SECS = 15;
 
 export class DifficultyEngine {
   /**
-   * Calcula la dificultad apropiada para el usuario.
+   * Calculates the appropriate difficulty for the user.
    *
-   * @param stats     - Estadísticas históricas del usuario
-   * @param category  - Categoría actual (usa stats por categoría si existen)
-   * @param sessionStreak - Racha de aciertos en la sesión activa
+   * @param stats     - The user's historical quiz statistics
+   * @param category  - Current category (uses per-category stats when they exist)
+   * @param sessionStreak - Streak of correct answers in the active session
    */
   calculate(stats: UserQuizStats | null, category: string, sessionStreak: number): QuizDifficulty {
     if (!stats || stats.totalAnswered === 0) return QuizDifficulty.EASY;
@@ -69,8 +69,8 @@ export class DifficultyEngine {
   }
 
   /**
-   * Calcula las monedas a otorgar por una respuesta correcta.
-   * Incluye bonus de racha cada 3 aciertos seguidos.
+   * Calculates the coins to award for a correct answer.
+   * Includes a streak bonus every 3 correct answers in a row.
    */
   calculateCoins(difficulty: QuizDifficulty, streak: number): number {
     const base = COIN_REWARDS[difficulty];

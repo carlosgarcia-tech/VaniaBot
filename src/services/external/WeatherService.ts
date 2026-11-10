@@ -1,7 +1,7 @@
 /**
  * WeatherService.ts
  *
- * VaniaBot services module exposing `WeatherService`, `weatherService`.
+ * OrbitBot services module exposing `WeatherService`, `weatherService`.
  *
  * @author **Carlos G**
  */

@@ -19,7 +19,7 @@ NC='\033[0m'
 
 VERSION="${1:-6.12.18}"
 RAW_MODE="${2:-}"
-IMAGE="ghcr.io/carlosgarcia-tech/vaniabot:${VERSION}"
+IMAGE="ghcr.io/carlosgarcia-tech/orbit:${VERSION}"
 START_TIME=$(date +%s%3N 2>/dev/null || echo 0)
 UPDATE_MODE=false
 [[ "$RAW_MODE" == "update" || "$RAW_MODE" == "--update" || "$RAW_MODE" == "-u" ]] \
@@ -247,7 +247,7 @@ boot_screen() {
   printf "  ${GHOST}│${NC}  ${GHOST}img ${NC}  ${DIM}%-52s${NC}${GHOST}│${NC}\n" "${IMAGE:0:52}"
   if $UPDATE_MODE; then
     local cur_ver
-    cur_ver=$(docker inspect vaniabot --format '{{.Config.Image}}' 2>/dev/null \
+    cur_ver=$(docker inspect orbit --format '{{.Config.Image}}' 2>/dev/null \
       | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "none")
     printf "  ${GHOST}│${NC}  ${GHOST}prev${NC}  ${CRIMSON}%-24s${NC}  ${GHOST}next${NC}  ${LIME}%-12s${NC}${GHOST}│${NC}\n" \
       "${cur_ver}" "${VERSION}"
@@ -260,9 +260,9 @@ boot_screen() {
   blank
   echo -ne "  ${BOLD}${NEON_GREEN}"
   if $UPDATE_MODE; then
-    typewrite "▶▶  OVERRIDE INICIADO  ·  SESIONES PRESERVADAS  ·  HOT-SWAP EN PROGRESO..." 0.015
+    typewrite "▶▶  OVERRIDE STARTED  ·  SESSIONS PRESERVED  ·  HOT-SWAP IN PROGRESS..." 0.015
   else
-    typewrite "▶▶  TODOS LOS SISTEMAS LISTOS  ·  INICIANDO SECUENCIA DE DEPLOY..." 0.015
+    typewrite "▶▶  ALL SYSTEMS GO  ·  STARTING DEPLOY SEQUENCE..." 0.015
   fi
   echo -e "${NC}"; blank; sleep 0.3
 }
@@ -276,31 +276,31 @@ check_persistence() {
 }
 
 migrate_subbot_sessions() {
-  info "${GHOST}verificando migración de sesiones de subbots...${NC}"
+  info "${GHOST}verifying subbot session migration...${NC}"
   local OLD_PATH="/app/data/subbot-sessions"
   local NEW_PATH="/app/subbot-sessions"
 
   local old_count
-  old_count=$(docker run --rm -v vaniabot_database:/check alpine sh -c "ls -1 /check${OLD_PATH} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
+  old_count=$(docker run --rm -v orbit_database:/check alpine sh -c "ls -1 /check${OLD_PATH} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
   local new_count
-  new_count=$(docker run --rm -v vaniabot_subbot_sessions:/check alpine sh -c "ls -1 /check${NEW_PATH} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
+  new_count=$(docker run --rm -v orbit_subbot_sessions:/check alpine sh -c "ls -1 /check${NEW_PATH} 2>/dev/null | wc -l" 2>/dev/null || echo "0")
 
   if [ "$old_count" -gt 2 ] && [ "$new_count" -le 2 ]; then
-    info "${NEON_YELLOW}Migrando sesiones de ${OLD_PATH} → ${NEW_PATH}${NC}"
+    info "${NEON_YELLOW}Migrating sessions from ${OLD_PATH} → ${NEW_PATH}${NC}"
     docker run --rm \
-      -v vaniabot_database:/old \
-      -v vaniabot_subbot_sessions:/new \
+      -v orbit_database:/old \
+      -v orbit_subbot_sessions:/new \
       alpine sh -c "
         mkdir -p /new/subbot-sessions
         cp -a /old${OLD_PATH}/. /new${NEW_PATH}/ 2>/dev/null || true
         chown -R 1001:1001 /new${NEW_PATH} 2>/dev/null || true
       " 2>/dev/null \
-      && ok "Sesiones migradas: ${NEON_GREEN}${BOLD}$((old_count-2)) sesiones${NC}" \
-      || warn "Migración falló — sesiones originales intactas"
+      && ok "Sessions migrated: ${NEON_GREEN}${BOLD}$((old_count-2)) sessions${NC}" \
+      || warn "Migration failed — original sessions intact"
   elif [ "$new_count" -gt 2 ]; then
-    ok "Sesiones ya en ubicación correcta: ${NEON_GREEN}${BOLD}$((new_count-2)) sesiones${NC}"
+    ok "Sessions already in place: ${NEON_GREEN}${BOLD}$((new_count-2)) sessions${NC}"
   else
-    info "${GHOST}Sin sesiones previas para migrar${NC}"
+    info "${GHOST}No previous sessions to migrate${NC}"
   fi
 }
 
@@ -312,10 +312,10 @@ fix_permissions() {
 
 launch_redis() {
   docker run -d \
-    --name vania-redis \
-    --network vania-network \
+    --name orbit-redis \
+    --network orbit-network \
     --restart unless-stopped \
-    -v vania-redis-data:/data \
+    -v orbit-redis-data:/data \
     redis:7-alpine \
     redis-server \
       --appendonly yes \
@@ -327,10 +327,10 @@ launch_redis() {
       --loglevel notice > /dev/null 2>&1
 }
 
-launch_vaniabot() {
+launch_orbit() {
   docker run -d \
-    --name vaniabot \
-    --network vania-network \
+    --name orbit \
+    --network orbit-network \
     --restart unless-stopped \
     --env-file .env \
     -e NODE_ENV=production \
@@ -338,17 +338,17 @@ launch_vaniabot() {
     -e AUTH_MODE="${AUTH_MODE:-qr}" \
     -e DOCKER_MODE=true \
     -e USE_REDIS=true \
-    -e REDIS_HOST=vania-redis \
+    -e REDIS_HOST=orbit-redis \
     -e REDIS_PORT=6379 \
-    -e SESSION_PATH=/app/vaniasession \
+    -e SESSION_PATH=/app/orbitsession \
     -e DATA_PATH=/app/data \
     -e SUBBOT_SESSIONS_PATH=/app/subbot-sessions \
     -e ASSETS_DIR=/app/static/assets \
-    -v vaniabot_session:/app/vaniasession \
-    -v vaniabot_database:/app/data \
-    -v vaniabot_storage:/app/storage \
-    -v vaniabot_subbot_sessions:/app/subbot-sessions \
-    -v vaniabot_temp:/app/temp \
+    -v orbit_session:/app/orbitsession \
+    -v orbit_database:/app/data \
+    -v orbit_storage:/app/storage \
+    -v orbit_subbot_sessions:/app/subbot-sessions \
+    -v orbit_temp:/app/temp \
     -p 3000:3000 \
     --user 1001:1001 \
     --memory=4g \
@@ -362,11 +362,11 @@ boot_screen
 
 if $UPDATE_MODE; then
 
-  step 1 "Descargando nueva imagen"
+  step 1 "Pulling new image"
   info "${GHOST}imagen  :${NC} ${NEON_ORANGE}${BOLD}${IMAGE}${NC}"
   blank
   if ! docker pull "$IMAGE"; then
-    fail "No se pudo descargar la imagen ${IMAGE}"
+    fail "Could not pull image ${IMAGE}"
   fi
   ok "Imagen ${NEON_ORANGE}${BOLD}${IMAGE}${NC} lista"
 
@@ -374,12 +374,12 @@ if $UPDATE_MODE; then
   info "${GHOST}verificando datos existentes...${NC}"
   blank
 
-  SESSION_COUNT=$(check_persistence "vaniabot_session" "")
-  DB_COUNT=$(check_persistence "vaniabot_database" "")
-  STORAGE_COUNT=$(check_persistence "vaniabot_storage" "")
+  SESSION_COUNT=$(check_persistence "orbit_session" "")
+  DB_COUNT=$(check_persistence "orbit_database" "")
+  STORAGE_COUNT=$(check_persistence "orbit_storage" "")
 
-  OLD_SUBBOT_COUNT=$(check_persistence "vaniabot_database" "/data/subbot-sessions")
-  NEW_SUBBOT_COUNT=$(check_persistence "vaniabot_subbot_sessions" "")
+  OLD_SUBBOT_COUNT=$(check_persistence "orbit_database" "/data/subbot-sessions")
+  NEW_SUBBOT_COUNT=$(check_persistence "orbit_subbot_sessions" "")
   if [ "$NEW_SUBBOT_COUNT" -gt 2 ]; then
     SUBBOT_COUNT=$NEW_SUBBOT_COUNT
   else
@@ -387,50 +387,50 @@ if $UPDATE_MODE; then
   fi
 
   if [ "$SESSION_COUNT" -gt 2 ]; then
-    ok "Sesiones encontradas: ${NEON_GREEN}${BOLD}$((SESSION_COUNT-2)) archivos${NC}"
+    ok "Sessions found: ${NEON_GREEN}${BOLD}$((SESSION_COUNT-2)) files${NC}"
   else
-    warn "No hay sesiones previas - se generará una nueva"
+    warn "No previous sessions - a new one will be generated"
   fi
 
   if [ "$DB_COUNT" -gt 1 ]; then
     ok "Datos en /app/data: ${NEON_GREEN}${BOLD}$((DB_COUNT-1)) archivos${NC}"
   else
-    warn "Volumen /app/data vacío"
+    warn "/app/data volume is empty"
   fi
 
   if [ "$STORAGE_COUNT" -gt 1 ]; then
     ok "Base de datos SQLite encontrada en storage: ${NEON_GREEN}${BOLD}$((STORAGE_COUNT-1)) archivos${NC}"
   else
-    warn "Sin DB previa en storage — se creará nueva al iniciar"
+    warn "No previous DB in storage — a new one will be created on start"
   fi
 
   if [ "$SUBBOT_COUNT" -gt 1 ]; then
-    ok "Sesiones de subbots encontradas: ${NEON_GREEN}${BOLD}$((SUBBOT_COUNT-1)) sesiones${NC}"
+    ok "Subbot sessions found: ${NEON_GREEN}${BOLD}$((SUBBOT_COUNT-1)) sessions${NC}"
   else
-    warn "Sin sesiones de subbots previas — se crearán al registrar subbots"
+    warn "No previous subbot sessions — they will be created when subbots register"
   fi
 
-  REDIS_KEYS=$(docker exec vania-redis redis-cli DBSIZE 2>/dev/null || echo "0")
+  REDIS_KEYS=$(docker exec orbit-redis redis-cli DBSIZE 2>/dev/null || echo "0")
   if [ "$REDIS_KEYS" -gt 0 ]; then
     ok "Redis tiene ${NEON_GREEN}${BOLD}${REDIS_KEYS} keys${NC} persistidos (subbots incluidos)"
-    docker exec vania-redis redis-cli BGSAVE 2>/dev/null || true
-    docker exec vania-redis redis-cli BGREWRITEAOF 2>/dev/null || true
+    docker exec orbit-redis redis-cli BGSAVE 2>/dev/null || true
+    docker exec orbit-redis redis-cli BGREWRITEAOF 2>/dev/null || true
     sleep 3  
     ok "Redis ${GHOST}→${NC} flush a disco completado"
   else
-    warn "Redis sin datos activos"
+    warn "Redis has no active data"
   fi
 
   BACKUP_TAG=$(date '+%Y%m%d-%H%M%S')
-  BACKUP_DIR="./vania-backups/${BACKUP_TAG}"
+  BACKUP_DIR="./orbit-backups/${BACKUP_TAG}"
   mkdir -p "${BACKUP_DIR}"
   info "${GHOST}creando backup en ${NEON_YELLOW}${BACKUP_DIR}${NC}..."
   docker run --rm \
-    -v vaniabot_database:/src-db \
-    -v vaniabot_session:/src-ses \
-    -v vaniabot_storage:/src-storage \
-    -v vaniabot_subbot_sessions:/src-subbots \
-    -v vania-redis-data:/src-redis \
+    -v orbit_database:/src-db \
+    -v orbit_session:/src-ses \
+    -v orbit_storage:/src-storage \
+    -v orbit_subbot_sessions:/src-subbots \
+    -v orbit-redis-data:/src-redis \
     -v "$(pwd)/${BACKUP_DIR}:/backup" \
     alpine sh -c "
       mkdir -p /backup/database /backup/session /backup/storage /backup/subbot-sessions /backup/redis
@@ -441,40 +441,40 @@ if $UPDATE_MODE; then
       cp -a /src-redis/.    /backup/redis/             2>/dev/null || true
     " 2>/dev/null \
     && ok "Backup guardado en ${NEON_YELLOW}${BACKUP_DIR}${NC} (incl. subbots + redis)" \
-    || warn "Backup falló — continuando de todas formas"
+    || warn "Backup failed — continuing anyway"
 
-  step 3 "Hot-swap del contenedor VaniaBot"
-  info "${GHOST}alcance :${NC} ${DIM}solo 'vaniabot' — redis y volúmenes intactos${NC}"
+  step 3 "Hot-swap of the OrbitBot container"
+  info "${GHOST}scope    :${NC} ${DIM}only 'orbit' — redis and volumes intact${NC}"
   blank
 
-  docker stop vaniabot 2>/dev/null \
-    && ok "vaniabot ${GHOST}detenido${NC}" \
-    || warn "vaniabot no estaba corriendo"
+  docker stop orbit 2>/dev/null \
+    && ok "orbit ${GHOST}stopped${NC}" \
+    || warn "orbit was not running"
   sleep 2
 
   migrate_subbot_sessions
 
-  fix_permissions "vaniabot_session"          "/app/vaniasession"
-  fix_permissions "vaniabot_database"         "/app/data"
-  fix_permissions "vaniabot_storage"          "/app/storage"
-  fix_permissions "vaniabot_subbot_sessions"  "/app/subbot-sessions"
+  fix_permissions "orbit_session"          "/app/orbitsession"
+  fix_permissions "orbit_database"         "/app/data"
+  fix_permissions "orbit_storage"          "/app/storage"
+  fix_permissions "orbit_subbot_sessions"  "/app/subbot-sessions"
 
-  docker rm vaniabot 2>/dev/null \
-    && ok "vaniabot ${GHOST}removido${NC}" \
+  docker rm orbit 2>/dev/null \
+    && ok "orbit ${GHOST}removed${NC}" \
     || info "nada que remover"
   blank
 
-  docker volume create vaniabot_storage          2>/dev/null || true
-  docker volume create vaniabot_subbot_sessions  2>/dev/null || true
+  docker volume create orbit_storage          2>/dev/null || true
+  docker volume create orbit_subbot_sessions  2>/dev/null || true
 
-  launch_vaniabot
-  ok "VaniaBot ${LIME}${BOLD}ONLINE${NC}  ${GHOST}·${NC}  ${NEON_YELLOW}${BOLD}v${VERSION}${NC}  ${GHOST}·${NC}  ${GHOST}:3000${NC}"
+  launch_orbit
+  ok "OrbitBot ${LIME}${BOLD}ONLINE${NC}  ${GHOST}·${NC}  ${NEON_YELLOW}${BOLD}v${VERSION}${NC}  ${GHOST}·${NC}  ${GHOST}:3000${NC}"
 
   step 4 "Verificando datos post-deploy"
   MAX=30; attempt=0
-  until docker ps --filter "name=^vaniabot$" --filter "status=running" | grep -q vaniabot; do
+  until docker ps --filter "name=^orbit$" --filter "status=running" | grep -q orbit; do
     attempt=$(( attempt + 1 ))
-    (( attempt >= MAX )) && fail "El contenedor no levantó en ${MAX}s"
+    (( attempt >= MAX )) && fail "Container did not come up in ${MAX}s"
     spin_msg "$attempt" "Waiting for status=running..." "$attempt" "$MAX"
     sleep 1
   done
@@ -482,33 +482,33 @@ if $UPDATE_MODE; then
   ok "Contenedor en estado ${NEON_GREEN}${BOLD}RUNNING${NC}"
 
   sleep 6
-  SESSION_AFTER=$(docker exec vaniabot ls -la /app/vaniasession/ 2>/dev/null | wc -l)
-  STORAGE_AFTER=$(docker exec vaniabot find /app/storage -name "*.db" 2>/dev/null | wc -l)
-  SUBBOT_AFTER=$(docker exec vaniabot ls -la /app/subbot-sessions/ 2>/dev/null | wc -l)
-  REDIS_AFTER=$(docker exec vania-redis redis-cli DBSIZE 2>/dev/null || echo "0")
+  SESSION_AFTER=$(docker exec orbit ls -la /app/orbitsession/ 2>/dev/null | wc -l)
+  STORAGE_AFTER=$(docker exec orbit find /app/storage -name "*.db" 2>/dev/null | wc -l)
+  SUBBOT_AFTER=$(docker exec orbit ls -la /app/subbot-sessions/ 2>/dev/null | wc -l)
+  REDIS_AFTER=$(docker exec orbit-redis redis-cli DBSIZE 2>/dev/null || echo "0")
 
   if [ "$SESSION_AFTER" -gt 2 ]; then
-    ok "Sesiones preservadas: ${NEON_GREEN}${BOLD}$((SESSION_AFTER-2)) archivos${NC}"
+    ok "Sessions preserved: ${NEON_GREEN}${BOLD}$((SESSION_AFTER-2)) files${NC}"
   else
-    warn "Las sesiones no se preservaron — puede requerir nuevo QR"
+    warn "Sessions not preserved — new QR may be required"
   fi
 
   if [ "$STORAGE_AFTER" -gt 0 ]; then
-    ok "Base de datos SQLite ${NEON_GREEN}${BOLD}PERSISTENTE${NC}  ${GHOST}·${NC}  ${DIM}/app/storage/database/vania.db${NC}"
+    ok "Base de datos SQLite ${NEON_GREEN}${BOLD}PERSISTENTE${NC}  ${GHOST}·${NC}  ${DIM}/app/storage/database/orbit.db${NC}"
   else
-    warn "DB aún no visible — el app puede estar inicializándola"
+    warn "DB not visible yet — the app may still be initializing it"
   fi
 
   if [ "$SUBBOT_AFTER" -gt 2 ]; then
-    ok "Subbots preservados: ${NEON_GREEN}${BOLD}$((SUBBOT_AFTER-2)) sesiones${NC}  ${GHOST}·${NC}  ${DIM}/app/subbot-sessions/${NC}"
+    ok "Subbots preserved: ${NEON_GREEN}${BOLD}$((SUBBOT_AFTER-2)) sessions${NC}  ${GHOST}·${NC}  ${DIM}/app/subbot-sessions/${NC}"
   else
-    warn "Sin sesiones de subbots activas aún"
+    warn "No active subbot sessions yet"
   fi
 
   ok "Redis keys post-swap: ${NEON_GREEN}${BOLD}${REDIS_AFTER}${NC}"
 
   step 5 "Verificando despliegue final"
-  ok "VaniaBot operativo con datos intactos"
+  ok "OrbitBot running with data intact"
   blank
   matrix_rain 2; blank
   box_top    "$LIME"
@@ -516,8 +516,8 @@ if $UPDATE_MODE; then
   box_line   "$LIME" "${BOLD}${WHITE}✔  HOT-SWAP COMPLETADO  ·  DATOS PRESERVADOS${NC}"
   box_empty  "$LIME"
   box_divider "$LIME"
-  box_line   "$LIME" "${GHOST}vaniabot    ${NC}${LIME}${BOLD}● RUNNING${NC}    ${GHOST}·${NC}  ${GHOST}redis       ${NC}${NEON_GREEN}${BOLD}● INTACTO${NC}"
-  box_line   "$LIME" "${GHOST}sesiones    ${NC}${ELECTRIC}${BOLD}● $((SESSION_AFTER-2)) FILES${NC}   ${GHOST}·${NC}  ${GHOST}subbots     ${NC}${NEON_GREEN}${BOLD}● $((SUBBOT_AFTER-2)) SESIONES${NC}"
+  box_line   "$LIME" "${GHOST}orbit    ${NC}${LIME}${BOLD}● RUNNING${NC}    ${GHOST}·${NC}  ${GHOST}redis       ${NC}${NEON_GREEN}${BOLD}● INTACTO${NC}"
+  box_line   "$LIME" "${GHOST}sesiones    ${NC}${ELECTRIC}${BOLD}● $((SESSION_AFTER-2)) FILES${NC}   ${GHOST}·${NC}  ${GHOST}subbots     ${NC}${NEON_GREEN}${BOLD}● $((SUBBOT_AFTER-2)) SESSIONS${NC}"
   box_line   "$LIME" "${GHOST}db-storage  ${NC}${NEON_GREEN}${BOLD}● PERSISTENTE${NC}  ${GHOST}·${NC}  ${GHOST}redis-keys  ${NC}${NEON_GREEN}${BOLD}● ${REDIS_AFTER}${NC}"
   box_line   "$LIME" "${GHOST}backup      ${NC}${NEON_YELLOW}${BOLD}● ${BACKUP_TAG}${NC}"
   box_line   "$LIME" "${GHOST}version     ${NC}${NEON_YELLOW}${BOLD}v${VERSION}${NC}         ${GHOST}·${NC}  ${GHOST}elapsed     ${NC}${DIM}$(elapsed)${NC}"
@@ -527,14 +527,14 @@ if $UPDATE_MODE; then
 else
 
   step 1 "Creando red Docker"
-  if docker network create vania-network 2>/dev/null; then
-    ok "Red ${ELECTRIC}${BOLD}vania-network${NC} creada"
+  if docker network create orbit-network 2>/dev/null; then
+    ok "Red ${ELECTRIC}${BOLD}orbit-network${NC} created"
   else
-    warn "La red ya existe · continuando"
+    warn "Network already exists · continuing"
   fi
 
-  step 2 "Montando volúmenes persistentes"
-  for vol in vaniabot_session vaniabot_database vaniabot_storage vaniabot_subbot_sessions vaniabot_temp vania-redis-data; do
+  step 2 "Mounting persistent volumes"
+  for vol in orbit_session orbit_database orbit_storage orbit_subbot_sessions orbit_temp orbit-redis-data; do
     if docker volume create "$vol" 2>/dev/null; then
       ok "Volumen ${NEON_GREEN}${BOLD}${vol}${NC}"
     else
@@ -544,84 +544,84 @@ else
   done
 
   step 3 "Configurando permisos correctos"
-  info "${GHOST}estableciendo permisos para UID 1001...${NC}"
+  info "${GHOST}setting permissions for UID 1001...${NC}"
   for vol_mount in \
-    "vaniabot_session:/app/vaniasession" \
-    "vaniabot_database:/app/data" \
-    "vaniabot_storage:/app/storage" \
-    "vaniabot_subbot_sessions:/app/subbot-sessions" \
-    "vaniabot_temp:/app/temp"
+    "orbit_session:/app/orbitsession" \
+    "orbit_database:/app/data" \
+    "orbit_storage:/app/storage" \
+    "orbit_subbot_sessions:/app/subbot-sessions" \
+    "orbit_temp:/app/temp"
   do
     vol="${vol_mount%%:*}"
     docker run --rm -v "${vol}:/data" alpine sh -c "mkdir -p /data && chown -R 1001:1001 /data && chmod -R 755 /data" 2>/dev/null
-    ok "Permisos configurados para ${NEON_GREEN}${BOLD}${vol}${NC}"
+    ok "Permissions set for ${NEON_GREEN}${BOLD}${vol}${NC}"
   done
 
   step 4 "Purgando contenedores anteriores"
-  if docker rm -f vaniabot vania-redis 2>/dev/null; then
+  if docker rm -f orbit orbit-redis 2>/dev/null; then
     ok "Contenedores anteriores eliminados"
   else
     info "Sin contenedores previos que purgar"
   fi
 
-  step 5 "Iniciando Redis con persistencia AOF+RDB"
+  step 5 "Starting Redis with AOF+RDB persistence"
   info "${GHOST}imagen  :${NC} ${DIM}redis:7-alpine${NC}"
-  info "${GHOST}red     :${NC} ${DIM}vania-network${NC}"
-  info "${GHOST}storage :${NC} ${DIM}vania-redis-data  ·  AOF everysec + RDB snapshots${NC}"
-  info "${GHOST}motivo  :${NC} ${DIM}subbots en Redis sobreviven reinicios del servidor${NC}"
+  info "${GHOST}red     :${NC} ${DIM}orbit-network${NC}"
+  info "${GHOST}storage :${NC} ${DIM}orbit-redis-data  ·  AOF everysec + RDB snapshots${NC}"
+  info "${GHOST}reason  :${NC} ${DIM}subbot data in Redis survives server restarts${NC}"
   blank
   launch_redis
-  ok "Contenedor ${HOT_PINK}${BOLD}vania-redis${NC} online  ${GHOST}·${NC}  ${DIM}persistencia AOF+RDB activa${NC}"
+  ok "Contenedor ${HOT_PINK}${BOLD}orbit-redis${NC} online  ${GHOST}·${NC}  ${DIM}AOF+RDB persistence active${NC}"
 
   step 6 "Verificando salud de Redis"
   MAX=30; attempt=0
-  until docker exec vania-redis redis-cli ping 2>/dev/null | grep -q PONG; do
+  until docker exec orbit-redis redis-cli ping 2>/dev/null | grep -q PONG; do
     attempt=$(( attempt + 1 ))
-    (( attempt >= MAX )) && fail "Redis no respondió en ${MAX}s"
+    (( attempt >= MAX )) && fail "Redis did not respond in ${MAX}s"
     spin_msg "$attempt" "Awaiting PONG response..." "$attempt" "$MAX"
     sleep 1
   done
   printf "\n"
   ok "Redis ${GHOST}→${NC}  ${NEON_GREEN}${BOLD}PONG${NC}  ·  latencia nominal"
 
-  AOF_STATUS=$(docker exec vania-redis redis-cli CONFIG GET appendonly 2>/dev/null | tail -1 || echo "unknown")
+  AOF_STATUS=$(docker exec orbit-redis redis-cli CONFIG GET appendonly 2>/dev/null | tail -1 || echo "unknown")
   if [ "$AOF_STATUS" = "yes" ]; then
     ok "AOF persistence ${NEON_GREEN}${BOLD}ENABLED${NC}  ${GHOST}·${NC}  ${DIM}subbots sobreviven reinicios${NC}"
   else
-    warn "AOF no confirmado — verificar configuración de Redis"
+    warn "AOF not confirmed — check Redis configuration"
   fi
 
   step 7 "Inicializando estructura de datos"
   info "${GHOST}preparando directorios (incl. subbot-sessions dedicado)...${NC}"
   docker run --rm \
-    -v vaniabot_database:/app/data \
-    -v vaniabot_session:/app/vaniasession \
-    -v vaniabot_storage:/app/storage \
-    -v vaniabot_subbot_sessions:/app/subbot-sessions \
-    -v vaniabot_temp:/app/temp \
+    -v orbit_database:/app/data \
+    -v orbit_session:/app/orbitsession \
+    -v orbit_storage:/app/storage \
+    -v orbit_subbot_sessions:/app/subbot-sessions \
+    -v orbit_temp:/app/temp \
     alpine \
     sh -c "
       mkdir -p \
         /app/data/temp \
-        /app/vaniasession \
+        /app/orbitsession \
         /app/storage/database \
         /app/subbot-sessions \
         /app/temp \
       && chown -R 1001:1001 \
-        /app/data /app/vaniasession /app/storage /app/subbot-sessions /app/temp \
+        /app/data /app/orbitsession /app/storage /app/subbot-sessions /app/temp \
       && chmod -R 755 \
-        /app/data /app/vaniasession /app/storage /app/subbot-sessions /app/temp
+        /app/data /app/orbitsession /app/storage /app/subbot-sessions /app/temp
     " 2>/dev/null
   ok "${NEON_ORANGE}Estructura de directorios${NC} lista  ${GHOST}·${NC}  ${DIM}/app/subbot-sessions dedicado${NC}"
 
-  step 8 "Deployando VaniaBot"
+  step 8 "Deploying OrbitBot"
   info "${GHOST}imagen    :${NC} ${NEON_ORANGE}${BOLD}${IMAGE}${NC}"
-  info "${GHOST}red       :${NC} ${NEON_ORANGE}vania-network${NC}"
+  info "${GHOST}network   :${NC} ${NEON_ORANGE}orbit-network${NC}"
   info "${GHOST}recursos  :${NC} ${NEON_ORANGE}4g RAM${NC}  ${GHOST}·${NC}  ${NEON_ORANGE}1.5 CPUs${NC}"
-  info "${GHOST}subbots   :${NC} ${NEON_ORANGE}/app/subbot-sessions${NC}  ${GHOST}→${NC}  ${DIM}vaniabot_subbot_sessions (persistente)${NC}"
+  info "${GHOST}subbots   :${NC} ${NEON_ORANGE}/app/subbot-sessions${NC}  ${GHOST}→${NC}  ${DIM}orbit_subbot_sessions (persistent)${NC}"
   blank
-  launch_vaniabot
-  ok "VaniaBot ${LIME}${BOLD}ONLINE${NC}  ${GHOST}·${NC}  ${NEON_YELLOW}${BOLD}:3000${NC}"
+  launch_orbit
+  ok "OrbitBot ${LIME}${BOLD}ONLINE${NC}  ${GHOST}·${NC}  ${NEON_YELLOW}${BOLD}:3000${NC}"
   blank; sleep 0.2
   matrix_rain 3; blank
   box_top    "$NEON_GREEN"
@@ -629,9 +629,9 @@ else
   box_line   "$NEON_GREEN" "${BOLD}${WHITE}✔  DEPLOY COMPLETADO EXITOSAMENTE${NC}"
   box_empty  "$NEON_GREEN"
   box_divider "$NEON_GREEN"
-  box_line   "$NEON_GREEN" "${GHOST}vaniabot    ${NC}${NEON_GREEN}${BOLD}● RUNNING${NC}    ${GHOST}·${NC}  ${GHOST}vania-redis ${NC}${NEON_GREEN}${BOLD}● RUNNING${NC}"
-  box_line   "$NEON_GREEN" "${GHOST}puerto      ${NC}${NEON_YELLOW}${BOLD}:3000${NC}        ${GHOST}·${NC}  ${GHOST}version     ${NC}${ELECTRIC}${BOLD}v${VERSION}${NC}"
-  box_line   "$NEON_GREEN" "${GHOST}red         ${NC}${DIM}vania-network${NC}   ${GHOST}·${NC}  ${GHOST}elapsed     ${NC}${DIM}$(elapsed)${NC}"
+  box_line   "$NEON_GREEN" "${GHOST}orbit    ${NC}${NEON_GREEN}${BOLD}● RUNNING${NC}    ${GHOST}·${NC}  ${GHOST}orbit-redis ${NC}${NEON_GREEN}${BOLD}● RUNNING${NC}"
+  box_line   "$NEON_GREEN" "${GHOST}port        ${NC}${NEON_YELLOW}${BOLD}:3000${NC}        ${GHOST}·${NC}  ${GHOST}version     ${NC}${ELECTRIC}${BOLD}v${VERSION}${NC}"
+  box_line   "$NEON_GREEN" "${GHOST}network     ${NC}${DIM}orbit-network${NC}   ${GHOST}·${NC}  ${GHOST}elapsed     ${NC}${DIM}$(elapsed)${NC}"
   box_line   "$NEON_GREEN" "${GHOST}persist     ${NC}${LIME}${BOLD}● ENABLED${NC}     ${GHOST}·${NC}  ${GHOST}volumes     ${NC}${NEON_GREEN}${BOLD}● ACTIVE${NC}"
   box_line   "$NEON_GREEN" "${GHOST}subbots     ${NC}${LIME}${BOLD}● VOLUMEN DEDICADO${NC}  ${GHOST}·${NC}  ${GHOST}redis-aof   ${NC}${NEON_GREEN}${BOLD}● ON${NC}"
   box_empty  "$NEON_GREEN"
@@ -640,35 +640,35 @@ else
 fi
 
 blank
-thin_top "COMANDOS ÚTILES" "$ELECTRIC"
-thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker logs -f vaniabot               ${NC}  ${GHOST}→  logs en vivo${NC}"
-thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker stop vaniabot                 ${NC}  ${GHOST}→  detener bot${NC}"
+thin_top "USEFUL COMMANDS" "$ELECTRIC"
+thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker logs -f orbit               ${NC}  ${GHOST}→  live logs${NC}"
+thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker stop orbit                 ${NC}  ${GHOST}→  stop bot${NC}"
 thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker ps                            ${NC}  ${GHOST}→  estado general${NC}"
-thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker logs -f vania-redis           ${NC}  ${GHOST}→  logs de redis${NC}"
-thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker exec vania-redis redis-cli DBSIZE  ${NC}  ${GHOST}→  keys en redis${NC}"
+thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker logs -f orbit-redis           ${NC}  ${GHOST}→  redis logs${NC}"
+thin_line "${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker exec orbit-redis redis-cli DBSIZE  ${NC}  ${GHOST}→  keys in redis${NC}"
 thin_line "${GHOST}─────────────────────────────────────────────────────${NC}"
 thin_line "${GHOST}  RESPALDO MANUAL DE DATOS:${NC}"
-thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v vaniabot_storage:/src -v \$(pwd):/bk alpine tar czf /bk/db-backup.tar.gz -C /src .${NC}"
-thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v vaniabot_session:/src -v \$(pwd):/bk alpine tar czf /bk/session-backup.tar.gz -C /src .${NC}"
-thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v vaniabot_subbot_sessions:/src -v \$(pwd):/bk alpine tar czf /bk/subbots-backup.tar.gz -C /src .${NC}"
-thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v vania-redis-data:/src -v \$(pwd):/bk alpine tar czf /bk/redis-backup.tar.gz -C /src .${NC}"
+thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v orbit_storage:/src -v \$(pwd):/bk alpine tar czf /bk/db-backup.tar.gz -C /src .${NC}"
+thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v orbit_session:/src -v \$(pwd):/bk alpine tar czf /bk/session-backup.tar.gz -C /src .${NC}"
+thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v orbit_subbot_sessions:/src -v \$(pwd):/bk alpine tar czf /bk/subbots-backup.tar.gz -C /src .${NC}"
+thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v orbit-redis-data:/src -v \$(pwd):/bk alpine tar czf /bk/redis-backup.tar.gz -C /src .${NC}"
 thin_line "${GHOST}─────────────────────────────────────────────────────${NC}"
-thin_line "${GHOST}  ACTUALIZAR sin perder sesiones ni datos:${NC}"
+thin_line "${GHOST}  UPDATE without losing sessions or data:${NC}"
 thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}curl -fsSL <url> | bash -s ${NEON_ORANGE}<version>${NC} ${LIME}update${NC}"
 thin_bottom
 blank
 
 echo -e "  ${GHOST}════════════════════════════════════════════════════════════${NC}"
 echo -e "  ${BOLD}${NEON_GREEN}📊 ESTADO DE PERSISTENCIA:${NC}"
-SESSION_FINAL=$(docker run --rm -v vaniabot_session:/session  alpine ls -la /session/  2>/dev/null | wc -l)
-DB_FINAL=$(     docker run --rm -v vaniabot_database:/data    alpine ls -la /data/     2>/dev/null | wc -l)
-STORAGE_FINAL=$(docker run --rm -v vaniabot_storage:/storage  alpine find /storage -name "*.db" 2>/dev/null | wc -l)
-SUBBOT_FINAL=$( docker run --rm -v vaniabot_subbot_sessions:/subbots alpine ls -la /subbots/ 2>/dev/null | wc -l)
-REDIS_FINAL=$(  docker exec vania-redis redis-cli DBSIZE 2>/dev/null || echo "0")
-echo -e "  ${GHOST}•${NC} Sesiones bot:   ${NEON_GREEN}$((SESSION_FINAL-2)) archivos${NC}"
+SESSION_FINAL=$(docker run --rm -v orbit_session:/session  alpine ls -la /session/  2>/dev/null | wc -l)
+DB_FINAL=$(     docker run --rm -v orbit_database:/data    alpine ls -la /data/     2>/dev/null | wc -l)
+STORAGE_FINAL=$(docker run --rm -v orbit_storage:/storage  alpine find /storage -name "*.db" 2>/dev/null | wc -l)
+SUBBOT_FINAL=$( docker run --rm -v orbit_subbot_sessions:/subbots alpine ls -la /subbots/ 2>/dev/null | wc -l)
+REDIS_FINAL=$(  docker exec orbit-redis redis-cli DBSIZE 2>/dev/null || echo "0")
+echo -e "  ${GHOST}•${NC} Bot sessions:   ${NEON_GREEN}$((SESSION_FINAL-2)) files${NC}"
 echo -e "  ${GHOST}•${NC} Datos:          ${NEON_GREEN}$((DB_FINAL-1)) archivos${NC}"
-echo -e "  ${GHOST}•${NC} SQLite DB:      ${NEON_GREEN}${STORAGE_FINAL} archivo(s) en vaniabot_storage${NC}"
-echo -e "  ${GHOST}•${NC} Subbot sessions:${NEON_GREEN}$((SUBBOT_FINAL-2)) sesiones en vaniabot_subbot_sessions${NC}"
+echo -e "  ${GHOST}•${NC} SQLite DB:      ${NEON_GREEN}${STORAGE_FINAL} file(s) in orbit_storage${NC}"
+echo -e "  ${GHOST}•${NC} Subbot sessions:${NEON_GREEN}$((SUBBOT_FINAL-2)) sessions in orbit_subbot_sessions${NC}"
 echo -e "  ${GHOST}•${NC} Redis keys:     ${NEON_GREEN}${REDIS_FINAL} keys (AOF+RDB persistente)${NC}"
 echo -e "  ${GHOST}════════════════════════════════════════════════════════════${NC}"
 blank

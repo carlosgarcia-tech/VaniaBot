@@ -1,7 +1,7 @@
 /**
  * TranslatorService.ts
  *
- * VaniaBot services module exposing `translatorService`.
+ * OrbitBot services module exposing `translatorService`.
  *
  * @author **Carlos G**
  */
@@ -232,7 +232,7 @@ class TranslatorService {
       msg += `\n\n${success.notas}`;
     }
 
-    msg += `\n\n> _VaniaBot🌐 — Traductor contextual_`;
+    msg += `\n\n> _OrbitBot🌐 — Traductor contextual_`;
     return msg;
   }
 }

@@ -1,7 +1,7 @@
 /**
  * DeliriusAnimeBase.ts
  *
- * VaniaBot commands module exposing `DeliriusAnimeBase`.
+ * OrbitBot commands module exposing `DeliriusAnimeBase`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * ATTPCommand.ts
  *
- * creative command `attp` — Genera texto animado en imagen
+ * creative command `attp` — Generates animated text as an image
  * Usage: !attp <texto>
  *
  * @author **Carlos G**
@@ -16,7 +16,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!attp`: Genera texto animado en imagen. */
+/** Command handler for `!attp`: Generates animated text as an image. */
 export class ATTPCommand extends Command {
   name = 'attp';
   description = 'Genera texto animado en imagen';

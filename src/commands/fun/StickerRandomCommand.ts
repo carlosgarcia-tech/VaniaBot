@@ -1,7 +1,7 @@
 /**
  * StickerRandomCommand.ts
  *
- * fun command `stickerrandom` — Genera un sticker meme aleatorio
+ * fun command `stickerrandom` — Generates a random meme sticker
  * Usage: !stickerrandom
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!stickerrandom`: Genera un sticker meme aleatorio. */
+/** Command handler for `!stickerrandom`: Generates a random meme sticker. */
 export class StickerRandomCommand extends Command {
   name = 'stickerrandom';
   description = 'Genera un sticker meme aleatorio';
@@ -82,7 +82,7 @@ export class StickerRandomCommand extends Command {
           }
         }
       } catch (error) {
-        // La API de imgflip es opcional: hay lista local de memes de respaldo.
+        // The imgflip API is optional: there is a local fallback meme list.
         logError('[StickerRandomCommand] imgflip API failed, using local memes', error);
       }
 
@@ -108,7 +108,7 @@ export class StickerRandomCommand extends Command {
       const { Sticker, StickerTypes } = await import('wa-sticker-formatter');
       const sticker = new Sticker(finalBuffer, {
         pack: '🎲 Random Sticker',
-        author: 'VaniaBot',
+        author: 'OrbitBot',
         type: StickerTypes.DEFAULT,
       });
 

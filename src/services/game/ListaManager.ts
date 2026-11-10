@@ -1,7 +1,7 @@
 /**
  * ListaManager.ts
  *
- * VaniaBot services module exposing `ListaManager`, `listaManager`.
+ * OrbitBot services module exposing `ListaManager`, `listaManager`.
  *
  * @author **Carlos G**
  */

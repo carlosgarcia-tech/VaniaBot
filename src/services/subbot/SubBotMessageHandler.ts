@@ -1,7 +1,7 @@
 /**
  * SubBotMessageHandler.ts
  *
- * VaniaBot services module exposing `SubBotMessageHandler`, `MiddlewareConfig`.
+ * OrbitBot services module exposing `SubBotMessageHandler`, `MiddlewareConfig`.
  *
  * @author **Carlos G**
  */
@@ -20,7 +20,7 @@ import { quizAnswerHandler } from '@/handlers/QuizAnswerHandler.js';
 import { handleMention } from '@/handlers/AiMentionHandler.js';
 import { welcomeService } from '@/services/system/WelcomeService.js';
 import { antiArabService } from '@/services/moderation/AntiArabService.js';
-import { VANIA_TOGGLE_COMMANDS } from '@/config/index.js';
+import { ORBIT_TOGGLE_COMMANDS } from '@/config/index.js';
 import { CommandExecutionError } from '@/utils/errors.js';
 import { logger, logError } from '@/utils/logger.js';
 import type { IMiddleware } from '@/types/index.js';
@@ -76,15 +76,15 @@ export class SubBotMessageHandler {
       const toggleBotId = `subbot${subConfig.slot}`;
       const ctx = new MessageContext(sock, msg, toggleBotId);
 
-      const isVaniaToggleCommand = VANIA_TOGGLE_COMMANDS.includes(ctx.command);
+      const isOrbitToggleCommand = ORBIT_TOGGLE_COMMANDS.includes(ctx.command);
 
-      if (isVaniaToggleCommand && !ctx.args[0]) {
+      if (isOrbitToggleCommand && !ctx.args[0]) {
         logger.debug(`📤 SubBot[${subConfig.id}] skipping non-slot toggle command: ${ctx.command}`);
         return;
       }
 
       if (ctx.chat.isGroup) {
-        const isEnabled = await serviceManager.vaniaToggleService.isAllowedForSubbot(
+        const isEnabled = await serviceManager.orbitToggleService.isAllowedForSubbot(
           ctx.chat.jid,
           toggleBotId,
           ctx.command,
@@ -190,7 +190,7 @@ export class SubBotMessageHandler {
     try {
       cacheManager.invalidateGroupMetadata(groupJid);
       await serviceManager.groupService.getGroup(groupJid);
-      const isEnabled = await serviceManager.vaniaToggleService.isEnabled(groupJid, botId);
+      const isEnabled = await serviceManager.orbitToggleService.isEnabled(groupJid, botId);
       if (!isEnabled) return;
 
       if (action === 'add') {

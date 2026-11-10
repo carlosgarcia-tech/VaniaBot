@@ -25,7 +25,7 @@ import { GroupService } from '../database/GroupService.js';
 import { LevelService } from '../database/LevelService.js';
 import { ModerationService } from '../moderation/ModerationService.js';
 import { ReportService } from './ReportService.js';
-import { VaniaToggleService } from './VaniaToggleService.js';
+import { OrbitToggleService } from './OrbitToggleService.js';
 import { NsfwToggleService } from './NsfwToggleService.js';
 import { PrimeService } from './PrimeService.js';
 import { licenseService } from './LicenseService.js';
@@ -48,7 +48,7 @@ export class ServiceManager {
   public levelService!: LevelService;
   public moderationService!: ModerationService;
   public reportService!: ReportService;
-  public vaniaToggleService!: VaniaToggleService;
+  public orbitToggleService!: OrbitToggleService;
   public nsfwToggleService!: NsfwToggleService;
   public primeService!: PrimeService;
   public licenseService = licenseService;
@@ -98,8 +98,8 @@ export class ServiceManager {
       this.moderationService = new ModerationService(this.db);
       this.reportService = new ReportService(this.db);
       await this.reportService.initialize();
-      this.vaniaToggleService = new VaniaToggleService();
-      this.vaniaToggleService.setDatabase(this.db);
+      this.orbitToggleService = new OrbitToggleService();
+      this.orbitToggleService.setDatabase(this.db);
       this.nsfwToggleService = new NsfwToggleService();
       this.nsfwToggleService.setDatabase(this.db);
       this.primeService = PrimeService.getInstance();

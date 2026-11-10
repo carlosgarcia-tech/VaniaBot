@@ -1,7 +1,7 @@
 /**
  * XnxxCommand.ts
  *
- * media command `xnxx` — Descarga video de XNXX
+ * media command `xnxx` — Downloads XNXX video
  * Usage: !xnxx <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!xnxx`: Descarga video de XNXX. */
+/** Command handler for `!xnxx`: Downloads XNXX video. */
 export class XnxxCommand extends Command {
   name = 'xnxx';
   description = 'Descarga video de XNXX';

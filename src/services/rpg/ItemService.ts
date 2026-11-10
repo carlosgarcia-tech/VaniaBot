@@ -1,7 +1,7 @@
 /**
  * ItemService.ts
  *
- * VaniaBot services module exposing `ItemService`, `InventoryItem`, `UseItemResult`, `EquipResult`.
+ * OrbitBot services module exposing `ItemService`, `InventoryItem`, `UseItemResult`, `EquipResult`.
  *
  * @author **Carlos G**
  */

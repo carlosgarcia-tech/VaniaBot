@@ -1,7 +1,7 @@
 /**
  * ConsejoCommand.ts
  *
- * fun command `consejo` — Da un consejo random
+ * fun command `consejo` — Gives random advice
  * Usage: !consejo
  *
  * @author **Carlos G**
@@ -26,7 +26,7 @@ const CONSEJOS = [
   'El dinero no compra la felicidad, pero sí tranquilidad',
 ];
 
-/** Command handler for `!consejo`: Da un consejo random. */
+/** Command handler for `!consejo`: Gives random advice. */
 export class ConsejoCommand extends Command {
   name = 'consejo';
   description = 'Da un consejo random';

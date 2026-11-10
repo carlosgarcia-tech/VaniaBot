@@ -1,7 +1,7 @@
 /**
  * TTSCommand.ts
  *
- * fun command `tts` — Convierte texto a voz
+ * fun command `tts` — Converts text to speech
  * Usage: !tts <texto>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!tts`: Convierte texto a voz. */
+/** Command handler for `!tts`: Converts text to speech. */
 export class TTSCommand extends Command {
   name = 'tts';
   description = 'Convierte texto a voz';
@@ -26,14 +26,14 @@ export class TTSCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!tts <texto>';
-  examples = ['!tts Hola mundo', '!tts Vania es genial'];
+  examples = ['!tts Hola mundo', '!tts Orbit es genial'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !tts <texto>\n_Ejemplo: !tts Hola Vania_');
+      await ctx.reply('✍️ *Uso:* !tts <texto>\n_Ejemplo: !tts Hola Orbit_');
       return;
     }
 

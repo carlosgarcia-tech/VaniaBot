@@ -1,7 +1,7 @@
 /**
  * TranslatorTypes.ts
  *
- * VaniaBot services module exposing `TraduccionSuccess`, `TraduccionOpts`, `resolverIdioma`, `idiomasDisponibles`.
+ * OrbitBot services module exposing `TraduccionSuccess`, `TraduccionOpts`, `resolverIdioma`, `idiomasDisponibles`.
  *
  * @author **Carlos G**
  */

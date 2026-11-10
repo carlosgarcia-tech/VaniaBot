@@ -1,7 +1,7 @@
 /**
  * FantasmasCommand.ts
  *
- * group command `fantasmas` — Ver usuarios inactivos en el grupo
+ * group command `fantasmas` — View inactive users in the group
  * Usage: !fantasmas [kick]
  *
  * @author **Carlos G**
@@ -15,7 +15,7 @@ import { logError } from '@/utils/logger.js';
 
 const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
-/** Command handler for `!fantasmas`: Ver usuarios inactivos en el grupo. */
+/** Command handler for `!fantasmas`: View inactive users in the group. */
 export class FantasmasCommand extends Command {
   name = 'fantasmas';
   description = 'Ver usuarios inactivos en el grupo';

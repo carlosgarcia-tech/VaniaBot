@@ -1,8 +1,8 @@
 /**
  * Ppt2PdfCommand.ts
  *
- * utility command `ppt2pdf` — Convierte una presentación PPT/PPTX a PDF
- * Usage: !ppt2pdf (responder a un archivo PPT/PPTX)
+ * utility command `ppt2pdf` — Converts a PPT/PPTX presentation to PDF
+ * Usage: !ppt2pdf (reply to a PPT/PPTX file)
  *
  * @author **Carlos G**
  */
@@ -13,7 +13,7 @@ import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { ConversionService } from '@/services/convert/ConversionService.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!ppt2pdf`: Convierte una presentación PPT/PPTX a PDF. */
+/** Command handler for `!ppt2pdf`: Converts a PPT/PPTX presentation to PDF. */
 export class Ppt2PdfCommand extends Command {
   name = 'ppt2pdf';
   description = 'Convierte una presentación PPT/PPTX a PDF';

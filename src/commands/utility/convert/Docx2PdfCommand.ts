@@ -1,8 +1,8 @@
 /**
  * Docx2PdfCommand.ts
  *
- * utility command `docx2pdf` — Convierte un documento DOC/DOCX a PDF
- * Usage: !docx2pdf (responder a un archivo DOC/DOCX)
+ * utility command `docx2pdf` — Converts a DOC/DOCX document to PDF
+ * Usage: !docx2pdf (reply to a DOC/DOCX file)
  *
  * @author **Carlos G**
  */
@@ -13,7 +13,7 @@ import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { ConversionService } from '@/services/convert/ConversionService.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!docx2pdf`: Convierte un documento DOC/DOCX a PDF. */
+/** Command handler for `!docx2pdf`: Converts a DOC/DOCX document to PDF. */
 export class Docx2PdfCommand extends Command {
   name = 'docx2pdf';
   description = 'Convierte un documento DOC/DOCX a PDF';

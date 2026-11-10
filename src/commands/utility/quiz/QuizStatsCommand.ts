@@ -1,8 +1,8 @@
 /**
  * QuizStatsCommand.ts
  *
- * utility command `quizstats` — Tus estadísticas del modo estudio
- * Usage: !quizstats [@usuario]
+ * utility command `quizstats` — Your study mode statistics
+ * Usage: !quizstats [@user]
  *
  * @author **Carlos G**
  */
@@ -24,7 +24,7 @@ interface UserWithQuizStats {
   quizStats?: UserQuizStats;
 }
 
-/** Command handler for `!quizstats`: Tus estadísticas del modo estudio. */
+/** Command handler for `!quizstats`: Your study mode statistics. */
 export class QuizStatsCommand extends Command {
   name = 'quizstats';
   description = 'Tus estadísticas del modo estudio';

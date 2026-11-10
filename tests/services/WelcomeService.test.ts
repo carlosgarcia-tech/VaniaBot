@@ -3,7 +3,7 @@ import { WelcomeService } from '../../src/services/system/WelcomeService.js';
 
 vi.mock('../../src/services/system/Servicemanager.js', () => ({
   serviceManager: {
-    vaniaToggleService: {
+    orbitToggleService: {
       isEnabled: vi.fn().mockResolvedValue(true),
     },
     groupService: {
@@ -248,7 +248,7 @@ describe('WelcomeService', () => {
     it('should skip when welcome is disabled', async () => {
       const { serviceManager } = await import('../../src/services/system/Servicemanager.js');
 
-      vi.mocked(serviceManager.vaniaToggleService.isEnabled).mockResolvedValue(true);
+      vi.mocked(serviceManager.orbitToggleService.isEnabled).mockResolvedValue(true);
       vi.mocked(serviceManager.groupService.getGroup).mockResolvedValue({
         jid: 'group@test.com',
         welcome: { enabled: false },
@@ -269,7 +269,7 @@ describe('WelcomeService', () => {
     it('should send welcome message when enabled', async () => {
       const { serviceManager } = await import('../../src/services/system/Servicemanager.js');
       
-      vi.mocked(serviceManager.vaniaToggleService.isEnabled).mockResolvedValue(true);
+      vi.mocked(serviceManager.orbitToggleService.isEnabled).mockResolvedValue(true);
       vi.mocked(serviceManager.groupService.getGroup).mockResolvedValue({
         jid: 'group@test.com',
         welcome: { enabled: true, message: 'Welcome @user' },
@@ -296,7 +296,7 @@ describe('WelcomeService', () => {
     it('should skip when goodbye is disabled', async () => {
       const { serviceManager } = await import('../../src/services/system/Servicemanager.js');
 
-      vi.mocked(serviceManager.vaniaToggleService.isEnabled).mockResolvedValue(true);
+      vi.mocked(serviceManager.orbitToggleService.isEnabled).mockResolvedValue(true);
       vi.mocked(serviceManager.groupService.getGroup).mockResolvedValue({
         jid: 'group@test.com',
         welcome: { enabled: false },

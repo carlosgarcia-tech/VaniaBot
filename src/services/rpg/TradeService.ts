@@ -1,7 +1,7 @@
 /**
  * TradeService.ts
  *
- * VaniaBot services module exposing `TradeService`, `TradeOffer`, `tradeService`.
+ * OrbitBot services module exposing `TradeService`, `TradeOffer`, `tradeService`.
  *
  * @author **Carlos G**
  */

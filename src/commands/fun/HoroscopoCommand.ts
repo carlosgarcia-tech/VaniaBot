@@ -1,7 +1,7 @@
 /**
  * HoroscopoCommand.ts
  *
- * fun command `horoscopo` — Muestra el horóscopo del día
+ * fun command `horoscopo` — Shows today's horoscope
  * Usage: !horoscopo [signo]
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!horoscopo`: Muestra el horóscopo del día. */
+/** Command handler for `!horoscopo`: Shows today's horoscope. */
 export class HoroscopoCommand extends Command {
   name = 'horoscopo';
   description = 'Muestra el horóscopo del día';

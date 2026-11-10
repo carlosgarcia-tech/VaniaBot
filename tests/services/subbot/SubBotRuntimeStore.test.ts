@@ -40,7 +40,7 @@ describe('SubBotRuntimeStore', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(NOW);
-    dir = join(tmpdir(), `vania-runtime-store-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    dir = join(tmpdir(), `orbit-runtime-store-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     mkdirSync(dir, { recursive: true });
     store = new SubBotRuntimeStore(dir);
   });
@@ -89,7 +89,7 @@ describe('SubBotRuntimeStore', () => {
     const state = freshState('bot1');
     store.save(state);
 
-    // TTL de runtime: 2 minutos. Avanza 3.
+    // Runtime TTL: 2 minutes. Advance 3.
     vi.advanceTimersByTime(SUBBOT_CONFIG.BOT_RUNTIME_STATE_TTL_MS + 60_000);
 
     expect(store.load('bot1')).toBeNull();
@@ -105,7 +105,7 @@ describe('SubBotRuntimeStore', () => {
   it('load rechaza archivos cuyo id no coincide con el bot pedido', () => {
     store.save(freshState('bot1'));
 
-    // El archivo bot1.json contiene el id de otro bot (copiado/renombrado)
+    // bot1.json holds another bot's id (copied/renamed)
     const raw = JSON.parse(readFileSync(join(dir, 'bot1.json'), 'utf-8')) as Record<string, unknown>;
     raw.id = 'otro-bot';
     writeFileSync(join(dir, 'bot1.json'), JSON.stringify(raw), 'utf-8');
@@ -260,7 +260,7 @@ describe('SubBotRuntimeStore', () => {
   });
 
   it('save falla en silencio (best-effort) si el dir no se puede crear', () => {
-    // Un "archivo" donde debería estar el dir padre: mkdir falla
+    // An "archive" where the parent dir should be: mkdir fails
     const blockingFile = join(dir, 'bloqueo');
     mkdirSync(dir, { recursive: true });
     writeFileSync(blockingFile, 'x', 'utf-8');

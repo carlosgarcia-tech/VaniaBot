@@ -27,7 +27,7 @@ export class ShopCommand extends Command {
   async execute(ctx: MessageContext): Promise<void> {
     const user = await serviceManager.userService.getUser(ctx.sender.jid);
 
-    let message = `🏪 *VANIABOT SHOP*\n\n`;
+    let message = `🏪 *ORBITBOT SHOP*\n\n`;
     message += `💰 Your Balance: $${user.money.toLocaleString()}\n\n`;
     message += `📦 *Available Items:*\n\n`;
 

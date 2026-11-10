@@ -1,7 +1,7 @@
 /**
  * FacebookphotoCommand.ts
  *
- * media command `facebookphoto` — Descarga fotos de Facebook
+ * media command `facebookphoto` — Downloads Facebook photos
  * Usage: !facebookphoto <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!facebookphoto`: Descarga fotos de Facebook. */
+/** Command handler for `!facebookphoto`: Downloads Facebook photos. */
 export class FacebookphotoCommand extends Command {
   name = 'facebookphoto';
   description = 'Descarga fotos de Facebook';

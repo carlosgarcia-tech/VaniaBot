@@ -1,8 +1,8 @@
 /**
  * CalculatorCommand.ts
  *
- * utility command `calc` — Calculadora avanzada y conversor de unidades.
- * Usage: !calc <expresión> | !calc <valor> <unidad> a <unidad>
+ * utility command `calc` — Advanced calculator and unit converter.
+ * Usage: !calc <expression> | !calc <value> <unit> to <unit>
  *
  * @author **Carlos G**
  */
@@ -57,7 +57,7 @@ const ALLOWED_CONSTANTS = [
   'SQRT2',
 ];
 
-/** Command handler for `!calc`: Calculadora avanzada y conversor de unidades. */
+/** Command handler for `!calc`: Advanced calculator and unit converter. */
 export class CalculatorCommand extends Command {
   name = 'calc';
   description = 'Calculadora avanzada y conversor de unidades.';

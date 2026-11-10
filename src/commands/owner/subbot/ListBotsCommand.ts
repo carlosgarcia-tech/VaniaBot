@@ -1,7 +1,7 @@
 /**
  * ListBotsCommand.ts
  *
- * subbot command `listbots` — Lista todas las subbots (solo owner)
+ * subbot command `listbots` — Lists all subbots (owner only)
  * Usage: .listbots
  *
  * @author **Carlos G**
@@ -16,12 +16,12 @@ import {
 } from '@/types/index.js';
 import { subBotManager } from '@/services/subbot/SubBotManager.js';
 
-/** Command handler for `!listbots`: Lista todas las subbots (solo owner). */
+/** Command handler for `!listbots`: Lists all subbots (owner only). */
 export class ListBotsCommand extends Command {
   name = 'listbots';
   description = 'Lista todas las subbots (solo owner)';
   category = CommandCategory.SUBBOT;
-  // Sin alias 'subbots': es el name de SubBotsCommand (estado de slots).
+  // No alias 'subbots': it is the name of SubBotsCommand (slot status).
   aliases = ['allbots'];
   usage = '.listbots';
   examples = ['.listbots'];
@@ -38,7 +38,7 @@ export class ListBotsCommand extends Command {
 
     if (all.length === 0) {
       await ctx.reply(
-        `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+        `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
           `   *SubBots registradas*\n` +
           `\n` +
           `🦋 Aún no hay subbots\n` +
@@ -65,7 +65,7 @@ export class ListBotsCommand extends Command {
     const connected = all.filter(s => s.status === 'connected').length;
 
     let text =
-      `╭━━━ 🌸 *VaniaBot* ━━━╮\n` +
+      `╭━━━ 🌸 *OrbitBot* ━━━╮\n` +
       `   *SubBots registradas*\n` +
       `\n` +
       `Total: *${all.length}*\n` +
@@ -80,7 +80,7 @@ export class ListBotsCommand extends Command {
         `   🆔 \`${s.id}\`\n\n`;
     }
 
-    text += `_— VaniaBot 🌸_`;
+    text += `_— OrbitBot 🌸_`;
 
     await ctx.reply(text.trim());
   }

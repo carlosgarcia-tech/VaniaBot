@@ -1,7 +1,7 @@
 /**
  * promptInjection.ts
  *
- * VaniaBot utils module exposing `InjectionCheckResult`, `detectPromptInjection`, `BLOCKED_PROMPT_PATTERNS`, `BLOCKED_CONTENT_PATTERNS`.
+ * OrbitBot utils module exposing `InjectionCheckResult`, `detectPromptInjection`, `BLOCKED_PROMPT_PATTERNS`, `BLOCKED_CONTENT_PATTERNS`.
  *
  * @author **Carlos G**
  */

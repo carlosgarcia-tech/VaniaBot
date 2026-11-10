@@ -1,7 +1,7 @@
 /**
  * TextImpressiveCommand.ts
  *
- * creative command `impressive` — Crea un efecto de texto impresionante en 3D
+ * creative command `impressive` — Creates an impressive 3D text effect
  * Usage: !impressive <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/create-3d-colorful-paint-text-effect-online-801.html';
 
-/** Command handler for `!impressive`: Crea un efecto de texto impresionante en 3D. */
+/** Command handler for `!impressive`: Creates an impressive 3D text effect. */
 export class TextImpressiveCommand extends Command {
   name = 'impressive';
   description = 'Crea un efecto de texto impresionante en 3D';
@@ -27,14 +27,14 @@ export class TextImpressiveCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!impressive <texto>';
-  examples = ['!impressive VaniaBot'];
+  examples = ['!impressive OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !impressive <texto>\n_Ejemplo: !impressive VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !impressive <texto>\n_Ejemplo: !impressive OrbitBot_');
       return;
     }
 

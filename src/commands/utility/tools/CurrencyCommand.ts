@@ -1,8 +1,8 @@
 /**
  * CurrencyCommand.ts
  *
- * utility command `moneda` — Convierte monedas y criptomonedas en tiempo real.
- * Usage: !moneda <cantidad> <de> <a>
+ * utility command `moneda` — Converts currencies and crypto in real time.
+ * Usage: !moneda <amount> <from> <to>
  *
  * @author **Carlos G**
  */
@@ -19,7 +19,7 @@ interface CoinGeckoResponse {
   [key: string]: Record<string, number>;
 }
 
-/** Command handler for `!moneda`: Convierte monedas y criptomonedas en tiempo real. */
+/** Command handler for `!moneda`: Converts currencies and crypto in real time. */
 export class CurrencyCommand extends Command {
   name = 'moneda';
   description = 'Convierte monedas y criptomonedas en tiempo real.';

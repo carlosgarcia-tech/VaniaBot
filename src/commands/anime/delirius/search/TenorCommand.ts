@@ -1,7 +1,7 @@
 /**
  * TenorCommand.ts
  *
- * anime command `tenor` — Busca GIFs en Tenor
+ * anime command `tenor` — Searches GIFs on Tenor
  * Usage: !tenor <busqueda>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!tenor`: Busca GIFs en Tenor. */
+/** Command handler for `!tenor`: Searches GIFs on Tenor. */
 export class TenorCommand extends Command {
   name = 'tenor';
   description = 'Busca GIFs en Tenor';

@@ -1,5 +1,5 @@
 /**
- * Custom ESLint plugin for VaniaBot command permission conventions.
+ * Custom ESLint plugin for OrbitBot command permission conventions.
  *
  * Rules:
  * - no-permission-typo: `permission = ...` is a dead property (the Command
@@ -84,7 +84,7 @@ export const rules = {
       schema: [],
       messages: {
         deadProperty:
-          "'permission' es una propiedad muerta: el framework solo lee 'permissions.user'. El comando queda con el default USER y sin protección real.",
+          "'permission' is a dead property: the framework only reads 'permissions.user'. The command stays at the USER default with no real protection.",
       },
     },
     create(context) {
@@ -115,7 +115,7 @@ export const rules = {
       schema: [],
       messages: {
         missingOwnerGate:
-          "El comando es de categoría OWNER pero no declara 'permissions = { user: [PermissionLevel.OWNER] }': queda abierto al default USER.",
+          "OWNER-category command does not declare 'permissions = { user: [PermissionLevel.OWNER] }': it stays open at the USER default.",
       },
     },
     create(context) {
@@ -153,7 +153,7 @@ export const rules = {
 };
 
 export const plugin = {
-  meta: { name: 'eslint-plugin-vania' },
+  meta: { name: 'eslint-plugin-orbit' },
   rules,
 };
 

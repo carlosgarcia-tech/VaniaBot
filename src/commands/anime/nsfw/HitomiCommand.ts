@@ -1,7 +1,7 @@
 /**
  * HitomiCommand.ts
  *
- * VaniaBot commands module exposing `HitomiCommand`.
+ * OrbitBot commands module exposing `HitomiCommand`.
  *
  * @author **Carlos G**
  */

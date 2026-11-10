@@ -1,8 +1,8 @@
 /**
  * InvertCommand.ts
  *
- * creative command `invert` — Efecto de colores invertidos
- * Usage: !invert [@usuario]
+ * creative command `invert` — Inverted colors effect
+ * Usage: !invert [@user]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!invert`: Efecto de colores invertidos. */
+/** Command handler for `!invert`: Inverted colors effect. */
 export class InvertCommand extends Command {
   name = 'invert';
   description = 'Efecto de colores invertidos';

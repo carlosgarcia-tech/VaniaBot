@@ -1,7 +1,7 @@
 /**
  * ModerationRouter.ts
  *
- * VaniaBot services module exposing `createModerationRouter`.
+ * OrbitBot services module exposing `createModerationRouter`.
  *
  * @author **Carlos G**
  */

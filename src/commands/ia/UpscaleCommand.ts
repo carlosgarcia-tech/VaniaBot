@@ -1,8 +1,8 @@
 /**
  * UpscaleCommand.ts
  *
- * media command `upscale` — Mejora la resolución de una imagen
- * Usage: !upscale (responde a imagen/adjunto) o !upscale <url>
+ * media command `upscale` — Upscales an image's resolution
+ * Usage: !upscale (reply to an image/attachment) or !upscale <url>
  *
  * @author **Carlos G**
  */
@@ -14,7 +14,7 @@ import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import axios from 'axios';
 
-/** Command handler for `!upscale`: Mejora la resolución de una imagen. */
+/** Command handler for `!upscale`: Upscales an image's resolution. */
 export class UpscaleCommand extends Command {
   name = 'upscale';
   description = 'Mejora la resolución de una imagen';

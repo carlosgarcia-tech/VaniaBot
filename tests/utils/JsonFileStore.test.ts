@@ -24,7 +24,7 @@ describe('JsonFileStore', () => {
   const defaults = (): TestStore => ({ groups: {} });
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), 'vania-store-test-'));
+    tempDir = mkdtempSync(join(tmpdir(), 'orbit-store-test-'));
     filePath = join(tempDir, 'nested', 'store.json');
     store = new JsonFileStore<TestStore>({ filePath, defaults });
   });

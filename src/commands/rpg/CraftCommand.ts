@@ -1,7 +1,7 @@
 /**
  * CraftCommand.ts
  *
- * rpg command `craft` — Craftea items usando materiales
+ * rpg command `craft` — Craft items using materials
  * Usage: !craft [item] | !craft list | !craft [item]
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { craftService } from '@/services/rpg/CraftService.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
-/** Command handler for `!craft`: Craftea items usando materiales. */
+/** Command handler for `!craft`: Craft items using materials. */
 export class CraftCommand extends Command {
   name = 'craft';
   description = 'Craftea items usando materiales';

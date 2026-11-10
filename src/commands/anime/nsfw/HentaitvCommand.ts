@@ -1,7 +1,7 @@
 /**
  * HentaitvCommand.ts
  *
- * VaniaBot commands module exposing `HentaitvCommand`.
+ * OrbitBot commands module exposing `HentaitvCommand`.
  *
  * @author **Carlos G**
  */

@@ -1,7 +1,7 @@
 /**
  * ClassService.ts
  *
- * VaniaBot services module exposing `ClassService`, `RPGClass`, `classService`.
+ * OrbitBot services module exposing `ClassService`, `RPGClass`, `classService`.
  *
  * @author **Carlos G**
  */

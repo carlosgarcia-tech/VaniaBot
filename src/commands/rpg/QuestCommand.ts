@@ -1,7 +1,7 @@
 /**
  * QuestCommand.ts
  *
- * rpg command `quest` — Muestra las misiones disponibles
+ * rpg command `quest` — Shows the available missions
  * Usage: !quest [info | daily | main | side]
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { questService } from '@/services/rpg/QuestService.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
-/** Command handler for `!quest`: Muestra las misiones disponibles. */
+/** Command handler for `!quest`: Shows the available missions. */
 export class QuestCommand extends Command {
   name = 'quest';
   description = 'Muestra las misiones disponibles';

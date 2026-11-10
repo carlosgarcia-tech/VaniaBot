@@ -1,7 +1,7 @@
 /**
  * RespaldarDataCommand.ts
  *
- * owner command `respaldar` — Genera un respaldo de tus datos
+ * owner command `respaldar` — Generates a backup of your data
  * Usage: !respaldar
  *
  * @author **Carlos G**
@@ -17,13 +17,13 @@ import {
 import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 
-/** Command handler for `!respaldar`: Genera un respaldo de tus datos. */
+/** Command handler for `!respaldar`: Generates a backup of your data. */
 export class RespaldarDataCommand extends Command {
   name = 'respaldar';
   description = 'Genera un respaldo de tus datos';
   category = CommandCategory.OWNER;
   permissions = { user: [PermissionLevel.OWNER] };
-  // Sin alias 'backup': es el name de BackupCommand (respaldo de sesion).
+  // No alias 'backup': it is the name of BackupCommand (session backup).
   aliases = ['export', 'misdatos'];
   usage = '!respaldar';
   examples = ['!respaldar'];

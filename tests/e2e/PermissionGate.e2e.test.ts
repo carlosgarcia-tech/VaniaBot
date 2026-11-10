@@ -1,13 +1,13 @@
 /**
  * PermissionGate.e2e.test.ts
  *
- * Puerta de permisos a través del bot real: un comando OWNER-only
- * (MetricsCommand) ejecutado por un usuario cualquiera debe recibir la
- * denegación del PermissionMiddleware, sin ejecutar nunca el comando.
+ * Permission gating through the real bot: an OWNER-only command (MetricsCommand)
+ * run by a regular user must receive the PermissionMiddleware denial without
+ * ever executing the command.
  *
- * La denegación ocurre en la cadena de middlewares (después de la
- * resolución en el registro), así que este test demuestra que el e2e
- * llega hasta PermissionMiddleware — no solo hasta la ejecución feliz.
+ * The denial happens inside the middleware chain (after registry resolution),
+ * so this test proves the e2e flow reaches PermissionMiddleware — not just a
+ * happy-path execution.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -26,7 +26,7 @@ vi.mock('@/services/external/AIService.js', () => ({
 
 const TIMEOUT = 30_000;
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('e2e: puerta de permisos', () => {
@@ -48,8 +48,8 @@ describe('e2e: puerta de permisos', () => {
 
       const texts = socket.texts();
       expect(texts).toContain('❌ No tienes permiso para usar este comando');
-      // El comando nunca llegó a ejecutarse: sin reacción de métricas
-      expect(socket.sent.some(m => (m.content as { text?: string }).text?.includes('Métricas de VaniaBot'))).toBe(false);
+      // The command never got to run: no metrics reaction
+      expect(socket.sent.some(m => (m.content as { text?: string }).text?.includes('Métricas de OrbitBot'))).toBe(false);
     },
     TIMEOUT,
   );
@@ -75,8 +75,8 @@ describe('e2e: puerta de permisos', () => {
       socket.receive(dmTextMessage('!metrics', ownerJid));
       await wait();
 
-      // La puerta deja pasar y el comando se ejecuta de verdad.
-      expect(socket.texts().some(t => t.includes('Métricas de VaniaBot'))).toBe(true);
+      // The gate lets it through and the command really executes.
+      expect(socket.texts().some(t => t.includes('Métricas de OrbitBot'))).toBe(true);
       expect(socket.texts()).not.toContain('❌ No tienes permiso para usar este comando');
     },
     TIMEOUT,
@@ -91,11 +91,12 @@ describe('e2e: puerta de permisos', () => {
       const ownerJid = `${ownerPhone}@s.whatsapp.net`;
 
       const { serviceManager } = await import('@/services/system/Servicemanager.js');
-      await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
-      // Ni el owner ni el bot figuran como admin: el owner debe suplirlo.
+      await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
+      // Neither the owner nor the bot is listed as admin: the owner must
+      // cover for it.
       await setParticipants(socket, group, [{ id: ownerJid }, member(senderJid(3))]);
 
-      // !mutelist es GROUP + ADMIN-only.
+      // !mutelist is GROUP + ADMIN-only.
       socket.receive(groupTextMessage('!mutelist', group, ownerJid));
       await wait();
 

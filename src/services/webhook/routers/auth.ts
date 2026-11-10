@@ -1,7 +1,7 @@
 /**
  * auth.ts
  *
- * VaniaBot services module exposing `extractApiToken`, `isAuthorized`, `requireApiToken`.
+ * OrbitBot services module exposing `extractApiToken`, `isAuthorized`, `requireApiToken`.
  *
  * @author **Carlos G**
  */

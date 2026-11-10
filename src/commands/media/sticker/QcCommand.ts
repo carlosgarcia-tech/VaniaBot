@@ -22,7 +22,7 @@ export class QcCommand extends Command {
   name = 'qc';
   description = 'Create a quote sticker with text and profile picture';
   category = CommandCategory.MEDIA;
-  // Sin alias 'quote': es el name de QuoteCommand.
+  // No alias 'quote': it is the name of QuoteCommand.
   aliases = [];
   usage = '!qc <text>';
   examples = ['!qc Hello World', '!qc @user Your text here'];
@@ -194,7 +194,7 @@ export class QcCommand extends Command {
       ${textRows}
       <text x="${W / 2}" y="${H - 16}"
         font-family="Arial,sans-serif" font-size="15"
-        fill="#3a3a6a" text-anchor="middle">VaniaBot</text>
+        fill="#3a3a6a" text-anchor="middle">OrbitBot</text>
     </svg>`;
 
     return await ImageProcessor.svgToBuffer(svg, W, H);

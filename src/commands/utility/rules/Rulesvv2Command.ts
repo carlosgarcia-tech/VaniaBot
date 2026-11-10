@@ -1,7 +1,7 @@
 /**
  * Rulesvv2Command.ts
  *
- * utility command `rules vv2` — Reglas VV2
+ * utility command `rules vv2` — VV2 rules
  * Usage: !rules vv2
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory } from '@/types/index.js';
 import type { MessageContext } from '@/types/index.js';
 import { sendAssetImage } from '@/utils/assetHelper.js';
 
-/** Command handler for `!rules vv2`: Reglas VV2. */
+/** Command handler for `!rules vv2`: VV2 rules. */
 export class RulesVV2Command extends Command {
   name = 'rules vv2';
   description = 'Reglas VV2';

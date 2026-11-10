@@ -1,8 +1,8 @@
 /**
  * AiCommand.ts
  *
- * utility command `ai` — Chatea con Vania IA. Mantiene historial de conversación.
- * Usage: !ai <mensaje>
+ * utility command `ai` — Chat with Orbit AI. Keeps conversation history.
+ * Usage: !ai <message>
  *
  * @author **Carlos G**
  */
@@ -12,12 +12,12 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { aiService } from '@/services/external/AIService.js';
 import { isRight } from '@/utils/either.js';
 
-/** Command handler for `!ai`: Chatea con Vania IA. Mantiene historial de conversación. */
+/** Command handler for `!ai`: Chat with Orbit AI. Keeps conversation history. */
 export class AiCommand extends Command {
   name = 'ai';
-  description = 'Chatea con Vania IA. Mantiene historial de conversación.';
+  description = 'Chatea con Orbit IA. Mantiene historial de conversación.';
   category = CommandCategory.UTILITY;
-  aliases = ['chat', 'vania', 'ask'];
+  aliases = ['chat', 'orbit', 'ask'];
   usage = '!ai <mensaje>';
   examples = [
     '!ai ¿cuánto es 15% de 340?',
@@ -30,7 +30,7 @@ export class AiCommand extends Command {
   async execute(ctx: MessageContext): Promise<void> {
     if (!ctx.args.length) {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *VaniaBot IA* ˚₊· ͟͟͞͞➳\n\n` +
+        `˚₊· ͟͟͞͞➳ *OrbitBot IA* ˚₊· ͟͟͞͞➳\n\n` +
           `✿ háblame, quiero platicar contigo\n\n` +
           `✩ *lo que puedo hacer:*\n` +
           `  ﹒*!ai* <mensaje> — chateamos con recuerdos\n` +

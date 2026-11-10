@@ -1,7 +1,7 @@
 /**
  * SnackvideoCommand.ts
  *
- * media command `snackvideo` — Descarga videos de SnackVideo
+ * media command `snackvideo` — Downloads SnackVideo videos
  * Usage: !snackvideo <url>
  *
  * @author **Carlos G**
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!snackvideo`: Descarga videos de SnackVideo. */
+/** Command handler for `!snackvideo`: Downloads SnackVideo videos. */
 export class SnackvideoCommand extends Command {
   name = 'snackvideo';
   description = 'Descarga videos de SnackVideo';

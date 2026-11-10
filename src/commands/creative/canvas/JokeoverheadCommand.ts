@@ -1,8 +1,8 @@
 /**
  * JokeoverheadCommand.ts
  *
- * creative command `jokeoverhead` — Genera chiste sobre imagen
- * Usage: !jokeoverhead [@usuario]
+ * creative command `jokeoverhead` — Generates a joke-overhead image
+ * Usage: !jokeoverhead [@user]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!jokeoverhead`: Genera chiste sobre imagen. */
+/** Command handler for `!jokeoverhead`: Generates a joke-overhead image. */
 export class JokeoverheadCommand extends Command {
   name = 'jokeoverhead';
   description = 'Genera chiste sobre imagen';

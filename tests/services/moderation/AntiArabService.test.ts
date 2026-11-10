@@ -63,7 +63,7 @@ describe('AntiArabService', () => {
     const config = service.getGroupConfig(GROUP);
 
     expect(config.enabled).toBe(false);
-    // Prefijos del Magreb y Medio Oriente según la política por defecto
+    // Maghreb and Middle East prefixes per the default policy
     expect(config.prefixes).toContain('212');
     expect(config.prefixes).toContain('213');
     expect(config.prefixes).toContain('20');
@@ -101,7 +101,7 @@ describe('AntiArabService', () => {
   });
 
   it('addPrefix añade prefijos nuevos normalizados a solo dígitos', () => {
-    // El '+' se elimina: shouldBlockNumber compara contra números sin '+'
+    // The '+' is stripped: shouldBlockNumber compares against '+'-less numbers
     service.addPrefix(GROUP, '+91');
 
     expect(service.getGroupConfig(GROUP).prefixes).toContain('91');

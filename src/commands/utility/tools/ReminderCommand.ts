@@ -1,8 +1,8 @@
 /**
  * ReminderCommand.ts
  *
- * utility command `recordatorio` — Programa recordatorios y alarmas personales.
- * Usage: !recordatorio <tiempo> <mensaje>
+ * utility command `recordatorio` — Schedules personal reminders and alarms.
+ * Usage: !recordatorio <tiempo> <message>
  *
  * @author **Carlos G**
  */
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { persistenceService } from '@/services/system/PersistenceService.js';
 import { formatTime } from '@/utils/helpers.js';
 
-/** Command handler for `!recordatorio`: Programa recordatorios y alarmas personales. */
+/** Command handler for `!recordatorio`: Schedules personal reminders and alarms. */
 export class ReminderCommand extends Command {
   name = 'recordatorio';
   description = 'Programa recordatorios y alarmas personales.';

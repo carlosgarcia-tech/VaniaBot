@@ -70,7 +70,7 @@ export class AllCommand extends Command {
       }
 
       text += `\nGracias por estar aquí ~ ❤️`;
-      text += `\n> _*I'm VaniaBot*_ ❤️`;
+      text += `\n> _*I'm OrbitBot*_ ❤️`;
 
       const mentions = participants.map(p => p.id);
 

@@ -109,8 +109,8 @@ vi.mock('../../../src/config/subbot.js', () => ({
   SUBBOT_CONFIG: {
     MAX_SLOTS: 50,
     DEFAULT_SLOTS: 15,
-    SESSION_BASE_PATH: '/tmp/vania-test-sessions-default',
-    RUNTIME_STATE_DIR: '/tmp/vania-test-runtime-default',
+    SESSION_BASE_PATH: '/tmp/orbit-test-sessions-default',
+    RUNTIME_STATE_DIR: '/tmp/orbit-test-runtime-default',
     BOT_RUNTIME_STATE_TTL_MS: 120_000,
     MESSAGE_DEDUP_TTL_MS: 60_000,
     MESSAGE_DEDUP_MAX_ENTRIES: 4000,
@@ -204,7 +204,7 @@ function makeConfig(slot: number): SubBotConfig {
     phoneNumber: '5215599998888',
     sessionPath: join(tmpdir(), `subbot-session-${slot}`),
     prefix: '!',
-    name: 'VaniaBot-Owner',
+    name: 'OrbitBot-Owner',
     active: true,
     createdAt: Date.now(),
     status: 'connecting',
@@ -227,8 +227,8 @@ describe('SubBotManager', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     mockDb.isPublicRequestsEnabled.mockReturnValue(true);
-    runtimeDir = mkdtempSync(join(tmpdir(), 'vania-runtime-'));
-    sessionsDir = mkdtempSync(join(tmpdir(), 'vania-subbot-sessions-'));
+    runtimeDir = mkdtempSync(join(tmpdir(), 'orbit-runtime-'));
+    sessionsDir = mkdtempSync(join(tmpdir(), 'orbit-subbot-sessions-'));
     Object.assign(SUBBOT_CONFIG, {
       RUNTIME_STATE_DIR: runtimeDir,
       SESSION_BASE_PATH: sessionsDir,
@@ -292,14 +292,14 @@ describe('SubBotManager', () => {
     const result = await manager.requestSubBot(OWNER_JID, 'Owner', '+52 1 55 9999 8888');
 
     expect(mockDb.reserveSlot).toHaveBeenCalledWith(3, '5215599998888', 'Owner');
-    // El id del subbot es randomBytes(8) en hex: no determinista
+    // The subbot id is randomBytes(8) in hex: not deterministic
     expect(mockDb.activateSlot).toHaveBeenCalledWith(
       3,
       expect.stringMatching(/^[0-9a-f]{16}$/),
       OWNER_JID,
       'Owner',
       '5215599998888',
-      'VaniaBot-Owner',
+      'OrbitBot-Owner',
     );
     expect(slotRef.status).toBe('pending');
     expect(mockDb.save).toHaveBeenCalled();
@@ -416,7 +416,7 @@ describe('SubBotManager', () => {
   });
 
   it('health check reactiva slots activos cuya instancia ya no existe', async () => {
-    // initialize sin slots activos; el slot aparece después (alta en caliente)
+    // initialize with no active slots; the slot appears later (hot add)
     await manager.initialize();
 
     mockDb.getActiveSlots.mockReturnValue([
@@ -448,7 +448,7 @@ describe('SubBotManager', () => {
 
     await vi.advanceTimersByTimeAsync(120_000);
 
-    // reconnectByOwner: stop de la vieja + pending + nueva instancia
+    // reconnectByOwner: stop of the old instance + pending + new instance
     expect(before?.stopped).toBe(true);
     expect(mockDb.updateSlotStatus).toHaveBeenCalledWith(2, 'pending');
     expect(instances.get('bot2')).toBeDefined();
@@ -456,8 +456,8 @@ describe('SubBotManager', () => {
   });
 
   it('health check resetea slots pending con pairing stale (>5 min)', async () => {
-    // El runtime state en memoria solo existe tras launchInstance, así que el
-    // flujo real es: requestSubBot → pending → owner nunca usa el código → stale
+    // The in-memory runtime state only exists after launchInstance, so the
+    // real flow is: requestSubBot → pending → owner never uses the code → stale
     mockDb.isPublicRequestsEnabled.mockReturnValue(true);
     const staleSlot: SubBotSlot = { slot: 4, status: 'free', id: 'bot4', ownerJid: OWNER_JID };
     mockDb.getActiveSlots.mockReturnValue([staleSlot]);
@@ -471,13 +471,13 @@ describe('SubBotManager', () => {
     await manager.requestSubBot(OWNER_JID, 'Owner', '+52 1 55 9999 8888');
     expect(staleSlot.status).toBe('pending');
 
-    // initialize arranca el health check; el slot pending no se relanza
+    // initialize starts the health check; the pending slot isn't relaunched
     await manager.initialize();
 
-    // 6 minutos sin usar el código (stale > 5 min) + tick del health check
+    // 6 minutes without using the code (stale > 5 min) + health check tick
     await vi.advanceTimersByTimeAsync(6 * 60_000 + 120_000);
 
-    // resetSlot: detiene la instancia, libera el slot y persiste
+    // resetSlot: stops the instance, frees the slot and persists
     expect(instances.get('bot4')?.stopped).toBe(true);
     expect(staleSlot.status).toBe('free');
     expect(staleSlot.id).toBeUndefined();
@@ -599,7 +599,7 @@ describe('SubBotManager', () => {
 
     await manager.shutdown();
 
-    // El manager limpia su mapa interno; las instancias mock deben quedar detenidas
+    // The manager clears its internal map; the mock instances must end up stopped
     expect([...instances.values()].every(i => i.stopped)).toBe(true);
     expect(existsSync(join(runtimeDir, 'bot1.json'))).toBe(true);
   });

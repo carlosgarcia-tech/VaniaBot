@@ -1,7 +1,7 @@
 /**
  * AISessionStore.ts
  *
- * VaniaBot services module exposing `AISessionStore`.
+ * OrbitBot services module exposing `AISessionStore`.
  *
  * @author **Carlos G**
  */

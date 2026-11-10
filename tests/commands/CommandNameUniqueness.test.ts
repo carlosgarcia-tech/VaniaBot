@@ -1,15 +1,15 @@
 /**
  * CommandNameUniqueness.test.ts
  *
- * Guardián anti-duplicados: el CommandRegistry sobrescribe en silencio
- * cualquier `name` o alias repetido (solo emite un warn), por lo que un
- * duplicado hace que un comando quede inalcanzable en runtime.
+ * Duplicate guard: the CommandRegistry silently overwrites any repeated
+ * `name` or alias (it only logs a warn), so a duplicate makes a command
+ * unreachable at runtime.
  *
- * Este test valida dos capas:
- *  1. Escaneo estático de todos los archivos de comandos, incluyendo los
- *     dinámicos generados desde `ANIME_COMMANDS` en anime/AnimeCommand.ts.
- *  2. El registro real: carga completa vía PluginLoader y verificación de
- *     que no haya colisiones entre lo efectivamente registrado.
+ * This test checks two layers:
+ *  1. Static scan of every command file, including the dynamic ones
+ *     generated from `ANIME_COMMANDS` in anime/AnimeCommand.ts.
+ *  2. The real registry: full load via PluginLoader and verification that
+ *     whatever actually registered has no collisions.
  */
 import { describe, it, expect } from 'vitest';
 import { readdirSync, statSync, readFileSync } from 'fs';
@@ -48,10 +48,10 @@ function parseAliasesBlock(block: string): string[] {
 }
 
 /**
- * Extrae los comandos declarados como campos de clase:
+ * Extracts commands declared as class fields:
  *   name = 'x';  aliases = ['a', 'b'];
- * En archivos multi-comando (p. ej. GroupCommand.ts), cada `name = '...'`
- * se asocia con el bloque `aliases = [...]` inmediatamente posterior.
+ * In multi-command files (e.g. GroupCommand.ts), each `name = '...'` is
+ * paired with the immediately following `aliases = [...]` block.
  */
 function parseClassCommands(source: string, file: string): ParsedCommand[] {
   const commands: ParsedCommand[] = [];
@@ -71,7 +71,7 @@ function parseClassCommands(source: string, file: string): ParsedCommand[] {
   return commands;
 }
 
-/** Extrae los defs dinámicos de `const ANIME_COMMANDS: AnimeCommandDef[] = [...]`. */
+/** Extracts the dynamic defs from `const ANIME_COMMANDS: AnimeCommandDef[] = [...]`. */
 function parseAnimeDefs(source: string, file: string): ParsedCommand[] {
   const block = /const ANIME_COMMANDS:\s*AnimeCommandDef\[\]\s*=\s*\[([\s\S]*?)\n\];/.exec(source);
   if (!block) return [];
@@ -135,16 +135,16 @@ describe('Unicidad de nombres y aliases de comandos', () => {
   });
 
   it('ningun alias NUEVO colisiona con el name de otro comando (escaneo estatico)', () => {
-    // El registro resuelve nombres y aliases en maps separados: un alias que
-    // coincida con el name de otro comando no se detecta como duplicado, pero
-    // el registro en tiempo real remapea silenciosamente el alias y deja el
-    // comando documentado inalcanzable (caso real ya corregido: alias 'ping'
-    // de HealthCommand ensombrecia a PingCommand).
+    // The registry resolves names and aliases into separate maps: an alias
+    // matching another command's name isn't detected as a duplicate, but
+    // real-time registration silently re-maps the alias and leaves the
+    // documented command unreachable (real case, since fixed: HealthCommand's
+    // 'ping' alias shadowing PingCommand).
     //
-    // La deuda pre-existente (kick, top, verdad, search, quote, backup,
-    // subbots, health, votar, traducir, ...) fue resuelta asignando cada
-    // alias a su comando correcto. La lista debe permanecer VACIA: si este
-    // test falla, se esta introduciendo una colision nueva.
+    // The pre-existing debt (kick, top, verdad, search, quote, backup,
+    // subbots, health, votar, traducir, ...) was paid off by assigning each
+    // alias to its correct command. The list must stay EMPTY: if this
+    // test fails, a new collision is being introduced.
     const DEUDA_CONOCIDA = new Set<string>([]);
 
     const { byName, byAlias } = buildCommandMap();
@@ -152,7 +152,7 @@ describe('Unicidad de nombres y aliases de comandos', () => {
     for (const [alias, aliasOwners] of byAlias) {
       for (const nameOwner of byName.get(alias) ?? []) {
         for (const aliasOwner of aliasOwners) {
-          if (aliasOwner.name === nameOwner.name) continue; // auto-alias inofensivo
+          if (aliasOwner.name === nameOwner.name) continue; // harmless self-alias
           const key = `${alias}: ${aliasOwner.name}(${relativeFile(aliasOwner.file).replace('src/commands/', '').replace('.ts', '')}) vs ${nameOwner.name}(${relativeFile(nameOwner.file).replace('src/commands/', '').replace('.ts', '')})`;
           if (!DEUDA_CONOCIDA.has(key)) {
             clashes.push(key);
@@ -170,8 +170,8 @@ describe('Unicidad de nombres y aliases de comandos', () => {
       for (const cmd of commands) {
         const label = `${relativeFile(file)} [${cmd.name}]`;
         expect(cmd.name, `${label}: name vacío`).not.toBe('');
-        // Multi-palabra permitido: el pipeline resuelve `!r cuadri` vía
-        // fullCommand (2 palabras máximo, ver MainMessagePipeline.resolveAndExecute)
+        // Multi-word names allowed: the pipeline resolves `!r cuadri` via
+        // fullCommand (2 words max, see MainMessagePipeline.resolveAndExecute)
         expect(cmd.name, `${label}: el name debe ser minúsculas`).toBe(cmd.name.toLowerCase());
         expect(cmd.name, `${label}: el name solo puede tener [a-z0-9_ ]`).toMatch(
           /^[a-z0-9_]+( [a-z0-9_]+)?$/,
@@ -189,13 +189,13 @@ describe('Unicidad de nombres y aliases de comandos', () => {
     async () => {
       const { PluginLoader } = await import('../../src/core/PluginLoader');
       const loader = PluginLoader.getInstance();
-      // loadCommands puebla el mapa lazy; getAllCommands fuerza la carga
-      // de los módulos restantes
+      // loadCommands populates the lazy map; getAllCommands forces the load
+      // of the remaining modules
       await loader.loadCommands([]);
       const commands = await loader.getAllCommands();
 
-      // El PluginLoader traga errores de import; si un módulo falla se pierde
-      // del registro. Un umbral bajo detecta ese caso degradado.
+      // The PluginLoader swallows import errors; a failing module silently
+      // drops out of the registry. A low threshold catches that degraded case.
       expect(commands.length).toBeGreaterThan(150);
 
       const names = new Map<string, number>();

@@ -1,8 +1,8 @@
 /**
  * FlirtCommand.ts
  *
- * fun command `flirt` — Envía una frase coqueta aleatoria
- * Usage: !flirt [@usuario]
+ * fun command `flirt` — Sends a random flirty line
+ * Usage: !flirt [@user]
  *
  * @author **Carlos G**
  */
@@ -18,7 +18,7 @@ import {
 
 const FLIRT_API_KEY = process.env.FLIRT_API_KEY || 'shizo';
 
-/** Command handler for `!flirt`: Envía una frase coqueta aleatoria. */
+/** Command handler for `!flirt`: Sends a random flirty line. */
 export class FlirtCommand extends Command {
   name = 'flirt';
   description = 'Envía una frase coqueta aleatoria';

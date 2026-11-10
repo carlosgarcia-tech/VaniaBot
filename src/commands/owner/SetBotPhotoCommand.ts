@@ -1,8 +1,8 @@
 /**
  * SetBotPhotoCommand.ts
  *
- * owner command `setbotphoto` — Cambia la foto de perfil del bot
- * Usage: !setbotphoto <url|imagen>
+ * owner command `setbotphoto` — Change the bot's profile photo
+ * Usage: !setbotphoto <url|image>
  *
  * @author **Carlos G**
  */
@@ -63,7 +63,7 @@ async function downloadImageFromMessage(ctx: MessageContext): Promise<Buffer | n
   }
 }
 
-/** Command handler for `!setbotphoto`: Cambia la foto de perfil del bot. */
+/** Command handler for `!setbotphoto`: Change the bot's profile photo. */
 export class SetBotPhotoCommand extends Command {
   name = 'setbotphoto';
   description = 'Cambia la foto de perfil del bot';

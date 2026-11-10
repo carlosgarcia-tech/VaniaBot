@@ -1,4 +1,4 @@
 #!/bin/bash
-echo ">>> Deteniendo VaniaBot..."
+echo ">>> Stopping OrbitBot..."
 docker-compose down
-echo ">>> ✓ Servicios detenidos"
+echo ">>> ✓ Services stopped"

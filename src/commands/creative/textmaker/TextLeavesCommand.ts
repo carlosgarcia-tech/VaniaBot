@@ -1,7 +1,7 @@
 /**
  * TextLeavesCommand.ts
  *
- * creative command `leaves` — Crea un efecto de texto con hojas
+ * creative command `leaves` — Creates a text effect with leaves
  * Usage: !leaves <texto>
  *
  * @author **Carlos G**
@@ -19,7 +19,7 @@ import {
 const PAGE_URL =
   'https://en.ephoto360.com/green-brush-text-effect-typography-maker-online-153.html';
 
-/** Command handler for `!leaves`: Crea un efecto de texto con hojas. */
+/** Command handler for `!leaves`: Creates a text effect with leaves. */
 export class TextLeavesCommand extends Command {
   name = 'leaves';
   description = 'Crea un efecto de texto con hojas';
@@ -28,14 +28,14 @@ export class TextLeavesCommand extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!leaves <texto>';
-  examples = ['!leaves VaniaBot'];
+  examples = ['!leaves OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !leaves <texto>\n_Ejemplo: !leaves VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !leaves <texto>\n_Ejemplo: !leaves OrbitBot_');
       return;
     }
 

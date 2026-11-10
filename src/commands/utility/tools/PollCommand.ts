@@ -1,8 +1,8 @@
 /**
  * PollCommand.ts
  *
- * utility command `encuesta` — Crea y gestiona encuestas con múltiples opciones.
- * Usage: !encuesta "Pregunta" "Op1" "Op2" "Op3..."
+ * utility command `encuesta` — Creates and manages polls with multiple options.
+ * Usage: !encuesta "Question" "Op1" "Op2" "Op3..."
  *
  * @author **Carlos G**
  */
@@ -13,12 +13,12 @@ import type { Poll } from '@/services/system/PersistenceService.js';
 import { persistenceService } from '@/services/system/PersistenceService.js';
 import { formatTime } from '@/utils/helpers.js';
 
-/** Command handler for `!encuesta`: Crea y gestiona encuestas con múltiples opciones. */
+/** Command handler for `!encuesta`: Creates and manages polls with multiple options. */
 export class PollCommand extends Command {
   name = 'encuesta';
   description = 'Crea y gestiona encuestas con múltiples opciones.';
   category = CommandCategory.UTILITY;
-  // Sin alias 'votar': es el name de VotarPoesiaCommand (votar poemas).
+  // No alias 'votar': it is the name of VotarPoesiaCommand (voting for poems).
   aliases = ['poll', 'votacion'];
   usage = '!encuesta "Pregunta" "Op1" "Op2" "Op3..."';
   examples = [
@@ -87,7 +87,7 @@ export class PollCommand extends Command {
 
     if (!ctx.args.length || sub === 'ayuda' || sub === 'help') {
       await ctx.reply(
-        `˚₊· ͟͟͞͞➳ *encuestas — VaniaBot* ˚₊· ͟͟͞͞➳\n` +
+        `˚₊· ͟͟͞͞➳ *encuestas — OrbitBot* ˚₊· ͟͟͞͞➳\n` +
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
           `✿ *para crear:*\n` +
           `  ﹒!encuesta "Pregunta" "Op1" "Op2" "Op3"...\n\n` +

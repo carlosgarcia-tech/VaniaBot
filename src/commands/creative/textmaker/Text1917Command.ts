@@ -1,7 +1,7 @@
 /**
  * Text1917Command.ts
  *
- * creative command `1917` — Crea un efecto de texto estilo 1917
+ * creative command `1917` — Creates a 1917-style text effect
  * Usage: !1917 <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const PAGE_URL = 'https://en.ephoto360.com/1917-style-text-effect-523.html';
 
-/** Command handler for `!1917`: Crea un efecto de texto estilo 1917. */
+/** Command handler for `!1917`: Creates a 1917-style text effect. */
 export class Text1917Command extends Command {
   name = '1917';
   description = 'Crea un efecto de texto estilo 1917';
@@ -27,14 +27,14 @@ export class Text1917Command extends Command {
   cooldown = 15000;
   contexts = [CommandContext.BOTH];
   usage = '!1917 <texto>';
-  examples = ['!1917 VaniaBot'];
+  examples = ['!1917 OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     const text = ctx.args?.join(' ').trim();
 
     if (!text) {
-      await ctx.reply('✍️ *Uso:* !1917 <texto>\n_Ejemplo: !1917 VaniaBot_');
+      await ctx.reply('✍️ *Uso:* !1917 <texto>\n_Ejemplo: !1917 OrbitBot_');
       return;
     }
 

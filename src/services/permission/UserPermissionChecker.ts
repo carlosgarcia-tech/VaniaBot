@@ -1,7 +1,7 @@
 /**
  * UserPermissionChecker.ts
  *
- * VaniaBot services module exposing `UserPermissionChecker`, `UserPermissions`.
+ * OrbitBot services module exposing `UserPermissionChecker`, `UserPermissions`.
  *
  * @author **Carlos G**
  */

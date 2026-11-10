@@ -1,29 +1,29 @@
 #!/bin/bash
 
 #
-#          VaniaBot - Script de Instalación para Termux
-#                Optimizado para Android/Termux
+#          OrbitBot - Termux Installation Script
+#                Optimized for Android/Termux
 #
-# Autor: Carlos G (@carlosgarcia-tech)
-# Versión: leída dinámicamente de package.json
-# Compatibilidad: Termux (Android 7.0+), Node.js 20+
+# Author: Carlos G (@carlosgarcia-tech)
+# Version: read dynamically from package.json
+# Compatibility: Termux (Android 7.0+), Node.js 20+
 #
-# Instalación en un solo comando (Termux recién instalado):
-#   pkg install -y git && git clone https://github.com/carlosgarcia-tech/VaniaBot.git && cd VaniaBot && bash install-termux.sh
+# One-command install (freshly installed Termux):
+#   pkg install -y git && git clone https://github.com/carlosgarcia-tech/OrbitBot.git && cd OrbitBot && bash install-termux.sh
 #
-# El script instala dependencias del sistema, dependencias npm, aplica el
-# parche de whatsapp-rust-bridge, crea el .env y verifica la instalación.
+# The script installs system dependencies, npm dependencies, applies the
+# whatsapp-rust-bridge patch, creates the .env and verifies the install.
 #
-# Uso:
-#   bash install-termux.sh           # Instalación completa (recomendada)
-#   bash install-termux.sh --minimal # Instalación mínima (recursos limitados)
-#   bash install-termux.sh --skip-npm # No instalar dependencias npm
-#   bash install-termux.sh --help    # Mostrar ayuda
+# Usage:
+#   bash install-termux.sh           # Full install (recommended)
+#   bash install-termux.sh --minimal # Minimal install (limited resources)
+#   bash install-termux.sh --skip-npm # Skip installing npm dependencies
+#   bash install-termux.sh --help    # Show help
 #
 
 set -e
 
-# Colores para output
+# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -39,14 +39,10 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="$CURRENT_DIR/install-termux.log"
 NODE_MAJOR_MIN=20
 
-# Versión del bot, leída de package.json (sin depender de node/jq,
-# que pueden no estar instalados todavía al iniciar el instalador)
+# Bot version, read from package.json (without depending on node/jq,
+# which may not be installed yet when the installer starts)
 BOT_VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$CURRENT_DIR/package.json" 2>/dev/null | head -n1)"
-BOT_VERSION="${BOT_VERSION:-desconocida}"
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Funciones de utilidad
-# ══════════════════════════════════════════════════════════════════════════════
+BOT_VERSION="${BOT_VERSION:-unknown}"
 
 log() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -78,88 +74,84 @@ header() {
 
 show_help() {
     cat << EOF
-${BOLD}VaniaBot - Script de Instalación para Termux${NC}
+${BOLD}OrbitBot - Termux Installation Script${NC}
 
-${BOLD}Uso:${NC}
-    bash install-termux.sh [OPCIONES]
+${BOLD}Usage:${NC}
+    bash install-termux.sh [OPTIONS]
 
-${BOLD}Opciones:${NC}
-    --full      Instalación completa (por defecto)
-    --minimal   Instalación mínima (para dispositivos con recursos limitados)
-    --skip-npm  No instalar dependencias npm (usar las existentes)
-    --help      Mostrar esta ayuda
+${BOLD}Options:${NC}
+    --full      Full install (default)
+    --minimal   Minimal install (for devices with limited resources)
+    --skip-npm  Do not install npm dependencies (use existing ones)
+    --help      Show this help
 
-${BOLD}Descripción:${NC}
-    Instala VaniaBot (v$BOT_VERSION) en Termux con todas las dependencias
-    necesarias para funcionar correctamente en Android.
+${BOLD}Description:${NC}
+    Installs OrbitBot (v$BOT_VERSION) on Termux with all dependencies
+    needed to run properly on Android.
 
-    Modo completo instala además:
-    - Herramientas de compilación (para módulos nativos)
-    - PyMuPDF, pdf2docx y python-pptx (conversión de documentos)
-    - yt-dlp (descarga de videos)
+    Full mode also installs:
+    - Build tools (for native modules)
+    - PyMuPDF, pdf2docx and python-pptx (document conversion)
+    - yt-dlp (video downloads)
 
-${BOLD}Limitaciones en Termux:${NC}
-    - LibreOffice no existe en Termux: los comandos docx->pdf y
-      ppt->pdf no están disponibles en Android (sí en Docker/Linux).
-    - PyMuPDF se compila desde fuente y puede tardar varios minutos;
-      si falla, el resto del bot funciona igual (solo sin conversión PDF).
+${BOLD}Limitations on Termux:${NC}
+    - LibreOffice does not exist on Termux: docx->pdf and
+      ppt->pdf commands are not available on Android (they are on Docker/Linux).
+    - PyMuPDF builds from source and can take several minutes;
+      if it fails, the rest of the bot still works (just without PDF conversion).
 
-${BOLD}Requisitos:${NC}
-    - Termux instalado (desde F-Droid o GitHub)
-    - Android 7.0 o superior
-    - Al menos 1GB de almacenamiento libre
-    - Conexión a internet para descargar dependencias
+${BOLD}Requirements:${NC}
+    - Termux installed (from F-Droid or GitHub)
+    - Android 7.0 or higher
+    - At least 1GB of free storage
+    - Internet connection to download dependencies
 
-${BOLD}Ejemplos:${NC}
-    bash install-termux.sh              # Instalación completa
-    bash install-termux.sh --minimal     # Para dispositivos limitados
-    bash install-termux.sh --skip-npm   # Si ya tienes node_modules
+${BOLD}Examples:${NC}
+    bash install-termux.sh              # Full install
+    bash install-termux.sh --minimal     # For limited devices
+    bash install-termux.sh --skip-npm   # If you already have node_modules
 
 EOF
 }
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Verificación inicial
-# ══════════════════════════════════════════════════════════════════════════════
-
 check_environment() {
-    header "Verificando Entorno"
+    header "Checking Environment"
 
-    # Verificar si estamos en Termux
+    # Check if we are in Termux
     if [ ! -d "/data/data/com.termux" ]; then
-        warn "No parece estar en Termux. El script continuará de todas formas."
+        warn "Doesn't look like Termux. The script will continue anyway."
     fi
 
-    # Verificar Android
+    # Check Android
     if [ -f "/system/build.prop" ]; then
-        log "Sistema detectado: Android"
+        log "Detected system: Android"
     fi
 
-    # Verificar permisos
+    # Check permissions
     if [ -w "$CURRENT_DIR" ]; then
-        success "Permisos de escritura OK"
+        success "Write permissions OK"
     else
-        error "No se puede escribir en el directorio actual"
+        error "Cannot write to the current directory"
         exit 1
     fi
 
-    # Verificar espacio
+    # Check disk space
     available=$(df -k "$CURRENT_DIR" | tail -1 | awk '{print $4}')
     if [ "$available" -lt 1000000 ]; then
-        warn "Poco espacio disponible: $((available / 1024))MB"
-        warn "Se recomienda al menos 1GB para una instalación completa"
+        warn "Low disk space available: $((available / 1024))MB"
+        warn "At least 1GB is recommended for a full install"
     else
-        success "Espacio disponible: $((available / 1024))MB"
+        success "Available space: $((available / 1024))MB"
     fi
 }
 
 install_system_deps() {
-    header "Instalando Dependencias del Sistema"
+    header "Installing System Dependencies"
 
-    log "Actualizando repositorios..."
+    log "Updating repositories..."
     pkg update -y >> "$LOG_FILE" 2>&1 || true
 
-    log "Instalando dependencias base..."
+    log "Installing base dependencies..."
     pkg install -y \
         git \
         nodejs \
@@ -178,33 +170,33 @@ install_system_deps() {
         unzip \
         2>&1 | tee -a "$LOG_FILE"
 
-    success "Dependencias base instaladas"
+    success "Base dependencies installed"
 
-    # Asegurar el binario python3 (PythonBridge lo invoca como 'python3')
+    # Ensure the python3 binary (PythonBridge invokes it as 'python3')
     if ! command -v python3 &> /dev/null && command -v python &> /dev/null; then
         if [ -n "$PREFIX" ]; then
             ln -sf "$(command -v python)" "$PREFIX/bin/python3"
-            success "Symlink python3 creado"
+            success "python3 symlink created"
         else
-            warn "python3 no disponible y PREFIX no definido"
+            warn "python3 not available and PREFIX not set"
         fi
     fi
 
-    # yt-dlp (Python puro, funciona en Termux)
-    log "Instalando yt-dlp..."
+    # yt-dlp (pure Python, works on Termux)
+    log "Installing yt-dlp..."
     pip install --upgrade yt-dlp >> "$LOG_FILE" 2>&1 || {
-        warn "Error instalando yt-dlp, intentando con python -m pip..."
+        warn "Error installing yt-dlp, trying with python -m pip..."
         python -m pip install --upgrade yt-dlp >> "$LOG_FILE" 2>&1 || true
     }
     if command -v yt-dlp &> /dev/null; then
-        success "yt-dlp instalado"
+        success "yt-dlp installed"
     else
-        warn "yt-dlp no quedó disponible en PATH - descarga de videos deshabilitada"
+        warn "yt-dlp not available in PATH - video download disabled"
     fi
 
-    # Para instalación completa, instalar dependencias adicionales
+    # For full install, install extra dependencies
     if [ "$INSTALL_MODE" = "full" ]; then
-        log "Instalando herramientas de compilación para módulos nativos..."
+        log "Installing build tools for native modules..."
         pkg install -y \
             clang \
             make \
@@ -213,34 +205,34 @@ install_system_deps() {
             libpng \
             zlib \
             2>&1 | tee -a "$LOG_FILE" || true
-        success "Herramientas de compilación instaladas"
+        success "Build tools installed"
 
-        # Dependencias Python de conversión de documentos (src/services/convert)
-        log "Instalando PyMuPDF (puede compilar desde fuente y tardar)..."
+        # Python document-conversion dependencies (src/services/convert)
+        log "Installing PyMuPDF (may compile from source and take a while)..."
         if pip install pymupdf >> "$LOG_FILE" 2>&1; then
-            success "PyMuPDF instalado (conversión de PDF habilitada)"
+            success "PyMuPDF installed (PDF conversion enabled)"
         else
-            warn "PyMuPDF no se pudo instalar - conversión de PDF deshabilitada"
-            warn "El resto del bot funciona normalmente sin esta función"
+            warn "PyMuPDF could not be installed - PDF conversion disabled"
+            warn "The rest of the bot works fine without this feature"
         fi
 
-        log "Instalando pdf2docx y python-pptx..."
+        log "Installing pdf2docx and python-pptx..."
         if pip install pdf2docx >> "$LOG_FILE" 2>&1; then
-            success "pdf2docx instalado (pdf -> docx)"
+            success "pdf2docx installed (pdf -> docx)"
         else
-            warn "pdf2docx no se pudo instalar - pdf->docx deshabilitado"
+            warn "pdf2docx could not be installed - pdf->docx disabled"
         fi
         if pip install python-pptx >> "$LOG_FILE" 2>&1; then
-            success "python-pptx instalado (pdf -> pptx)"
+            success "python-pptx installed (pdf -> pptx)"
         else
-            warn "python-pptx no se pudo instalar - pdf->pptx deshabilitado"
+            warn "python-pptx could not be installed - pdf->pptx disabled"
         fi
 
-        # LibreOffice no existe en Termux
-        warn "LibreOffice no está disponible en Termux: docx->pdf y ppt->pdf no funcionarán en Android"
-        warn "Esas conversiones requieren Docker/Linux o un servidor externo"
+        # LibreOffice does not exist on Termux
+        warn "LibreOffice is not available on Termux: docx->pdf and ppt->pdf will not work on Android"
+        warn "Those conversions require Docker/Linux or an external server"
 
-        # ImageMagick policy fix para evitar errores de seguridad
+        # ImageMagick policy fix to avoid security errors
         if ls "$TERMUX_SHARE"/etc/ImageMagick-*/policy.xml >/dev/null 2>&1; then
             POLICY_FILE=$(find "$TERMUX_SHARE" -name "policy.xml" -path "*ImageMagick*" 2>/dev/null | head -1)
             if [ -n "$POLICY_FILE" ] && [ -f "$POLICY_FILE" ]; then
@@ -248,194 +240,194 @@ install_system_deps() {
             fi
         fi
     else
-        warn "Modo mínimo: omitiendo dependencias opcionales (conversión de documentos y compilación nativa)"
+        warn "Minimal mode: skipping optional dependencies (document conversion and native builds)"
     fi
 
-    # Verificar instalaciones
-    log "Verificando instalaciones..."
+    # Verify installations
+    log "Verifying installations..."
 
     if command -v node &> /dev/null; then
         success "Node.js: $(node --version)"
     else
-        error "Node.js no se instaló correctamente"
+        error "Node.js was not installed correctly"
     fi
 
     if command -v npm &> /dev/null; then
         success "NPM: $(npm --version)"
     else
-        error "NPM no se instaló correctamente"
+        error "NPM was not installed correctly"
     fi
 
     if command -v ffmpeg &> /dev/null; then
         success "FFmpeg: $(ffmpeg -version 2>&1 | head -n 1)"
     else
-        warn "FFmpeg no se instaló - algunas funciones de video no funcionarán"
+        warn "FFmpeg was not installed - some video features will not work"
     fi
 
     if command -v python3 &> /dev/null; then
         success "Python: $(python3 --version)"
     else
-        warn "Python3 no disponible - conversión de documentos y yt-dlp no funcionarán"
+        warn "Python3 not available - document conversion and yt-dlp will not work"
     fi
 }
 
 install_nodejs_deps() {
-    header "Instalando Dependencias de Node.js"
+    header "Installing Node.js Dependencies"
 
     cd "$CURRENT_DIR"
 
-    # Verificar versión de Node.js (el proyecto exige >= 20)
+    # Check Node.js version (the project requires >= 20)
     if command -v node &> /dev/null; then
         NODE_MAJOR=$(node -p 'process.versions.node.split(".")[0]')
         if [ "$NODE_MAJOR" -lt "$NODE_MAJOR_MIN" ]; then
-            error "Node.js $(node --version) es demasiado viejo: se requiere >= ${NODE_MAJOR_MIN}.x"
-            error "Actualiza con: pkg upgrade nodejs"
+            error "Node.js $(node --version) is too old: >= ${NODE_MAJOR_MIN}.x required"
+            error "Update with: pkg upgrade nodejs"
             exit 1
         fi
-        success "Node.js $(node --version) cumple el requisito (>= ${NODE_MAJOR_MIN}.x)"
+        success "Node.js $(node --version) meets the requirement (>= ${NODE_MAJOR_MIN}.x)"
     fi
 
-    # Verificar si package.json existe
+    # Check if package.json exists
     if [ ! -f "package.json" ]; then
-        error "package.json no encontrado. Asegúrate de estar en el directorio de VaniaBot"
+        error "package.json not found. Make sure you are in the OrbitBot directory"
         exit 1
     fi
 
-    # Limpiar node_modules si existe para reinstalación limpia
+    # Clean node_modules if it exists for a clean reinstall
     if [ -d "node_modules" ]; then
-        warn "Limpiando node_modules anterior..."
+        warn "Cleaning previous node_modules..."
         rm -rf node_modules package-lock.json
     fi
 
-    # Instalar dependencias
-    log "Instalando dependencias npm (esto puede tardar varios minutos)..."
-    echo "Comando: npm install --prefer-offline"
+    # Install dependencies
+    log "Installing npm dependencies (this may take several minutes)..."
+    echo "Command: npm install --prefer-offline"
 
     if [ "$INSTALL_MODE" = "minimal" ]; then
-        # Instalación mínima sin dependencias pesadas opcionales
-        log "Modo mínimo: omitiendo dependencias pesadas..."
+        # Minimal install without heavy optional dependencies
+        log "Minimal mode: skipping heavy dependencies..."
         npm install --ignore-scripts --no-optional 2>&1 | tee -a "$LOG_FILE" || INSTALL_FAILED=true
     else
         npm install --prefer-offline 2>&1 | tee -a "$LOG_FILE" || INSTALL_FAILED=true
     fi
 
     if [ "${INSTALL_FAILED:-false}" = "true" ]; then
-        error "Error instalando dependencias npm"
-        warn "Intentando instalación mínima..."
+        error "Error installing npm dependencies"
+        warn "Trying minimal install..."
         npm install --ignore-scripts 2>&1 | tee -a "$LOG_FILE" || true
     fi
 
-    # Aplicar el parche de whatsapp-rust-bridge (postinstall del package.json).
-    # Con --ignore-scripts el parche NO se ejecuta y el bot no arranca, así que
-    # se aplica manualmente en ambos casos.
-    log "Aplicando parche de whatsapp-rust-bridge..."
-    npm run postinstall >> "$LOG_FILE" 2>&1 || warn "Parche de whatsapp-rust-bridge omitido"
+    # Apply the whatsapp-rust-bridge patch (postinstall in package.json).
+    # With --ignore-scripts the patch is NOT run and the bot won't start, so
+    # it is applied manually in both cases.
+    log "Applying whatsapp-rust-bridge patch..."
+    npm run postinstall >> "$LOG_FILE" 2>&1 || warn "whatsapp-rust-bridge patch skipped"
 
-    # Rebuild de módulos nativos (canvas, etc.) si hay toolchain
-    log "Verificando módulos nativos..."
-    npm rebuild >> "$LOG_FILE" 2>&1 || warn "npm rebuild falló - algunos módulos nativos pueden no estar disponibles"
+    # Rebuild native modules (canvas, etc.) if a toolchain is present
+    log "Checking native modules..."
+    npm rebuild >> "$LOG_FILE" 2>&1 || warn "npm rebuild failed - some native modules may not be available"
 }
 
 setup_config() {
-    header "Configurando VaniaBot"
+    header "Setting Up OrbitBot"
 
     cd "$CURRENT_DIR"
 
-    # Crear archivo .env si no existe
+    # Create .env file if it doesn't exist
     if [ ! -f ".env" ]; then
-        log "Creando archivo .env básico..."
+        log "Creating basic .env file..."
         cat > .env << 'EOF'
-# VaniaBot - Configuración básica
-BOT_NAME=VaniaBot
+# OrbitBot - Basic configuration
+BOT_NAME=OrbitBot
 BOT_PREFIX=.
 
-# Tu número de WhatsApp con código de país (dueño del bot)
+# Your WhatsApp number with country code (bot owner)
 OWNERS=
 
-# Número del bot (necesario para código de pareo)
+# Bot number (required for pairing code)
 PHONE_NUMBER=
 
-# Autenticación por código de pareo (más estable que QR en Termux)
+# Pairing code authentication (more stable than QR on Termux)
 USE_PAIRING_CODE=true
 
-# Inteligencia artificial (https://console.groq.com/keys)
+# Artificial intelligence (https://console.groq.com/keys)
 GROQ_API_KEY=
 
 NODE_ENV=development
 EOF
-        success ".env básico creado"
+        success "Basic .env created"
 
-        warn "⚠️ IMPORTANTE: Edita el archivo .env y configura:"
-        echo "   - OWNERS: Tu número de WhatsApp con código de país (ej: 5215512345678)"
-        echo "   - PHONE_NUMBER: Número del bot (para código de pareo)"
-        echo "   - GROQ_API_KEY: Obtener en https://console.groq.com/keys"
+        warn "⚠️ IMPORTANT: Edit the .env file and configure:"
+        echo "   - OWNERS: Your WhatsApp number with country code (e.g. 5215512345678)"
+        echo "   - PHONE_NUMBER: Bot number (for pairing code)"
+        echo "   - GROQ_API_KEY: Get it at https://console.groq.com/keys"
         echo ""
         echo "   nano .env"
         echo ""
     else
-        success ".env ya existe"
+        success ".env already exists"
     fi
 
-    # Crear directorios necesarios
-    log "Creando directorios..."
+    # Create required directories
+    log "Creating directories..."
     mkdir -p data/temp
     mkdir -p data/assets
     mkdir -p data/backups
-    mkdir -p vaniasession
+    mkdir -p orbitsession
     mkdir -p logs
-    success "Directorios creados"
+    success "Directories created"
 
-    # Configurar timezone
+    # Configure timezone
     if [ -f "/data/data/com.termux/files/usr/etc/motd" ]; then
-        log "Configurando timezone..."
+        log "Configuring timezone..."
         export TZ="America/Mexico_City"
     fi
 }
 
 verify_installation() {
-    header "Verificando Instalación"
+    header "Verifying Installation"
 
     local errors=0
 
-    log "Verificando archivos necesarios..."
+    log "Checking required files..."
 
-    for file in package.json tsconfig.json vania.ts src/index.ts; do
+    for file in package.json tsconfig.json orbit.ts src/index.ts; do
         if [ -f "$file" ]; then
-            success "$file existe"
+            success "$file exists"
         else
-            error "$file no encontrado"
+            error "$file not found"
             errors=$((errors + 1))
         fi
     done
 
-    log "Verificando TypeScript..."
+    log "Checking TypeScript..."
     if npx tsc --version >> "$LOG_FILE" 2>&1; then
         success "TypeScript: $(npx tsc --version)"
     else
-        warn "TypeScript no está disponible directamente"
+        warn "TypeScript not directly available"
     fi
 
-    log "Verificando estructura del proyecto..."
+    log "Checking project structure..."
     if [ -d "src/commands" ] && [ -d "src/services" ]; then
-        success "Estructura del proyecto OK"
+        success "Project structure OK"
     else
-        error "Estructura del proyecto incompleta"
+        error "Project structure incomplete"
         errors=$((errors + 1))
     fi
 
-    log "Verificando parche de whatsapp-rust-bridge..."
+    log "Checking whatsapp-rust-bridge patch..."
     if node -e "require('whatsapp-rust-bridge/package.json')" >> "$LOG_FILE" 2>&1; then
-        success "whatsapp-rust-bridge accesible"
+        success "whatsapp-rust-bridge accessible"
     else
-        warn "whatsapp-rust-bridge no verificable (el bot puede fallar al arrancar)"
+        warn "whatsapp-rust-bridge not verifiable (the bot may fail to start)"
     fi
 
     if [ "$INSTALL_MODE" = "full" ] && command -v python3 &> /dev/null; then
-        log "Verificando PyMuPDF (conversión de documentos)..."
+        log "Checking PyMuPDF (document conversion)..."
         if python3 -c "import fitz" >> "$LOG_FILE" 2>&1; then
-            success "PyMuPDF disponible - conversión de PDF habilitada"
+            success "PyMuPDF available - PDF conversion enabled"
         else
-            warn "PyMuPDF no disponible - conversión de PDF deshabilitada"
+            warn "PyMuPDF not available - PDF conversion disabled"
         fi
     fi
 
@@ -443,81 +435,77 @@ verify_installation() {
 }
 
 show_instructions() {
-    header "Instalación Completada"
+    header "Installation Completed"
 
     cat << EOF
 ${GREEN}╔════════════════════════════════════════════════════════════════════════╗
-║                   ¡VaniaBot instalado exitosamente!                      ║
+║                   OrbitBot installed successfully!                       ║
 ╚════════════════════════════════════════════════════════════════════════╝${NC}
 
-${BOLD}📋 Próximos pasos:${NC}
+${BOLD}📋 Next steps:${NC}
 
-1. ${YELLOW}Configura el archivo .env${NC}
+1. ${YELLOW}Configure the .env file${NC}
    nano .env
 
-   Variables requeridas:
-   • OWNERS - Tu número con código de país (ej: 5215512345678)
-   • PHONE_NUMBER - Número del bot (para código de pareo)
-   • GROQ_API_KEY - Obtener en https://console.groq.com/keys
+   Required variables:
+   • OWNERS - Your number with country code (e.g.: 5215512345678)
+   • PHONE_NUMBER - Bot number (for pairing code)
+   • GROQ_API_KEY - Get it at https://console.groq.com/keys
 
-2. ${YELLOW}Iniciar el bot${NC}
+2. ${YELLOW}Start the bot${NC}
 
-   # Código de pareo (recomendado en Termux):
+   # Pairing code (recommended on Termux):
    npm run code
 
-   # Modo QR (primera vez alternativa):
+   # QR mode (first-time alternative):
    npm run qr
 
-   # Menú interactivo de autenticación:
+   # Interactive authentication menu:
    npm start
 
-   # Modo desarrollo:
+   # Development mode:
    npm run dev
 
-3. ${YELLOW}Vincula el bot con WhatsApp${NC}
-   Con USE_PAIRING_CODE=true, escribe el código de 8 caracteres en
-   WhatsApp > Dispositivos vinculados > Vincular con el número del bot.
+3. ${YELLOW}Link the bot to WhatsApp${NC}
+   With USE_PAIRING_CODE=true, enter the 8-character code in
+   WhatsApp > Linked devices > Link with the bot's number.
 
-${BOLD}📌 Comandos útiles:${NC}
-   • Ver logs: pm2 logs vaniabot
-   • Reiniciar: pm2 restart vaniabot
-   • Estado: pm2 status
-   • Panel de salud: http://localhost:3000/api/health (con el bot corriendo)
+${BOLD}📌 Useful commands:${NC}
+   • View logs: pm2 logs orbit
+   • Restart: pm2 restart orbit
+   • Status: pm2 status
+   • Health panel: http://localhost:3000/api/health (with the bot running)
 
-${BOLD}🔧 Mantener el bot funcionando 24/7:${NC}
+${BOLD}🔧 Keeping the bot running 24/7:${NC}
 
-   # Activar wake lock (evita que Termux se duerma):
+   # Enable wake lock (prevents Termux from sleeping):
    termux-wake-lock
 
-   # Usar PM2:
+   # Use PM2:
    npm install -g pm2
-   pm2 start vania.ts --interpreter tsx --name vaniabot
+   pm2 start orbit.ts --interpreter tsx --name orbit
    pm2 save
    pm2 startup
 
-${BOLD}⚠️ Notas importantes:${NC}
-   • El bot requiere ser admin del grupo para funcionar correctamente
-   • Asegúrate de que FFmpeg esté instalado para funciones de video
-   • Guarda tu sesión periódicamente haciendo backup de vaniasession/
-   • docx->pdf y ppt->pdf no funcionan en Termux (LibreOffice no existe
-     en Android); pdf->img, pdf->docx y pdf->pptx sí (si PyMuPDF instaló)
-   • El prefijo configurado funciona, y también valen '.' y '!' siempre
+${BOLD}⚠️ Important notes:${NC}
+   • The bot needs to be a group admin to work correctly
+   • Make sure FFmpeg is installed for video features
+   • Save your session periodically with a backup of orbitsession/
+   • docx->pdf and ppt->pdf do not work on Termux (LibreOffice does not
+     exist on Android); pdf->img, pdf->docx and pdf->pptx do (if PyMuPDF installed)
+   • The configured prefix works, and '.' and '!' always work too
 
-${BOLD}🐛 Solución de problemas:${NC}
-   • Error de permisos: termux-setup-storage
-   • Ver logs: cat install-termux.log
-   • Reinstalar deps: rm -rf node_modules && npm install && npm run postinstall
-   • Node viejo: pkg upgrade nodejs  (se requiere Node 20+)
+${BOLD}🐛 Troubleshooting:${NC}
+   • Permission errors: termux-setup-storage
+   • View logs: cat install-termux.log
+   • Reinstall deps: rm -rf node_modules && npm install && npm run postinstall
+   • Old Node: pkg upgrade nodejs  (Node 20+ required)
 
 EOF
 }
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Función principal
-# ══════════════════════════════════════════════════════════════════════════════
-
 main() {
-    # Parsear argumentos
+    # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
             --full)
@@ -526,7 +514,7 @@ main() {
                 ;;
             --minimal)
                 INSTALL_MODE="minimal"
-                warn "Modo mínimo activado - algunas funciones pueden no estar disponibles"
+                warn "Minimal mode enabled - some features may not be available"
                 shift
                 ;;
             --skip-npm)
@@ -538,42 +526,42 @@ main() {
                 exit 0
                 ;;
             *)
-                error "Opción desconocida: $1"
+                error "Unknown option: $1"
                 show_help
                 exit 1
                 ;;
         esac
     done
 
-    # Iniciar log
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] === Iniciando instalación de VaniaBot v$BOT_VERSION ===" > "$LOG_FILE"
+    # Start log
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] === Starting OrbitBot v$BOT_VERSION installation ===" > "$LOG_FILE"
 
-    header "VaniaBot v$BOT_VERSION - Instalación para Termux"
+    header "OrbitBot v$BOT_VERSION - Termux Installation"
 
-    echo -e "${BOLD}Modo de instalación:${NC} ${CYAN}$INSTALL_MODE${NC}"
+    echo -e "${BOLD}Install mode:${NC} ${CYAN}$INSTALL_MODE${NC}"
     echo ""
 
-    # Ejecutar pasos
+    # Run steps
     check_environment
     install_system_deps
 
     if [ "${SKIP_NPM:-false}" != "true" ]; then
         install_nodejs_deps
     else
-        warn "Saltando instalación de npm..."
+        warn "Skipping npm install..."
     fi
 
     setup_config
 
     if verify_installation; then
         show_instructions
-        success "Instalación completada"
+        success "Installation completed"
     else
-        error "La instalación tuvo algunos problemas"
-        warn "Revisa el archivo $LOG_FILE para más detalles"
+        error "The installation had some problems"
+        warn "Check $LOG_FILE for more details"
         exit 1
     fi
 }
 
-# Ejecutar
+# Run
 main "$@"

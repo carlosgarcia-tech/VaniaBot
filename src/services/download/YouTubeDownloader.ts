@@ -1,7 +1,7 @@
 /**
  * YouTubeDownloader.ts
  *
- * VaniaBot services module exposing `YouTubeDownloader`.
+ * OrbitBot services module exposing `YouTubeDownloader`.
  *
  * @author **Carlos G**
  */

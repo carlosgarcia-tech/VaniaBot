@@ -1,7 +1,7 @@
 /**
  * OwnersCommand.ts
  *
- * utility command `owners` — Muestra la lista de owners del bot
+ * utility command `owners` — Shows the bot's owner list
  * Usage: !owners
  *
  * @author **Carlos G**
@@ -13,7 +13,7 @@ import { logError } from '@/utils/logger.js';
 import type { MessageContext } from '@/types/index.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
-/** Command handler for `!owners`: Muestra la lista de owners del bot. */
+/** Command handler for `!owners`: Shows the bot's owner list. */
 export class OwnersCommand extends Command {
   name = 'owners';
   description = 'Muestra la lista de owners del bot';
@@ -38,7 +38,7 @@ export class OwnersCommand extends Command {
       });
 
       const message = `
-      ˚₊· ͟͟͞͞➳ *owneres de VaniaBot* ˚₊· ͟͟͞͞➳
+      ˚₊· ͟͟͞͞➳ *owneres de OrbitBot* ˚₊· ͟͟͞͞➳
       ﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒
 
       ${ownersList}

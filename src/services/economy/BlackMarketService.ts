@@ -1,7 +1,7 @@
 /**
  * BlackMarketService.ts
  *
- * VaniaBot services module exposing `BlackMarketListing`, `blackMarketService`.
+ * OrbitBot services module exposing `BlackMarketListing`, `blackMarketService`.
  *
  * @author **Carlos G**
  */

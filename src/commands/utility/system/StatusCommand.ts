@@ -1,7 +1,7 @@
 /**
  * StatusCommand.ts
  *
- * utility command `status` — Ver estado y salud del sistema
+ * utility command `status` — View system status and health
  *
  * @author **Carlos G**
  */
@@ -10,11 +10,11 @@ import { Command } from '@/commands/Command.js';
 import { type MessageContext, PermissionLevel, CommandCategory } from '@/types/index.js';
 import { healthCheckService } from '@/services/system/HealthCheckService.js';
 
-/** Command handler for `!status`: Ver estado y salud del sistema. */
+/** Command handler for `!status`: View system status and health. */
 export class StatusCommand extends Command {
   name = 'status';
   description = 'Ver estado y salud del sistema';
-  // Sin alias 'health': es el name de HealthCommand.
+  // No alias 'health': it is the name of HealthCommand.
   aliases = ['sysinfo'];
   category = CommandCategory.UTILITY;
   cooldown = 5000;
@@ -91,8 +91,8 @@ export class StatusCommand extends Command {
 export class HealthCommand extends Command {
   name = 'health';
   description = 'Verificar salud del bot';
-  // Sin alias 'ping': es el name de PingCommand y el registro remapeaba
-  // !ping hacia este comando, sabotenado el ping de latencia real.
+  // No alias 'ping': it is the name of PingCommand and the registry remapped
+  // !ping to this command, hijacking the real latency ping.
   aliases = ['pong'];
   category = CommandCategory.UTILITY;
   cooldown = 3000;

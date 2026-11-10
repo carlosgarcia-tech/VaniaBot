@@ -1,7 +1,7 @@
 /**
  * JsonDatabase.ts
  *
- * VaniaBot services module exposing `JsonDatabase`.
+ * OrbitBot services module exposing `JsonDatabase`.
  *
  * @author **Carlos G**
  */
@@ -155,7 +155,7 @@ class UnifiedCache {
   }
 }
 
-const CRITICAL_COLLECTIONS = ['users', 'groups', 'settings', 'economy', 'levels', 'vania_toggle'];
+const CRITICAL_COLLECTIONS = ['users', 'groups', 'settings', 'economy', 'levels', 'orbit_toggle'];
 
 export class JsonDatabase extends Database {
   private data!: JsonData;

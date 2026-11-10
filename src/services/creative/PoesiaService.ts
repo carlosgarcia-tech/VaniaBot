@@ -1,7 +1,7 @@
 /**
  * PoesiaService.ts
  *
- * VaniaBot services module exposing `PoesiaService`, `TIPO_EMOJI`, `TIPO_LABEL`, `poesiaService`.
+ * OrbitBot services module exposing `PoesiaService`, `TIPO_EMOJI`, `TIPO_LABEL`, `poesiaService`.
  *
  * @author **Carlos G**
  */
@@ -211,11 +211,11 @@ export class PoesiaService {
   formatEntry(entry: ContenidoEntry, showMeta = true, footer?: string): string {
     const emoji = TIPO_EMOJI[entry.tipo];
     const label = TIPO_LABEL[entry.tipo];
-    const defaultFooter = footer || '> _VaniaBot💝 — Poesía & Amor_';
+    const defaultFooter = footer || '> _OrbitBot💝 — Poesía & Amor_';
 
     let cleanContent = entry.contenido;
-    cleanContent = cleanContent.replace(/>\s*VaniaBot[💝]*\s*[-–—]?\s*Poes[ií]a.*$/gim, '').trim();
-    cleanContent = cleanContent.replace(/>\s*VaniaBot[💝]*\s*$/gim, '').trim();
+    cleanContent = cleanContent.replace(/>\s*OrbitBot[💝]*\s*[-–—]?\s*Poes[ií]a.*$/gim, '').trim();
+    cleanContent = cleanContent.replace(/>\s*OrbitBot[💝]*\s*$/gim, '').trim();
 
     let msg = '';
 
@@ -249,7 +249,7 @@ export class PoesiaService {
 
     const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
     const titulo = tipo ? `${TIPO_EMOJI[tipo]} Top ${TIPO_LABEL[tipo]}` : '🏆 Top Poesía del Grupo';
-    const defaultFooter = footer || '> _VaniaBot💝 — Poesía & Amor_';
+    const defaultFooter = footer || '> _OrbitBot💝 — Poesía & Amor_';
 
     let msg = `${titulo}\n━━━━━━━━━━━━\n\n`;
 
@@ -276,7 +276,7 @@ export class PoesiaService {
     }
   }
 
-  /** Limpieza del caché expirado (llamar periódicamente) */
+  /** Clears expired cache entries (call periodically) */
   cleanCache(): void {
     const now = Date.now();
     for (const [k, v] of this.cache.entries()) {

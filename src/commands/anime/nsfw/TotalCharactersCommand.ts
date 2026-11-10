@@ -1,7 +1,7 @@
 /**
  * TotalCharactersCommand.ts
  *
- * VaniaBot commands module exposing `TotalCharactersCommand`.
+ * OrbitBot commands module exposing `TotalCharactersCommand`.
  *
  * @author **Carlos G**
  */

@@ -1,23 +1,21 @@
 /**
  * FakeWASocket.ts
  *
- * Socket falso para pruebas e2e del pipeline principal. Implementa
- * únicamente la superficie que Client/AuthManager/pipeline consumen de
- * un WASocket real: registro de eventos (ev.on), envío de mensajes
- * (sendMessage), presence, ws.readyState (el health check de AuthManager
- * lo consulta) y las consultas de grupo/perfil que los guards pueden
- * pedir.
+ * Fake socket for e2e tests of the main pipeline. It implements only the
+ * surface that Client/AuthManager/pipeline consume from a real WASocket:
+ * event registration (ev.on), message sending (sendMessage), presence,
+ * ws.readyState (queried by the AuthManager health check) and the
+ * group/profile queries the guards may issue.
  *
- * Los mensajes enviados quedan grabados en `sent` para que los tests
- * afirmen sobre ellos; `receive()` inyecta un messages.upsert como el
- * que Baileys emitiría con un mensaje entrante real, y emit() permite
- * disparar cualquier otro evento del bus (connection.update, etc.).
+ * Sent messages are recorded in `sent` so tests can assert on them;
+ * receive() injects a messages.upsert like the one Baileys would emit for a
+ * real incoming message, and emit() allows firing any other bus event
+ * (connection.update, etc.).
  *
- * Los participantes de grupo son configurables por test (`setGroup`) para
- * poder afirmar sobre permisos, antilink en modo kick y silencios: sin eso,
- * `participants: []` hace que el bot nunca sea admin. Cada cambio de
- * participantes debe ir acompañado de una invalidación de caches
- * (ver harness/groups.ts).
+ * Group participants are configurable per test (`setGroup`) so tests can
+ * assert on permissions, antilink in kick mode and mutes: without that,
+ * `participants: []` makes the bot never an admin. Every participant change
+ * must be accompanied by cache invalidation (see harness/groups.ts).
  */
 
 import type { AnyMessageContent, WAMessage } from 'baileys';
@@ -50,12 +48,12 @@ export type UpsertType = 'notify' | 'append';
 type EventHandler = (payload: unknown) => void;
 
 export class FakeWASocket {
-  user = { id: '861234567890123:1@s.whatsapp.net', name: 'VaniaBot' };
+  user = { id: '861234567890123:1@s.whatsapp.net', name: 'OrbitBot' };
 
-  /** Mensajes enviados por el bot, en orden de llegada. */
+  /** Messages sent by the bot, in arrival order. */
   readonly sent: SentMessage[] = [];
 
-  /** Llamadas a groupParticipantsUpdate (kick/remove, add, etc.). */
+  /** groupParticipantsUpdate calls (kick/remove, add, etc.). */
   readonly participantUpdates: ParticipantUpdate[] = [];
 
   private readonly handlers = new Map<string, Set<EventHandler>>();
@@ -72,7 +70,7 @@ export class FakeWASocket {
     },
   };
 
-  /** Emite un evento del bus de Baileys a los listeners registrados. */
+  /** Emits a Baileys bus event to the registered listeners. */
   emit(event: string, payload: unknown): void {
     for (const handler of this.handlers.get(event) ?? []) {
       handler(payload);
@@ -80,16 +78,16 @@ export class FakeWASocket {
   }
 
 /**
-   * Inyecta un messages.upsert con el mensaje dado. `append` reproduce la
-   * sincronización de historial: el pipeline solo procesa `notify`.
+   * Injects a messages.upsert with the given message. `append` reproduces
+   * history sync: the pipeline only processes `notify`.
    */
   receive(message: WAMessage, type: UpsertType = 'notify'): void {
     this.emit('messages.upsert', { messages: [message], type });
   }
 
   /**
-   * Inyecta varios mensajes en un solo upsert (como el burst que emite
-   * Baileys al reconectar con historial pendiente).
+   * Injects several messages in a single upsert (like the burst Baileys
+   * emits when reconnecting with pending history).
    */
   receiveMany(messages: WAMessage[], type: UpsertType = 'notify'): void {
     this.emit('messages.upsert', { messages, type });
@@ -115,8 +113,8 @@ export class FakeWASocket {
   }
 
   /**
-   * Define la metadata de un grupo (participantes y admin flags). Sustituye
-   * la respuesta por defecto de participants: [].
+   * Sets a group's metadata (participants and admin flags). Replaces the
+   * default participants: [] response.
    */
   setGroup(jid: string, group: Partial<FakeGroup> = {}): void {
     const current = this.groups.get(jid);
@@ -145,21 +143,21 @@ export class FakeWASocket {
     readyState: 1,
   };
 
-  /** Textos planos enviados, en orden. */
+  /** Plain texts sent, in order. */
   texts(): string[] {
     return this.sent
       .map(s => (s.content as { text?: string }).text ?? '')
       .filter(t => t.length > 0);
   }
 
-  /** Claves de los mensajes que el bot intentó borrar (delete). */
+  /** Keys of the messages the bot attempted to delete (delete). */
   deletions(): string[] {
     return this.sent
       .map(s => (s.content as { delete?: { id?: string } }).delete?.id)
       .filter((id): id is string => typeof id === 'string');
   }
 
-  /** Reacciones enviadas por el bot (ctx.react). */
+  /** Reactions sent by the bot (ctx.react). */
   reactions(): string[] {
     return this.sent
       .map(s => (s.content as { react?: { text?: string } }).react?.text)

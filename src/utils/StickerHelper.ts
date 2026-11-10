@@ -17,8 +17,8 @@ import { logError } from '@/utils/logger.js';
 import { StickerService } from '@/services/media/StickerService.js';
 
 /** Pack name/author embedded in every generated sticker. */
-const PACK_NAME = '𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩';
-const PACK_AUTHOR = '𝙑𝙖𝙣𝙞𝙖𝘽𝙤𝙩';
+const PACK_NAME = '𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩';
+const PACK_AUTHOR = '𝙊𝙧𝙗𝙞𝙩𝘽𝙤𝙩';
 
 export class StickerHelper {
   private static service = new StickerService();

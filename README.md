@@ -1,9 +1,9 @@
-# VaniaBot
+# OrbitBot
 
 A production-grade WhatsApp automation system built with TypeScript — featuring 300+ commands across 15 categories, 20 service modules, a middleware pipeline that every message traverses, multi-instance SubBot orchestration, and a test suite of ~1000 unit and end-to-end tests that run in CI.
 
-[![CI](https://github.com/carlosgarcia-tech/VaniaBot/actions/workflows/ci.yml/badge.svg)](https://github.com/carlosgarcia-tech/VaniaBot/actions/workflows/ci.yml)
-[![Code coverage](https://codecov.io/gh/carlosgarcia-tech/VaniaBot/branch/main/graph/badge.svg)](https://codecov.io/gh/carlosgarcia-tech/VaniaBot)
+[![CI](https://github.com/carlosgarcia-tech/OrbitBot/actions/workflows/ci.yml/badge.svg)](https://github.com/carlosgarcia-tech/OrbitBot/actions/workflows/ci.yml)
+[![Code coverage](https://codecov.io/gh/carlosgarcia-tech/OrbitBot/branch/main/graph/badge.svg)](https://codecov.io/gh/carlosgarcia-tech/OrbitBot)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-43853D?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2DD4BF?style=flat-square)](LICENSE)
@@ -12,7 +12,7 @@ A production-grade WhatsApp automation system built with TypeScript — featurin
 
 ## Why this project exists (and what makes it interesting)
 
-Most WhatsApp bots are a `switch/case` on a message string. VaniaBot started the same way — and became unmaintainable at around 20 commands. This project is the result of rethinking the entire architecture to be modular, resilient, and scalable without rewriting core logic every time something breaks or a new feature is added.
+Most WhatsApp bots are a `switch/case` on a message string. OrbitBot started the same way — and became unmaintainable at around 20 commands. This project is the result of rethinking the entire architecture to be modular, resilient, and scalable without rewriting core logic every time something breaks or a new feature is added.
 
 The interesting engineering problems solved here:
 
@@ -28,13 +28,13 @@ The sections below explain each of these in detail.
 
 ### Core Design: Middleware Pipeline + Command Registry
 
-Instead of a monolithic message handler, every incoming message passes through a supervisor (`vania.ts` keeps the bot process alive), an event bus, and a sequential middleware chain before reaching a command. Cross-cutting concerns (registration, permissions, anti-spam, cooldowns) are completely decoupled from business logic.
+Instead of a monolithic message handler, every incoming message passes through a supervisor (`orbit.ts` keeps the bot process alive), an event bus, and a sequential middleware chain before reaching a command. Cross-cutting concerns (registration, permissions, anti-spam, cooldowns) are completely decoupled from business logic.
 
 ```mermaid
 flowchart TD
     MSG([Incoming message]) --> RT[RealTimeMessageProcessor<br/>dedupe + sequential/parallel queues]
     RT --> G{Group guards}
-    G -->|mute · vania-toggle · antilink| STOP([Handled / dropped])
+    G -->|mute · orbit-toggle · antilink| STOP([Handled / dropped])
     G -->|pass| CTX[MessageContext<br/>prefix parsing + permission loading]
     CTX --> CR{CommandRegistry lookup<br/>name or alias, lazy plugin load}
     CR -->|found| MW[Middleware chain]
@@ -52,7 +52,7 @@ flowchart TD
 
 ### Resilience: Circuit Breaker Around the AI Provider
 
-VaniaBot uses Groq (LLaMA 3) as its AI provider. The problem: external APIs fail. Instead of surfacing errors to users, every AI call runs through a circuit breaker with structured fallbacks.
+OrbitBot uses Groq (LLaMA 3) as its AI provider. The problem: external APIs fail. Instead of surfacing errors to users, every AI call runs through a circuit breaker with structured fallbacks.
 
 ```mermaid
 flowchart LR
@@ -91,7 +91,7 @@ Each instance reconnects independently with backoff (shared disconnect policy wi
 
 ### Document Pipeline: Bidirectional Conversion Bridge
 
-Most WhatsApp bots that "convert files" only go one direction (usually _something_ → PDF) using a single engine for everything. VaniaBot's converter is bidirectional and picks a different engine per format, because forcing every conversion through the same tool (typically LibreOffice) produces visibly worse output for some formats than others.
+Most WhatsApp bots that "convert files" only go one direction (usually _something_ → PDF) using a single engine for everything. OrbitBot's converter is bidirectional and picks a different engine per format, because forcing every conversion through the same tool (typically LibreOffice) produces visibly worse output for some formats than others.
 
 ```mermaid
 flowchart LR
@@ -180,9 +180,9 @@ An optional Express 5 panel (`PanelServer`) exposes health metrics and webhook r
 ## Project Structure
 
 ```
-VaniaBot/
+OrbitBot/
 ├── src/
-│   ├── vania.ts                # Supervisor: spawns the bot, IPC "ready", restart backoff
+│   ├── orbit.ts                # Supervisor: spawns the bot, IPC "ready", restart backoff
 │   ├── index.ts                # Entry point: database → client → panel
 │   │
 │   ├── commands/               # One file per command, auto-registered (15 categories)
@@ -239,7 +239,7 @@ VaniaBot/
 ### Quick start (script)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/carlosgarcia-tech/VaniaBot/main/VaniaBot.sh | bash -s v7.1.3
+curl -fsSL https://raw.githubusercontent.com/carlosgarcia-tech/OrbitBot/main/OrbitBot.sh | bash -s v7.1.3
 ```
 
 Installs Node.js, FFmpeg and other system dependencies, clones the repo, installs npm dependencies, applies the `whatsapp-rust-bridge` patch and creates a starter `.env`. Pass a version (`v7.1.3` in the example) to pin the install; without it, the script falls back to the latest published GitHub release. You'll still need to fill in your credentials in `.env` (see Configuration below).
@@ -249,7 +249,7 @@ Installs Node.js, FFmpeg and other system dependencies, clones the repo, install
 One command from a fresh Termux install (F-Droid or GitHub build):
 
 ```bash
-pkg install -y git && git clone https://github.com/carlosgarcia-tech/VaniaBot.git && cd VaniaBot && bash install-termux.sh
+pkg install -y git && git clone https://github.com/carlosgarcia-tech/OrbitBot.git && cd OrbitBot && bash install-termux.sh
 ```
 
 The script installs system dependencies (Node.js 20+, Python 3, FFmpeg, yt-dlp), the npm dependencies, applies the `whatsapp-rust-bridge` patch, creates a starter `.env` (pairing-code auth ready) and verifies the whole installation. Flags: `--minimal` for low-resource devices, `--skip-npm`, `--help`.
@@ -260,7 +260,7 @@ Termux caveats: LibreOffice does not exist on Android, so `docx→pdf` and `ppt�
 
 ```bash
 # Create required directories
-mkdir -p vaniasession subbots data temp
+mkdir -p orbitsession subbots data temp
 
 # Configure environment
 cp .env.example .env
@@ -278,8 +278,8 @@ Images are built and published automatically by CI on every push to `main` (tagg
 ### Local development
 
 ```bash
-git clone https://github.com/carlosgarcia-tech/VaniaBot.git
-cd VaniaBot
+git clone https://github.com/carlosgarcia-tech/OrbitBot.git
+cd OrbitBot
 npm install
 cp .env.example .env
 npm run dev    # hot-reload
@@ -296,7 +296,7 @@ Useful scripts:
 | `npm test`                    | full Vitest suite (~1000 tests)          |
 | `npm run test:coverage`       | coverage report                          |
 
-Auth on first run: scan the QR, or use `USE_PAIRING_CODE=true` with `PHONE_NUMBER` to get a linking code. The session persists in `SESSION_PATH` (default `./vaniasession`).
+Auth on first run: scan the QR, or use `USE_PAIRING_CODE=true` with `PHONE_NUMBER` to get a linking code. The session persists in `SESSION_PATH` (default `./orbitsession`).
 
 ---
 
@@ -322,7 +322,7 @@ Auth on first run: scan the QR, or use `USE_PAIRING_CODE=true` with `PHONE_NUMBE
 | --------------- | -------------------------------------- | ------------------------ |
 | `DB_TYPE`       | `sqlite`, `json` or `mongodb`          | `sqlite`                 |
 | `MONGODB_URI`   | MongoDB connection string (if mongodb) | —                        |
-| `SESSION_PATH`  | WhatsApp session directory             | `./vaniasession`         |
+| `SESSION_PATH`  | WhatsApp session directory             | `./orbitsession`         |
 | `CACHE_ENABLED` | In-memory cache layer                  | `true`                   |
 | `REDIS_URL`     | Redis (optional, Docker setups)        | `redis://localhost:6379` |
 
@@ -330,7 +330,7 @@ Auth on first run: scan the QR, or use `USE_PAIRING_CODE=true` with `PHONE_NUMBE
 
 | Variable                  | Description                            | Default      |
 | ------------------------- | -------------------------------------- | ------------ |
-| `BOT_NAME`                | Bot display name                       | `VaniaBot`   |
+| `BOT_NAME`                | Bot display name                       | `OrbitBot`   |
 | `BOT_PREFIX`              | Command prefix (`.` and `!` also work) | `.`          |
 | `USE_PAIRING_CODE`        | Pairing code instead of QR             | `true`       |
 | `PANEL_DISABLED`          | Disable the web panel                  | `false`      |
@@ -346,7 +346,7 @@ See [.env.example](.env.example) for the complete annotated list.
 
 ## Commands overview
 
-VaniaBot has 300+ commands in 15 categories. Every command declares `name`, `aliases`, `usage`, `examples`, `cooldown` and permissions in its own file. A static test enforces that names and aliases are globally unique in both directions, so what `.help` shows is what runs.
+OrbitBot has 300+ commands in 15 categories. Every command declares `name`, `aliases`, `usage`, `examples`, `cooldown` and permissions in its own file. A static test enforces that names and aliases are globally unique in both directions, so what `.help` shows is what runs.
 
 | Domain             | Examples                                                                 |
 | ------------------ | ------------------------------------------------------------------------ |
@@ -396,7 +396,7 @@ CI (GitHub Actions) runs build, lint, typecheck, unit+coverage and a dedicated e
 <details>
 <summary>"Session not found" error</summary>
 
-Delete the `vaniasession/` folder and restart to re-scan the pairing QR.
+Delete the `orbitsession/` folder and restart to re-scan the pairing QR.
 
 </details>
 
@@ -414,7 +414,7 @@ Delete the `vaniasession/` folder and restart to re-scan the pairing QR.
 
 ```env
 DB_TYPE=mongodb
-MONGODB_URI=mongodb://localhost:27017/vaniabot
+MONGODB_URI=mongodb://localhost:27017/orbit
 ```
 
 </details>
@@ -434,7 +434,7 @@ MONGODB_URI=mongodb://localhost:27017/vaniabot
 
 1. Run `termux-wake-lock` before starting the bot (the installer prints this step).
 2. Disable battery optimization for Termux: Android **Settings → Apps → Termux → Battery → Unrestricted**.
-3. Keep the bot supervised with PM2: `npm install -g pm2 && pm2 start vania.ts --interpreter tsx --name vaniabot && pm2 save`.
+3. Keep the bot supervised with PM2: `npm install -g pm2 && pm2 start orbit.ts --interpreter tsx --name orbit && pm2 save`.
 
 </details>
 

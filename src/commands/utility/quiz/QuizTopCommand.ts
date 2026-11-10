@@ -1,7 +1,7 @@
 /**
  * QuizTopCommand.ts
  *
- * utility command `quiztop` — Top jugadores de quiz del grupo
+ * utility command `quiztop` — Group's top quiz players
  * Usage: !quiztop [categoria?]
  *
  * @author **Carlos G**
@@ -42,7 +42,7 @@ interface TopEntry {
   bestStreak: number;
 }
 
-/** Command handler for `!quiztop`: Top jugadores de quiz del grupo. */
+/** Command handler for `!quiztop`: Group's top quiz players. */
 export class QuizTopCommand extends Command {
   name = 'quiztop';
   description = 'Top jugadores de quiz del grupo';
@@ -123,7 +123,7 @@ export class QuizTopCommand extends Command {
         `˚₊· ͟͟͞͞➳ *top quiz${category ? ` — ${category}` : ''}* ˚₊· ͟͟͞͞➳\n` +
           `﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒﹒\n\n` +
           rows +
-          `\n\n> _VaniaBot 💝 — tu compi de estudio_`,
+          `\n\n> _OrbitBot 💝 — tu compi de estudio_`,
       );
     } catch (err) {
       logError('[QuizTopCommand] Error', err);

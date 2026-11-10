@@ -1,15 +1,15 @@
 /**
  * MuteFlow.e2e.test.ts
  *
- * Silencio de un usuario de grupo de punta a punta con el bot real:
+ * End-to-end mute of a group user with the real bot:
  *
- *   admin del grupo → !mute @usuario 10m (MuteCommand + ModerationService +
- *   middlewareCache) → el usuario silenciado escribe !ping y el guard
- *   handleMutedUser borra el mensaje sin responder.
+ *   group admin → !mute @user 10m (MuteCommand + ModerationService +
+ *   middlewareCache) → the muted user sends !ping and the handleMutedUser
+ *   guard deletes the message without replying.
  *
- * También cubre las dos puertas que el comando tiene que atravesar:
- * PermissionMiddleware (admin del grupo) y el permiso de admin del bot, y
- * la vuelta atrás con !unmute.
+ * Also covers the two gates the command must pass through:
+ * PermissionMiddleware (group admin) and the bot's own admin permission,
+ * plus the undo path with !unmute.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
@@ -33,10 +33,10 @@ vi.mock('@/services/external/AIService.js', () => ({
 
 const TIMEOUT = 30_000;
 
-/** Espera a que el pipeline (queueMicrotask + setImmediate) termine. */
+/** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-/** Primer owner de configuración como JID de WhatsApp. */
+/** First configured owner as a WhatsApp JID. */
 async function ownerJid(): Promise<string> {
   const { config } = await import('@/config/index.js');
   const ownerPhone = config.owners.find(owner => !owner.includes('@lid'));
@@ -48,15 +48,15 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   let caseCounter = 0;
 
   /**
-   * Grupo, moderador y objetivo nuevos por caso: el silencio se registra en
-   * la base del harness y los contadores de anti-spam/cooldown viven durante
-   * todo el boot, así que reutilizar remitentes entre tests los contaminaría.
+   * Fresh group, moderator and target per case: mutes are stored in the
+   * harness database and the anti-spam/cooldown counters live for the whole
+   * boot, so reusing senders across tests would cross-contaminate them.
    *
-   * `botIsAdmin` decide si el bot figura como admin entre los participantes.
-   * `moderatorIsOwner` usa un owner como moderador: necesario para probar el
-   * permiso del bot sin admins en el grupo, porque BotPermissionChecker
-   * considera admin al bot si el grupo tiene algún admin aunque no aparezca
-   * en la lista de participantes.
+   * `botIsAdmin` decides whether the bot is listed as an admin participant.
+   * `moderatorIsOwner` uses an owner as the moderator: necessary to test the
+   * bot's permission with no admins in the group, because
+   * BotPermissionChecker treats the bot as admin whenever the group has any
+   * admin, even if the bot itself is missing from the participant list.
    */
   async function freshCase(options: {
     botIsAdmin?: boolean;
@@ -71,7 +71,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
     const target = senderJid(900 + caseCounter);
 
     const { serviceManager } = await import('@/services/system/Servicemanager.js');
-    await serviceManager.vaniaToggleService.enable(group, 'e2e-setup');
+    await serviceManager.orbitToggleService.enable(group, 'e2e-setup');
 
     const moderatorParticipant: FakeParticipant = moderatorIsOwner
       ? member(moderator)
@@ -104,7 +104,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
       expect(texts.some(t => t.includes('en silencio'))).toBe(true);
       expect(socket.reactions()).toContain('✅');
 
-      // El usuario silenciado escribe: el guard borra el mensaje y no responde.
+      // The muted user speaks: the guard deletes the message and does not reply.
       socket.reset();
       socket.receive(groupTextMessage('!ping', group, target));
       await wait();
@@ -125,7 +125,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
 
       expect(socket.texts()).toContain('❌ No tienes permiso para usar este comando');
 
-      // El moderador sigue sin estar silenciado: su comando sí responde.
+      // The moderator is not muted: their command still answers.
       socket.reset();
       socket.receive(groupTextMessage('!ping', group, moderator));
       await wait();
@@ -137,8 +137,8 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   it(
     'sin admin el bot no puede ejecutar el silencio',
     async () => {
-      // Owner al frente, grupo sin ningún admin: el permiso del usuario pasa
-      // pero el del bot no.
+      // Owner running things, group with no admins at all: the user's
+      // permission passes but the bot's does not.
       const { group, moderator, target } = await freshCase({
         botIsAdmin: false,
         moderatorIsOwner: true,
@@ -149,7 +149,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
 
       expect(socket.texts()).toContain('❌ El bot necesita ser admin para ejecutar este comando');
 
-      // Y el objetivo no quedó silenciado.
+      // And the target did not end up muted.
       socket.reset();
       socket.receive(groupTextMessage('!ping', group, target));
       await wait();
@@ -161,9 +161,9 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   it(
     'el bot cuenta como admin si el grupo tiene algún admin aunque no esté en la lista',
     async () => {
-      // BotPermissionChecker no encuentra al bot entre los participantes y
-      // cae al respaldo "si algún participante es admin, el bot también".
-      // Moderador admin normal, el bot ausente de los participantes.
+      // BotPermissionChecker doesn't find the bot among the participants and
+      // falls back to "if any participant is admin, so is the bot".
+      // Regular admin moderator, bot absent from the participants.
       const { group, moderator, target } = await freshCase({ botIsAdmin: false });
       await setParticipants(socket, group, [{ id: moderator, admin: 'admin' }, member(target)]);
 
@@ -249,8 +249,8 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   it(
     'sin admin en el grupo el mensaje silenciado no se borra, pero tampoco responde',
     async () => {
-      // El guard handleMutedUser solo borra si el bot es admin; el silencio
-      // sigue vigentes en el pipeline y el comando no llega a ejecutarse.
+      // handleMutedUser only deletes when the bot is admin; the mute is
+      // still live in the pipeline and the command never gets to run.
       const { group, moderator, target } = await freshCase();
 
       socket.receive(groupMentionMessage('!mute 10m', group, moderator, target, 'Moderador'));

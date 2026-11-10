@@ -1,7 +1,7 @@
 /**
  * Purgatoriomap.ts
  *
- * VaniaBot commands module exposing `Coord`, `MapNode`, `MapEdge`, `ResolvedEdge`.
+ * OrbitBot commands module exposing `Coord`, `MapNode`, `MapEdge`, `ResolvedEdge`.
  *
  * @author **Carlos G**
  */
@@ -684,9 +684,9 @@ export const ZONE_NODES: Record<ZoneId, string[]> = {
 
 export interface PrecomputedGraph {
   adjacency: Record<string, ResolvedEdge[]>;
-  /** Grado de cada nodo (número de conexiones) — usado para detectar chokepoints */
+  /** Degree of each node (number of connections) — used to detect chokepoints */
   nodeDegree: Record<string, number>;
-  /** Costo mínimo de arista en el grafo — para heurística admisible A* */
+  /** Minimum edge cost in the graph — for the admissible A* heuristic */
   minEdgeCost: number;
   /** Alias lookup */
   aliasMap: Record<string, string>;

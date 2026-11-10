@@ -1,7 +1,7 @@
 /**
  * BookCommand.ts
  *
- * creative command `book` — Genera imagen de libro
+ * creative command `book` — Generates a book image
  * Usage: !book <texto>
  *
  * @author **Carlos G**
@@ -18,7 +18,7 @@ import {
 
 const MAX_WORDS = 30;
 
-/** Command handler for `!book`: Genera imagen de libro. */
+/** Command handler for `!book`: Generates a book image. */
 export class BookCommand extends Command {
   name = 'book';
   description = 'Genera imagen de libro';
@@ -27,7 +27,7 @@ export class BookCommand extends Command {
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!book <texto>';
-  examples = ['!book Bienvenidos a VaniaBot'];
+  examples = ['!book Bienvenidos a OrbitBot'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
@@ -36,7 +36,7 @@ export class BookCommand extends Command {
     if (!input) {
       await ctx.reply(
         `📖 *Uso:* !book <texto>\n` +
-          `_Ejemplo: !book Bienvenidos a VaniaBot_\n\n` +
+          `_Ejemplo: !book Bienvenidos a OrbitBot_\n\n` +
           `✩ máximo ${MAX_WORDS} palabras`,
       );
       return;
@@ -52,7 +52,7 @@ export class BookCommand extends Command {
 
     await new CanvasBase().sendImage(ctx, 'book', {
       text: words.join(' '),
-      footer: 'VaniaBot',
+      footer: 'OrbitBot',
     });
   }
 }

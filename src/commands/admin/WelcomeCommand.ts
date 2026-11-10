@@ -1,7 +1,7 @@
 /**
  * WelcomeCommand.ts
  *
- * admin command `welcome` — Configura mensajes de bienvenida
+ * admin command `welcome` — Configure welcome messages
  * Usage: !welcome [on/off/set/test/reset/pic/nopic]
  *
  * @author **Carlos G**
@@ -12,7 +12,7 @@ import { CommandCategory, CommandContext, PermissionLevel } from '@/types/index.
 import type { MessageContext } from '@/types/index.js';
 import { welcomeService } from '@/services/system/WelcomeService.js';
 
-/** Command handler for `!welcome`: Configura mensajes de bienvenida. */
+/** Command handler for `!welcome`: Configure welcome messages. */
 export class WelcomeCommand extends Command {
   name = 'welcome';
   description = 'Configura mensajes de bienvenida';

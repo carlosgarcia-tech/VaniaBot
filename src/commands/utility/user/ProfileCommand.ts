@@ -83,11 +83,11 @@ export class ProfileCommand extends Command {
 
     const message = `
 ┌───────────────────┐
-│   ✦ VANIA BOT ✦    │
+│   ✦ ORBIT BOT ✦    │
 └───────────────────┘
 
 ◈ INFO
-   • name: ${ctx.sock.user?.name || 'VaniaBot'}
+   • name: ${ctx.sock.user?.name || 'OrbitBot'}
    • status: online
    • uptime: ${uptime}
 

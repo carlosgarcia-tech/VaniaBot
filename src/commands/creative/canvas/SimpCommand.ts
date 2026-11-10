@@ -1,8 +1,8 @@
 /**
  * SimpCommand.ts
  *
- * creative command `simp` — Efecto simp
- * Usage: !simp [@usuario]
+ * creative command `simp` — Simp effect
+ * Usage: !simp [@user]
  *
  * @author **Carlos G**
  */
@@ -17,7 +17,7 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!simp`: Efecto simp. */
+/** Command handler for `!simp`: Simp effect. */
 export class SimpCommand extends Command {
   name = 'simp';
   description = 'Efecto simp';

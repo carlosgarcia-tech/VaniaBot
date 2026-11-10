@@ -1,7 +1,7 @@
 /**
  * HelpCommand.ts
  *
- * utility command `help` — Muestra lista de comandos disponibles
+ * utility command `help` — Shows the list of available commands
  * Usage: !help [comando]
  *
  * @author **Carlos G**
@@ -50,7 +50,7 @@ const charset: Record<string, string> = {
 const toSmallCaps = (text: string): string =>
   text.toLowerCase().replace(/[a-z]/g, c => charset[c] ?? c);
 
-/** Command handler for `!help`: Muestra lista de comandos disponibles. */
+/** Command handler for `!help`: Shows the list of available commands. */
 export class HelpCommand extends Command {
   name = 'help';
   description = 'Muestra lista de comandos disponibles';
@@ -94,7 +94,7 @@ export class HelpCommand extends Command {
       command.examples.forEach(ex => (helpText += `   • ${ex}\n`));
     }
     if (command.cooldown) helpText += `\n⏱️ *Cooldown:* ${command.cooldown / 1000}s\n`;
-    helpText += `\n⌬ 𝗩𝗔𝗡𝗜𝗔 𝗕𝗢𝗧 💝`;
+    helpText += `\n⌬ 𝗢𝗥𝗕𝗜𝗧 𝗕𝗢𝗧 💝`;
 
     await ctx.reply(helpText);
   }
@@ -115,7 +115,7 @@ export class HelpCommand extends Command {
     const botName =
       ctx.chat.isGroup && isPrime
         ? await primeService.getGroupName(ctx.sock, ctx.chat.jid)
-        : 'VANIA';
+        : 'ORBIT';
 
     let userData, progress;
     try {
@@ -146,7 +146,7 @@ export class HelpCommand extends Command {
     menu += `> ⏳ ᴀᴄᴛɪᴠᴏ   » ${uptime}\n`;
     menu += `> 👥 ᴜꜱᴜᴀʀɪᴏꜱ » 1\n\n`;
     menu += `🤖 » 𝐌𝐄𝐍𝐔 ${botName} 𝐁𝐎𝐓 «\n`;
-    menu += `👑 » 𝗢𝗽𝗲𝗿𝗮𝗱𝗼𝗿𝐚: ${isPrime ? botName : '𝐕𝐚𝐧𝐢𝐚'} «\n${readmore}\n`;
+    menu += `👑 » 𝗢𝗽𝗲𝗿𝗮𝗱𝗼𝗿𝐚: ${isPrime ? botName : '𝐎𝐫𝐛𝐢𝐭'} «\n${readmore}\n`;
 
     const categoryOrder = [
       CommandCategory.UTILITY,

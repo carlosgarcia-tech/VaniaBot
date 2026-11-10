@@ -1,7 +1,7 @@
 /**
  * ProcesosCommand.ts
  *
- * owner command `procesos` — Lista procesos activos
+ * owner command `procesos` — List active processes
  * Usage: !procesos
  *
  * @author **Carlos G**
@@ -28,7 +28,7 @@ import { logError } from '@/utils/logger.js';
 
 const execAsync = promisify(exec);
 
-/** Command handler for `!procesos`: Lista procesos activos. */
+/** Command handler for `!procesos`: List active processes. */
 export class ProcesosCommand extends Command {
   name = 'procesos';
   description = 'Lista procesos activos';

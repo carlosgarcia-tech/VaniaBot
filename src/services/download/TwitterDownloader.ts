@@ -1,7 +1,7 @@
 /**
  * TwitterDownloader.ts
  *
- * VaniaBot services module exposing `TwitterDownloader`, `TwitterVideo`.
+ * OrbitBot services module exposing `TwitterDownloader`, `TwitterVideo`.
  *
  * @author **Carlos G**
  */

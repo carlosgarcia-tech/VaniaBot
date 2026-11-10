@@ -34,7 +34,7 @@ export interface CacheStats {
 
 const DEFAULT_OPTIONS: CacheOptions = {
   ttl: 300,
-  prefix: 'vania:',
+  prefix: 'orbit:',
 };
 
 export class RedisCacheService {

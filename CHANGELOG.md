@@ -1,85 +1,85 @@
 # Changelog
 
-Todos los cambios notables de este proyecto se documentan en este archivo.
+All notable changes to this project are documented in this file.
 
-El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
-y el versionado sigue [Semantic Versioning](https://semver.org/lang/es/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [7.1.3] - 2026-10-01
 
 ### Changed
 
-- Convención de tags de la imagen Docker unificada sin prefijo `v` entre ambos pipelines: `ci.yml` (push a main) y `release.yml` (tags de Git) publican ahora los mismos formatos `X.Y.Z`, `X.Y`, `X` y `latest`, siguiendo la convención habitual de los registros Docker.
+- Unified Docker image tag convention without the `v` prefix across both pipelines: `ci.yml` (push to main) and `release.yml` (Git tags) now publish the same `X.Y.Z`, `X.Y`, `X` and `latest` formats, following common Docker registry conventions.
 
 ### Fixed
 
-- El patrón `{{minor}}` de `metadata-action` producía solo el dígito minor (tags basura `1`, `6`, `12`... en ghcr.io) en lugar del minor flotante; ahora usa `{{major}}.{{minor}}` y cada release publica el tag `X.Y`.
+- The `{{minor}}` pattern of `metadata-action` produced only the minor digit (junk tags `1`, `6`, `12`... on ghcr.io) instead of the floating minor; it now uses `{{major}}.{{minor}}` and each release publishes the `X.Y` tag.
 
 ### Removed
 
-- El tag crudo de Git (`vX.Y.Z`) ya no se publica en la imagen Docker del release: los patrones semver cubren la versión completa y el crudo solo duplicaba el release con otra convención.
+- The raw Git tag (`vX.Y.Z`) is no longer published on the release Docker image: the semver patterns cover the full version and the raw tag only duplicated the release under a different convention.
 
 ## [7.1.2] - 2026-10-01
 
 ### Added
 
-- Script de instalación rápida `VaniaBot.sh` versionado en el repositorio, que reemplaza al gist externo del quick start: resuelve la versión a instalar del argumento (con o sin `v`), del `package.json` local o del último release publicado en GitHub, detecta apt/dnf/pacman, exige Node.js 20+, aplica el parche de `whatsapp-rust-bridge` y crea un `.env` inicial con autenticación por código de pareo.
-- `VaniaBot.sh` incluido en el job de `shellcheck` del CI.
+- Quick install script `OrbitBot.sh` versioned in the repository, replacing the external gist from the quick start: resolves the version to install from the argument (with or without `v`), the local `package.json`, or the latest GitHub release; detects apt/dnf/pacman, requires Node.js 20+, applies the `whatsapp-rust-bridge` patch and creates an initial `.env` with pairing-code authentication.
+- `OrbitBot.sh` included in the CI `shellcheck` job.
 
 ### Changed
 
-- `install-termux.sh` muestra la versión del proyecto leída dinámicamente de `package.json` (header, ayuda, log y banner) en lugar de una versión fija que quedaba desactualizada en cada release, con el mismo mecanismo sin dependencias (`sed`) y fallback si el archivo no existe.
+- `install-termux.sh` now shows the project version read dynamically from `package.json` (header, help, log and banner) instead of a fixed version that went stale on every release, using the same dependency-free mechanism (`sed`) with a fallback when the file is missing.
 
 ### Fixed
 
-- La URL del quick start del README apuntaba a un gist inexistente (404); ahora sirve el script desde `raw.githubusercontent.com` y el ejemplo va fijado a la versión del release.
+- The README quick start URL pointed to a nonexistent gist (404); it now serves the script from `raw.githubusercontent.com` and the example is pinned to the release version.
 
 ## [7.1.1] - 2026-10-01
 
 ### Added
 
-- Job `shellcheck` en el pipeline de CI que valida los scripts `.sh` del repositorio (`deploy.sh`, `entrypoint.sh`, `install-termux.sh`, `stop.sh`) en cada push y PR, y bloquea la publicación de la imagen Docker si falla.
-- Sección "Termux (Android)" en el README con la instalación en un solo comando y una sección de solución de problemas con los errores típicos de Termux (bot detenido al dormir el teléfono, `npm install` con OOM, arranque tras instalar, versión de Node, permisos de almacenamiento y conversiones sin LibreOffice).
+- `shellcheck` job in the CI pipeline validating the repository `.sh` scripts (`deploy.sh`, `entrypoint.sh`, `install-termux.sh`, `stop.sh`) on every push and PR, blocking the Docker image publication on failure.
+- "Termux (Android)" section in the README with the one-command install and a troubleshooting section for typical Termux errors (bot stopped when the phone sleeps, `npm install` OOM, startup after install, Node version, storage permissions and conversions without LibreOffice).
 
 ### Changed
 
-- `install-termux.sh` adaptado a la serie 7.x: requisito de Node.js 20+ con verificación explícita, instalación de PyMuPDF, pdf2docx y python-pptx para el puente de conversión de documentos, symlink `python3` para `PythonBridge`, `.env` inicial con `PHONE_NUMBER` y `USE_PAIRING_CODE` (pareo en lugar de QR), creación de los directorios `data/assets` y `data/backups`, y aviso de la limitación de LibreOffice en Android.
-- Limpieza de formato en LICENSE (sin líneas decorativas) y tablas del README alineadas.
+- `install-termux.sh` adapted to the 7.x series: Node.js 20+ requirement with explicit verification, installation of PyMuPDF, pdf2docx and python-pptx for the document conversion bridge, `python3` symlink for `PythonBridge`, initial `.env` with `PHONE_NUMBER` and `USE_PAIRING_CODE` (pairing instead of QR), creation of `data/assets` and `data/backups` directories, and a warning about the LibreOffice limitation on Android.
+- Format cleanup in LICENSE (no decorative lines) and aligned README tables.
 
 ### Fixed
 
-- `install-termux.sh`: el modo `--minimal` no aplicaba el parche de `whatsapp-rust-bridge` porque `--ignore-scripts` se salta el `postinstall` y el bot no arrancaba; ahora el parche se aplica siempre. Patrones `A && B || C` reemplazados por `if/else` explícitos (ShellCheck SC2015).
-- `entrypoint.sh`: el shebang estaba en la segunda línea, por lo que ejecutar el entrypoint de Docker directamente fallaba al no encontrar el intérprete (ShellCheck SC1128).
-- `deploy.sh`: variables sin uso eliminadas (`STEEL`, `DB_AFTER`, `mnt`) y declaraciones `local` separadas de sus asignaciones para no enmascarar códigos de salida (ShellCheck SC2034/SC2155).
+- `install-termux.sh`: `--minimal` mode did not apply the `whatsapp-rust-bridge` patch because `--ignore-scripts` skips the `postinstall` and the bot would not start; the patch is now always applied. `A && B || C` patterns replaced with explicit `if/else` (ShellCheck SC2015).
+- `entrypoint.sh`: the shebang was on the second line, so running the Docker entrypoint directly failed because it could not find the interpreter (ShellCheck SC1128).
+- `deploy.sh`: unused variables removed (`STEEL`, `DB_AFTER`, `mnt`) and `local` declarations separated from their assignments to avoid masking exit codes (ShellCheck SC2034/SC2155).
 
 ## [7.1.0] - 2026-10-01
 
 ### Added
 
-- Comando owner `!loteria reiniciar` (alias `reset`) que permite reiniciar la lotería desde el chat, con persistencia del estado entre reinicios del bot.
-- Tickets de lotería con códigos únicos generados mediante `crypto.randomBytes`.
-- Suite end-to-end del pipeline principal (`!ping` completo, comandos sin prefijo, deduplicación de mensajes, eco offline) construida sobre un harness con `FakeWASocket` inyectado a través de `WASocketFactory`.
-- Job dedicado `e2e` en el pipeline de CI que bloquea la publicación de la imagen Docker hasta superar las pruebas end-to-end.
-- Reporte de cobertura a Codecov y badges de CI y cobertura en el README.
+- Owner command `!lottery reset` (alias `--reset`) that allows restarting the lottery from the chat, with state persistence across bot restarts.
+- Lottery tickets with unique codes generated via `crypto.randomBytes`.
+- End-to-end suite for the main pipeline (full `!ping`, prefixless commands, message deduplication, offline echo) built on a harness with a `FakeWASocket` injected through `WASocketFactory`.
+- Dedicated `e2e` job in the CI pipeline that blocks Docker image publication until the end-to-end tests pass.
+- Coverage report to Codecov plus CI and coverage badges in the README.
 
 ### Fixed
 
-- El alias `ping` quedaba eclipsado por `HealthCommand`; ahora responde `PingCommand`. Se añadió una prueba anti-colisión cruzada (nombre contra alias) al test de unicidad de comandos.
-- Resueltas 14 colisiones de alias entre comandos (`kick` → moderación, `top` → leaderboards, `verdad` → juego, `search` → búsqueda web con `SearchCommand` renombrado a `encontrar`, `quote`, `backup`/`respaldar` separados, subbots, `health`, `votar`, `traducir`, `poesia`, `flirt`, `amor`, `patear`).
+- The `ping` alias was shadowed by `HealthCommand`; it now resolves to `PingCommand`. A cross-collision test (command name vs alias) was added to the command uniqueness test.
+- Fixed 14 alias collisions between commands (`kick` → moderation, `top` → leaderboards, `truth` → game, `search` → web search with `SearchCommand` renamed to `find`, `quote`, `backup`/`restore` split, subbots, `health`, `vote`, `translate`, `poetry`, `flirt`, `love`, `kickout`).
 
 ### Changed
 
-- README reescrito para reflejar el estado real del proyecto (instalación, comandos, arquitectura y despliegue).
-- La cobertura de pruebas se reporta en formato `lcov` para su envío a Codecov.
+- README rewritten to reflect the real state of the project (install, commands, architecture, deployment).
+- Test coverage is reported in `lcov` format for Codecov submission.
 
 ## [7.0.1] - 2026-06-26
 
 ### Fixed
 
-- `parseCommand` solo aceptaba `config.prefix`, mientras que el pipeline detectaba comandos con `config.prefix`, `.` y `!`. Si el prefijo usado no coincidía exactamente, el comando se descartaba en silencio. Ahora `parseCommand` busca el primer prefijo coincidente entre `[config.prefix, '.', '!']`.
-- Null-safety en `loadReminders`, `loadPolls` y `loadListas` de `PersistenceService`: los datos nulos o corruptos en Redis provocaban excepciones del tipo `Cannot read properties of null`. Se agregaron verificaciones antes de acceder a las propiedades.
-- Los errores al instanciar comandos en `PluginLoader` se registraban sin identificar el archivo causante; ahora el contexto del error incluye el archivo.
+- `parseCommand` only accepted `config.prefix`, while the pipeline detected commands with `config.prefix`, `.` and `!`. If the used prefix did not match exactly, the command was silently dropped. `parseCommand` now looks for the first matching prefix among `[config.prefix, '.', '!']`.
+- Null-safety in `loadReminders`, `loadPolls` and `loadLists` of `PersistenceService`: null or corrupted data in Redis caused exceptions of the type `Cannot read properties of null`. Property access is now pre-checked.
+- Errors when instantiating commands in `PluginLoader` were logged without identifying the offending file; the error context now includes the file.
 
 ## [7.0.0] - 2026-06-23
 
-- Lanzamiento de la serie 7.x. Las versiones anteriores no cuentan con changelog detallado.
+- Launch of the 7.x series. Previous versions have no detailed changelog.

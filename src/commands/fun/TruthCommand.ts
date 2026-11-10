@@ -1,7 +1,7 @@
 /**
  * TruthCommand.ts
  *
- * fun command `truth` — Obtiene una pregunta de verdad aleatoria
+ * fun command `truth` — Gets a random truth question
  * Usage: !truth
  *
  * @author **Carlos G**
@@ -60,12 +60,12 @@ const TRUTH_QUESTIONS = [
   '¿Cuál es la verdad que escondes de tu familia?',
 ];
 
-/** Command handler for `!truth`: Obtiene una pregunta de verdad aleatoria. */
+/** Command handler for `!truth`: Gets a random truth question. */
 export class TruthCommand extends Command {
   name = 'truth';
   description = 'Obtiene una pregunta de verdad aleatoria';
   category = CommandCategory.FUN;
-  // Sin alias 'verdad': es el name de VerdadRetoCommand (juego completo).
+  // No alias 'verdad': it is the name of VerdadRetoCommand (full game).
   aliases = ['verdad_o_reto'];
   cooldown = 8000;
   contexts = [CommandContext.BOTH];

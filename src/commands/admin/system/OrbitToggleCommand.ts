@@ -1,8 +1,8 @@
 /**
- * VaniaToggleCommand.ts
+ * OrbitToggleCommand.ts
  *
- * admin command `vaniaoff` — Desactiva a Vania en este grupo
- * Usage: !vaniaoff [slot]
+ * admin command `orbitoff` — Disables Orbit in this group
+ * Usage: !orbitoff [slot]
  *
  * @author **Carlos G**
  */
@@ -17,16 +17,16 @@ import {
 import { logError } from '@/utils/logger.js';
 import { serviceManager } from '@/services/system/Servicemanager.js';
 
-/** Command handler for `!vaniaoff`: Desactiva a Vania en este grupo. */
-export class VaniaOffCommand extends Command {
-  name = 'vaniaoff';
-  description = 'Desactiva a Vania en este grupo';
+/** Command handler for `!orbitoff`: Disables Orbit in this group. */
+export class OrbitOffCommand extends Command {
+  name = 'orbitoff';
+  description = 'Desactiva a Orbit en este grupo';
   category = CommandCategory.ADMIN;
-  aliases = ['vaniaoff', 'botoff', 'apagar'];
+  aliases = ['orbitoff', 'botoff', 'apagar'];
   cooldown = 3000;
   contexts = [CommandContext.GROUP];
-  usage = '!vaniaoff [slot]';
-  examples = ['!vaniaoff', '!vaniaoff 1', '!vaniaoff 2'];
+  usage = '!orbitoff [slot]';
+  examples = ['!orbitoff', '!orbitoff 1', '!orbitoff 2'];
   permissions = { user: [PermissionLevel.OWNER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
@@ -42,42 +42,42 @@ export class VaniaOffCommand extends Command {
         }
       }
 
-      const isEnabled = await serviceManager.vaniaToggleService.isEnabled(
+      const isEnabled = await serviceManager.orbitToggleService.isEnabled(
         ctx.chat.jid,
         targetBotId,
       );
 
       if (!isEnabled) {
-        const botName = targetSlot ? `SubBot ${targetSlot}` : 'Vania';
+        const botName = targetSlot ? `SubBot ${targetSlot}` : 'Orbit';
         await ctx.reply(`🔴 *${botName} ya está desactivada* en este grupo.`);
         return;
       }
 
-      await serviceManager.vaniaToggleService.disable(ctx.chat.jid, ctx.sender.jid, targetBotId);
+      await serviceManager.orbitToggleService.disable(ctx.chat.jid, ctx.sender.jid, targetBotId);
 
-      const botName = targetSlot ? `SubBot ${targetSlot}` : 'Vania';
+      const botName = targetSlot ? `SubBot ${targetSlot}` : 'Orbit';
       await ctx.react('🔴');
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *${botName} está descansando* ˚₊· ͟͟͞͞➳\n\n` +
-          `No voy a responder hasta que me activen con *!vaniaon${targetSlot ? ' ' + targetSlot : ''}*.\n\n` +
+          `No voy a responder hasta que me activen con *!orbiton${targetSlot ? ' ' + targetSlot : ''}*.\n\n` +
           `_Me apagó @${ctx.sender.pushName || 'admin'}_ ✿`,
       );
     } catch (error) {
-      logError('[VaniaOff] Error', error);
+      logError('[OrbitOff] Error', error);
       await ctx.reply('❌ Ocurrió un error. Intenta de nuevo.');
     }
   }
 }
 
-export class VaniaOnCommand extends Command {
-  name = 'vaniaon';
-  description = 'Activa a Vania en este grupo';
+export class OrbitOnCommand extends Command {
+  name = 'orbiton';
+  description = 'Activa a Orbit en este grupo';
   category = CommandCategory.ADMIN;
-  aliases = ['vaniaon', 'boton', 'encender'];
+  aliases = ['orbiton', 'boton', 'encender'];
   cooldown = 3000;
   contexts = [CommandContext.GROUP];
-  usage = '!vaniaon [slot]';
-  examples = ['!vaniaon', '!vaniaon 1', '!vaniaon 2'];
+  usage = '!orbiton [slot]';
+  examples = ['!orbiton', '!orbiton 1', '!orbiton 2'];
   permissions = { user: [PermissionLevel.OWNER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
@@ -93,20 +93,20 @@ export class VaniaOnCommand extends Command {
         }
       }
 
-      const isEnabled = await serviceManager.vaniaToggleService.isEnabled(
+      const isEnabled = await serviceManager.orbitToggleService.isEnabled(
         ctx.chat.jid,
         targetBotId,
       );
 
       if (isEnabled) {
-        const botName = targetSlot ? `SubBot ${targetSlot}` : 'Vania';
+        const botName = targetSlot ? `SubBot ${targetSlot}` : 'Orbit';
         await ctx.reply(`🟢 *${botName} ya está activada* en este grupo.`);
         return;
       }
 
-      await serviceManager.vaniaToggleService.enable(ctx.chat.jid, ctx.sender.jid, targetBotId);
+      await serviceManager.orbitToggleService.enable(ctx.chat.jid, ctx.sender.jid, targetBotId);
 
-      const botName = targetSlot ? `SubBot ${targetSlot}` : 'Vania';
+      const botName = targetSlot ? `SubBot ${targetSlot}` : 'Orbit';
       await ctx.react('🟢');
       await ctx.reply(
         `˚₊· ͟͟͞͞➳ *${botName} ya está aquí* ˚₊· ͟͟͞͞➳\n\n` +
@@ -114,31 +114,31 @@ export class VaniaOnCommand extends Command {
           `_Me encendió @${ctx.sender.pushName || 'admin'}_ ✩`,
       );
     } catch (error) {
-      logError('[VaniaOn] Error', error);
+      logError('[OrbitOn] Error', error);
       await ctx.reply('❌ Ocurrió un error. Intenta de nuevo.');
     }
   }
 }
 
-export class VaniaStatusCommand extends Command {
-  name = 'vaniastatus';
-  description = 'Muestra el estado de Vania en este grupo';
+export class OrbitStatusCommand extends Command {
+  name = 'orbitstatus';
+  description = 'Muestra el estado de Orbit en este grupo';
   category = CommandCategory.ADMIN;
-  aliases = ['vaniastatus', 'botstatus'];
+  aliases = ['orbitstatus', 'botstatus'];
   cooldown = 3000;
   contexts = [CommandContext.GROUP];
-  usage = '!vaniastatus';
-  examples = ['!vaniastatus'];
+  usage = '!orbitstatus';
+  examples = ['!orbitstatus'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
     try {
-      const { enabled, record } = await serviceManager.vaniaToggleService.getStatus(
+      const { enabled, record } = await serviceManager.orbitToggleService.getStatus(
         ctx.chat.jid,
         ctx.botId,
       );
 
-      const botName = ctx.botId === 'main' ? 'Vania' : ctx.botId;
+      const botName = ctx.botId === 'main' ? 'Orbit' : ctx.botId;
       const status = enabled ? '🟢 *Activada*' : '🔴 *Desactivada*';
 
       let info = `📊 *Estado de ${botName}*\n\n${status}`;
@@ -155,7 +155,7 @@ export class VaniaStatusCommand extends Command {
 
       await ctx.reply(info);
     } catch (error) {
-      logError('[VaniaStatus] Error', error);
+      logError('[OrbitStatus] Error', error);
       await ctx.reply('❌ Ocurrió un error. Intenta de nuevo.');
     }
   }

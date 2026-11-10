@@ -1,7 +1,7 @@
 /**
  * ExternalAPIsCommand.ts
  *
- * utility command `wikipedia` — Buscar en Wikipedia
+ * utility command `wikipedia` — Search Wikipedia
  * Usage: .wikipedia <tema>
  *
  * @author **Carlos G**
@@ -13,7 +13,7 @@ import type { MessageContext } from '@/types/index.js';
 import axios from 'axios';
 import { logger } from '@/utils/logger.js';
 
-/** Command handler for `!wikipedia`: Buscar en Wikipedia. */
+/** Command handler for `!wikipedia`: Search Wikipedia. */
 export class WikipediaCommand extends Command {
   name = 'wikipedia';
   description = 'Buscar en Wikipedia';
@@ -42,7 +42,7 @@ export class WikipediaCommand extends Command {
         {
           timeout: 10000,
           headers: {
-            'User-Agent': 'VaniaBot/1.0 (WhatsApp Bot)',
+            'User-Agent': 'OrbitBot/1.0 (WhatsApp Bot)',
             Accept: 'application/json',
           },
         },
@@ -107,7 +107,7 @@ export class DefineCommand extends Command {
         {
           timeout: 10000,
           headers: {
-            'User-Agent': 'VaniaBot/1.0 (WhatsApp Bot)',
+            'User-Agent': 'OrbitBot/1.0 (WhatsApp Bot)',
           },
         },
       );

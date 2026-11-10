@@ -85,7 +85,7 @@ describe('ShopService', () => {
     const badges = service.getItemsByType('badge');
     expect(badges.every(i => i.type === 'badge')).toBe(true);
 
-    // Tipo sin items también devuelve array vacío, no error
+    // Type without items also returns an empty array, not an error
     expect(service.getItemsByType('cosmetic')).toBeInstanceOf(Array);
   });
 

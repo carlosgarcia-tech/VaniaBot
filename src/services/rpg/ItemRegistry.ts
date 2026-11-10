@@ -1,7 +1,7 @@
 /**
  * ItemRegistry.ts
  *
- * VaniaBot services module exposing `ItemRegistry`, `RPGItemStats`, `RPGItem`, `itemRegistry`.
+ * OrbitBot services module exposing `ItemRegistry`, `RPGItemStats`, `RPGItem`, `itemRegistry`.
  *
  * @author **Carlos G**
  */

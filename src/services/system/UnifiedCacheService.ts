@@ -32,7 +32,7 @@ export interface UnifiedCacheOptions {
 const DEFAULT_OPTIONS: UnifiedCacheOptions = {
   useRedis: true,
   ttl: 300,
-  prefix: 'vania:',
+  prefix: 'orbit:',
 };
 
 export class UnifiedCacheService {
@@ -94,8 +94,8 @@ export class UnifiedCacheService {
           return result;
         }
       } catch (error) {
-        // Redis caído con redisReady=true: sin este log el fallo de capa
-        // era invisible (todo caía al fallback de memoria en silencio).
+        // Redis down with redisReady=true: without this log the layer
+        // failure was invisible (everything fell back to memory silently).
         logger.warn(`[UnifiedCache] Redis GET failed for ${fullKey}:`, error);
       }
     }

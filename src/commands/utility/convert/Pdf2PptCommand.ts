@@ -1,8 +1,8 @@
 /**
  * Pdf2PptCommand.ts
  *
- * utility command `pdf2ppt` — Convierte un PDF a PowerPoint (páginas como imágenes, no editable)
- * Usage: !pdf2ppt (responder a un archivo PDF)
+ * utility command `pdf2ppt` — Converts a PDF to PowerPoint (pages as images, not editable)
+ * Usage: !pdf2ppt (reply to a PDF file)
  *
  * @author **Carlos G**
  */
@@ -15,7 +15,7 @@ import { TooManyPagesError } from '@/services/convert/PythonBridge.js';
 import { extractDocumentMessage } from '@/services/convert/extractDocumentMessage.js';
 import { logError } from '@/utils/logger.js';
 
-/** Command handler for `!pdf2ppt`: Convierte un PDF a PowerPoint (páginas como imágenes, no editable). */
+/** Command handler for `!pdf2ppt`: Converts a PDF to PowerPoint (pages as images, not editable). */
 export class Pdf2PptCommand extends Command {
   name = 'pdf2ppt';
   description = 'Convierte un PDF a PowerPoint (páginas como imágenes, no editable)';

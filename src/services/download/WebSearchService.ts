@@ -1,7 +1,7 @@
 /**
  * WebSearchService.ts
  *
- * VaniaBot services module exposing `WebSearchService`, `SearchResult`, `webSearchService`.
+ * OrbitBot services module exposing `WebSearchService`, `SearchResult`, `webSearchService`.
  *
  * @author **Carlos G**
  */

@@ -111,13 +111,13 @@ export class PrimeService {
    */
   async formatFooter(sock: WASocket, groupJid: string, isGroup: boolean): Promise<string> {
     if (!isGroup) {
-      return '> VaniaBot💝';
+      return '> OrbitBot💝';
     }
 
     const primeEnabled = await this.isPrimeEnabled(groupJid);
 
     if (!primeEnabled) {
-      return '> VaniaBot💝';
+      return '> OrbitBot💝';
     }
 
     const groupName = await this.getGroupName(sock, groupJid);
@@ -134,13 +134,13 @@ export class PrimeService {
     isGroup: boolean,
   ): Promise<{ pack: string; author: string }> {
     if (!isGroup) {
-      return { pack: 'VaniaBot', author: 'VaniaBot' };
+      return { pack: 'OrbitBot', author: 'OrbitBot' };
     }
 
     const primeEnabled = await this.isPrimeEnabled(groupJid);
 
     if (!primeEnabled) {
-      return { pack: 'VaniaBot', author: 'VaniaBot' };
+      return { pack: 'OrbitBot', author: 'OrbitBot' };
     }
 
     const groupName = await this.getGroupName(sock, groupJid);

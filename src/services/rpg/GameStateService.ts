@@ -1,7 +1,7 @@
 /**
  * GameStateService.ts
  *
- * VaniaBot services module exposing `PersistedMarketOffer`, `PersistedUserMissions`, `PersistedActiveCombat`, `PersistedLoan`.
+ * OrbitBot services module exposing `PersistedMarketOffer`, `PersistedUserMissions`, `PersistedActiveCombat`, `PersistedLoan`.
  *
  * @author **Carlos G**
  */

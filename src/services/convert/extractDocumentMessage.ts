@@ -1,7 +1,7 @@
 /**
  * extractDocumentMessage.ts
  *
- * VaniaBot services module exposing `extractDocumentMessage`.
+ * OrbitBot services module exposing `extractDocumentMessage`.
  *
  * @author **Carlos G**
  */
@@ -10,9 +10,9 @@ import type { WAMessage } from 'baileys';
 import type { MessageContext } from '@/types/index.js';
 
 /**
- * Extrae el WAMessage correspondiente a un documento adjunto,
- * ya sea citado (quoted) o enviado directamente junto al comando.
- * Devuelve null si no hay ningún documento presente.
+ * Extracts the WAMessage for an attached document, either quoted
+ * or sent directly alongside the command.
+ * Returns null if no document is present.
  */
 export function extractDocumentMessage(ctx: MessageContext): WAMessage | null {
   const quotedMsg = ctx.quoted;
