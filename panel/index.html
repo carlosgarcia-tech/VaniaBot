@@ -1,2616 +1,1853 @@
 <!doctype html>
-<html lang="es">
-    <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OrbitBot Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
-
-      :root {
-        --bg-deep: #050a1a;
-        --bg-card: rgba(15, 20, 40, 0.8);
-        --aurora-green: #00d4aa;
-        --aurora-indigo: #818CF8;
-        --aurora-blue: #00b4d8;
-        --aurora-purple: #7b2fff;
-        --text-primary: #e8f1f5;
-        --text-muted: rgba(232, 241, 245, 0.6);
-        --glow-green: 0 0 20px rgba(0, 212, 170, 0.3);
-        --glow-indigo: 0 0 20px rgba(129, 140, 248, 0.35);
-        --glow-blue: 0 0 20px rgba(0, 180, 216, 0.3);
-        --noise-opacity: 0.03;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-        background: var(--bg-deep);
-        color: var(--text-primary);
-        min-height: 100vh;
-        position: relative;
-        overflow-x: hidden;
-      }
-
-      /* Animated Aurora Mesh Background */
-      body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background:
-          radial-gradient(ellipse at 20% 50%, rgba(0, 212, 170, 0.15) 0%, transparent 50%),
-          radial-gradient(ellipse at 80% 20%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
-          radial-gradient(ellipse at 50% 80%, rgba(0, 180, 216, 0.1) 0%, transparent 50%),
-          radial-gradient(ellipse at 90% 90%, rgba(123, 47, 255, 0.08) 0%, transparent 50%);
-        animation: auroraShift 20s ease-in-out infinite alternate;
-        z-index: 0;
-        pointer-events: none;
-      }
-
-      @keyframes auroraShift {
-        0% {
-          background-position: 0% 0%;
-          filter: hue-rotate(0deg);
-        }
-        100% {
-          background-position: 100% 100%;
-          filter: hue-rotate(30deg);
-        }
-      }
-
-      /* Noise Texture Overlay */
-      body::after {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: var(--noise-opacity);
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        z-index: 1;
-        pointer-events: none;
-      }
-
-      .dashboard {
-        max-width: 1600px;
-        margin: 0 auto;
-        padding: 2rem 1.5rem;
-        position: relative;
-        z-index: 2;
-        animation: fadeIn 1s ease-out;
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.2rem 1.8rem;
-        background: var(--bg-card);
-        backdrop-filter: blur(20px);
-        border-radius: 16px 4px 16px 4px;
-        margin-bottom: 2rem;
-        border: 1px solid rgba(0, 212, 170, 0.1);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        animation: slideInLeft 0.8s ease-out;
-      }
-
-      @keyframes slideInLeft {
-        from { opacity: 0; transform: translateX(-40px) rotate(-2deg); }
-        to { opacity: 1; transform: translateX(0) rotate(0deg); }
-      }
-
-      .logo {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        transform: rotate(-5deg);
-      }
-
-      .logo-emoji {
-        font-size: 3rem;
-        filter: drop-shadow(0 0 10px var(--aurora-green));
-        animation: float 3s ease-in-out infinite;
-      }
-
-      @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-8px); }
-      }
-
-      .logo h1 {
-        font-family: 'Outfit', sans-serif;
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: 0.05em;
-        background: linear-gradient(135deg, var(--aurora-green) 0%, var(--aurora-indigo) 50%, var(--aurora-blue) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 40px rgba(0, 212, 170, 0.5);
-        font-style: italic;
-      }
-
-      .header-status {
-        display: flex;
-        align-items: center;
-        gap: 1.2rem;
-      }
-
-      .status-badge {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        padding: 0.6rem 1.2rem;
-        background: rgba(0, 212, 170, 0.1);
-        border-radius: 2rem;
-        font-size: 0.875rem;
-        color: var(--aurora-green);
-        border: 1px solid rgba(0, 212, 170, 0.2);
-        backdrop-filter: blur(10px);
-      }
-
-      .status-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--aurora-green);
-        position: relative;
-      }
-
-      .status-dot::before {
-        content: '';
-        position: absolute;
-        top: -4px;
-        left: -4px;
-        right: -4px;
-        bottom: -4px;
-        border-radius: 50%;
-        background: var(--aurora-green);
-        opacity: 0.4;
-        animation: pulseRing 2s ease-out infinite;
-      }
-
-      @keyframes pulseRing {
-        0% { transform: scale(1); opacity: 0.4; }
-        100% { transform: scale(2); opacity: 0; }
-      }
-
-      .status-dot.warning {
-        background: var(--aurora-indigo);
-      }
-      .status-dot.warning::before {
-        background: var(--aurora-indigo);
-      }
-      .status-dot.danger {
-        background: #ff4757;
-      }
-      .status-dot.danger::before {
-        background: #ff4757;
-      }
-
-      .refresh-btn {
-        background: linear-gradient(135deg, var(--aurora-green), var(--aurora-blue));
-        border: none;
-        color: #050a1a;
-        padding: 0.6rem 1.4rem;
-        border-radius: 2rem;
-        cursor: pointer;
-        font-weight: 700;
-        font-family: 'Outfit', sans-serif;
-        font-size: 0.9rem;
-        letter-spacing: 0.03em;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
-      }
-
-      .refresh-btn:hover {
-        transform: translateY(-2px) scale(1.05);
-        box-shadow: 0 8px 25px rgba(0, 212, 170, 0.5);
-      }
-
-      /* Asymmetric Grid */
-      .grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr;
-        gap: 1.2rem;
-        margin-bottom: 2rem;
-      }
-
-      .grid > :nth-child(4),
-      .grid > :nth-child(5),
-      .grid > :nth-child(6) {
-        grid-column: span 1;
-      }
-
-      .stat-card {
-        background: var(--bg-card);
-        backdrop-filter: blur(20px);
-        border-radius: 16px 4px 16px 4px;
-        padding: 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        animation: slideUp 0.6s ease-out forwards;
-        opacity: 0;
-      }
-
-      .stat-card:nth-child(1) { animation-delay: 0.1s; }
-      .stat-card:nth-child(2) { animation-delay: 0.2s; }
-      .stat-card:nth-child(3) { animation-delay: 0.3s; }
-      .stat-card:nth-child(4) { animation-delay: 0.4s; }
-      .stat-card:nth-child(5) { animation-delay: 0.5s; }
-      .stat-card:nth-child(6) { animation-delay: 0.6s; }
-
-      @keyframes slideUp {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--aurora-green), var(--aurora-indigo), var(--aurora-blue));
-        opacity: 0;
-        transition: opacity 0.4s;
-      }
-
-      .stat-card:hover::before {
-        opacity: 1;
-      }
-
-      .stat-card:hover {
-        background: rgba(15, 20, 40, 0.9);
-        transform: translateY(-4px);
-        box-shadow: var(--glow-green), 0 12px 40px rgba(0, 0, 0, 0.5);
-        border-color: rgba(0, 212, 170, 0.2);
-      }
-
-      .stat-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-
-      .stat-label {
-        font-family: 'Outfit', sans-serif;
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.15em;
-        font-weight: 600;
-      }
-
-      .stat-icon {
-        font-size: 1.5rem;
-        opacity: 0.9;
-        filter: drop-shadow(0 0 8px rgba(0, 212, 170, 0.5));
-      }
-
-      .stat-value {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 2.5rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, var(--aurora-green) 0%, var(--aurora-blue) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        line-height: 1;
-        margin: 0.5rem 0;
-      }
-
-      .stat-sub {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        margin-top: 0.5rem;
-      }
-
-      .section {
-        background: var(--bg-card);
-        backdrop-filter: blur(20px);
-        border-radius: 16px 4px 16px 4px;
-        padding: 1.8rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-      }
-
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid rgba(0, 212, 170, 0.1);
-      }
-
-      .section-title {
-        font-family: 'Outfit', sans-serif;
-        font-size: 1.2rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        letter-spacing: 0.02em;
-        background: linear-gradient(135deg, var(--text-primary) 0%, var(--aurora-green) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .tabs {
-        display: flex;
-        gap: 0.6rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-        padding: 0.5rem;
-        background: rgba(15, 20, 40, 0.5);
-        border-radius: 3rem;
-        backdrop-filter: blur(10px);
-      }
-
-      .tab {
-        padding: 0.7rem 1.4rem;
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 2rem;
-        color: var(--text-muted);
-        font-weight: 600;
-        font-family: 'Outfit', sans-serif;
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 0.9rem;
-        letter-spacing: 0.03em;
-      }
-
-      .tab:hover {
-        border-color: rgba(0, 212, 170, 0.3);
-        color: var(--text-primary);
-        background: rgba(0, 212, 170, 0.05);
-      }
-
-      .tab.active {
-        background: linear-gradient(135deg, var(--aurora-green), var(--aurora-blue));
-        border-color: transparent;
-        color: #050a1a;
-        font-weight: 700;
-        box-shadow: 0 4px 15px rgba(0, 212, 170, 0.4);
-      }
-
-      .tab-content {
-        display: none;
-        animation: fadeIn 0.5s ease-out;
-      }
-      .tab-content.active {
-        display: block;
-      }
-
-      .chart-container {
-        position: relative;
-        height: 300px;
-        margin-top: 1rem;
-      }
-
-      .two-col {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-      }
-
-      @media (max-width: 1024px) {
-        .two-col {
-          grid-template-columns: 1fr;
-        }
-        .grid {
-          grid-template-columns: 1fr 1fr;
-        }
-        .grid > :first-child {
-          grid-column: span 2;
-        }
-      }
-
-      @media (max-width: 768px) {
-        .grid {
-          grid-template-columns: 1fr;
-        }
-        .grid > :first-child {
-          grid-column: span 1;
-        }
-      }
-
-      .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        scrollbar-width: thin;
-        scrollbar-color: var(--aurora-green) transparent;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid rgba(0, 212, 170, 0.08);
-      }
-
-      th {
-        font-family: 'Outfit', sans-serif;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        font-weight: 700;
-        letter-spacing: 0.15em;
-      }
-
-      td {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.85rem;
-        color: var(--text-primary);
-      }
-
-      tr {
-        animation: slideInLeft 0.4s ease-out forwards;
-        opacity: 0;
-      }
-
-      tr:nth-child(1) { animation-delay: 0.05s; }
-      tr:nth-child(2) { animation-delay: 0.1s; }
-      tr:nth-child(3) { animation-delay: 0.15s; }
-      tr:nth-child(4) { animation-delay: 0.2s; }
-      tr:nth-child(5) { animation-delay: 0.25s; }
-
-      tr:hover {
-        background: rgba(0, 212, 170, 0.03);
-      }
-
-      tr:hover td:first-child {
-        border-left: 3px solid var(--aurora-green);
-      }
-
-      .badge {
-        display: inline-block;
-        padding: 0.3rem 0.8rem;
-        border-radius: 2rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        font-family: 'Outfit', sans-serif;
-        letter-spacing: 0.05em;
-      }
-
-      .badge-success {
-        background: rgba(0, 212, 170, 0.15);
-        color: var(--aurora-green);
-        border: 1px solid rgba(0, 212, 170, 0.3);
-      }
-      .badge-warning {
-        background: rgba(255, 0, 110, 0.15);
-        color: var(--aurora-indigo);
-        border: 1px solid rgba(255, 0, 110, 0.3);
-      }
-      .badge-danger {
-        background: rgba(255, 71, 87, 0.15);
-        color: #ff4757;
-        border: 1px solid rgba(255, 71, 87, 0.3);
-      }
-      .badge-info {
-        background: rgba(0, 180, 216, 0.15);
-        color: var(--aurora-blue);
-        border: 1px solid rgba(0, 180, 216, 0.3);
-      }
-
-      .loading {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(0, 212, 170, 0.1);
-        border-top-color: var(--aurora-green);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-
-      .empty-state {
-        text-align: center;
-        padding: 3rem 2rem;
-        color: var(--text-muted);
-      }
-
-      .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        filter: drop-shadow(0 0 20px rgba(0, 212, 170, 0.3));
-        animation: float 3s ease-in-out infinite;
-      }
-
-      .progress-bar {
-        height: 8px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 4px;
-        overflow: hidden;
-        margin-top: 0.8rem;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--aurora-green), var(--aurora-blue));
-        border-radius: 4px;
-        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
-      }
-
-      .health-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1rem;
-      }
-
-      .health-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        transition: all 0.3s;
-      }
-
-      .health-item:hover {
-        background: rgba(0, 212, 170, 0.05);
-        border-color: rgba(0, 212, 170, 0.2);
-      }
-
-      .health-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-      }
-
-      .health-icon.pass {
-        background: rgba(0, 212, 170, 0.15);
-        color: var(--aurora-green);
-        box-shadow: var(--glow-green);
-      }
-      .health-icon.warn {
-        background: rgba(255, 0, 110, 0.15);
-        color: var(--aurora-indigo);
-        box-shadow: var(--glow-indigo);
-      }
-      .health-icon.fail {
-        background: rgba(255, 71, 87, 0.15);
-        color: #ff4757;
-        box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
-      }
-
-      .health-info h4 {
-        font-family: 'Outfit', sans-serif;
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.3rem;
-      }
-
-      .health-info p {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.75rem;
-        color: var(--text-muted);
-      }
-
-      .logs-container {
-        max-height: 400px;
-        overflow-y: auto;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.8rem;
-        scrollbar-width: thin;
-        scrollbar-color: var(--aurora-green) transparent;
-      }
-
-      .log-entry {
-        display: flex;
-        gap: 1rem;
-        padding: 0.8rem 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        transition: all 0.3s;
-        animation: slideInLeft 0.3s ease-out forwards;
-        opacity: 0;
-      }
-
-      .log-entry:nth-child(1) { animation-delay: 0.02s; }
-      .log-entry:nth-child(2) { animation-delay: 0.04s; }
-      .log-entry:nth-child(3) { animation-delay: 0.06s; }
-
-      .log-entry:hover {
-        background: rgba(0, 212, 170, 0.03);
-      }
-
-      .log-time {
-        color: var(--text-muted);
-        white-space: nowrap;
-        font-size: 0.75rem;
-      }
-
-      .log-level {
-        font-weight: 700;
-        min-width: 60px;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-      }
-
-      .log-level.info { color: var(--aurora-blue); }
-      .log-level.error { color: #ff4757; }
-      .log-level.warn { color: var(--aurora-indigo); }
-      .log-level.success { color: var(--aurora-green); }
-
-      .log-message {
-        flex: 1;
-        word-break: break-all;
-        color: var(--text-primary);
-      }
-
-      .group-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.2rem;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 12px;
-        margin-bottom: 0.8rem;
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        transition: all 0.3s;
-      }
-
-      .group-item:hover {
-        background: rgba(0, 212, 170, 0.05);
-        border-color: rgba(0, 212, 170, 0.2);
-        transform: translateX(5px);
-      }
-
-      .group-name {
-        font-family: 'Outfit', sans-serif;
-        font-weight: 700;
-        font-size: 1rem;
-        color: var(--text-primary);
-      }
-
-      .group-meta {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.75rem;
-        color: var(--text-muted);
-      }
-
-      .group-settings {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-
-      .slots-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 1rem;
-      }
-
-      .slot {
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 12px;
-        padding: 1.2rem;
-        text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .slot::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--aurora-green), var(--aurora-blue));
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-
-      .slot:hover::before {
-        opacity: 1;
-      }
-
-      .slot:hover {
-        border-color: rgba(0, 212, 170, 0.3);
-        transform: translateY(-4px);
-        box-shadow: var(--glow-green);
-      }
-
-      .slot-number {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--text-primary);
-      }
-
-      .slot-status {
-        font-family: 'Outfit', sans-serif;
-        font-size: 0.7rem;
-        padding: 0.3rem 0.8rem;
-        border-radius: 2rem;
-        display: inline-block;
-        margin-top: 0.8rem;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-      }
-
-      .slot.free .slot-status {
-        background: rgba(0, 212, 170, 0.15);
-        color: var(--aurora-green);
-        border: 1px solid rgba(0, 212, 170, 0.3);
-      }
-      .slot.connected .slot-status {
-        background: rgba(0, 180, 216, 0.15);
-        color: var(--aurora-blue);
-        border: 1px solid rgba(0, 180, 216, 0.3);
-      }
-      .slot.pending .slot-status,
-      .slot.linking .slot-status {
-        background: rgba(255, 0, 110, 0.15);
-        color: var(--aurora-indigo);
-        border: 1px solid rgba(255, 0, 110, 0.3);
-      }
-      .slot.disconnected .slot-status {
-        background: rgba(255, 71, 87, 0.15);
-        color: #ff4757;
-        border: 1px solid rgba(255, 71, 87, 0.3);
-      }
-
-      .slot-info {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        margin-top: 0.5rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .top-commands {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 0.8rem;
-      }
-
-      .command-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.8rem 1rem;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        transition: all 0.3s;
-      }
-
-      .command-item:hover {
-        background: rgba(0, 212, 170, 0.05);
-        border-color: rgba(0, 212, 170, 0.2);
-      }
-
-      .command-name {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.85rem;
-        color: var(--aurora-green);
-      }
-
-      .command-count {
-        font-family: 'IBM Plex Mono', monospace;
-        font-weight: 700;
-        font-size: 1.1rem;
-        background: linear-gradient(135deg, var(--aurora-green), var(--aurora-blue));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .command-bar {
-        flex: 1;
-        height: 6px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 3px;
-        margin: 0 1rem;
-        overflow: hidden;
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
-      }
-
-      .command-bar-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--aurora-green), var(--aurora-blue));
-        border-radius: 3px;
-        box-shadow: 0 0 8px rgba(0, 212, 170, 0.5);
-      }
-
-      footer {
-        text-align: center;
-        padding: 2rem 1.5rem;
-        color: var(--text-muted);
-        font-size: 0.85rem;
-        border-top: 1px solid transparent;
-        margin-top: 2rem;
-        position: relative;
-      }
-
-      footer::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 25%;
-        right: 25%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, var(--aurora-green), var(--aurora-indigo), var(--aurora-blue), transparent);
-      }
-
-      footer p {
-        font-family: 'Outfit', sans-serif;
-        font-weight: 300;
-        letter-spacing: 0.05em;
-      }
-
-      footer p strong {
-        font-weight: 700;
-        background: linear-gradient(135deg, var(--aurora-green), var(--aurora-blue));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      /* Toast Notifications */
-      .toast-container {
-        position: fixed;
-        top: 1.5rem;
-        right: 1.5rem;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        pointer-events: none;
-      }
-
-      .toast {
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        backdrop-filter: blur(20px);
-        background: var(--bg-card);
-        border: 1px solid rgba(0, 212, 170, 0.2);
-        color: var(--text-primary);
-        font-family: 'Outfit', sans-serif;
-        font-size: 0.9rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        animation: slideInRight 0.4s ease-out;
-        pointer-events: auto;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        max-width: 400px;
-      }
-
-      @keyframes slideInRight {
-        from { opacity: 0; transform: translateX(100px); }
-        to { opacity: 1; transform: translateX(0); }
-      }
-
-      .toast.error {
-        border-color: rgba(255, 71, 87, 0.3);
-      }
-
-      .toast.warning {
-        border-color: rgba(255, 0, 110, 0.3);
-      }
-
-      .toast-icon {
-        font-size: 1.2rem;
-        flex-shrink: 0;
-      }
-
-      /* Live indicator */
-      .live-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-size: 0.75rem;
-        color: var(--aurora-green);
-        font-family: 'IBM Plex Mono', monospace;
-      }
-
-      .live-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--aurora-green);
-        animation: pulse 1.5s ease-in-out infinite;
-      }
-
-      @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.5; transform: scale(1.5); }
-      }
-
-      /* Focus styles for keyboard navigation */
-      .tab:focus-visible,
-      .refresh-btn:focus-visible {
-        outline: 2px solid var(--aurora-green);
-        outline-offset: 3px;
-      }
-
-      tr:focus-visible {
-        outline: 2px solid var(--aurora-green);
-        outline-offset: -2px;
-      }
-
-      /* Mobile refresh button */
-      @media (max-width: 768px) {
-        .header-status {
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-
-        .refresh-btn {
-          order: 3;
-          width: 100%;
-          text-align: center;
-        }
-
-        .live-indicator {
-          width: 100%;
-          justify-content: center;
-        }
-      }
-
-      .dashboard {
-        max-width: 1600px;
-        margin: 0 auto;
-        padding: 1.5rem;
-      }
-
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1.5rem;
-        background: var(--bg-card);
-        border-radius: 1rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid var(--border);
-      }
-
-      .logo {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      .logo-emoji {
-        font-size: 2.5rem;
-      }
-      .logo h1 {
-        font-size: 1.5rem;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .header-status {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .status-badge {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: rgba(72, 187, 120, 0.15);
-        border-radius: 2rem;
-        font-size: 0.875rem;
-        color: var(--success);
-      }
-
-      .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--success);
-        animation: pulse 2s infinite;
-      }
-
-      .status-dot.warning {
-        background: var(--warning);
-      }
-      .status-dot.danger {
-        background: var(--danger);
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
-      }
-
-      .refresh-btn {
-        background: var(--primary);
-        border: none;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s;
-      }
-
-      .refresh-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .stat-card {
-        background: var(--bg-card);
-        border-radius: 1rem;
-        padding: 1.25rem;
-        border: 1px solid var(--border);
-        transition: all 0.3s;
-      }
-
-      .stat-card:hover {
-        background: var(--bg-card-hover);
-        transform: translateY(-2px);
-      }
-
-      .stat-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-      }
-
-      .stat-label {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      .stat-icon {
-        font-size: 1.25rem;
-        opacity: 0.8;
-      }
-
-      .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .stat-sub {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        margin-top: 0.25rem;
-      }
-
-      .section {
-        background: var(--bg-card);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid var(--border);
-      }
-
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.25rem;
-      }
-
-      .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .tabs {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
-      }
-
-      .tab {
-        padding: 0.6rem 1.2rem;
-        background: transparent;
-        border: 1px solid var(--border);
-        border-radius: 0.5rem;
-        color: var(--text-muted);
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-
-      .tab:hover {
-        border-color: var(--primary);
-        color: var(--text);
-      }
-      .tab.active {
-        background: var(--primary);
-        border-color: var(--primary);
-        color: white;
-      }
-
-      .tab-content {
-        display: none;
-      }
-      .tab-content.active {
-        display: block;
-      }
-
-      .chart-container {
-        position: relative;
-        height: 300px;
-        margin-top: 1rem;
-      }
-
-      .table-container {
-        overflow-x: auto;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        padding: 0.75rem;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-      }
-
-      th {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        font-weight: 600;
-      }
-
-      td {
-        font-size: 0.875rem;
-      }
-
-      tr:hover {
-        background: rgba(255, 255, 255, 0.02);
-      }
-
-      .badge {
-        display: inline-block;
-        padding: 0.25rem 0.6rem;
-        border-radius: 1rem;
-        font-size: 0.7rem;
-        font-weight: 600;
-      }
-
-      .badge-success {
-        background: rgba(72, 187, 120, 0.2);
-        color: var(--success);
-      }
-      .badge-warning {
-        background: rgba(237, 137, 54, 0.2);
-        color: var(--warning);
-      }
-      .badge-danger {
-        background: rgba(245, 101, 101, 0.2);
-        color: var(--danger);
-      }
-      .badge-info {
-        background: rgba(102, 126, 234, 0.2);
-        color: var(--primary);
-      }
-
-      .slots-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 0.75rem;
-      }
-
-      .slot {
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 0.75rem;
-        padding: 1rem;
-        text-align: center;
-        border: 1px solid var(--border);
-        transition: all 0.3s;
-      }
-
-      .slot:hover {
-        border-color: var(--primary);
-        transform: translateY(-2px);
-      }
-      .slot-number {
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-      .slot-status {
-        font-size: 0.65rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 1rem;
-        display: inline-block;
-        margin-top: 0.5rem;
-      }
-
-      .slot.free .slot-status {
-        background: rgba(72, 187, 120, 0.2);
-        color: var(--success);
-      }
-      .slot.connected .slot-status {
-        background: rgba(102, 126, 234, 0.2);
-        color: var(--primary);
-      }
-      .slot.pending .slot-status,
-      .slot.linking .slot-status {
-        background: rgba(237, 137, 54, 0.2);
-        color: var(--warning);
-      }
-      .slot.disconnected .slot-status {
-        background: rgba(245, 101, 101, 0.2);
-        color: var(--danger);
-      }
-
-      .slot-info {
-        font-size: 0.65rem;
-        color: var(--text-muted);
-        margin-top: 0.4rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .health-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-      }
-
-      .health-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 0.5rem;
-      }
-
-      .health-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-      }
-
-      .health-icon.pass {
-        background: rgba(72, 187, 120, 0.2);
-        color: var(--success);
-      }
-      .health-icon.warn {
-        background: rgba(237, 137, 54, 0.2);
-        color: var(--warning);
-      }
-      .health-icon.fail {
-        background: rgba(245, 101, 101, 0.2);
-        color: var(--danger);
-      }
-
-      .health-info h4 {
-        font-size: 0.875rem;
-        font-weight: 600;
-      }
-      .health-info p {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-      }
-
-      .logs-container {
-        max-height: 400px;
-        overflow-y: auto;
-        font-family: 'Monaco', 'Menlo', monospace;
-        font-size: 0.75rem;
-      }
-
-      .log-entry {
-        display: flex;
-        gap: 0.75rem;
-        padding: 0.5rem;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .log-entry:hover {
-        background: rgba(255, 255, 255, 0.02);
-      }
-      .log-time {
-        color: var(--text-muted);
-        white-space: nowrap;
-      }
-      .log-level {
-        font-weight: 600;
-        min-width: 50px;
-      }
-      .log-level.info {
-        color: var(--primary);
-      }
-      .log-level.error {
-        color: var(--danger);
-      }
-      .log-level.warn {
-        color: var(--warning);
-      }
-      .log-level.success {
-        color: var(--success);
-      }
-      .log-message {
-        flex: 1;
-        word-break: break-all;
-      }
-
-      .group-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 0.5rem;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s;
-      }
-
-      .group-item:hover {
-        background: rgba(255, 255, 255, 0.04);
-      }
-      .group-name {
-        font-weight: 600;
-        font-size: 0.9rem;
-      }
-      .group-meta {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-      }
-      .group-settings {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-
-      .loading {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      .empty-state {
-        text-align: center;
-        padding: 2rem;
-        color: var(--text-muted);
-      }
-
-      .empty-state-icon {
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .two-col {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-      }
-
-      @media (max-width: 1024px) {
-        .two-col {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .progress-bar {
-        height: 6px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 3px;
-        overflow: hidden;
-        margin-top: 0.5rem;
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
-        border-radius: 3px;
-        transition: width 0.5s ease;
-      }
-
-      .top-commands {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 0.75rem;
-      }
-
-      .command-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 0.5rem;
-      }
-
-      .command-name {
-        font-family: monospace;
-        font-size: 0.85rem;
-        color: var(--primary);
-      }
-
-      .command-count {
-        font-weight: 700;
-        font-size: 1rem;
-      }
-
-      .command-bar {
-        flex: 1;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 2px;
-        margin: 0 1rem;
-        overflow: hidden;
-      }
-
-      .command-bar-fill {
-        height: 100%;
-        background: var(--primary);
-        border-radius: 2px;
-      }
-
-      footer {
-        text-align: center;
-        padding: 1.5rem;
-        color: var(--text-muted);
-        font-size: 0.8rem;
-        border-top: 1px solid var(--border);
-        margin-top: 1rem;
-      }
-
-      /* ---------- Token auth overlay ---------- */
-      .logout-btn {
-        background: transparent;
-        border: 1px solid rgba(255, 71, 87, 0.35);
-        border-radius: 2rem;
-        color: #ff4757;
-        cursor: pointer;
-        font-family: 'Outfit', sans-serif;
-        font-size: 0.8rem;
-        font-weight: 700;
-        letter-spacing: 0.03em;
-        padding: 0.55rem 1.1rem;
-        transition: background 0.3s, transform 0.2s;
-      }
-      .logout-btn:hover {
-        background: rgba(255, 71, 87, 0.12);
-        transform: translateY(-1px);
-      }
-
-      .token-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 10000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        background: rgba(5, 10, 26, 0.92);
-        backdrop-filter: blur(14px);
-      }
-      .token-overlay.visible {
-        display: flex;
-      }
-      .token-card {
-        background: var(--bg-card);
-        border: 1px solid rgba(0, 212, 170, 0.25);
-        border-radius: 16px 4px 16px 4px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-        padding: 2.5rem;
-        max-width: 400px;
-        width: calc(100% - 2rem);
-        text-align: center;
-        font-family: 'Outfit', sans-serif;
-      }
-      .token-emoji {
-        font-size: 3rem;
-        margin-bottom: 0.75rem;
-        filter: drop-shadow(0 0 12px rgba(0, 212, 170, 0.5));
-      }
-      .token-card h2 {
-        background: linear-gradient(135deg, var(--aurora-green) 0%, var(--aurora-blue) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 1.4rem;
-        font-weight: 800;
-        margin-bottom: 0.75rem;
-      }
-      .token-card p {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        line-height: 1.5;
-        margin-bottom: 1.25rem;
-      }
-      .token-card .token-hint {
-        font-size: 0.75rem;
-      }
-      .token-card code {
-        background: rgba(255, 255, 255, 0.06);
-        border-radius: 4px;
-        padding: 0.1rem 0.35rem;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.75rem;
-      }
-      .token-card input {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(0, 212, 170, 0.25);
-        border-radius: 10px;
-        color: var(--text-primary);
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.95rem;
-        padding: 0.8rem 1rem;
-        outline: none;
-        transition: border-color 0.3s, box-shadow 0.3s;
-      }
-      .token-card input:focus {
-        border-color: var(--aurora-green);
-        box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
-      }
-      .token-error {
-        color: #ff4757;
-        font-size: 0.8rem;
-        margin-top: 0.75rem;
-      }
-      .token-btn {
-        margin-top: 1.25rem;
-        width: 100%;
-        background: linear-gradient(135deg, var(--aurora-green), var(--aurora-blue));
-        border: none;
-        border-radius: 10px;
-        color: #050a1a;
-        cursor: pointer;
-        font-family: 'Outfit', sans-serif;
-        font-size: 1rem;
-        font-weight: 700;
-        letter-spacing: 0.03em;
-        padding: 0.85rem;
-        transition: transform 0.2s, box-shadow 0.3s;
-      }
-      .token-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="token-overlay" id="tokenOverlay">
-      <form class="token-card" id="tokenForm" autocomplete="off">
-        <div class="token-emoji">🔐</div>
-        <h2>Acceso al Dashboard</h2>
-        <p>Enter the panel token to see the data.<br><span class="token-hint">It is the value of <code>PANEL_WEBHOOK_TOKEN</code> in your <code>.env</code>.</span></p>
-        <input
-          type="password"
-          id="tokenInput"
-          placeholder="Token del panel"
-          autocomplete="current-password"
-          spellcheck="false"
-        />
-        <div class="token-error" id="tokenError" style="display: none"></div>
-        <button type="submit" class="token-btn">Entrar</button>
-      </form>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>OrbitBot · Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --space-0: #05070F;
+      --panel: rgba(13, 18, 36, 0.55);
+      --panel-strong: rgba(13, 18, 36, 0.88);
+      --hairline: rgba(255, 255, 255, 0.07);
+      --text: #E9EDF8;
+      --text-muted: #9AA3BF;
+      --primary: #818CF8;
+      --secondary: #38BDF8;
+      --glow: #22D3EE;
+      --star: #FACC15;
+      --success: #34D399;
+      --danger: #FF5A6E;
+      --radius: 18px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --font-ui: 'Outfit', system-ui, -apple-system, sans-serif;
+      --font-data: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { color-scheme: dark; }
+
+    body {
+      font: 400 1rem/1.5 var(--font-ui);
+      background: var(--space-0);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Deep-space backdrop: static star layers + nebula tint + orbit arcs */
+    .space {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(1100px 720px at 78% -10%, rgba(129, 140, 248, 0.10), transparent 62%),
+        radial-gradient(960px 680px at 12% 112%, rgba(34, 211, 238, 0.07), transparent 60%),
+        radial-gradient(820px 560px at 104% 82%, rgba(56, 189, 248, 0.06), transparent 60%);
+    }
+    .space::before,
+    .space::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+    }
+    .space::before {
+      background-image:
+        radial-gradient(1px 1px at 12px 34px, rgba(255, 255, 255, 0.55) 50%, transparent 55%),
+        radial-gradient(1px 1px at 78px 92px, rgba(255, 255, 255, 0.30) 50%, transparent 55%),
+        radial-gradient(1.5px 1.5px at 132px 24px, rgba(250, 204, 21, 0.45) 50%, transparent 55%),
+        radial-gradient(1px 1px at 164px 142px, rgba(129, 140, 248, 0.55) 50%, transparent 55%);
+      background-size: 192px 192px;
+      opacity: 0.55;
+    }
+    .space::after {
+      background-image:
+        radial-gradient(1px 1px at 44px 122px, rgba(255, 255, 255, 0.22) 50%, transparent 55%),
+        radial-gradient(1px 1px at 118px 64px, rgba(255, 255, 255, 0.18) 50%, transparent 55%),
+        radial-gradient(1px 1px at 180px 158px, rgba(34, 211, 238, 0.22) 50%, transparent 55%);
+      background-size: 240px 240px;
+      opacity: 0.7;
+    }
+    .orbit-field {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .orbit-field::before,
+    .orbit-field::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(129, 140, 248, 0.09);
+    }
+    .orbit-field::before { width: 620px; height: 620px; top: -280px; right: -170px; }
+    .orbit-field::after  { width: 380px; height: 380px; top: -160px; right: -50px; border-color: rgba(34, 211, 238, 0.08); }
+
+    .dashboard {
+      position: relative;
+      z-index: 1;
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+      animation: dashboard-in 0.5s var(--ease-out) both;
+    }
+
+    @keyframes dashboard-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Toolbar: translucent material, content scrolls underneath */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.9rem 1.4rem;
+      margin: 0 -1.5rem 1.8rem;
+      padding-inline: max(1.5rem, calc((100vw - 1360px) / 2 + 1.5rem));
+      background: rgba(9, 12, 24, 0.62);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-bottom: 1px solid rgba(129, 140, 248, 0.12);
+    }
+
+    .logo { display: flex; align-items: center; gap: 0.8rem; }
+
+    .logo-emoji {
+      font-size: 1.6rem;
+      filter: drop-shadow(0 0 10px rgba(129, 140, 248, 0.5));
+    }
+
+    .logo h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .logo h1 .sub {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 0.85rem;
+      margin-left: 0.5rem;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.45rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      position: relative;
+      flex: none;
+    }
+    .status-dot::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: inherit;
+      opacity: 0.35;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    .status-dot.danger { background: var(--danger); }
+    .status-dot.warning { background: var(--star); }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.35; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-data);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: var(--glow);
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--glow);
+      animation: live-pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes live-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* Buttons: hover lift, pointer-down press */
+    .refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(129, 140, 248, 0.12);
+      border: 1px solid rgba(129, 140, 248, 0.3);
+      color: var(--text);
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font: 600 0.85rem/1 var(--font-ui);
+      transition: background 0.2s var(--ease-out), border-color 0.2s var(--ease-out), transform 0.1s ease-out;
+    }
+    .refresh-btn:hover {
+      background: rgba(129, 140, 248, 0.2);
+      border-color: rgba(129, 140, 248, 0.55);
+    }
+    .refresh-btn:active { transform: scale(0.96); }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 90, 110, 0.35);
+      border-radius: 999px;
+      color: var(--danger);
+      cursor: pointer;
+      font: 600 0.82rem/1 var(--font-ui);
+      padding: 0.55rem 1.1rem;
+      transition: background 0.2s var(--ease-out), transform 0.1s ease-out;
+    }
+    .logout-btn:hover { background: rgba(255, 90, 110, 0.12); }
+    .logout-btn:active { transform: scale(0.96); }
+
+    /* Metric cards: each edge colour encodes what the metric is */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .stat-card {
+      background: var(--panel);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s var(--ease-out), transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+      animation: card-in 0.4s var(--ease-out) both;
+    }
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.09s; }
+    .stat-card:nth-child(3) { animation-delay: 0.13s; }
+    .stat-card:nth-child(4) { animation-delay: 0.17s; }
+    .stat-card:nth-child(5) { animation-delay: 0.21s; }
+    .stat-card:nth-child(6) { animation-delay: 0.25s; }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 1rem;
+      bottom: 1rem;
+      width: 3px;
+      border-radius: 3px;
+      background: var(--hairline);
+    }
+    .stat-card.edge-primary::before { background: var(--primary); box-shadow: 0 0 12px rgba(129, 140, 248, 0.6); }
+    .stat-card.edge-glow::before { background: var(--glow); box-shadow: 0 0 12px rgba(34, 211, 238, 0.6); }
+    .stat-card.edge-secondary::before { background: var(--secondary); box-shadow: 0 0 12px rgba(56, 189, 248, 0.6); }
+    .stat-card.edge-star::before { background: var(--star); box-shadow: 0 0 12px rgba(250, 204, 21, 0.5); }
+    .stat-card.edge-danger::before { background: var(--danger); box-shadow: 0 0 12px rgba(255, 90, 110, 0.5); }
+
+    .stat-card:hover {
+      border-color: rgba(129, 140, 248, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.7rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .stat-icon { font-size: 1.15rem; opacity: 0.85; }
+
+    .stat-value {
+      font-family: var(--font-data);
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      text-shadow: 0 0 26px rgba(129, 140, 248, 0.3);
+    }
+
+    .stat-sub {
+      font-family: var(--font-data);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .progress-bar {
+      height: 5px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 0.7rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--glow));
+      border-radius: 999px;
+      box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+      transition: width 0.6s var(--ease-out);
+    }
+
+    /* Tab bar: single-pill glass segmented control */
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      padding: 0.35rem;
+      margin-bottom: 1.6rem;
+      background: rgba(9, 12, 24, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--hairline);
+      border-radius: 999px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex: none;
+      padding: 0.6rem 1.2rem;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      color: var(--text-muted);
+      font: 500 0.88rem/1 var(--font-ui);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.18s ease-out, background 0.18s ease-out, border-color 0.18s ease-out, transform 0.1s ease-out;
+    }
+    .tab:hover { color: var(--text); }
+    .tab:active { transform: scale(0.96); }
+    .tab.active {
+      background: rgba(129, 140, 248, 0.16);
+      border-color: rgba(129, 140, 248, 0.4);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: panel-in 0.28s var(--ease-out); }
+
+    @keyframes panel-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Sections share the same glass material */
+    .section {
+      background: var(--panel);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      border: 1px solid var(--hairline);
+      border-radius: 20px;
+      padding: 1.6rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.3rem;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .section-title::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex: none;
+      background: linear-gradient(135deg, var(--primary), var(--glow));
+      box-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.4rem;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 290px;
+      margin-top: 0.4rem;
+    }
+
+    /* Tables */
+    .table-container { overflow-x: auto; scrollbar-width: thin; scrollbar-color: rgba(129, 140, 248, 0.4) transparent; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th {
+      font: 500 0.78rem/1 var(--font-ui);
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    td {
+      font-family: var(--font-data);
+      font-size: 0.82rem;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+    /* Badges: functional status colours */
+    .badge {
+      display: inline-block;
+      padding: 0.28rem 0.75rem;
+      border-radius: 999px;
+      font: 600 0.72rem/1.3 var(--font-ui);
+      letter-spacing: 0.02em;
+      border: 1px solid transparent;
+    }
+    .badge-success { background: rgba(52, 211, 153, 0.12); color: var(--success); border-color: rgba(52, 211, 153, 0.3); }
+    .badge-warning { background: rgba(250, 204, 21, 0.1); color: var(--star); border-color: rgba(250, 204, 21, 0.25); }
+    .badge-danger { background: rgba(255, 90, 110, 0.12); color: var(--danger); border-color: rgba(255, 90, 110, 0.3); }
+    .badge-info { background: rgba(56, 189, 248, 0.12); color: var(--secondary); border-color: rgba(56, 189, 248, 0.3); }
+
+    /* Health checks */
+    .health-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 0.9rem;
+    }
+
+    .health-item {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.95rem 1.1rem;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      transition: border-color 0.2s var(--ease-out);
+    }
+    .health-item:hover { border-color: rgba(129, 140, 248, 0.35); }
+
+    .health-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      flex: none;
+    }
+    .health-icon.pass { background: rgba(52, 211, 153, 0.12); color: var(--success); }
+    .health-icon.warn { background: rgba(250, 204, 21, 0.1); color: var(--star); }
+    .health-icon.fail { background: rgba(255, 90, 110, 0.12); color: var(--danger); }
+
+    .health-info { min-width: 0; }
+    .health-info h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .health-info p { font-family: var(--font-data); font-size: 0.72rem; color: var(--text-muted); }
+
+    /* Logs */
+    .logs-container {
+      max-height: 420px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(129, 140, 248, 0.4) transparent;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: 1rem;
+      padding: 0.7rem 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: var(--font-data);
+      font-size: 0.78rem;
+    }
+    .log-entry:hover { background: rgba(255, 255, 255, 0.02); }
+
+    .log-time { color: var(--text-muted); white-space: nowrap; font-size: 0.72rem; }
+
+    .log-level { font-weight: 600; min-width: 60px; font-size: 0.72rem; }
+    .log-level.info { color: var(--secondary); }
+    .log-level.error { color: var(--danger); }
+    .log-level.warn { color: var(--star); }
+    .log-level.success { color: var(--success); }
+
+    .log-message { flex: 1; word-break: break-all; color: var(--text); }
+
+    /* Groups */
+    .group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.05rem 1.15rem;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      margin-bottom: 0.7rem;
+      transition: border-color 0.2s var(--ease-out);
+    }
+    .group-item:hover { border-color: rgba(129, 140, 248, 0.35); }
+
+    .group-name { font-weight: 600; font-size: 0.95rem; }
+    .group-meta { font-family: var(--font-data); font-size: 0.7rem; color: var(--text-muted); }
+
+    .group-settings { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: flex-end; }
+
+    /* SubBot slots */
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.9rem;
+    }
+
+    .slot {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+      padding: 1.15rem 1rem;
+      text-align: center;
+      transition: border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+    }
+    .slot:hover { border-color: rgba(129, 140, 248, 0.4); transform: translateY(-2px); }
+
+    .slot-number {
+      font-family: var(--font-data);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .slot-status {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      display: inline-block;
+      margin-top: 0.7rem;
+      border: 1px solid transparent;
+    }
+
+    .slot.free .slot-status { background: rgba(52, 211, 153, 0.12); color: var(--success); border-color: rgba(52, 211, 153, 0.3); }
+    .slot.connected .slot-status { background: rgba(56, 189, 248, 0.12); color: var(--secondary); border-color: rgba(56, 189, 248, 0.3); }
+    .slot.pending .slot-status,
+    .slot.linking .slot-status { background: rgba(250, 204, 21, 0.1); color: var(--star); border-color: rgba(250, 204, 21, 0.25); }
+    .slot.reserved .slot-status { background: rgba(154, 163, 191, 0.12); color: var(--text-muted); border-color: var(--hairline); }
+    .slot.disconnected .slot-status { background: rgba(255, 90, 110, 0.12); color: var(--danger); border-color: rgba(255, 90, 110, 0.3); }
+
+    .slot-info {
+      font-family: var(--font-data);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Top commands */
+    .top-commands {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .command-item {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      transition: border-color 0.2s var(--ease-out);
+    }
+    .command-item:hover { border-color: rgba(129, 140, 248, 0.35); }
+
+    .command-name {
+      font-family: var(--font-data);
+      font-size: 0.82rem;
+      color: var(--primary);
+      min-width: 6.5em;
+    }
+
+    .command-count {
+      font-family: var(--font-data);
+      font-weight: 600;
+      font-size: 1rem;
+      min-width: 3em;
+      text-align: right;
+    }
+
+    .command-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .command-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--glow));
+      border-radius: 999px;
+      box-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+    }
+
+    /* Empty states as invitations */
+    .empty-state {
+      text-align: center;
+      padding: 2.6rem 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .empty-state-icon { font-size: 2.2rem; margin-bottom: 0.6rem; opacity: 0.7; }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(129, 140, 248, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toasts: arrive from the right, leave on the same path */
+    .toast-container {
+      position: fixed;
+      top: 1.2rem;
+      right: 1.4rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 0.95rem 1.3rem;
+      border-radius: 14px;
+      background: var(--panel-strong);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid rgba(129, 140, 248, 0.25);
+      color: var(--text);
+      font-size: 0.88rem;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+      animation: toast-in 0.26s var(--ease-out);
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      max-width: 380px;
+      transition: opacity 0.26s ease-out, transform 0.26s var(--ease-out);
+    }
+    .toast.error { border-color: rgba(255, 90, 110, 0.35); }
+    .toast.warning { border-color: rgba(250, 204, 21, 0.3); }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(110%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .toast-icon { font-size: 1.05rem; flex-shrink: 0; }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-top: 1.5rem;
+      position: relative;
+    }
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.35), transparent);
+    }
+
+    /* Token auth overlay */
+    .token-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: rgba(4, 6, 12, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.28s ease-out, visibility 0.28s;
+    }
+    .token-overlay.visible { opacity: 1; visibility: visible; }
+
+    .token-card {
+      background: var(--panel-strong);
+      border: 1px solid rgba(129, 140, 248, 0.25);
+      border-radius: 22px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+      padding: 2.4rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      transform: translateY(10px) scale(0.97);
+      transition: transform 0.3s var(--ease-out);
+    }
+    .token-overlay.visible .token-card { transform: translateY(0) scale(1); }
+
+    .token-emoji {
+      font-size: 2.4rem;
+      margin-bottom: 0.8rem;
+      filter: drop-shadow(0 0 14px rgba(129, 140, 248, 0.55));
+    }
+
+    .token-card h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.7rem;
+    }
+
+    .token-card p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      margin-bottom: 1.2rem;
+    }
+    .token-card .token-hint { font-size: 0.74rem; }
+
+    .token-card code {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 5px;
+      padding: 0.12rem 0.4rem;
+      font-family: var(--font-data);
+      font-size: 0.74rem;
+    }
+
+    .token-card input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(129, 140, 248, 0.25);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: var(--font-data);
+      font-size: 0.95rem;
+      padding: 0.8rem 1rem;
+      outline: none;
+      transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+    }
+    .token-card input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.18);
+    }
+
+    .token-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.75rem; }
+
+    .token-btn {
+      margin-top: 1.2rem;
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--glow));
+      border: none;
+      border-radius: 12px;
+      color: var(--space-0);
+      cursor: pointer;
+      font: 700 0.95rem/1 var(--font-ui);
+      padding: 0.9rem;
+      transition: box-shadow 0.2s var(--ease-out), transform 0.1s ease-out;
+    }
+    .token-btn:hover { box-shadow: 0 8px 28px rgba(129, 140, 248, 0.4); }
+    .token-btn:active { transform: scale(0.97); }
+
+    /* Keyboard focus is always visible */
+    .tab:focus-visible,
+    .refresh-btn:focus-visible,
+    .logout-btn:focus-visible,
+    .token-btn:focus-visible,
+    .token-card input:focus-visible {
+      outline: 2px solid var(--secondary);
+      outline-offset: 2px;
+    }
+
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media (prefers-reduced-transparency: reduce) {
+      header, .stat-card, .section, .tab, .toast, .token-card {
+        background: var(--panel-strong);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+    }
+
+    @media (prefers-contrast: more) {
+      .stat-card, .section, header, .tab.active {
+        border-color: rgba(255, 255, 255, 0.35);
+        background: #0A0F1E;
+      }
+      .text-muted, .stat-label, .section-title-color { color: #C7CEe2; }
+    }
+
+    /* Layout adapts, it never breaks */
+    @media (max-width: 1024px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      header { flex-direction: column; align-items: stretch; gap: 0.7rem; padding-inline: 1rem; margin-inline: -1rem; }
+      .dashboard { padding: 0 1rem 2rem; }
+      .header-status { justify-content: center; flex-wrap: wrap; }
+      .status-badge { width: 100%; justify-content: center; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .tabs { border-radius: 22px; }
+      .token-card { padding: 1.8rem; }
+    }
+
+    @media (max-width: 420px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="space" aria-hidden="true"></div>
+  <div class="orbit-field" aria-hidden="true"></div>
+
+  <div class="token-overlay" id="tokenOverlay">
+    <form class="token-card" id="tokenForm" autocomplete="off">
+      <div class="token-emoji">🌌</div>
+      <h2>OrbitBot Control</h2>
+      <p>Enter the panel token to see the data.<br><span class="token-hint">It is the value of <code>PANEL_WEBHOOK_TOKEN</code> in your <code>.env</code>.</span></p>
+      <input
+        type="password"
+        id="tokenInput"
+        placeholder="Panel token"
+        autocomplete="current-password"
+        spellcheck="false"
+      />
+      <div class="token-error" id="tokenError" style="display: none"></div>
+      <button type="submit" class="token-btn">Enter</button>
+    </form>
+  </div>
+
+  <div class="dashboard">
+    <header>
+      <div class="logo">
+        <span class="logo-emoji">🌌</span>
+        <h1>OrbitBot <span class="sub">Control</span></h1>
+      </div>
+      <div class="header-status">
+        <div class="status-badge">
+          <span class="status-dot" id="mainBotStatus"></span>
+          <span id="mainBotText">Connecting…</span>
+        </div>
+        <button class="refresh-btn" onclick="refreshAll()">
+          <span class="loading" id="refreshLoading" style="display: none"></span>
+          <span id="refreshText">Refresh</span>
+        </button>
+        <button class="logout-btn" id="logoutBtn" title="Log out">Logout</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="stat-card edge-primary">
+        <div class="stat-header">
+          <span class="stat-label">Msgs / min</span>
+          <span class="stat-icon">💬</span>
+        </div>
+        <div class="stat-value" id="msgsPerMin">-</div>
+        <div class="stat-sub">Avg: <span id="avgMsgs">0</span>/min</div>
+      </div>
+      <div class="stat-card edge-glow">
+        <div class="stat-header">
+          <span class="stat-label">Cmds / min</span>
+          <span class="stat-icon">⚡</span>
+        </div>
+        <div class="stat-value" id="cmdsPerMin">-</div>
+        <div class="stat-sub">Total: <span id="totalCmds">0</span></div>
+      </div>
+      <div class="stat-card edge-secondary">
+        <div class="stat-header">
+          <span class="stat-label">RAM used</span>
+          <span class="stat-icon">🔭</span>
+        </div>
+        <div class="stat-value" id="ramPercent">-</div>
+        <div class="stat-sub"><span id="ramUsed">0</span> / <span id="ramTotal">0</span> GB</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="ramProgress" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="stat-card edge-star">
+        <div class="stat-header">
+          <span class="stat-label">SubBots active</span>
+          <span class="stat-icon">🤖</span>
+        </div>
+        <div class="stat-value"><span id="activeBots">0</span>/<span id="totalBots">0</span></div>
+        <div class="stat-sub">Free slots: <span id="availableSlots">0</span></div>
+      </div>
+      <div class="stat-card edge-primary">
+        <div class="stat-header">
+          <span class="stat-label">Groups</span>
+          <span class="stat-icon">👥</span>
+        </div>
+        <div class="stat-value" id="totalGroups">-</div>
+        <div class="stat-sub">Active: <span id="activeGroups">0</span></div>
+      </div>
+      <div class="stat-card edge-danger">
+        <div class="stat-header">
+          <span class="stat-label">Errors / min</span>
+          <span class="stat-icon">⚠️</span>
+        </div>
+        <div class="stat-value" id="errorsPerMin">-</div>
+        <div class="stat-sub">Total: <span id="totalErrors">0</span></div>
+      </div>
     </div>
 
-    <div class="dashboard">
-      <header>
-        <div class="logo">
-          <span class="logo-emoji">🌌</span>
-          <h1>OrbitBot Dashboard</h1>
-        </div>
-        <div class="header-status">
-          <div class="status-badge">
-            <span class="status-dot" id="mainBotStatus"></span>
-            <span id="mainBotText">Conectando...</span>
-          </div>
-          <button class="refresh-btn" onclick="refreshAll()">
-            <span class="loading" id="refreshLoading" style="display: none"></span>
-            <span id="refreshText">Refresh</span>
-          </button>
-          <button class="logout-btn" id="logoutBtn" title="Log out">Logout</button>
-        </div>
-      </header>
-
-      <div class="grid">
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">Msgs/min</span>
-            <span class="stat-icon">💬</span>
-          </div>
-          <div class="stat-value" id="msgsPerMin">-</div>
-          <div class="stat-sub">Promedio: <span id="avgMsgs">0</span>/min</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">Cmds/min</span>
-            <span class="stat-icon">⚡</span>
-          </div>
-          <div class="stat-value" id="cmdsPerMin">-</div>
-          <div class="stat-sub">Total: <span id="totalCmds">0</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">RAM Usada</span>
-            <span class="stat-icon">🔭</span>
-          </div>
-          <div class="stat-value" id="ramPercent">-</div>
-          <div class="stat-sub"><span id="ramUsed">0</span> / <span id="ramTotal">0</span> GB</div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="ramProgress" style="width: 0%"></div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">SubBots Activos</span>
-            <span class="stat-icon">🤖</span>
-          </div>
-          <div class="stat-value"><span id="activeBots">0</span>/<span id="totalBots">0</span></div>
-          <div class="stat-sub">Slots disponibles: <span id="availableSlots">0</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">Grupos</span>
-            <span class="stat-icon">👥</span>
-          </div>
-          <div class="stat-value" id="totalGroups">-</div>
-          <div class="stat-sub">Activos: <span id="activeGroups">0</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-label">Errores/min</span>
-            <span class="stat-icon">⚠️</span>
-          </div>
-          <div class="stat-value" id="errorsPerMin">-</div>
-          <div class="stat-sub">Total: <span id="totalErrors">0</span></div>
-        </div>
-      </div>
-
-      <div class="tabs">
-        <button class="tab active" data-tab="overview">📊 Overview</button>
-        <button class="tab" data-tab="commands">⚡ Commands</button>
-        <button class="tab" data-tab="moderation">🛡️ Moderation</button>
-        <button class="tab" data-tab="groups">👥 Grupos</button>
-        <button class="tab" data-tab="subbots">🤖 SubBots</button>
-        <button class="tab" data-tab="system">💻 Sistema</button>
-        <button class="tab" data-tab="logs">📋 Logs</button>
-      </div>
-
-      <div id="tab-overview" class="tab-content active">
-        <div class="two-col">
-          <div class="section">
-            <div class="section-header">
-              <h3 class="section-title">📈 Real-time Activity</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="activityChart"></canvas>
-            </div>
-          </div>
-          <div class="section">
-            <div class="section-header">
-              <h3 class="section-title">🔭 Memory Usage</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="memoryChart"></canvas>
-            </div>
-          </div>
-        </div>
-        <div class="section">
-          <div class="section-header">
-            <h3 class="section-title">🏆 Top Commands</h3>
-          </div>
-          <div class="top-commands" id="topCommands">
-            <div class="empty-state">
-              <div class="empty-state-icon">⏳</div>
-              <p>Cargando...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-commands" class="tab-content">
-        <div class="section">
-          <div class="section-header">
-            <h3 class="section-title">⚡ Command Stats</h3>
-          </div>
-          <div class="table-container">
-            <table id="commandsTable">
-              <thead>
-                <tr>
-                  <th>Command</th>
-                  <th>Ejecuciones</th>
-                  <th>Total Time</th>
-                  <th>Avg Time</th>
-                  <th>Errores</th>
-                </tr>
-              </thead>
-              <tbody id="commandsBody">
-                <tr>
-                  <td colspan="5" class="empty-state">Cargando...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-moderation" class="tab-content">
-        <div class="section">
-          <div class="section-header">
-            <h3 class="section-title">🛡️ Moderation Actions</h3>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Usuario</th>
-                  <th>Action</th>
-                  <th>Moderador</th>
-                  <th>Reason</th>
-                  <th>Fecha</th>
-                </tr>
-              </thead>
-              <tbody id="moderationBody">
-                <tr>
-                  <td colspan="5" class="empty-state">Cargando...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="two-col">
-          <div class="section">
-            <div class="section-header">
-              <h3 class="section-title">🔨 Baneos Activos</h3>
-            </div>
-            <div id="bansList"><div class="empty-state">Sin datos</div></div>
-          </div>
-          <div class="section">
-            <div class="section-header">
-              <h3 class="section-title">🔇 Mutes Activos</h3>
-            </div>
-            <div id="mutesList"><div class="empty-state">Sin datos</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-groups" class="tab-content">
-        <div class="section">
-          <div class="section-header">
-            <h3 class="section-title">👥 Grupos Registrados</h3>
-          </div>
-          <div id="groupsList">
-            <div class="empty-state">
-              <div class="empty-state-icon">👥</div>
-              <p>Cargando grupos...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-subbots" class="tab-content">
-        <div class="section">
-          <div class="section-header">
-            <h3 class="section-title">🤖 Slots de SubBots</h3>
-          </div>
-          <div class="slots-grid" id="slotsGrid">
-            <div class="empty-state">Cargando slots...</div>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-system" class="tab-content">
-        <div class="section">
-          <div class="section-header">
-            <h3 class="section-title">💻 Estado del Sistema</h3>
-          </div>
-          <div class="health-grid" id="healthGrid">
-            <div class="empty-state">Cargando estado...</div>
-          </div>
-        </div>
-        <div class="two-col">
-          <div class="section">
-            <div class="section-header">
-              <h3 class="section-title">📊 Cache</h3>
-            </div>
-            <div id="cacheStats"><div class="empty-state">Cargando...</div></div>
-          </div>
-          <div class="section">
-            <div class="section-header">
-              <h3 class="section-title">⏱️ Uptime</h3>
-            </div>
-            <div id="uptimeStats">
-              <div class="stat-card">
-                <div class="stat-label">Uptime</div>
-                <div class="stat-value" id="uptimeValue">-</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-logs" class="tab-content">
-        <div class="section">
-          <div class="section-header">
-            <h3 class="section-title">📋 Logs del Dashboard</h3>
-            <button
-              class="refresh-btn"
-              onclick="loadLogs()"
-              style="padding: 0.3rem 0.8rem; font-size: 0.75rem"
-            >
-              Actualizar
-            </button>
-          </div>
-          <div class="logs-container" id="logsContainer">
-            <div class="empty-state">Sin logs</div>
-          </div>
-        </div>
-      </div>
-
-      <footer>
-        <p>OrbitBot Dashboard • Desarrollado con 💜</p>
-      </footer>
+    <div class="tabs">
+      <button class="tab active" data-tab="overview">✦ Overview</button>
+      <button class="tab" data-tab="commands">⚡ Commands</button>
+      <button class="tab" data-tab="moderation">🛡️ Moderation</button>
+      <button class="tab" data-tab="groups">👥 Groups</button>
+      <button class="tab" data-tab="subbots">🤖 SubBots</button>
+      <button class="tab" data-tab="system">🖥 System</button>
+      <button class="tab" data-tab="logs">📋 Logs</button>
     </div>
 
-    <script>
-      const API_BASE = '';
-      const TOKEN_STORAGE_KEY = 'orbit_panel_token';
-      let activityChart, memoryChart;
-      let refreshInterval;
-      let counterAnimations = {};
+    <div id="tab-overview" class="tab-content active">
+      <div class="two-col">
+        <div class="section">
+          <div class="section-header">
+            <h3 class="section-title">Real-time activity</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="activityChart"></canvas>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header">
+            <h3 class="section-title">Memory usage</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="memoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">Top commands</h3>
+        </div>
+        <div class="top-commands" id="topCommands">
+          <div class="empty-state">
+            <div class="empty-state-icon">⏳</div>
+            <p>Loading…</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      // ---------- Token auth ----------
-      function getStoredToken() {
-        try {
-          return localStorage.getItem(TOKEN_STORAGE_KEY) || '';
-        } catch {
-          return '';
-        }
-      }
+    <div id="tab-commands" class="tab-content">
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">Command stats</h3>
+        </div>
+        <div class="table-container">
+          <table id="commandsTable">
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>Executions</th>
+                <th>Total time</th>
+                <th>Avg time</th>
+                <th>Errors</th>
+              </tr>
+            </thead>
+            <tbody id="commandsBody">
+              <tr>
+                <td colspan="5" class="empty-state">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-      function storeToken(token) {
-        try {
-          localStorage.setItem(TOKEN_STORAGE_KEY, token);
-        } catch {
-          /* storage unavailable (private mode); token lives for this session only */
-        }
-      }
+    <div id="tab-moderation" class="tab-content">
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">Moderation actions</h3>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Action</th>
+                <th>Moderator</th>
+                <th>Reason</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="moderationBody">
+              <tr>
+                <td colspan="5" class="empty-state">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="section">
+          <div class="section-header">
+            <h3 class="section-title">Active bans</h3>
+          </div>
+          <div id="bansList"><div class="empty-state">No data</div></div>
+        </div>
+        <div class="section">
+          <div class="section-header">
+            <h3 class="section-title">Active mutes</h3>
+          </div>
+          <div id="mutesList"><div class="empty-state">No data</div></div>
+        </div>
+      </div>
+    </div>
 
-      function clearToken() {
-        try {
-          localStorage.removeItem(TOKEN_STORAGE_KEY);
-        } catch {
-          /* ignore */
-        }
-        const input = document.getElementById('tokenInput');
-        if (input) input.value = '';
-      }
+    <div id="tab-groups" class="tab-content">
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">Registered groups</h3>
+        </div>
+        <div id="groupsList">
+          <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <p>Loading groups…</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      function showTokenOverlay(errorMessage) {
-        const overlay = document.getElementById('tokenOverlay');
-        if (!overlay) return;
-        const errEl = document.getElementById('tokenError');
-        if (errEl) {
-          errEl.textContent = errorMessage || '';
-          errEl.style.display = errorMessage ? 'block' : 'none';
-        }
-        overlay.classList.add('visible');
-        setTimeout(() => document.getElementById('tokenInput')?.focus(), 100);
-      }
+    <div id="tab-subbots" class="tab-content">
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">SubBot slots</h3>
+        </div>
+        <div class="slots-grid" id="slotsGrid">
+          <div class="empty-state">Loading slots…</div>
+        </div>
+      </div>
+    </div>
 
-      function hideTokenOverlay() {
-        const overlay = document.getElementById('tokenOverlay');
-        if (overlay) overlay.classList.remove('visible');
-      }
-
-      function stopAutoRefresh() {
-        if (refreshInterval) {
-          clearInterval(refreshInterval);
-          refreshInterval = null;
-        }
-      }
-
-      function handleTokenSubmit() {
-        const input = document.getElementById('tokenInput');
-        const token = (input?.value || '').trim();
-        if (!token) {
-          showTokenOverlay('Enter the panel token (PANEL_WEBHOOK_TOKEN).');
-          return;
-        }
-        storeToken(token);
-        hideTokenOverlay();
-        loadAllData().catch(err => console.error('loadAllData failed:', err));
-        stopAutoRefresh();
-        refreshInterval = setInterval(loadAllData, 30000);
-      }
-
-      /**
-       * fetch wrapper that attaches the panel token and reacts to 401
-       * by asking for a new one.
-       */
-      async function apiFetch(url, options = {}) {
-        const headers = { ...(options.headers || {}) };
-        const token = getStoredToken();
-        if (token) headers['x-api-token'] = token;
-
-        const res = await fetch(url, { ...options, headers });
-        if (res.status === 401) {
-          clearToken();
-          stopAutoRefresh();
-          showTokenOverlay('Invalid or expired token. Enter the token again.');
-          throw new Error('Unauthorized (401): ' + url);
-        }
-        return res;
-      }
-      // ---------- end token auth ----------
-
-      document.addEventListener('DOMContentLoaded', () => {
-        try {
-          initCharts();
-        } catch (err) {
-          console.warn('Charts failed to initialize (CDN may be blocked):', err);
-        }
-        setupTabs();
-        addLiveIndicator();
-
-        const tokenForm = document.getElementById('tokenForm');
-        if (tokenForm) {
-          tokenForm.addEventListener('submit', e => {
-            e.preventDefault();
-            handleTokenSubmit();
-          });
-        }
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-          logoutBtn.addEventListener('click', () => {
-            clearToken();
-            stopAutoRefresh();
-            showTokenOverlay();
-          });
-        }
-
-        if (getStoredToken()) {
-          loadAllData().catch(err => console.error('loadAllData failed:', err));
-          refreshInterval = setInterval(loadAllData, 30000);
-        } else {
-          showTokenOverlay();
-        }
-      });
-
-      function animateCounter(elementId, targetValue, prefix = '', suffix = '') {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-
-        const duration = 1000;
-        const startTime = performance.now();
-
-        function update(currentTime) {
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const current = Math.floor(eased * targetValue);
-
-          el.textContent = prefix + current.toLocaleString() + suffix;
-
-          if (progress < 1) {
-            counterAnimations[elementId] = requestAnimationFrame(update);
-          }
-        }
-
-        if (counterAnimations[elementId]) {
-          cancelAnimationFrame(counterAnimations[elementId]);
-        }
-
-        counterAnimations[elementId] = requestAnimationFrame(update);
-      }
-
-      function showToast(message, type = 'info') {
-        let container = document.querySelector('.toast-container');
-        if (!container) {
-          container = document.createElement('div');
-          container.className = 'toast-container';
-          document.body.appendChild(container);
-        }
-
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-          <span class="toast-icon">${type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '✅'}</span>
-          <span>${message}</span>
-        `;
-
-        container.appendChild(toast);
-
-        setTimeout(() => {
-          toast.style.opacity = '0';
-          toast.style.transform = 'translateX(100px)';
-          setTimeout(() => toast.remove(), 400);
-        }, 3000);
-      }
-
-      function addLiveIndicator() {
-        const headerStatus = document.querySelector('.header-status');
-        if (!headerStatus) return;
-
-        const liveDiv = document.createElement('div');
-        liveDiv.className = 'live-indicator';
-        liveDiv.innerHTML = `
-          <span class="live-dot"></span>
-          <span>LIVE</span>
-        `;
-
-        headerStatus.insertBefore(liveDiv, headerStatus.firstChild);
-      }
-
-      function setupTabs() {
-        document.querySelectorAll('.tab').forEach(tab => {
-          tab.addEventListener('click', () => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            tab.classList.add('active');
-            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
-          });
-        });
-      }
-
-      function initCharts() {
-        const activityCtx = document.getElementById('activityChart').getContext('2d');
-        activityChart = new Chart(activityCtx, {
-          type: 'line',
-          data: {
-            labels: [],
-            datasets: [
-              {
-                label: 'Messages',
-                data: [],
-                borderColor: '#00d4aa',
-                backgroundColor: 'rgba(0, 212, 170, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2,
-              },
-              {
-                label: 'Commands',
-                data: [],
-                borderColor: '#00b4d8',
-                backgroundColor: 'rgba(0, 180, 216, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { labels: { color: '#e8f1f5' } },
-            },
-            scales: {
-              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#e8f1f5' } },
-              y: {
-                grid: { color: 'rgba(255,255,255,0.05)' },
-                ticks: { color: '#e8f1f5' },
-                beginAtZero: true,
-              },
-            },
-          },
-        });
-
-        const memoryCtx = document.getElementById('memoryChart').getContext('2d');
-        memoryChart = new Chart(memoryCtx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Usado', 'Libre'],
-            datasets: [{
-              data: [0, 100],
-              backgroundColor: ['#00d4aa', 'rgba(255,255,255,0.08)'],
-              borderWidth: 0,
-            }],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '75%',
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: { color: '#e8f1f5', font: { family: 'IBM Plex Mono', monospace', size: 12 } },
-              },
-            },
-          },
-        });
-      }
-
-      async function refreshAll() {
-        const loadingEl = document.getElementById('refreshLoading');
-        const textEl = document.getElementById('refreshText');
-        loadingEl.style.display = 'inline-block';
-        textEl.style.display = 'none';
-
-        try {
-          await loadAllData();
-          showToast('Datos actualizados correctamente', 'success');
-        } catch (err) {
-          showToast('Error al actualizar datos', 'error');
-          console.error('Refresh error:', err);
-        } finally {
-          loadingEl.style.display = 'none';
-          textEl.style.display = 'inline';
-        }
-      }
-
-      async function loadAllData() {
-        loadStats().catch(err => console.error('loadStats failed:', err));
-        loadMetrics().catch(err => console.error('loadMetrics failed:', err));
-        loadCommands().catch(err => console.error('loadCommands failed:', err));
-        loadModeration().catch(err => console.error('loadModeration failed:', err));
-        loadGroups().catch(err => console.error('loadGroups failed:', err));
-        loadSlots().catch(err => console.error('loadSlots failed:', err));
-        loadHealth().catch(err => console.error('loadHealth failed:', err));
-        loadLogs().catch(err => console.error('loadLogs failed:', err));
-      }
-
-      async function loadStats() {
-        try {
-          const res = await apiFetch('/api/stats');
-          if (!res.ok) {
-            console.error('[panel] /api/stats failed:', res.status, res.statusText);
-            return;
-          }
-          const data = await res.json();
-
-          animateCounter('msgsPerMin', data.averages?.messages || 0);
-          document.getElementById('avgMsgs').textContent = data.averages?.messages || 0;
-          animateCounter('cmdsPerMin', data.averages?.commands || 0);
-          animateCounter('totalCmds', data.stats?.commandsExecuted || 0, '', '');
-          animateCounter('errorsPerMin', data.averages?.errors || 0);
-          animateCounter('totalErrors', data.stats?.errorsCount || 0, '', '');
-
-          const ramUsed = parseFloat((data.memorySystem?.used / 1024 / 1024 / 1024).toFixed(1));
-          const ramTotal = parseFloat((data.memorySystem?.total / 1024 / 1024 / 1024).toFixed(1));
-          const ramPct = data.memorySystem?.percentage || 0;
-          animateCounter('ramPercent', ramPct, '', '%');
-          document.getElementById('ramUsed').textContent = ramUsed.toFixed(1);
-          document.getElementById('ramTotal').textContent = ramTotal.toFixed(1);
-          document.getElementById('ramProgress').style.width = ramPct + '%';
-
-          const mainBot = data.bots?.find(b => b.id === 'main');
-          const statusDot = document.getElementById('mainBotStatus');
-          const statusText = document.getElementById('mainBotText');
-          if (mainBot?.connected) {
-            statusDot.className = 'status-dot';
-            statusText.textContent = 'Online';
-          } else {
-            statusDot.className = 'status-dot danger';
-            statusText.textContent = 'Offline';
-          }
-
-          const subBots = data.bots?.filter(b => b.id !== 'main') || [];
-          const connectedSubBots = subBots.filter(b => b.connected).length;
-          document.getElementById('activeBots').textContent = connectedSubBots;
-          document.getElementById('totalBots').textContent = subBots.length;
-          document.getElementById('availableSlots').textContent = data.slots?.available || 0;
-
-          document.getElementById('uptimeValue').textContent = formatUptime(data.uptime);
-
-          if (data.cache) {
-            document.getElementById('cacheStats').innerHTML = `
-            <div class="health-item"><div class="health-info"><h4>Entradas</h4><p>${data.cache.size || 0}</p></div></div>
-            <div class="health-item"><div class="health-info"><h4>Hits</h4><p>${data.cache.hits || 0}</p></div></div>
-            <div class="health-item"><div class="health-info"><h4>Misses</h4><p>${data.cache.misses || 0}</p></div></div>
-          `;
-          }
-
-          memoryChart.data.datasets[0].data = [ramUsed, Math.max(0, ramTotal - ramUsed)];
-          memoryChart.update('none');
-        } catch (err) {
-          console.error('Stats error:', err);
-        }
-      }
-
-      async function loadMetrics() {
-        try {
-          const res = await apiFetch('/api/metrics/realtime');
-          const data = await res.json();
-
-          const history = data.history || [];
-          const labels = history.map(m =>
-            new Date(m.timestamp * (m.timestamp > 1e12 ? 1 : 1000)).toLocaleTimeString(),
-          );
-          const msgsData = history.map(m => m.messagesPerMinute);
-          const cmdsData = history.map(m => m.commandsPerMinute);
-
-          activityChart.data.labels = labels;
-          activityChart.data.datasets[0].data = msgsData;
-          activityChart.data.datasets[1].data = cmdsData;
-          activityChart.update('none');
-        } catch (err) {
-          console.error('Metrics error:', err);
-        }
-      }
-
-      async function loadCommands() {
-        try {
-          const res = await apiFetch('/api/commands/metrics');
-          const data = await res.json();
-
-          const top = (data.topCommands || data.commands || []).slice(0, 8);
-          const maxCount = top.length > 0 ? top[0].count : 1;
-
-          if (top.length > 0) {
-            document.getElementById('topCommands').innerHTML = top
-              .map(
-                cmd => `
-            <div class="command-item">
-              <span class="command-name">/${cmd.name}</span>
-              <div class="command-bar"><div class="command-bar-fill" style="width: ${(cmd.count / maxCount) * 100}%"></div></div>
-              <span class="command-count">${cmd.count}</span>
-            </div>
-          `,
-              )
-              .join('');
-          } else {
-            document.getElementById('topCommands').innerHTML =
-              '<div class="empty-state">Sin datos</div>';
-          }
-
-          const tbody = document.getElementById('commandsBody');
-          const commands = (data.commands || []).slice(0, 30);
-          if (commands.length > 0) {
-            tbody.innerHTML = commands
-              .map(
-                cmd => `
-            <tr>
-              <td><code style="color: var(--primary)">/${cmd.name}</code></td>
-              <td>${cmd.count}</td>
-              <td>${cmd.totalTime}ms</td>
-              <td>${cmd.avgTime}ms</td>
-              <td>${cmd.errors > 0 ? '<span class="badge badge-danger">' + cmd.errors + '</span>' : '0'}</td>
-            </tr>
-          `,
-              )
-              .join('');
-          } else {
-            tbody.innerHTML =
-              '<tr><td colspan="5" class="empty-state">No commands executed</td></tr>';
-          }
-        } catch (err) {
-          console.error('Commands error:', err);
-        }
-      }
-
-      async function loadModeration() {
-        try {
-          const [actionsRes, bansRes, mutesRes] = await Promise.all([
-            apiFetch('/api/moderation/actions?limit=20'),
-            apiFetch('/api/moderation/bans'),
-            apiFetch('/api/moderation/mutes'),
-          ]);
-
-          const actions = await actionsRes.json();
-          const bans = await bansRes.json();
-          const mutes = await mutesRes.json();
-
-          const actionsBody = document.getElementById('moderationBody');
-          if (actions.actions?.length > 0) {
-            actionsBody.innerHTML = actions.actions
-              .map(
-                a => `
-            <tr>
-              <td>${a.userName || a.userId}</td>
-              <td><span class="badge badge-${getActionBadge(a.action)}">${a.action.toUpperCase()}</span></td>
-              <td>${a.moderator}</td>
-              <td>${a.reason || '-'}</td>
-              <td>${new Date(a.timestamp).toLocaleString()}</td>
-            </tr>
-          `,
-              )
-              .join('');
-          } else {
-            actionsBody.innerHTML =
-              '<tr><td colspan="5" class="empty-state">No moderation actions</td></tr>';
-          }
-
-          const bansList = document.getElementById('bansList');
-          if (bans.bans?.length > 0) {
-            bansList.innerHTML = bans.bans
-              .slice(0, 10)
-              .map(
-                b => `
-            <div class="health-item">
-              <div class="health-info">
-                <h4>${b.userName || b.userId}</h4>
-                <p>${b.reason || 'No reason'}</p>
-              </div>
-              <span class="badge badge-danger">Baneado</span>
-            </div>
-          `,
-              )
-              .join('');
-          } else {
-            bansList.innerHTML = '<div class="empty-state">Sin baneos activos</div>';
-          }
-
-          const mutesList = document.getElementById('mutesList');
-          if (mutes.mutes?.length > 0) {
-            mutesList.innerHTML = mutes.mutes
-              .slice(0, 10)
-              .map(
-                m => `
-            <div class="health-item">
-              <div class="health-info">
-                <h4>${m.userName || m.userId}</h4>
-                <p>Expira: ${new Date(m.expiresAt).toLocaleString()}</p>
-              </div>
-              <span class="badge badge-warning">Muteado</span>
-            </div>
-          `,
-              )
-              .join('');
-          } else {
-            mutesList.innerHTML = '<div class="empty-state">Sin mutes activos</div>';
-          }
-        } catch (err) {
-          console.error('Moderation error:', err);
-        }
-      }
-
-      async function loadGroups() {
-        try {
-          const res = await apiFetch('/api/groups');
-          const data = await res.json();
-
-          document.getElementById('totalGroups').textContent = data.total || 0;
-          document.getElementById('activeGroups').textContent = data.active || 0;
-
-          const groupsList = document.getElementById('groupsList');
-          if (data.groups?.length > 0) {
-            groupsList.innerHTML = data.groups
-              .map(
-                g => `
-            <div class="group-item">
-              <div>
-                <div class="group-name">${g.name}</div>
-                <div class="group-meta">${g.jid}</div>
-              </div>
-              <div class="group-settings">
-                ${g.welcome ? '<span class="badge badge-info">Welcome</span>' : ''}
-                ${g.goodbye ? '<span class="badge badge-info">Goodbye</span>' : ''}
-                ${g.antiLink ? '<span class="badge badge-warning">Antilink</span>' : ''}
-                ${g.antiSpam ? '<span class="badge badge-warning">Antispam</span>' : ''}
-                ${g.onlyAdmin ? '<span class="badge badge-danger">Admin Only</span>' : ''}
-                ${!g.isActive ? '<span class="badge badge-danger">Inactivo</span>' : ''}
-              </div>
-            </div>
-          `,
-              )
-              .join('');
-          } else {
-            groupsList.innerHTML =
-              '<div class="empty-state"><div class="empty-state-icon">👥</div><p>No hay grupos registrados</p></div>';
-          }
-        } catch (err) {
-          console.error('Groups error:', err);
-        }
-      }
-
-      async function loadSlots() {
-        try {
-          const res = await apiFetch('/api/slots');
-          const data = await res.json();
-
-          const slotsGrid = document.getElementById('slotsGrid');
-          if (data.slots?.length > 0) {
-            slotsGrid.innerHTML = data.slots
-              .map(
-                slot => `
-            <div class="slot ${slot.status}">
-              <div class="slot-number">#${slot.slot}</div>
-              <span class="slot-status">${getStatusLabel(slot.status)}</span>
-              <div class="slot-info">${slot.name || slot.phoneNumber || '-'}</div>
-              ${slot.phoneNumber ? '<div class="slot-info">' + slot.phoneNumber + '</div>' : ''}
-            </div>
-          `,
-              )
-              .join('');
-          } else {
-            slotsGrid.innerHTML = '<div class="empty-state">No hay slots configurados</div>';
-          }
-        } catch (err) {
-          console.error('Slots error:', err);
-        }
-      }
-
-      async function loadHealth() {
-        try {
-          const res = await apiFetch('/api/health/detailed');
-          const data = await res.json();
-
-          const healthGrid = document.getElementById('healthGrid');
-          const checks = data.checks || [];
-          const statuses = {
-            pass: { icon: '✅', class: 'pass', label: 'OK' },
-            warn: { icon: '⚠️', class: 'warn', label: 'Advertencia' },
-            fail: { icon: '❌', class: 'fail', label: 'Fallido' },
-          };
-
-          healthGrid.innerHTML = checks
-            .map(check => {
-              const status = statuses[check.status] || statuses.pass;
-              return `
-            <div class="health-item">
-              <div class="health-icon ${status.class}">${status.icon}</div>
-              <div class="health-info">
-                <h4>${check.name}</h4>
-                <p>${check.message || status.label}</p>
-              </div>
-            </div>
-          `;
-            })
-            .join('');
-
-          if (data.system) {
-            document.getElementById('uptimeStats').innerHTML = `
+    <div id="tab-system" class="tab-content">
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">System status</h3>
+        </div>
+        <div class="health-grid" id="healthGrid">
+          <div class="empty-state">Loading status…</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="section">
+          <div class="section-header">
+            <h3 class="section-title">Cache</h3>
+          </div>
+          <div id="cacheStats"><div class="empty-state">Loading…</div></div>
+        </div>
+        <div class="section">
+          <div class="section-header">
+            <h3 class="section-title">Uptime</h3>
+          </div>
+          <div id="uptimeStats">
             <div class="stat-card">
               <div class="stat-label">Uptime</div>
-              <div class="stat-value">${formatUptime(data.uptime)}</div>
+              <div class="stat-value" id="uptimeValue">-</div>
             </div>
-            <div class="stat-card">
-              <div class="stat-label">Plataforma</div>
-              <div class="stat-value" style="font-size: 1.5rem">${data.system.platform}</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">CPU</div>
-              <div class="stat-value" style="font-size: 1.5rem">${data.system.cpuCount} cores</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Node.js</div>
-              <div class="stat-value" style="font-size: 1.2rem">${data.process?.nodeVersion || '-'}</div>
-            </div>
-          `;
-          }
-        } catch (err) {
-          console.error('Health error:', err);
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-logs" class="tab-content">
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">Panel logs</h3>
+          <button class="refresh-btn" onclick="loadLogs()" style="padding: 0.45rem 1rem; font-size: 0.78rem">Refresh</button>
+        </div>
+        <div class="logs-container" id="logsContainer">
+          <div class="empty-state">No logs</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>OrbitBot Control · Built by Carlos G ✦</p>
+    </footer>
+  </div>
+
+  <script>
+    const API_BASE = '';
+    const TOKEN_STORAGE_KEY = 'orbit_panel_token';
+    let activityChart, memoryChart;
+    let refreshInterval;
+    let counterAnimations = {};
+
+    // ---------- Token auth ----------
+    function getStoredToken() {
+      try {
+        return localStorage.getItem(TOKEN_STORAGE_KEY) || '';
+      } catch {
+        return '';
+      }
+    }
+
+    function storeToken(token) {
+      try {
+        localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      } catch {
+        /* storage unavailable (private mode); token lives for this session only */
+      }
+    }
+
+    function clearToken() {
+      try {
+        localStorage.removeItem(TOKEN_STORAGE_KEY);
+      } catch {
+        /* ignore */
+      }
+      const input = document.getElementById('tokenInput');
+      if (input) input.value = '';
+    }
+
+    function showTokenOverlay(errorMessage) {
+      const overlay = document.getElementById('tokenOverlay');
+      if (!overlay) return;
+      const errEl = document.getElementById('tokenError');
+      if (errEl) {
+        errEl.textContent = errorMessage || '';
+        errEl.style.display = errorMessage ? 'block' : 'none';
+      }
+      overlay.classList.add('visible');
+      setTimeout(() => document.getElementById('tokenInput')?.focus(), 150);
+    }
+
+    function hideTokenOverlay() {
+      const overlay = document.getElementById('tokenOverlay');
+      if (overlay) overlay.classList.remove('visible');
+    }
+
+    function stopAutoRefresh() {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+      }
+    }
+
+    function handleTokenSubmit() {
+      const input = document.getElementById('tokenInput');
+      const token = (input?.value || '').trim();
+      if (!token) {
+        showTokenOverlay('Enter the panel token (PANEL_WEBHOOK_TOKEN).');
+        return;
+      }
+      storeToken(token);
+      hideTokenOverlay();
+      loadAllData().catch(err => console.error('loadAllData failed:', err));
+      stopAutoRefresh();
+      refreshInterval = setInterval(loadAllData, 30000);
+    }
+
+    /**
+     * fetch wrapper that attaches the panel token and reacts to 401
+     * by asking for a new one.
+     */
+    async function apiFetch(url, options = {}) {
+      const headers = { ...(options.headers || {}) };
+      const token = getStoredToken();
+      if (token) headers['x-api-token'] = token;
+
+      const res = await fetch(url, { ...options, headers });
+      if (res.status === 401) {
+        clearToken();
+        stopAutoRefresh();
+        showTokenOverlay('Invalid or expired token. Enter the token again.');
+        throw new Error('Unauthorized (401): ' + url);
+      }
+      return res;
+    }
+    // ---------- end token auth ----------
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        initCharts();
+      } catch (err) {
+        console.warn('Charts failed to initialize (CDN may be blocked):', err);
+      }
+      setupTabs();
+      addLiveIndicator();
+
+      const tokenForm = document.getElementById('tokenForm');
+      if (tokenForm) {
+        tokenForm.addEventListener('submit', e => {
+          e.preventDefault();
+          handleTokenSubmit();
+        });
+      }
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          clearToken();
+          stopAutoRefresh();
+          showTokenOverlay();
+        });
+      }
+
+      if (getStoredToken()) {
+        loadAllData().catch(err => console.error('loadAllData failed:', err));
+        refreshInterval = setInterval(loadAllData, 30000);
+      } else {
+        showTokenOverlay();
+      }
+    });
+
+    function animateCounter(elementId, targetValue, prefix = '', suffix = '') {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+
+      const duration = 700;
+      const startTime = performance.now();
+
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(eased * targetValue);
+
+        el.textContent = prefix + current.toLocaleString() + suffix;
+
+        if (progress < 1) {
+          counterAnimations[elementId] = requestAnimationFrame(update);
         }
       }
 
-      async function loadLogs() {
-        try {
-          const res = await apiFetch('/api/logs?limit=50');
-          const data = await res.json();
+      if (counterAnimations[elementId]) {
+        cancelAnimationFrame(counterAnimations[elementId]);
+      }
 
-          const container = document.getElementById('logsContainer');
-          if (data.logs?.length > 0) {
-            container.innerHTML = data.logs
-              .map(
-                log => `
-            <div class="log-entry">
-              <span class="log-time">${new Date(log.timestamp).toLocaleTimeString()}</span>
-              <span class="log-level ${log.level}">${log.level.toUpperCase()}</span>
-              <span class="log-message">${log.message}</span>
-            </div>
-          `,
-              )
-              .join('');
-          } else {
-            container.innerHTML = '<div class="empty-state">Sin logs disponibles</div>';
-          }
-        } catch (err) {
-          console.error('Logs error:', err);
+      counterAnimations[elementId] = requestAnimationFrame(update);
+    }
+
+    function showToast(message, type = 'info') {
+      let container = document.querySelector('.toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <span class="toast-icon">${type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '✅'}</span>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(110%)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function addLiveIndicator() {
+      const headerStatus = document.querySelector('.header-status');
+      if (!headerStatus) return;
+
+      const liveDiv = document.createElement('div');
+      liveDiv.className = 'live-indicator';
+      liveDiv.innerHTML = `
+        <span class="live-dot"></span>
+        <span>LIVE</span>
+      `;
+
+      headerStatus.insertBefore(liveDiv, headerStatus.firstChild);
+    }
+
+    function setupTabs() {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+      });
+    }
+
+    function initCharts() {
+      const activityCtx = document.getElementById('activityChart').getContext('2d');
+      activityChart = new Chart(activityCtx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Messages',
+              data: [],
+              borderColor: '#818CF8',
+              backgroundColor: 'rgba(129, 140, 248, 0.12)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2,
+              pointRadius: 0,
+            },
+            {
+              label: 'Commands',
+              data: [],
+              borderColor: '#22D3EE',
+              backgroundColor: 'rgba(34, 211, 238, 0.10)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2,
+              pointRadius: 0,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#9AA3BF' } },
+          },
+          scales: {
+            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9AA3BF' } },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#9AA3BF' },
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+      memoryChart = new Chart(memoryCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Used', 'Free'],
+          datasets: [{
+            data: [0, 100],
+            backgroundColor: ['#818CF8', 'rgba(255, 255, 255, 0.08)'],
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '78%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#9AA3BF', font: { family: 'IBM Plex Mono', size: 11 } },
+            },
+          },
+        },
+      });
+    }
+
+    async function refreshAll() {
+      const loadingEl = document.getElementById('refreshLoading');
+      const textEl = document.getElementById('refreshText');
+      loadingEl.style.display = 'inline-block';
+      textEl.style.display = 'none';
+
+      try {
+        await loadAllData();
+        showToast('Data refreshed', 'success');
+      } catch (err) {
+        showToast('Refresh failed', 'error');
+        console.error('Refresh error:', err);
+      } finally {
+        loadingEl.style.display = 'none';
+        textEl.style.display = 'inline';
+      }
+    }
+
+    async function loadAllData() {
+      loadStats().catch(err => console.error('loadStats failed:', err));
+      loadMetrics().catch(err => console.error('loadMetrics failed:', err));
+      loadCommands().catch(err => console.error('loadCommands failed:', err));
+      loadModeration().catch(err => console.error('loadModeration failed:', err));
+      loadGroups().catch(err => console.error('loadGroups failed:', err));
+      loadSlots().catch(err => console.error('loadSlots failed:', err));
+      loadHealth().catch(err => console.error('loadHealth failed:', err));
+      loadLogs().catch(err => console.error('loadLogs failed:', err));
+    }
+
+    async function loadStats() {
+      try {
+        const res = await apiFetch('/api/stats');
+        if (!res.ok) {
+          console.error('[panel] /api/stats failed:', res.status, res.statusText);
+          return;
         }
-      }
+        const data = await res.json();
 
-      function formatUptime(secs) {
-        if (!secs) return '-';
-        const d = Math.floor(secs / 86400);
-        const h = Math.floor((secs % 86400) / 3600);
-        const m = Math.floor((secs % 3600) / 60);
-        const s = Math.floor(secs % 60);
-        if (d > 0) return `${d}d ${h}h ${m}m`;
-        if (h > 0) return `${h}h ${m}m ${s}s`;
-        return `${m}m ${s}s`;
-      }
+        animateCounter('msgsPerMin', data.averages?.messages || 0);
+        document.getElementById('avgMsgs').textContent = data.averages?.messages || 0;
+        animateCounter('cmdsPerMin', data.averages?.commands || 0);
+        animateCounter('totalCmds', data.stats?.commandsExecuted || 0, '', '');
+        animateCounter('errorsPerMin', data.averages?.errors || 0);
+        animateCounter('totalErrors', data.stats?.errorsCount || 0, '', '');
 
-      function getStatusLabel(status) {
-        const labels = {
-          free: 'LIBRE',
-          reserved: 'RESERVADO',
-          pending: 'PENDIENTE',
-          linking: 'VINCULANDO',
-          connected: 'CONECTADO',
-          disconnected: 'DESCONECTADO',
+        const ramUsed = parseFloat((data.memorySystem?.used / 1024 / 1024 / 1024).toFixed(1));
+        const ramTotal = parseFloat((data.memorySystem?.total / 1024 / 1024 / 1024).toFixed(1));
+        const ramPct = data.memorySystem?.percentage || 0;
+        animateCounter('ramPercent', ramPct, '', '%');
+        document.getElementById('ramUsed').textContent = ramUsed.toFixed(1);
+        document.getElementById('ramTotal').textContent = ramTotal.toFixed(1);
+        document.getElementById('ramProgress').style.width = ramPct + '%';
+
+        const mainBot = data.bots?.find(b => b.id === 'main');
+        const statusDot = document.getElementById('mainBotStatus');
+        const statusText = document.getElementById('mainBotText');
+        if (mainBot?.connected) {
+          statusDot.className = 'status-dot';
+          statusText.textContent = 'Online';
+        } else {
+          statusDot.className = 'status-dot danger';
+          statusText.textContent = 'Offline';
+        }
+
+        const subBots = data.bots?.filter(b => b.id !== 'main') || [];
+        const connectedSubBots = subBots.filter(b => b.connected).length;
+        document.getElementById('activeBots').textContent = connectedSubBots;
+        document.getElementById('totalBots').textContent = subBots.length;
+        document.getElementById('availableSlots').textContent = data.slots?.available || 0;
+
+        document.getElementById('uptimeValue').textContent = formatUptime(data.uptime);
+
+        if (data.cache) {
+          document.getElementById('cacheStats').innerHTML = `
+          <div class="health-item"><div class="health-info"><h4>Entries</h4><p>${data.cache.size || 0}</p></div></div>
+          <div class="health-item"><div class="health-info"><h4>Hits</h4><p>${data.cache.hits || 0}</p></div></div>
+          <div class="health-item"><div class="health-info"><h4>Misses</h4><p>${data.cache.misses || 0}</p></div></div>
+        `;
+        }
+
+        memoryChart.data.datasets[0].data = [ramUsed, Math.max(0, ramTotal - ramUsed)];
+        memoryChart.update('none');
+      } catch (err) {
+        console.error('Stats error:', err);
+      }
+    }
+
+    async function loadMetrics() {
+      try {
+        const res = await apiFetch('/api/metrics/realtime');
+        const data = await res.json();
+
+        const history = data.history || [];
+        const labels = history.map(m =>
+          new Date(m.timestamp * (m.timestamp > 1e12 ? 1 : 1000)).toLocaleTimeString(),
+        );
+        const msgsData = history.map(m => m.messagesPerMinute);
+        const cmdsData = history.map(m => m.commandsPerMinute);
+
+        activityChart.data.labels = labels;
+        activityChart.data.datasets[0].data = msgsData;
+        activityChart.data.datasets[1].data = cmdsData;
+        activityChart.update('none');
+      } catch (err) {
+        console.error('Metrics error:', err);
+      }
+    }
+
+    async function loadCommands() {
+      try {
+        const res = await apiFetch('/api/commands/metrics');
+        const data = await res.json();
+
+        const top = (data.topCommands || data.commands || []).slice(0, 8);
+        const maxCount = top.length > 0 ? top[0].count : 1;
+
+        if (top.length > 0) {
+          document.getElementById('topCommands').innerHTML = top
+            .map(
+              cmd => `
+          <div class="command-item">
+            <span class="command-name">/${cmd.name}</span>
+            <div class="command-bar"><div class="command-bar-fill" style="width: ${(cmd.count / maxCount) * 100}%"></div></div>
+            <span class="command-count">${cmd.count}</span>
+          </div>
+        `,
+            )
+            .join('');
+        } else {
+          document.getElementById('topCommands').innerHTML =
+            '<div class="empty-state">No data</div>';
+        }
+
+        const tbody = document.getElementById('commandsBody');
+        const commands = (data.commands || []).slice(0, 30);
+        if (commands.length > 0) {
+          tbody.innerHTML = commands
+            .map(
+              cmd => `
+          <tr>
+            <td><code style="color: var(--primary)">/${cmd.name}</code></td>
+            <td>${cmd.count}</td>
+            <td>${cmd.totalTime}ms</td>
+            <td>${cmd.avgTime}ms</td>
+            <td>${cmd.errors > 0 ? '<span class="badge badge-danger">' + cmd.errors + '</span>' : '0'}</td>
+          </tr>
+        `,
+            )
+            .join('');
+        } else {
+          tbody.innerHTML =
+            '<tr><td colspan="5" class="empty-state">No commands executed</td></tr>';
+        }
+      } catch (err) {
+        console.error('Commands error:', err);
+      }
+    }
+
+    async function loadModeration() {
+      try {
+        const [actionsRes, bansRes, mutesRes] = await Promise.all([
+          apiFetch('/api/moderation/actions?limit=20'),
+          apiFetch('/api/moderation/bans'),
+          apiFetch('/api/moderation/mutes'),
+        ]);
+
+        const actions = await actionsRes.json();
+        const bans = await bansRes.json();
+        const mutes = await mutesRes.json();
+
+        const actionsBody = document.getElementById('moderationBody');
+        if (actions.actions?.length > 0) {
+          actionsBody.innerHTML = actions.actions
+            .map(
+              a => `
+          <tr>
+            <td>${a.userName || a.userId}</td>
+            <td><span class="badge badge-${getActionBadge(a.action)}">${a.action.toUpperCase()}</span></td>
+            <td>${a.moderator}</td>
+            <td>${a.reason || '-'}</td>
+            <td>${new Date(a.timestamp).toLocaleString()}</td>
+          </tr>
+        `,
+            )
+            .join('');
+        } else {
+          actionsBody.innerHTML =
+            '<tr><td colspan="5" class="empty-state">No moderation actions</td></tr>';
+        }
+
+        const bansList = document.getElementById('bansList');
+        if (bans.bans?.length > 0) {
+          bansList.innerHTML = bans.bans
+            .slice(0, 10)
+            .map(
+              b => `
+          <div class="health-item">
+            <div class="health-info">
+              <h4>${b.userName || b.userId}</h4>
+              <p>${b.reason || 'No reason'}</p>
+            </div>
+            <span class="badge badge-danger">Banned</span>
+          </div>
+        `,
+            )
+            .join('');
+        } else {
+          bansList.innerHTML = '<div class="empty-state">No active bans</div>';
+        }
+
+        const mutesList = document.getElementById('mutesList');
+        if (mutes.mutes?.length > 0) {
+          mutesList.innerHTML = mutes.mutes
+            .slice(0, 10)
+            .map(
+              m => `
+          <div class="health-item">
+            <div class="health-info">
+              <h4>${m.userName || m.userId}</h4>
+              <p>Expires: ${new Date(m.expiresAt).toLocaleString()}</p>
+            </div>
+            <span class="badge badge-warning">Muted</span>
+          </div>
+        `,
+            )
+            .join('');
+        } else {
+          mutesList.innerHTML = '<div class="empty-state">No active mutes</div>';
+        }
+      } catch (err) {
+        console.error('Moderation error:', err);
+      }
+    }
+
+    async function loadGroups() {
+      try {
+        const res = await apiFetch('/api/groups');
+        const data = await res.json();
+
+        document.getElementById('totalGroups').textContent = data.total || 0;
+        document.getElementById('activeGroups').textContent = data.active || 0;
+
+        const groupsList = document.getElementById('groupsList');
+        if (data.groups?.length > 0) {
+          groupsList.innerHTML = data.groups
+            .map(
+              g => `
+          <div class="group-item">
+            <div>
+              <div class="group-name">${g.name}</div>
+              <div class="group-meta">${g.jid}</div>
+            </div>
+            <div class="group-settings">
+              ${g.welcome ? '<span class="badge badge-info">Welcome</span>' : ''}
+              ${g.goodbye ? '<span class="badge badge-info">Goodbye</span>' : ''}
+              ${g.antiLink ? '<span class="badge badge-warning">Antilink</span>' : ''}
+              ${g.antiSpam ? '<span class="badge badge-warning">Antispam</span>' : ''}
+              ${g.onlyAdmin ? '<span class="badge badge-danger">Admin only</span>' : ''}
+              ${!g.isActive ? '<span class="badge badge-danger">Inactive</span>' : ''}
+            </div>
+          </div>
+        `,
+            )
+            .join('');
+        } else {
+          groupsList.innerHTML =
+            '<div class="empty-state"><div class="empty-state-icon">👥</div><p>No registered groups</p></div>';
+        }
+      } catch (err) {
+        console.error('Groups error:', err);
+      }
+    }
+
+    async function loadSlots() {
+      try {
+        const res = await apiFetch('/api/slots');
+        const data = await res.json();
+
+        const slotsGrid = document.getElementById('slotsGrid');
+        if (data.slots?.length > 0) {
+          slotsGrid.innerHTML = data.slots
+            .map(
+              slot => `
+          <div class="slot ${slot.status}">
+            <div class="slot-number">#${slot.slot}</div>
+            <span class="slot-status">${getStatusLabel(slot.status)}</span>
+            <div class="slot-info">${slot.name || slot.phoneNumber || '-'}</div>
+            ${slot.phoneNumber ? '<div class="slot-info">' + slot.phoneNumber + '</div>' : ''}
+          </div>
+        `,
+            )
+            .join('');
+        } else {
+          slotsGrid.innerHTML = '<div class="empty-state">No slots configured</div>';
+        }
+      } catch (err) {
+        console.error('Slots error:', err);
+      }
+    }
+
+    async function loadHealth() {
+      try {
+        const res = await apiFetch('/api/health/detailed');
+        const data = await res.json();
+
+        const healthGrid = document.getElementById('healthGrid');
+        const checks = data.checks || [];
+        const statuses = {
+          pass: { icon: '✅', class: 'pass', label: 'OK' },
+          warn: { icon: '⚠️', class: 'warn', label: 'Warning' },
+          fail: { icon: '❌', class: 'fail', label: 'Failed' },
         };
-        return labels[status] || status?.toUpperCase() || '-';
-      }
 
-      function getActionBadge(action) {
-        const badges = {
-          ban: 'danger',
-          kick: 'danger',
-          mute: 'warning',
-          warn: 'warning',
-        };
-        return badges[action] || 'info';
+        healthGrid.innerHTML = checks
+          .map(check => {
+            const status = statuses[check.status] || statuses.pass;
+            return `
+          <div class="health-item">
+            <div class="health-icon ${status.class}">${status.icon}</div>
+            <div class="health-info">
+              <h4>${check.name}</h4>
+              <p>${check.message || status.label}</p>
+            </div>
+          </div>
+        `;
+          })
+          .join('');
+
+        if (data.system) {
+          document.getElementById('uptimeStats').innerHTML = `
+          <div class="stat-card">
+            <div class="stat-label">Uptime</div>
+            <div class="stat-value">${formatUptime(data.uptime)}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Platform</div>
+            <div class="stat-value" style="font-size: 1.4rem">${data.system.platform}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">CPU</div>
+            <div class="stat-value" style="font-size: 1.4rem">${data.system.cpuCount} cores</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Node.js</div>
+            <div class="stat-value" style="font-size: 1.1rem">${data.process?.nodeVersion || '-'}</div>
+          </div>
+        `;
+        }
+      } catch (err) {
+        console.error('Health error:', err);
       }
-    </script>
-  </body>
+    }
+
+    async function loadLogs() {
+      try {
+        const res = await apiFetch('/api/logs?limit=50');
+        const data = await res.json();
+
+        const container = document.getElementById('logsContainer');
+        if (data.logs?.length > 0) {
+          container.innerHTML = data.logs
+            .map(
+              log => `
+          <div class="log-entry">
+            <span class="log-time">${new Date(log.timestamp).toLocaleTimeString()}</span>
+            <span class="log-level ${log.level}">${log.level.toUpperCase()}</span>
+            <span class="log-message">${log.message}</span>
+          </div>
+        `,
+            )
+            .join('');
+        } else {
+          container.innerHTML = '<div class="empty-state">No logs available</div>';
+        }
+      } catch (err) {
+        console.error('Logs error:', err);
+      }
+    }
+
+    function formatUptime(secs) {
+      if (!secs) return '-';
+      const d = Math.floor(secs / 86400);
+      const h = Math.floor((secs % 86400) / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      const s = Math.floor(secs % 60);
+      if (d > 0) return `${d}d ${h}h ${m}m`;
+      if (h > 0) return `${h}h ${m}m ${s}s`;
+      return `${m}m ${s}s`;
+    }
+
+    function getStatusLabel(status) {
+      const labels = {
+        free: 'FREE',
+        reserved: 'RESERVED',
+        pending: 'PENDING',
+        linking: 'LINKING',
+        connected: 'CONNECTED',
+        disconnected: 'OFFLINE',
+      };
+      return labels[status] || status?.toUpperCase() || '-';
+    }
+
+    function getActionBadge(action) {
+      const badges = {
+        ban: 'danger',
+        kick: 'danger',
+        mute: 'warning',
+        warn: 'warning',
+      };
+      return badges[action] || 'info';
+    }
+  </script>
+</body>
 </html>
