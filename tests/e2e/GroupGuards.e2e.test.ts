@@ -59,7 +59,7 @@ describe('e2e: guards de grupo', () => {
       await wait();
 
       const texts = socket.texts();
-      expect(texts).toContain('🏓 Calculando...');
+      expect(socket.reactions()).toContain('🏓');
       expect(texts.some(t => t.startsWith('🏓 Pong!'))).toBe(true);
       // The reply goes to the group, not the sender
       expect(socket.sent.every(m => m.jid === GROUP)).toBe(true);

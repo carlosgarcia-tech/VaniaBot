@@ -32,6 +32,8 @@ export class CuevanaCommand extends Command {
   name = 'cuevana';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Busca y descarga películas/series de Cuevana';
   category = CommandCategory.MEDIA;
   aliases = ['cv', 'cuevana', 'serie'];

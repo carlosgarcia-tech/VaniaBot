@@ -22,6 +22,8 @@ export class Facebookv2Command extends Command {
   name = 'facebookv2';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Descarga videos de Facebook (v2)';
   category = CommandCategory.MEDIA;
   aliases = ['fbv2', 'fbvideo2'];

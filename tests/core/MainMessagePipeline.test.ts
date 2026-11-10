@@ -932,7 +932,7 @@ describe('MainMessagePipeline', () => {
       );
     });
 
-    it('replies with a timeout hint when the command exceeds the deadline', async () => {
+    it('lets the command keep running in the background past its deadline', async () => {
       vi.useFakeTimers();
       const { fire, sock, stats } = createPipeline();
       const { execute } = registerCommand('pipeslow');
@@ -941,13 +941,12 @@ describe('MainMessagePipeline', () => {
       fireUpsert(fire, makeMessage('.pipeslow'));
       await vi.advanceTimersByTimeAsync(31_000);
 
-      expect(stats.errorsCount).toBe(1);
+      // Deadline passes: pipeline stops waiting but the command is NOT killed,
+      // so no error, no failure reply — it keeps running in the background and
+      // would still deliver its result when it finishes.
+      expect(stats.errorsCount).toBe(0);
       expect(stats.commandsExecuted).toBe(0);
-      expect(sock.sendMessage).toHaveBeenCalledWith(
-        PRIVATE_JID,
-        expect.objectContaining({ text: '⏱️ El comando tardó demasiado. Intenta de nuevo.' }),
-        expect.objectContaining({ quoted: expect.anything() }),
-      );
+      expect(sock.sendMessage).not.toHaveBeenCalled();
     });
 
     it('tracks per-command metrics with count, average time and errors', async () => {

@@ -52,7 +52,7 @@ describe('e2e: pipeline principal con socket falso', () => {
       await wait();
 
       const texts = socket.texts();
-      expect(texts).toContain('🏓 Calculando...');
+      expect(socket.reactions()).toContain('🏓');
       expect(texts.some(t => t.startsWith('🏓 Pong!'))).toBe(true);
       expect(texts.some(t => /⏱️ Latencia: \d+ms/.test(t))).toBe(true);
 
@@ -81,7 +81,7 @@ describe('e2e: pipeline principal con socket falso', () => {
       socket.receive(msg); // same WAMessage (same key.id): deduped
       await wait(400);
 
-      const pingCount = socket.texts().filter(t => t === '🏓 Calculando...').length;
+      const pingCount = socket.reactions().filter(r => r === '🏓').length;
       expect(pingCount).toBe(1);
     },
     TIMEOUT,

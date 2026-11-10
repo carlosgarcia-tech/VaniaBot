@@ -24,7 +24,7 @@ export class PingCommand extends Command {
   async execute(ctx: MessageContext): Promise<void> {
     const start = Date.now();
 
-    await ctx.reply('🏓 Calculando...');
+    await ctx.react('🏓');
 
     const latency = Date.now() - start;
 

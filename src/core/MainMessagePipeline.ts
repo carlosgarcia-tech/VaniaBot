@@ -530,19 +530,20 @@ export class MainMessagePipeline {
       this.stats.commandsExecuted++;
       this.trackCommandMetric(command.name, Date.now() - cmdStartTime, false);
     } catch (error) {
+      if (error instanceof Error && error.message.includes('timed out')) {
+        // Soft deadline: the pipeline stops waiting (frees its queue slot) but
+        // the command keeps running in the background and will still deliver
+        // its result — a slow download over a bad network is normal, not an
+        // error, so never kill it or tell the user it failed.
+        logger.info(`⏳ ${command.name} sigue ejecutándose en segundo plano`);
+        return;
+      }
       this.stats.errorsCount++;
       this.trackCommandMetric(command.name, Date.now() - cmdStartTime, true);
-      if (error instanceof Error && error.message.includes('timed out')) {
-        logger.error(`⏱️ Command ${command.name} timed out`);
-        await ctx
-          .reply('⏱️ El comando tardó demasiado. Intenta de nuevo.')
-          .catch((err: unknown) => logError('[MainMessagePipeline]', err));
-      } else {
-        logError('Command', new CommandExecutionError(ctx.command, error));
-        await ctx
-          .reply('Error al ejecutar el comando.')
-          .catch((err: unknown) => logError('[MainMessagePipeline]', err));
-      }
+      logError('Command', new CommandExecutionError(ctx.command, error));
+      await ctx
+        .reply('Error al ejecutar el comando.')
+        .catch((err: unknown) => logError('[MainMessagePipeline]', err));
     }
   }
 

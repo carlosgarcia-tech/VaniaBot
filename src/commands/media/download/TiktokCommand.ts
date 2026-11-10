@@ -45,6 +45,8 @@ export class TiktokCommand extends Command {
   name = 'tiktok';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Download TikTok videos without watermark';
   category = CommandCategory.MEDIA;
   aliases = ['tt', 'tk'];

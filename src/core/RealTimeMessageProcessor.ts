@@ -42,7 +42,7 @@ export class RealTimeMessageProcessor extends EventEmitter {
   private parallelQueue: QueuedMessage[] = [];
   /** Guard flag preventing a second sequential drain loop from starting. */
   private isProcessingSequential = false;
-  private maxParallel = 3;
+  private maxParallel = 5;
   private activeParallel = 0;
 
   /**

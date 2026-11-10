@@ -47,7 +47,7 @@ describe('e2e: parsing de prefijos y resolución de comandos', () => {
       await wait();
 
       const texts = socket.texts();
-      expect(texts).toContain('🏓 Calculando...');
+      expect(socket.reactions()).toContain('🏓');
       expect(texts.some(t => t.startsWith('🏓 Pong!'))).toBe(true);
     },
     TIMEOUT,
@@ -60,7 +60,7 @@ describe('e2e: parsing de prefijos y resolución de comandos', () => {
       await wait();
 
       const texts = socket.texts();
-      expect(texts).toContain('🏓 Calculando...');
+      expect(socket.reactions()).toContain('🏓');
       expect(texts.some(t => /⏱️ Latencia: \d+ms/.test(t))).toBe(true);
     },
     TIMEOUT,

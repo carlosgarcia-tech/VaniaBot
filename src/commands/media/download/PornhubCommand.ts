@@ -22,6 +22,8 @@ export class PornhubCommand extends Command {
   name = 'pornhub';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Descarga video de Pornhub';
   category = CommandCategory.MEDIA;
   aliases = ['ph'];

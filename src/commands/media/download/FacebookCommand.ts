@@ -38,6 +38,8 @@ export class FacebookCommand extends Command {
   name = 'facebook';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Download Facebook videos and Reels';
   category = CommandCategory.MEDIA;
   aliases = ['fb', 'fbvideo'];

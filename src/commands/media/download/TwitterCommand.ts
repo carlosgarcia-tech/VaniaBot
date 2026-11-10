@@ -36,6 +36,8 @@ export class TwitterCommand extends Command {
   name = 'twitter';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Descarga videos de Twitter/X';
   category = CommandCategory.MEDIA;
   aliases = ['tw', 'xvideo', 'xv'];

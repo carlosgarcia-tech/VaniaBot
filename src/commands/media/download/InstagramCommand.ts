@@ -44,6 +44,8 @@ export class InstagramCommand extends Command {
   name = 'instagram';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Download Instagram Reels, posts and stories';
   category = CommandCategory.MEDIA;
   aliases = ['ig', 'insta', 'reel'];

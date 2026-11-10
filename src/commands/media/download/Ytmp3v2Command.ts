@@ -22,6 +22,8 @@ export class Ytmp3v2Command extends Command {
   name = 'ytmp3v2';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Descarga audio de YouTube (v2)';
   category = CommandCategory.MEDIA;
   aliases = ['ytmp3v2'];

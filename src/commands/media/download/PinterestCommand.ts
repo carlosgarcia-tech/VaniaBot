@@ -25,6 +25,8 @@ export class PinterestCommand extends Command {
   name = 'pinterest';
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
+  /** Independent network downloads: safe to run concurrently. */
+  parallelizable = true;
   description = 'Descarga imágenes/videos de Pinterest';
   category = CommandCategory.MEDIA;
   aliases = ['pin', 'pindl', 'pinterestdl'];
