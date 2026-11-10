@@ -12,7 +12,15 @@ import { panelServer } from './services/webhook/PanelServer.js';
 import { initializeDatabase } from './repositories/Database.js';
 import { subBotDatabase } from './services/subbot/SubBotDatabase.js';
 import { databaseSwitcher } from './services/system/DatabaseSwitcher.js';
-import { createStartupProgress } from './utils/cli.js';
+import { createStartupProgress, displayOrbitBanner } from './utils/cli.js';
+import { existsSync, writeFileSync, unlinkSync } from 'fs';
+
+/**
+ * Written when the dev startup renders the CLI banner, so a tsx watch restart
+ * skips the animation just like the orbit.ts supervisor does for real boots.
+ */
+const BOOT_FLAG = './data/.orbit-session';
+let renderedBanner = false;
 
 const originalConsoleError = console.error;
 console.error = function (...args: unknown[]) {
@@ -30,7 +38,16 @@ let client: WhatsAppClient;
 
 async function main(): Promise<void> {
   const isDocker = process.env.DOCKER_MODE === 'true' || process.env.DOCKER === 'true';
-  const startupProgress = isDocker ? createStartupProgress() : null;
+  const isDev = !isDocker && process.env.NODE_ENV === 'development';
+  const startupProgress = isDocker || isDev ? createStartupProgress() : null;
+
+  if (isDev && !existsSync(BOOT_FLAG)) {
+    // dev boots straight into index.ts (no supervisor), so the CLI render
+    // lives here and only on the first boot of a session.
+    await displayOrbitBanner();
+    writeFileSync(BOOT_FLAG, 'ORBIT_RUNNING');
+    renderedBanner = true;
+  }
 
   if (!isDocker) {
     logger.info('Iniciando WhatsApp Bot...');
@@ -56,15 +73,18 @@ async function main(): Promise<void> {
   client = new WhatsAppClient();
   // Expose globally so HealthCheckService / panel routers can read metrics.
   globalThis.client = client;
+
+  // The panel must not depend on the WhatsApp connection: an account that
+  // hangs waiting for QR or pairing would otherwise never expose the panel.
+  const disablePanel = process.env.PANEL_DISABLED === 'true';
+  if (!disablePanel) {
+    await panelServer.start();
+  }
+
   await client.initialize();
 
   if (!isDocker) {
     logger.info('Bot iniciado correctamente');
-  }
-
-  const disablePanel = process.env.PANEL_DISABLED === 'true';
-  if (!disablePanel) {
-    await panelServer.start();
   }
 }
 
@@ -78,6 +98,14 @@ async function shutdown(reason: string): Promise<void> {
     await logger.flush();
   } catch (error) {
     logError('shutdown', error);
+  }
+
+  if (renderedBanner && existsSync(BOOT_FLAG)) {
+    try {
+      unlinkSync(BOOT_FLAG);
+    } catch {
+      /* non-fatal: the next boot just skips the banner animation */
+    }
   }
 
   setTimeout(() => process.exit(0), 5000).unref();
