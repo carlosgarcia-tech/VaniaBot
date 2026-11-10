@@ -7,6 +7,7 @@
  */
 
 import { logError } from '@/utils/logger.js';
+import { renderLocalCanvas } from './LocalCanvasRenderer.js';
 
 const BASE_URL = 'https://api.delirius.store/canvas';
 const TIMEOUT_MS = 30000;
@@ -16,6 +17,10 @@ export type CanvasResult =
 
 export class CanvasService {
   async getResult(endpoint: string, params?: Record<string, string>): Promise<CanvasResult> {
+    // Local-first: migrated effects render on-machine with zero network calls.
+    const local = await renderLocalCanvas(endpoint, params);
+    if (local) return { type: 'buffer', buffer: local, contentType: 'image/png' };
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 

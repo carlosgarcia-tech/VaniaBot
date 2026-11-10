@@ -200,6 +200,8 @@
 ### P1 — Delirius canvas (~35 comandos) → **canvas 100% local con @napi-rs/canvas**
 Ya existe infraestructura local probada: `ImageProcessor` (`src/utils/imageProcessor.ts`) + `@napi-rs/canvas` + ffmpeg que hoy usan `qc`-fallback, `nota` y `patsticker`. Los efectos (afect/bed/hitler/tweet/cmm/rip/welcard…) son composición de 2 avatares + texto sobre plantilla: se pueden replicar localmente con plantillas de fondo (como `nota.jpg`) sin API alguna. Esfuerzo: alto pero unificado (una clase `LocalCanvasService` con un método por efecto).
 
+> **Progreso (10 nov 2026):** creado `src/services/external/LocalCanvasRenderer.ts` y conectado en `CanvasService.getResult` con prioridad local. **Migrados: `brat`, `ttp`, `circle`, `invert`** (renderizan 100% en la máquina, cero llamadas externas; verificado end-to-end incluida la conversión a sticker webp). Los endpoints aún no migrados siguen su path anterior.
+
 ### P1 — Delirius anime/reactions/random (~50 imágenes/GIFs) → **nekos.best + listas de CDN propias**
 `nekos.best` está vivo (waifu + GIFs de hug/pat/kiss/…) y cubre reacciones e imágenes anime. Para lo que nekos no cubra, curar listas estáticas de GIFs (ya existe ese patrón en `InteractionCommand` con telegra.ph/catbox). El módulo NSFW queda deshabilitado o se apoya en las mismas listas.
 
