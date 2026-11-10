@@ -43,6 +43,8 @@ class TikTokPreview extends MediaPreviewBase {
 /** Command handler for `!tiktok`: Download TikTok videos without watermark. */
 export class TiktokCommand extends Command {
   name = 'tiktok';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Download TikTok videos without watermark';
   category = CommandCategory.MEDIA;
   aliases = ['tt', 'tk'];

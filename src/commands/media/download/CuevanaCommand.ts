@@ -30,6 +30,8 @@ const TMP_DIR = path.join(os.tmpdir(), 'orbit-cuevana');
 /** Command handler for `!cuevana`: Searches and downloads movies/series from Cuevana. */
 export class CuevanaCommand extends Command {
   name = 'cuevana';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Busca y descarga películas/series de Cuevana';
   category = CommandCategory.MEDIA;
   aliases = ['cv', 'cuevana', 'serie'];

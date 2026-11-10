@@ -77,7 +77,9 @@ const createPinoLogger = (category?: string) => {
         colorize: true,
         translateTime: 'HH:MM:ss',
         ignore: 'pid,hostname',
-        minimumLevel: 'warn',
+        // visible info lines are how the operator sees startup stages and the
+        // panel URL on the console; filtering starts at info, not warn.
+        minimumLevel: 'info',
         customColors: {
           info: 'green',
           warn: 'yellow',
@@ -250,7 +252,9 @@ const consoleLogger = !IS_PRODUCTION
           colorize: true,
           translateTime: 'HH:MM:ss',
           ignore: 'pid,hostname',
-          minimumLevel: 'warn',
+          // visible info lines are how the operator sees startup stages and the
+          // panel URL on the console; filtering starts at info, not warn.
+          minimumLevel: 'info',
         },
       },
     })

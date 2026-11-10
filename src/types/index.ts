@@ -29,6 +29,12 @@ export interface ICommand {
   /** Minimum milliseconds between two executions by the same user. */
   cooldown?: number;
   /**
+   * Override of the pipeline's global command timeout (30s) for commands
+   * that legitimately run longer, e.g. media downloads that fetch and
+   * upload large files.
+   */
+  timeout?: number;
+  /**
    * Marks the command as safe to run concurrently.
    * Only set this for read-only commands: anything mutating shared state
    * (economy, levels, moderation) must stay sequential to avoid lost updates.

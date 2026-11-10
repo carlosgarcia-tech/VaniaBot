@@ -23,6 +23,8 @@ import { logError } from '@/utils/logger.js';
 /** Command handler for `!pinterest`: Downloads Pinterest images/videos. */
 export class PinterestCommand extends Command {
   name = 'pinterest';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Descarga imágenes/videos de Pinterest';
   category = CommandCategory.MEDIA;
   aliases = ['pin', 'pindl', 'pinterestdl'];

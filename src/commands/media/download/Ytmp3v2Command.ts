@@ -20,6 +20,8 @@ import {
 /** Command handler for `!ytmp3v2`: Downloads YouTube audio (v2). */
 export class Ytmp3v2Command extends Command {
   name = 'ytmp3v2';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Descarga audio de YouTube (v2)';
   category = CommandCategory.MEDIA;
   aliases = ['ytmp3v2'];

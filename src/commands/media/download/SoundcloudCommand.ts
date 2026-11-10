@@ -20,6 +20,8 @@ import {
 /** Command handler for `!soundcloud`: Downloads SoundCloud audio. */
 export class SoundcloudCommand extends Command {
   name = 'soundcloud';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Descarga audio de SoundCloud';
   category = CommandCategory.MEDIA;
   aliases = ['scdl'];

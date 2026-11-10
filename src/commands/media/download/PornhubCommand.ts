@@ -20,6 +20,8 @@ import {
 /** Command handler for `!pornhub`: Downloads Pornhub video. */
 export class PornhubCommand extends Command {
   name = 'pornhub';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Descarga video de Pornhub';
   category = CommandCategory.MEDIA;
   aliases = ['ph'];

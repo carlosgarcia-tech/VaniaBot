@@ -20,6 +20,8 @@ import {
 /** Command handler for `!facebookv2`: Downloads Facebook videos (v2). */
 export class Facebookv2Command extends Command {
   name = 'facebookv2';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Descarga videos de Facebook (v2)';
   category = CommandCategory.MEDIA;
   aliases = ['fbv2', 'fbvideo2'];

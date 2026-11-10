@@ -38,6 +38,8 @@ class YtAudioPreview extends MediaPreviewBase {
 /** Command handler for `!ytmp3`: Download YouTube audio as MP3. */
 export class YtMp3Command extends Command {
   name = 'ytmp3';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Download YouTube audio as MP3';
   category = CommandCategory.MEDIA;
   aliases = ['yta', 'ytaudio', 'play', 'playmp3'];

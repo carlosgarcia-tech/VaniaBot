@@ -23,6 +23,8 @@ import { logError } from '@/utils/logger.js';
 /** Command handler for `!apk`: Searches Android apps. */
 export class APKCommand extends Command {
   name = 'apk';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Busca aplicaciones Android';
   category = CommandCategory.MEDIA;
   aliases = ['app', 'apksearch'];

@@ -24,6 +24,8 @@ import { logError } from '@/utils/logger.js';
 /** Command handler for `!mega`: Downloads files from Mega.nz. */
 export class MegaCommand extends Command {
   name = 'mega';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Descarga archivos de Mega.nz';
   category = CommandCategory.MEDIA;
   aliases = ['megadl'];

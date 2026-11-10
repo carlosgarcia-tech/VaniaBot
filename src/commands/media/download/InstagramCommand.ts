@@ -42,6 +42,8 @@ class InstagramPreview extends MediaPreviewBase {
 /** Command handler for `!instagram`: Download Instagram Reels, posts and stories. */
 export class InstagramCommand extends Command {
   name = 'instagram';
+  /** Media downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
   description = 'Download Instagram Reels, posts and stories';
   category = CommandCategory.MEDIA;
   aliases = ['ig', 'insta', 'reel'];

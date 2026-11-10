@@ -207,6 +207,11 @@ export class PanelServer {
     `;
   }
 
+  /** Local URL shown in the console; 0.0.0.0 binds every interface but is not clickable. */
+  private displayUrl(port: number): string {
+    return `http://localhost:${port}`;
+  }
+
   async start(): Promise<void> {
     const http = await import('http');
 
@@ -214,8 +219,8 @@ export class PanelServer {
       this.server = http.createServer(this.app);
 
       this.server.listen(this.config.port, this.config.host, () => {
-        logger.info(`🌌 OrbitBot Panel running at http://${this.config.host}:${this.config.port}`);
-        logger.info(`📊 API: http://${this.config.host}:${this.config.port}/api/stats`);
+        logger.info(`🌌 OrbitBot Panel listening on ${this.displayUrl(this.config.port)}`);
+        logger.info(`📊 API: ${this.displayUrl(this.config.port)}/api/stats`);
         resolve();
       });
 
@@ -234,9 +239,8 @@ export class PanelServer {
             resolve(); // keep the bot running even if the panel fails to bind
           });
           this.server.listen(this.config.port + 1, this.config.host, () => {
-            logger.info(
-              `🌌 OrbitBot Panel running at http://${this.config.host}:${this.config.port + 1}`,
-            );
+            logger.info(`🌌 OrbitBot Panel listening on ${this.displayUrl(this.config.port + 1)}`);
+            logger.info(`📊 API: ${this.displayUrl(this.config.port + 1)}/api/stats`);
             resolve();
           });
         } else {

@@ -524,8 +524,8 @@ export class MainMessagePipeline {
     try {
       await withTimeout(
         command.execute(ctx),
-        COMMAND_TIMEOUT_MS,
-        `Command ${command.name} timed out after ${COMMAND_TIMEOUT_MS}ms`,
+        command.timeout ?? COMMAND_TIMEOUT_MS,
+        `Command ${command.name} timed out after ${command.timeout ?? COMMAND_TIMEOUT_MS}ms`,
       );
       this.stats.commandsExecuted++;
       this.trackCommandMetric(command.name, Date.now() - cmdStartTime, false);
