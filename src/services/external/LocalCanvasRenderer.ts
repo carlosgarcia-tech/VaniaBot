@@ -14,7 +14,7 @@ import { createCanvas, loadImage, type SKRSContext2D } from '@napi-rs/canvas';
 import { Jimp } from 'jimp';
 import { logError } from '@/utils/logger.js';
 import { generatePost } from './TweetPost.js';
-import { generateWelcome } from './WelcomeCard.js';
+import { generateWelcomeTemplate } from './WelcomeCard.js';
 import { generateFriendship } from './FriendshipCard.js';
 
 const SIZE = 512;
@@ -407,14 +407,12 @@ async function renderXnxxcard(params: Record<string, string>): Promise<Buffer> {
   return canvas.toBuffer('image/png');
 }
 
-/** Welcome card: delegates to the local space-themed WelcomeCard generator. */
+/** Welcome card: user photo + name drawn over the space template asset. */
 async function renderWelcard(params: Record<string, string>): Promise<Buffer> {
   const name = (params.name ?? '').slice(0, 20) || 'Usuario';
-  return generateWelcome({
+  return generateWelcomeTemplate({
     image: params.image || avatarDiscBuffer(name, 512),
     username: name,
-    inviter: (params.author ?? '').slice(0, 20) || name,
-    bot: (params.server ?? '').slice(0, 20) || 'OrbitBot',
   });
 }
 
