@@ -15,6 +15,7 @@ import { Jimp } from 'jimp';
 import { logError } from '@/utils/logger.js';
 import { generatePost } from './TweetPost.js';
 import { generateWelcome } from './WelcomeCard.js';
+import { generateFriendship } from './FriendshipCard.js';
 
 const SIZE = 512;
 const FETCH_TIMEOUT_MS = 20000;
@@ -479,36 +480,17 @@ async function renderGay(params: Record<string, string>): Promise<Buffer> {
   return canvas.toBuffer('image/png');
 }
 
-/** Shared renderer for `friendship` and `ship`: two avatars + heart + percentage. */
+/** Shared renderer for `friendship` and `ship`: delegates to FriendshipCard. */
 async function renderShipCard(params: Record<string, string>): Promise<Buffer> {
-  const canvas = createCanvas(SIZE, 512);
-  const ctx = canvas.getContext('2d');
-  const grad = ctx.createLinearGradient(0, 0, SIZE, SIZE);
-  grad.addColorStop(0, '#111318');
-  grad.addColorStop(1, '#2b1055');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, SIZE, 512);
-
-  const label = (params.text ?? 'Ship').slice(0, 16);
-  ctx.fillStyle = WHITE;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = "bold 44px 'Liberation Sans', sans-serif";
-  ctx.fillText(label, SIZE / 2, 72);
-
-  const d = 168;
-  await drawAvatar(ctx, params.image1, 52, 140, d);
-  await drawAvatar(ctx, params.image2, SIZE - 52 - d, 140, d);
-  drawHeart(ctx, SIZE / 2, 218, 120, '#ff2d78');
-
-  ctx.fillStyle = WHITE;
-  ctx.font = "bold 64px 'Liberation Sans', sans-serif";
-  ctx.fillText((params.percentage ?? '0%').slice(0, 8), SIZE / 2, 352);
-  ctx.fillStyle = '#ff9ecb';
-  ctx.font = "26px 'Liberation Sans', sans-serif";
-  const footer = params.footer ?? (label === 'Friends' ? 'amistad' : 'compatibilidad');
-  ctx.fillText(footer.slice(0, 40), SIZE / 2, 430);
-  return canvas.toBuffer('image/png');
+  const name1 = (params.name1 ?? 'User 1').slice(0, 15);
+  const name2 = (params.name2 ?? 'User 2').slice(0, 15);
+  return generateFriendship({
+    leftImage: params.image1 || avatarDiscBuffer(name1, 512),
+    rightImage: params.image2 || avatarDiscBuffer(name2, 512),
+    title: (params.text ?? 'Friends').slice(0, 16),
+    number: params.percentage || '50',
+    text: `${name1} & ${name2}`,
+  });
 }
 
 /** Self-check runnable via `npx tsx src/services/external/LocalCanvasRenderer.ts`. */
