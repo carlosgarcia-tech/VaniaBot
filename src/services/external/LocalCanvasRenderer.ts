@@ -13,6 +13,7 @@
 import { createCanvas, loadImage, type SKRSContext2D } from '@napi-rs/canvas';
 import { Jimp } from 'jimp';
 import { logError } from '@/utils/logger.js';
+import { generatePost } from './TweetPost.js';
 
 const SIZE = 512;
 const FETCH_TIMEOUT_MS = 20000;
@@ -287,57 +288,30 @@ async function renderChangeMyMind(params: Record<string, string>): Promise<Buffe
   return canvas.toBuffer('image/png');
 }
 
-/** Fake tweet card (delirius `tweet`). */
+/** Fake tweet card: delegates to the local TweetPost generator. */
 async function renderTweet(params: Record<string, string>): Promise<Buffer> {
-  const bg = params.theme === 'light' ? '#ffffff' : '#15202b';
-  const fg = params.theme === 'light' ? '#0f1419' : WHITE;
-  const muted = params.theme === 'light' ? '#536471' : '#8899a6';
-  const canvas = createCanvas(SIZE, 380);
+  const nickname = (params.name ?? 'User').slice(0, 20);
+  // generatePost requires an avatar; synthesize a plain disc when missing.
+  const avatar = params.image || avatarDiscBuffer(nickname);
+  return generatePost({
+    avatar,
+    nickname,
+    content: (params.comment ?? '').slice(0, 100),
+    username: (params.username ?? '@user').slice(0, 16),
+  });
+}
+
+/** Solid gray disc with the initial letter, as a PNG buffer. */
+function avatarDiscBuffer(name: string): Buffer {
+  const canvas = createCanvas(58, 58);
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, SIZE, 380);
-
-  await drawAvatar(ctx, params.image, 28, 28, 64);
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = fg;
-  ctx.font = "bold 26px 'Liberation Sans', sans-serif";
-  ctx.fillText((params.name ?? 'User').slice(0, 24), 108, 50);
-  ctx.fillStyle = muted;
-  ctx.font = "20px 'Liberation Sans', sans-serif";
-  ctx.fillText((params.username ?? '@user').slice(0, 24), 108, 76);
-
-  ctx.fillStyle = fg;
-  const { lines, lineHeight } = layoutLines(
-    ctx,
-    (params.comment ?? '').slice(0, 100),
-    "26px 'Liberation Sans', sans-serif",
-    SIZE - 64,
-    180,
-  );
-  lines.forEach((line, i) => ctx.fillText(line, 32, 130 + i * lineHeight));
-
-  // footer icons (vector, no emoji font needed)
-  ctx.strokeStyle = muted;
-  ctx.lineWidth = 2.5;
-  const rowY = 340;
-  const cols = [64, 180, 296, 412];
-  // reply bubble
-  ctx.beginPath();
-  ctx.ellipse(cols[0], rowY, 11, 9, 0, Math.PI, 0);
-  ctx.lineTo(cols[0] - 16, rowY + 8);
-  ctx.stroke();
-  // retweet arrows
-  ctx.beginPath();
-  ctx.arc(cols[1], rowY, 8, Math.PI * 0.6, Math.PI * 2.1);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(cols[1] + 10, rowY - 6);
-  ctx.lineTo(cols[1] + 10, rowY + 1);
-  ctx.stroke();
-  // heart
-  drawHeart(ctx, cols[2], rowY, 22, muted);
-
+  ctx.fillStyle = '#3a3f4b';
+  ctx.fillRect(0, 0, 58, 58);
+  ctx.fillStyle = WHITE;
+  ctx.font = "bold 28px 'Liberation Sans', sans-serif";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(name.charAt(0).toUpperCase(), 29, 31);
   return canvas.toBuffer('image/png');
 }
 
