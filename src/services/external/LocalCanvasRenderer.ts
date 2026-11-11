@@ -14,6 +14,7 @@ import { createCanvas, loadImage, type SKRSContext2D } from '@napi-rs/canvas';
 import { Jimp } from 'jimp';
 import { logError } from '@/utils/logger.js';
 import { generatePost } from './TweetPost.js';
+import { generateWelcome } from './WelcomeCard.js';
 
 const SIZE = 512;
 const FETCH_TIMEOUT_MS = 20000;
@@ -301,17 +302,17 @@ async function renderTweet(params: Record<string, string>): Promise<Buffer> {
   });
 }
 
-/** Solid gray disc with the initial letter, as a PNG buffer. */
-function avatarDiscBuffer(name: string): Buffer {
-  const canvas = createCanvas(58, 58);
+/** Solid disc with the initial letter, as a PNG buffer. */
+function avatarDiscBuffer(name: string, size = 58): Buffer {
+  const canvas = createCanvas(size, size);
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#3a3f4b';
-  ctx.fillRect(0, 0, 58, 58);
+  ctx.fillRect(0, 0, size, size);
   ctx.fillStyle = WHITE;
-  ctx.font = "bold 28px 'Liberation Sans', sans-serif";
+  ctx.font = `bold ${Math.round(size * 0.48)}px 'Liberation Sans', sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(name.charAt(0).toUpperCase(), 29, 31);
+  ctx.fillText(name.charAt(0).toUpperCase(), size / 2, size * 0.54);
   return canvas.toBuffer('image/png');
 }
 
@@ -405,37 +406,15 @@ async function renderXnxxcard(params: Record<string, string>): Promise<Buffer> {
   return canvas.toBuffer('image/png');
 }
 
-/** Welcome card with gradient, avatar, name and inviter (delirius `welcard`). */
+/** Welcome card: delegates to the local space-themed WelcomeCard generator. */
 async function renderWelcard(params: Record<string, string>): Promise<Buffer> {
-  const canvas = createCanvas(SIZE, 512);
-  const ctx = canvas.getContext('2d');
-  const grad = ctx.createLinearGradient(0, 0, SIZE, SIZE);
-  grad.addColorStop(0, '#4f46e5');
-  grad.addColorStop(1, '#1e1b4b');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, SIZE, 512);
-
-  ctx.fillStyle = WHITE;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = "bold 52px 'Liberation Sans', sans-serif";
-  ctx.fillText('WELCOME', SIZE / 2, 96);
-
-  ctx.beginPath();
-  ctx.arc(SIZE / 2, 232, 92, 0, Math.PI * 2);
-  ctx.lineWidth = 8;
-  ctx.strokeStyle = '#a5b4fc';
-  ctx.stroke();
-  await drawAvatar(ctx, params.image, SIZE / 2 - 88, 144, 176);
-
-  ctx.fillStyle = WHITE;
-  ctx.font = "bold 40px 'Liberation Sans', sans-serif";
-  ctx.fillText((params.name ?? '').slice(0, 22), SIZE / 2, 384);
-  ctx.fillStyle = '#c7d2fe';
-  ctx.font = "22px 'Liberation Sans', sans-serif";
-  ctx.fillText(`invitado por ${params.author ?? 'OrbitBot'}`.slice(0, 40), SIZE / 2, 432);
-  ctx.fillText(`${params.server ?? 'OrbitBot'}`.slice(0, 34), SIZE / 2, 464);
-  return canvas.toBuffer('image/png');
+  const name = (params.name ?? '').slice(0, 20) || 'Usuario';
+  return generateWelcome({
+    image: params.image || avatarDiscBuffer(name, 512),
+    username: name,
+    inviter: (params.author ?? '').slice(0, 20) || name,
+    bot: (params.server ?? '').slice(0, 20) || 'OrbitBot',
+  });
 }
 
 /** Rainbow "gay card": avatar, name and rank (delirius `gaycard`). */
