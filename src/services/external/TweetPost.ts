@@ -38,9 +38,9 @@ const COLORS = {
 const FONT = 'Arial, sans-serif';
 
 function drawAvatar(ctx: SKRSContext2D, image: Awaited<ReturnType<typeof loadImage>>): void {
-  const x = 29;
-  const y = 5;
-  const size = 58;
+  const x = 40;
+  const y = 14;
+  const size = 120;
 
   ctx.save();
   ctx.beginPath();
@@ -200,7 +200,7 @@ function drawInteractions(
 
   ctx.strokeStyle = COLORS.secondary;
   ctx.fillStyle = COLORS.secondary;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 3.5;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
@@ -230,8 +230,8 @@ function drawInteractions(
     }
 
     if ('count' in action && action.count !== undefined) {
-      ctx.font = `19px ${FONT}`;
-      ctx.fillText(String(action.count), x + 12, y + 7);
+      ctx.font = `26px ${FONT}`;
+      ctx.fillText(String(action.count), x + 14, y + 9);
     }
   }
 
@@ -263,20 +263,20 @@ export async function generatePost(options: PostOptions): Promise<Buffer> {
   const measureCanvas = createCanvas(width, 100);
   const measureCtx = measureCanvas.getContext('2d');
 
-  measureCtx.font = `23px ${FONT}`;
+  measureCtx.font = `38px ${FONT}`;
 
-  const contentX = 100;
-  const contentY = 58;
+  const contentX = 180;
+  const contentY = 150;
   const contentMaxWidth = width - contentX - 35;
 
   const lines = wrapText(measureCtx, content, contentMaxWidth);
 
-  const lineHeight = 30;
+  const lineHeight = 48;
 
   // Calculate dynamic image height.
-  const footerY = Math.max(130, contentY + lines.length * lineHeight + 25);
+  const footerY = Math.max(220, contentY + lines.length * lineHeight + 45);
 
-  const height = footerY + 35;
+  const height = footerY + 45;
 
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
@@ -289,21 +289,21 @@ export async function generatePost(options: PostOptions): Promise<Buffer> {
   drawAvatar(ctx, profileImage);
 
   // Header.
-  const headerX = 100;
-  const headerY = 27;
+  const headerX = 180;
+  const headerY = 72;
 
   ctx.textBaseline = 'alphabetic';
 
-  ctx.font = `bold 23px ${FONT}`;
+  ctx.font = `bold 40px ${FONT}`;
   ctx.fillStyle = COLORS.primary;
 
-  const nicknameText = truncateText(ctx, nickname, width - headerX - 180);
+  const nicknameText = truncateText(ctx, nickname, width - headerX - 260);
 
   ctx.fillText(nicknameText, headerX, headerY);
 
   const nicknameWidth = ctx.measureText(nicknameText).width;
 
-  ctx.font = `22px ${FONT}`;
+  ctx.font = `34px ${FONT}`;
   ctx.fillStyle = COLORS.secondary;
 
   const metadata = ` ${username} · ${timestamp}`;
@@ -313,7 +313,7 @@ export async function generatePost(options: PostOptions): Promise<Buffer> {
   ctx.fillText(truncateText(ctx, metadata, metadataMaxWidth), metadataX, headerY);
 
   // Post content.
-  ctx.font = `23px ${FONT}`;
+  ctx.font = `38px ${FONT}`;
   ctx.fillStyle = COLORS.primary;
   ctx.textBaseline = 'alphabetic';
 
