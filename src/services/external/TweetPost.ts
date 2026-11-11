@@ -39,8 +39,8 @@ const FONT = 'Arial, sans-serif';
 
 function drawAvatar(ctx: SKRSContext2D, image: Awaited<ReturnType<typeof loadImage>>): void {
   const x = 40;
-  const y = 14;
-  const size = 120;
+  const y = 18;
+  const size = 170;
 
   ctx.save();
   ctx.beginPath();
@@ -200,7 +200,7 @@ function drawInteractions(
 
   ctx.strokeStyle = COLORS.secondary;
   ctx.fillStyle = COLORS.secondary;
-  ctx.lineWidth = 3.5;
+  ctx.lineWidth = 4.5;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
@@ -263,20 +263,20 @@ export async function generatePost(options: PostOptions): Promise<Buffer> {
   const measureCanvas = createCanvas(width, 100);
   const measureCtx = measureCanvas.getContext('2d');
 
-  measureCtx.font = `38px ${FONT}`;
+  measureCtx.font = `52px ${FONT}`;
 
-  const contentX = 180;
-  const contentY = 150;
+  const contentX = 240;
+  const contentY = 215;
   const contentMaxWidth = width - contentX - 35;
 
   const lines = wrapText(measureCtx, content, contentMaxWidth);
 
-  const lineHeight = 48;
+  const lineHeight = 64;
 
   // Calculate dynamic image height.
-  const footerY = Math.max(220, contentY + lines.length * lineHeight + 45);
+  const footerY = Math.max(300, contentY + lines.length * lineHeight + 60);
 
-  const height = footerY + 45;
+  const height = footerY + 55;
 
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
@@ -289,31 +289,30 @@ export async function generatePost(options: PostOptions): Promise<Buffer> {
   drawAvatar(ctx, profileImage);
 
   // Header.
-  const headerX = 180;
-  const headerY = 72;
+  const headerX = 240;
+  const headerY = 92;
 
   ctx.textBaseline = 'alphabetic';
 
-  ctx.font = `bold 40px ${FONT}`;
+  ctx.font = `bold 56px ${FONT}`;
   ctx.fillStyle = COLORS.primary;
 
-  const nicknameText = truncateText(ctx, nickname, width - headerX - 260);
+  const nicknameText = truncateText(ctx, nickname, width - headerX - 40);
 
   ctx.fillText(nicknameText, headerX, headerY);
 
-  const nicknameWidth = ctx.measureText(nicknameText).width;
-
-  ctx.font = `34px ${FONT}`;
+  ctx.font = `44px ${FONT}`;
   ctx.fillStyle = COLORS.secondary;
 
-  const metadata = ` ${username} · ${timestamp}`;
-  const metadataX = headerX + nicknameWidth + 4;
-  const metadataMaxWidth = Math.max(0, width - metadataX - 20);
+  const metadata = `${username} · ${timestamp}`;
+  const metadataX = headerX;
+  const metadataMaxWidth = Math.max(0, width - metadataX - 35);
 
-  ctx.fillText(truncateText(ctx, metadata, metadataMaxWidth), metadataX, headerY);
+  // Second header line: handle and timestamp below the nickname.
+  ctx.fillText(truncateText(ctx, metadata, metadataMaxWidth), metadataX, headerY + 54);
 
   // Post content.
-  ctx.font = `38px ${FONT}`;
+  ctx.font = `52px ${FONT}`;
   ctx.fillStyle = COLORS.primary;
   ctx.textBaseline = 'alphabetic';
 
