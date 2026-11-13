@@ -2,11 +2,13 @@
 
 A production-grade WhatsApp automation system built with TypeScript — featuring 300+ commands across 15 categories, 20 service modules, a middleware pipeline that every message traverses, multi-instance SubBot orchestration, and a test suite of ~1000 unit and end-to-end tests that run in CI.
 
-[![CI](https://github.com/carlosgarcia-tech/OrbitBot/actions/workflows/ci.yml/badge.svg)](https://github.com/carlosgarcia-tech/OrbitBot/actions/workflows/ci.yml)
+[![CI](https://github.com/carlosgarcia-tech/VaniaBot/actions/workflows/ci.yml/badge.svg)](https://github.com/carlosgarcia-tech/VaniaBot/actions/workflows/ci.yml)
 [![Code coverage](https://codecov.io/gh/carlosgarcia-tech/OrbitBot/branch/main/graph/badge.svg)](https://codecov.io/gh/carlosgarcia-tech/OrbitBot)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-43853D?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2DD4BF?style=flat-square)](LICENSE)
+
+> **Project status: migration in progress.** OrbitBot is the new name of **VaniaBot**. I am currently migrating the bot from VaniaBot to OrbitBot: this repository is where all active development happens, and it will be the single, up-to-date home of the project going forward. Some references to the previous name (VaniaBot) may still appear in older commits, documentation, links or portfolio entries while the migration is completed.
 
 ---
 
