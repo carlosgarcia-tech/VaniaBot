@@ -62,8 +62,8 @@ export class FriendshipCommand extends Command {
       const contacts = await ctx.sock.onWhatsApp(jid);
       const contact = contacts?.[0];
       if (contact && 'pushName' in contact && contact.pushName) return contact.pushName as string;
-      const number = jid.split('@')[0];
-      return number;
+      // Never return the raw number: it leaks the uid/lid into the card.
+      return null;
     } catch {
       return null;
     }

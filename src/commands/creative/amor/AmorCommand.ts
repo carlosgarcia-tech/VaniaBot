@@ -9,6 +9,7 @@
 
 import { Command } from '../../Command.js';
 import { aiService } from '@/services/external/AIService.js';
+import { contactsCache } from '@/utils/ContactsCache.js';
 import { isRight } from '@/utils/either.js';
 import {
   CommandCategory,
@@ -132,8 +133,8 @@ export class ShipCommand extends Command {
       return;
     }
 
-    const nombre1 = mentioned[0].split('@')[0];
-    const nombre2 = mentioned[1].split('@')[0];
+    const nombre1 = await contactsCache.getContactName(ctx, mentioned[0]);
+    const nombre2 = await contactsCache.getContactName(ctx, mentioned[1]);
 
     await ctx.react('🚀');
 

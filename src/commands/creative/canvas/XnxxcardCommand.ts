@@ -12,6 +12,7 @@ import { ImageHelper } from '@/utils/ImageHelper.js';
 import { StickerHelper } from '@/utils/StickerHelper.js';
 import { findAssetFile } from '@/utils/assetHelper.js';
 import { canvasService } from '@/services/external/CanvasService.js';
+import { contactsCache } from '@/utils/ContactsCache.js';
 import { uploadToTmpfiles } from '@/utils/helpers.js';
 import { logger } from '@/utils/logger.js';
 import {
@@ -67,10 +68,10 @@ export class XnxxcardCommand extends Command {
     const targetJid = mentioned ?? ctx.sender.jid;
 
     const userTag = mentioned
-      ? `@${mentioned.split('@')[0]}`
+      ? await contactsCache.getContactName(ctx, mentioned)
       : ctx.sender.pushName
         ? `@${ctx.sender.pushName.replace(/\s+/g, '')}`
-        : `@${ctx.sender.jid.split('@')[0]}`;
+        : '@usuario';
 
     await ctx.react('🎬');
 

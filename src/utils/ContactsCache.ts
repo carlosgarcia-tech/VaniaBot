@@ -43,34 +43,39 @@ class ContactsCache {
 
   /**
    * Resolves a display name, falling back to a group metadata lookup and then
-   * to an `@number` placeholder so callers always receive something printable.
+   * to a generic placeholder so callers always receive something printable.
+   * The raw JID is never returned: it would leak the uid/lid digits instead
+   * of a human name.
    */
   async getContactName(ctx: MessageContext, jid: string): Promise<string> {
     const cached = this.get(jid);
     if (cached) return cached;
 
-    try {
-      const groupMeta = await ctx.sock.groupMetadata(ctx.chat.jid);
-      const targetBase = jid.split('@')[0].split(':')[0];
+    // Participant names only exist in groups; groupMetadata throws on DMs.
+    if (ctx.chat.jid.endsWith('@g.us')) {
+      try {
+        const groupMeta = await ctx.sock.groupMetadata(ctx.chat.jid);
+        const targetBase = jid.split('@')[0].split(':')[0];
 
-      const participant = groupMeta.participants.find(p => {
-        const pBase = p.id.split('@')[0].split(':')[0];
-        return pBase === targetBase;
-      });
+        const participant = groupMeta.participants.find(p => {
+          const pBase = p.id.split('@')[0].split(':')[0];
+          return pBase === targetBase;
+        });
 
-      if (participant) {
-        const name = participant.notify || participant.name || participant.verifiedName;
+        if (participant) {
+          const name = participant.notify || participant.name || participant.verifiedName;
 
-        if (name) {
-          this.set(participant.id, name);
-          return name;
+          if (name) {
+            this.set(participant.id, name);
+            return name;
+          }
         }
+      } catch (error) {
+        logError('[ContactsCache]', error);
       }
-    } catch (error) {
-      logError('[ContactsCache]', error);
     }
 
-    return `@${jid.split('@')[0]}`;
+    return 'Usuario';
   }
 
   /**
