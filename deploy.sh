@@ -17,9 +17,31 @@ DIM='\033[2m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-VERSION="${1:-6.12.18}"
-RAW_MODE="${2:-}"
+DEPLOY_ENV="${1:-develop}"
+case "${DEPLOY_ENV}" in
+  develop|production) ;;
+  *)
+    echo -e "  ${RED}${BOLD}uso:${NC} ./deploy.sh [${NEON_GREEN}develop${NC}|${ELECTRIC}production${NC}] [versión] [update]" >&2
+    echo -e "       develop    → build local desde el Dockerfile del repo" >&2
+    echo -e "       production → pull de la imagen del registry" >&2
+    exit 1
+    ;;
+esac
+VERSION="${2:-6.12.18}"
+RAW_MODE="${3:-}"
+# ./deploy.sh production update — modo como 2º arg, versión default
+if [[ "$RAW_MODE" == "" ]]; then
+  case "$VERSION" in
+    update|--update|-u) RAW_MODE="$VERSION"; VERSION="6.12.18" ;;
+  esac
+fi
 IMAGE="ghcr.io/carlosgarcia-tech/orbit:${VERSION}"
+SOURCE_LABEL="build local"
+IMAGE_PROTO="IMAGE·BUILD"
+if [[ "$DEPLOY_ENV" == "production" ]]; then
+  SOURCE_LABEL="registry pull"
+  IMAGE_PROTO="IMAGE·PULL"
+fi
 START_TIME=$(date +%s%3N 2>/dev/null || echo 0)
 UPDATE_MODE=false
 [[ "$RAW_MODE" == "update" || "$RAW_MODE" == "--update" || "$RAW_MODE" == "-u" ]] \
@@ -28,7 +50,7 @@ UPDATE_MODE=false
 if $UPDATE_MODE; then
   TOTAL_STEPS=5
   STEP_COLORS=("$NEON_ORANGE" "$HOT_PINK" "$LIME" "$ELECTRIC" "$PURPLE")
-  STEP_PROTO=("IMAGE·PULL" "BACKUP·CHECK" "HOT·SWAP" "DATA·VERIFY" "SYS·VERIFY")
+  STEP_PROTO=("$IMAGE_PROTO" "BACKUP·CHECK" "HOT·SWAP" "DATA·VERIFY" "SYS·VERIFY")
 else
   TOTAL_STEPS=8
   STEP_COLORS=("$ELECTRIC" "$NEON_GREEN" "$VIOLET" "$HOT_PINK" "$NEON_ORANGE" "$LIME" "$PURPLE" "$ELECTRIC")
@@ -229,10 +251,10 @@ boot_screen() {
   blank
   local MODE_LABEL MODE_COLOR
   if $UPDATE_MODE; then
-    MODE_LABEL="HOT-SWAP  ·  UPDATE MODE  ·  PERSISTENCE ENABLED"
+    MODE_LABEL="HOT-SWAP  ·  UPDATE MODE  ·  ${DEPLOY_ENV^^}  ·  PERSISTENCE ENABLED"
     MODE_COLOR="$NEON_ORANGE"
   else
-    MODE_LABEL="DEPLOY SYSTEM  ·  INSTALL MODE  ·  PERSISTENCE ENABLED"
+    MODE_LABEL="DEPLOY SYSTEM  ·  ${DEPLOY_ENV^^} MODE  ·  PERSISTENCE ENABLED"
     MODE_COLOR="$ELECTRIC"
   fi
   echo -e "  ${GHOST}╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌${NC}"
@@ -310,6 +332,20 @@ fix_permissions() {
   docker run --rm -v "${vol_name}:${mount_path}" alpine sh -c "chown -R 1001:1001 ${mount_path} && chmod -R 755 ${mount_path}" 2>/dev/null
 }
 
+acquire_image() {
+  if [[ "$DEPLOY_ENV" == "production" ]]; then
+    if ! docker pull "$IMAGE"; then
+      fail "Could not pull image ${IMAGE}"
+    fi
+    ok "Imagen ${NEON_ORANGE}${BOLD}${IMAGE}${NC} descargada del registro"
+  else
+    if ! docker build -t "$IMAGE" .; then
+      fail "Could not build image ${IMAGE}"
+    fi
+    ok "Imagen ${NEON_ORANGE}${BOLD}${IMAGE}${NC} construida localmente"
+  fi
+}
+
 launch_redis() {
   docker run -d \
     --name orbit-redis \
@@ -362,13 +398,10 @@ boot_screen
 
 if $UPDATE_MODE; then
 
-  step 1 "Pulling new image"
-  info "${GHOST}imagen  :${NC} ${NEON_ORANGE}${BOLD}${IMAGE}${NC}"
+  step 1 "Obteniendo imagen"
+  info "${GHOST}imagen  :${NC} ${NEON_ORANGE}${BOLD}${IMAGE}${NC}  ${GHOST}(${SOURCE_LABEL})${NC}"
   blank
-  if ! docker pull "$IMAGE"; then
-    fail "Could not pull image ${IMAGE}"
-  fi
-  ok "Imagen ${NEON_ORANGE}${BOLD}${IMAGE}${NC} lista"
+  acquire_image
 
   step 2 "Verificando persistencia y creando backup"
   info "${GHOST}verificando datos existentes...${NC}"
@@ -615,10 +648,12 @@ else
   ok "${NEON_ORANGE}Estructura de directorios${NC} lista  ${GHOST}·${NC}  ${DIM}/app/subbot-sessions dedicado${NC}"
 
   step 8 "Deploying OrbitBot"
-  info "${GHOST}imagen    :${NC} ${NEON_ORANGE}${BOLD}${IMAGE}${NC}"
+  info "${GHOST}imagen    :${NC} ${NEON_ORANGE}${BOLD}${IMAGE}${NC}  ${GHOST}(local build)${NC}"
   info "${GHOST}network   :${NC} ${NEON_ORANGE}orbit-network${NC}"
   info "${GHOST}recursos  :${NC} ${NEON_ORANGE}4g RAM${NC}  ${GHOST}·${NC}  ${NEON_ORANGE}1.5 CPUs${NC}"
   info "${GHOST}subbots   :${NC} ${NEON_ORANGE}/app/subbot-sessions${NC}  ${GHOST}→${NC}  ${DIM}orbit_subbot_sessions (persistent)${NC}"
+  blank
+  acquire_image
   blank
   launch_orbit
   ok "OrbitBot ${LIME}${BOLD}ONLINE${NC}  ${GHOST}·${NC}  ${NEON_YELLOW}${BOLD}:3000${NC}"
@@ -654,7 +689,7 @@ thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v orbit_subbot
 thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}docker run --rm -v orbit-redis-data:/src -v \$(pwd):/bk alpine tar czf /bk/redis-backup.tar.gz -C /src .${NC}"
 thin_line "${GHOST}─────────────────────────────────────────────────────${NC}"
 thin_line "${GHOST}  UPDATE without losing sessions or data:${NC}"
-thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}curl -fsSL <url> | bash -s ${NEON_ORANGE}<version>${NC} ${LIME}update${NC}"
+thin_line "  ${NEON_YELLOW}${BOLD}\$${NC}  ${DIM}bash deploy.sh ${NEON_GREEN}develop${NC}${DIM}|${NC}${ELECTRIC}production${NC} ${NEON_ORANGE}[versión]${NC} ${LIME}update${NC}"
 thin_bottom
 blank
 
