@@ -395,3 +395,48 @@ export function rotateCookieJar(jarPath: string): boolean {
     return false;
   }
 }
+
+/**
+ * Parses `yt-dlp --list-impersonate-targets` output: the first column of
+ * each AVAILABLE target line. Headers (uppercase words) and unavailable
+ * targets (✗) are dropped.
+ */
+export function parseImpersonateTargets(output: string): string[] {
+  const targets: string[] = [];
+  for (const rawLine of output.split('\n')) {
+    const line = rawLine.trim();
+    if (!line || line.includes('✗') || /not available/i.test(line)) continue;
+    const token = /^\S+/.exec(line)?.[0] ?? '';
+    // Only lowercase identifiers are target names; headers start uppercase.
+    if (!/^[a-z][a-z0-9_.-]*$/.test(token)) continue;
+    targets.push(token);
+  }
+  return targets;
+}
+
+/** Family order required by the plan: chrome, safari, firefox, edge. */
+const IMPERSONATE_FAMILY_ORDER = ['chrome', 'safari', 'firefox', 'edge'] as const;
+
+/**
+ * Builds the retry rotation list from the targets this installation really
+ * has (never assumes names). Exact bases first (chrome), then variants in
+ * alphabetical order, families in plan order.
+ */
+export function buildImpersonateCandidates(targets: string[]): string[] {
+  const candidates: string[] = [];
+  for (const family of IMPERSONATE_FAMILY_ORDER) {
+    const inFamily = targets.filter(t => t.startsWith(family));
+    if (inFamily.length === 0) continue;
+    const exact = inFamily.filter(t => t === family);
+    const variants = inFamily.filter(t => t !== family).sort();
+    candidates.push(...exact, ...variants);
+  }
+  return candidates;
+}
+
+/** Per-invocation network family flag (TIKTOK_IP_FAMILY). */
+export function ipFamilyArgs(family: 'auto' | '4' | '6'): string[] {
+  if (family === '4') return ['-4'];
+  if (family === '6') return ['--force-ipv6'];
+  return [];
+}

@@ -13,6 +13,9 @@ import {
   TikTokBreaker,
   isTikTokBlockError,
   rotateCookieJar,
+  parseImpersonateTargets,
+  buildImpersonateCandidates,
+  ipFamilyArgs,
 } from '../../../src/services/download/TikTokGuard.js';
 import { JsonFileStore } from '../../../src/utils/JsonFileStore.js';
 
@@ -458,5 +461,66 @@ describe('rotateCookieJar', () => {
     fs.writeFileSync(jarPath, 'new jar');
     expect(rotateCookieJar(jarPath)).toBe(true);
     expect(fs.readFileSync(`${jarPath}.bak`, 'utf-8')).toBe('new jar');
+  });
+});
+
+describe('parseImpersonateTargets', () => {
+  // Realistic `yt-dlp --list-impersonate-targets` output shape
+  const OUTPUT = [
+    'Impersonate targets:',
+    'ClientOS     Client type',
+    'chrome             ✓ (curl_cffi)',
+    'chrome-99.0.4844.84  ✓ (curl_cffi)',
+    'chrome131_android  ✓ (curl_cffi)',
+    'edge101            ✓ (curl_cffi)',
+    'firefox135         ✓ (curl_cffi)',
+    'safari17_0         ✓ (curl_cffi)',
+    'ios15_5            ✗ (not available)',
+  ].join('\n');
+
+  it('extracts the first column of available targets', () => {
+    const targets = parseImpersonateTargets(OUTPUT);
+    expect(targets).toContain('chrome');
+    expect(targets).toContain('chrome-99.0.4844.84');
+    expect(targets).toContain('firefox135');
+    expect(targets).toContain('safari17_0');
+    expect(targets).toContain('edge101');
+    expect(targets).not.toContain('ios15_5'); // unavailable
+    expect(targets).not.toContain('Impersonate'); // header
+    expect(targets).not.toContain('ClientOS'); // header
+  });
+
+  it('returns an empty list for garbage input', () => {
+    expect(parseImpersonateTargets('')).toEqual([]);
+  });
+});
+
+describe('buildImpersonateCandidates', () => {
+  it('orders chrome first, then safari, firefox and edge (plan order)', () => {
+    const candidates = buildImpersonateCandidates([
+      'firefox135',
+      'safari17_0',
+      'chrome',
+      'chrome-131.0.6778.85',
+      'edge101',
+    ]);
+    expect(candidates).toEqual(['chrome', 'chrome-131.0.6778.85', 'safari17_0', 'firefox135', 'edge101']);
+  });
+
+  it('only uses targets that actually exist in this installation', () => {
+    const candidates = buildImpersonateCandidates(['chrome-99.0.4844.84', 'chrome']);
+    expect(candidates).toEqual(['chrome', 'chrome-99.0.4844.84']);
+    expect(candidates.every(t => t.startsWith('chrome'))).toBe(true);
+  });
+});
+
+describe('ipFamilyArgs', () => {
+  it('adds no flag on auto', () => {
+    expect(ipFamilyArgs('auto')).toEqual([]);
+  });
+
+  it('adds -4 for ipv4 and --force-ipv6 for ipv6', () => {
+    expect(ipFamilyArgs('4')).toEqual(['-4']);
+    expect(ipFamilyArgs('6')).toEqual(['--force-ipv6']);
   });
 });
