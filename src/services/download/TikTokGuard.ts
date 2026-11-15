@@ -340,11 +340,12 @@ export class TikTokBreaker {
   /**
    * Registers a confirmed block. No-ops while the breaker is already open so
    * one user request (which may fail in several internal methods) cannot
-   * open it twice.
+   * open it twice. Returns true only on the closed→open transition — the
+   * caller uses it to rotate the cookie jar once per opening.
    */
-  recordBlock(reason?: string): void {
+  recordBlock(reason?: string): boolean {
     const state = this.load();
-    if (state.openUntil > this.now()) return;
+    if (state.openUntil > this.now()) return false;
 
     const level = Math.min(state.backoffLevel + 1, this.backoffCap());
     const pauseMs = Math.min(this.baseMinMs * 2 ** (level - 1), this.maxMinMs);
@@ -357,6 +358,7 @@ export class TikTokBreaker {
           `(level ${level})${reason ? `: ${reason.slice(0, 300)}` : ''}`,
       ),
     );
+    return true;
   }
 
   /** Registers a successful download: closes the breaker and resets backoff. */
@@ -374,5 +376,22 @@ export class TikTokBreaker {
 
   private load(): TikTokBreakerState {
     return this.store.load();
+  }
+}
+
+/**
+ * Rotates the yt-dlp cookie jar to `<jar>.bak` so the next run generates a
+ * fresh session. Called once per breaker opening (a flagged IP taints the
+ * session's ttwid reputation). The jar is only written by yt-dlp itself.
+ */
+export function rotateCookieJar(jarPath: string): boolean {
+  if (!fs.existsSync(jarPath)) return false;
+  try {
+    fs.renameSync(jarPath, `${jarPath}.bak`); // rename replaces a stale .bak
+    logger.info(`[TikTokGuard] Cookie jar rotated to ${jarPath}.bak`);
+    return true;
+  } catch (error) {
+    logError('TikTokGuard.rotateCookieJar', error);
+    return false;
   }
 }

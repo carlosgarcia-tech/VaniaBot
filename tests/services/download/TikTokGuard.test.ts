@@ -12,6 +12,7 @@ import { TikTokQueue, TikTokFileCache, createInFlightDedupe } from '../../../src
 import {
   TikTokBreaker,
   isTikTokBlockError,
+  rotateCookieJar,
 } from '../../../src/services/download/TikTokGuard.js';
 import { JsonFileStore } from '../../../src/utils/JsonFileStore.js';
 
@@ -416,5 +417,46 @@ describe('TikTokBreaker', () => {
     const rehydrated = makeBreaker(); // new instance, same file — like a container restart
     expect(rehydrated.isOpen()).toBe(true);
     expect(rehydrated.minutesLeft()).toBe(15);
+  });
+
+  it('reports the closed→open transition only once (one cookie rotation per opening)', () => {
+    const breaker = makeBreaker();
+    expect(breaker.recordBlock()).toBe(true); // just opened
+    expect(breaker.recordBlock()).toBe(false); // still open, same user request must not re-rotate
+    clock += 16 * 60 * 1000; // pause elapsed, new block reopens
+    expect(breaker.recordBlock()).toBe(true);
+  });
+});
+
+describe('rotateCookieJar', () => {
+  let tmpDir: string;
+  let jarPath: string;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tiktok-jar-'));
+    jarPath = path.join(tmpDir, 'tiktok_cookies.txt');
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('renames the jar to .bak so yt-dlp generates a fresh one', () => {
+    fs.writeFileSync(jarPath, '# Netscape HTTP Cookie File\n.tiktok.com\tTRUE\t/\tttwid\t1|xyz\n');
+    expect(rotateCookieJar(jarPath)).toBe(true);
+    expect(fs.existsSync(jarPath)).toBe(false);
+    expect(fs.readFileSync(`${jarPath}.bak`, 'utf-8')).toContain('ttwid');
+  });
+
+  it('is a no-op when the jar does not exist yet', () => {
+    expect(rotateCookieJar(jarPath)).toBe(false);
+    expect(fs.existsSync(`${jarPath}.bak`)).toBe(false);
+  });
+
+  it('overwrites a stale .bak from a previous rotation', () => {
+    fs.writeFileSync(`${jarPath}.bak`, 'old jar');
+    fs.writeFileSync(jarPath, 'new jar');
+    expect(rotateCookieJar(jarPath)).toBe(true);
+    expect(fs.readFileSync(`${jarPath}.bak`, 'utf-8')).toBe('new jar');
   });
 });
