@@ -197,6 +197,11 @@ export class TikTokFileCache {
     this.now = options.now ?? Date.now;
   }
 
+  /** Directory the cache stores into (also used to identify cached files). */
+  get directory(): string {
+    return this.dir;
+  }
+
   /** Cached file path for the video id, or null on miss/TTL/expiry. */
   get(videoId: string): string | null {
     const file = this.pathFor(videoId);
@@ -444,4 +449,187 @@ export function ipFamilyArgs(family: 'auto' | '4' | '6'): string[] {
 /** Last-resort mobile API fallback (tried once after web retries fail). */
 export function mobileApiArgs(): string[] {
   return ['--extractor-args', 'tiktok:api_hostname=api22-normal-c-useast2a.tiktokv.com'];
+}
+
+/** Friendly rejection shown to users while the breaker is open. */
+export class TikTokBlockedError extends Error {
+  readonly minutes: number;
+
+  constructor(minutes: number) {
+    super(
+      `TikTok limitó temporalmente las descargas desde este servidor. ` +
+        `Intenta de nuevo en ~${minutes} min.`,
+    );
+    this.name = 'TikTokBlockedError';
+    this.minutes = minutes;
+  }
+}
+
+/** Env parsing with the plan's defaults; invalid/absent values fall back. */
+function envNumber(name: string, fallback: number): number {
+  const value = Number(process.env[name]);
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+/**
+ * Orchestrates every yt-dlp TikTok call through the guard: canonical URL
+ * memo, serial queue with minimum gap, per-video file cache, in-flight
+ * dedupe, persistent breaker and impersonation-target rotation. TikTok
+ * callers inject the actual exec function, so the whole policy is testable
+ * without touching the network.
+ */
+export class TikTokGuardService {
+  private readonly queue: TikTokQueue;
+  private readonly cache: TikTokFileCache;
+  private readonly breaker: TikTokBreaker;
+  private readonly dedupe = createInFlightDedupe();
+  private readonly runYtDlp: (args: string[], timeout: number) => Promise<string>;
+  private readonly cookiesPath: string;
+  private readonly ipFamily: 'auto' | '4' | '6';
+  private readonly now: () => number;
+  private readonly fetchImpl: typeof fetch;
+
+  /** Impersonation targets from this installation; null = not queried yet. */
+  private targets: string[] | null = null;
+  private readonly canonicalMemo = new Map<string, { value: string; ts: number }>();
+
+  constructor(options: {
+    runYtDlp: (args: string[], timeout: number) => Promise<string>;
+    cacheDir?: string;
+    cookiesPath?: string;
+    breakerPath?: string;
+    minGapMs?: number;
+    jitterMs?: number;
+    maxWaitMs?: number;
+    ttlMs?: number;
+    maxTotalBytes?: number;
+    baseMinMs?: number;
+    maxMinMs?: number;
+    ipFamily?: 'auto' | '4' | '6';
+    now?: () => number;
+    sleep?: (ms: number) => Promise<void>;
+    random?: () => number;
+    fetchImpl?: typeof fetch;
+  }) {
+    const now = options.now ?? Date.now;
+    this.runYtDlp = options.runYtDlp;
+    this.cookiesPath = options.cookiesPath ?? './data/tiktok_cookies.txt';
+    this.ipFamily = options.ipFamily ?? 'auto';
+    this.now = now;
+    this.fetchImpl = options.fetchImpl ?? fetch;
+    this.queue = new TikTokQueue({
+      minGapMs: options.minGapMs ?? envNumber('TIKTOK_MIN_GAP_MS', 15000),
+      jitterMs: options.jitterMs ?? envNumber('TIKTOK_JITTER_MS', 5000),
+      maxWaitMs: options.maxWaitMs ?? 180000,
+      now,
+      sleep: options.sleep,
+      random: options.random,
+    });
+    this.cache = new TikTokFileCache({
+      dir: options.cacheDir ?? './data/tiktok_cache',
+      ttlMs: options.ttlMs ?? envNumber('TIKTOK_CACHE_TTL_MS', 6 * 60 * 60 * 1000),
+      maxTotalBytes: options.maxTotalBytes ?? envNumber('TIKTOK_CACHE_MAX_MB', 500) * 1024 * 1024,
+      now,
+    });
+    this.breaker = new TikTokBreaker({
+      store: new JsonFileStore<TikTokBreakerState>({
+        filePath: options.breakerPath ?? './data/tiktok_breaker.json',
+        defaults: () => ({ openUntil: 0, backoffLevel: 0 }),
+      }),
+      baseMinMs: options.baseMinMs ?? envNumber('TIKTOK_BREAKER_BASE_MIN', 15) * 60 * 1000,
+      maxMinMs: options.maxMinMs ?? envNumber('TIKTOK_BREAKER_MAX_MIN', 120) * 60 * 1000,
+      now,
+    });
+  }
+
+  /** Canonical URL, memoized per original short link (one redirect per URL). */
+  async canonical(url: string): Promise<string> {
+    const memo = this.canonicalMemo.get(url);
+    if (memo && this.now() - memo.ts < 10 * 60 * 1000) return memo.value;
+    const value = await this.dedupe(`canonical:${url}`, () =>
+      resolveCanonicalUrl(url, this.fetchImpl),
+    );
+    this.canonicalMemo.set(url, { value, ts: this.now() });
+    return value;
+  }
+
+  isBlocked(): boolean {
+    return this.breaker.isOpen();
+  }
+
+  blockedMinutesLeft(): number {
+    return this.breaker.minutesLeft();
+  }
+
+  /** Per-invocation yt-dlp args shared by every TikTok call. */
+  buildBaseArgs(impersonateTarget?: string): string[] {
+    const target =
+      impersonateTarget ??
+      (this.targets === null ? 'chrome' : this.targets[0] || undefined);
+    return [
+      '--cookies',
+      this.cookiesPath,
+      '--extractor-retries',
+      '0',
+      ...(target ? ['--impersonate', target] : []),
+      ...ipFamilyArgs(this.ipFamily),
+    ];
+  }
+
+  /**
+   * Impersonation target for a retry attempt, from the targets this
+   * installation really lists (queried once, then cached). undefined when
+   * the list is empty or the attempt exceeds the candidates.
+   */
+  async impersonateTargetFor(attempt: number): Promise<string | undefined> {
+    if (this.targets === null) {
+      try {
+        this.targets = parseImpersonateTargets(
+          await this.runYtDlp(['--list-impersonate-targets'], 15000),
+        );
+      } catch (error) {
+        this.targets = [];
+        logError('TikTokGuardService.impersonateTargetFor', error);
+      }
+    }
+    return buildImpersonateCandidates(this.targets)[attempt];
+  }
+
+  /**
+   * Runs one yt-dlp call through the guard: refuses while the breaker is
+   * open, dedupes concurrent identical calls (same key) and serializes
+   * everything through the minimum-gap queue.
+   */
+  async guardRun<T>(key: string, task: () => Promise<T>): Promise<T> {
+    if (this.breaker.isOpen()) {
+      throw new TikTokBlockedError(this.breaker.minutesLeft());
+    }
+    return this.dedupe(key, () => this.queue.enqueue(task));
+  }
+
+  /** Classifies a yt-dlp stderr: confirmed blocks open the breaker (and rotate the jar once per opening). */
+  handleFailure(stderr: string): void {
+    if (!isTikTokBlockError(stderr)) return;
+    if (this.breaker.recordBlock(stderr)) {
+      rotateCookieJar(this.cookiesPath);
+    }
+  }
+
+  /** A successful download resets the breaker. */
+  handleSuccess(): void {
+    this.breaker.recordSuccess();
+  }
+
+  serveFromCache(videoId: string): string | null {
+    return this.cache.get(videoId);
+  }
+
+  storeInCache(videoId: string, sourcePath: string): void {
+    this.cache.store(videoId, sourcePath);
+  }
+
+  /** True for files living inside the cache dir (never delete those). */
+  ownsCachedFile(filePath: string): boolean {
+    return filePath.startsWith(this.cache.directory + path.sep);
+  }
 }

@@ -17,6 +17,8 @@ import {
   buildImpersonateCandidates,
   ipFamilyArgs,
   mobileApiArgs,
+  TikTokGuardService,
+  TikTokBlockedError,
 } from '../../../src/services/download/TikTokGuard.js';
 import { JsonFileStore } from '../../../src/utils/JsonFileStore.js';
 
@@ -532,5 +534,192 @@ describe('mobileApiArgs', () => {
       '--extractor-args',
       'tiktok:api_hostname=api22-normal-c-useast2a.tiktokv.com',
     ]);
+  });
+});
+
+describe('TikTokGuardService', () => {
+  let tmpDir: string;
+  let calls: string[][];
+  let clock: number;
+
+  const makeService = (overrides: Record<string, unknown> = {}) => {
+    calls = [];
+    clock = 1_700_000_000_000;
+    return new TikTokGuardService({
+      runYtDlp: (args: string[]) => {
+        calls.push(args);
+        return Promise.resolve(
+          'chrome             ✓\nchrome-131.0.6778.85 ✓\nsafari17_0 ✓\nfirefox135 ✓\nedge101 ✓\n',
+        );
+      },
+      cacheDir: path.join(tmpDir, 'cache'),
+      cookiesPath: path.join(tmpDir, 'tiktok_cookies.txt'),
+      breakerPath: path.join(tmpDir, 'tiktok_breaker.json'),
+      minGapMs: 30,
+      jitterMs: 0,
+      retryDelayMs: () => 7,
+      now: () => clock,
+      sleep: async (ms: number) => {
+        clock += ms;
+      },
+      ...overrides,
+    });
+  };
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tiktok-guard-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('buildBaseArgs passes cookies, extractor-retries 0 and impersonation explicitly', async () => {
+    const guard = makeService({ ipFamily: '4' as const });
+    expect(guard.buildBaseArgs()).toEqual([
+      '--cookies',
+      path.join(tmpDir, 'tiktok_cookies.txt'),
+      '--extractor-retries',
+      '0',
+      '--impersonate',
+      'chrome',
+      '-4',
+    ]);
+  });
+
+  it('buildBaseArgs omits the impersonate flag when no target is available', () => {
+    const guard = makeService();
+    (guard as unknown as { targets: string[] | null }).targets = [];
+    expect(guard.buildBaseArgs()).toEqual([
+      '--cookies',
+      path.join(tmpDir, 'tiktok_cookies.txt'),
+      '--extractor-retries',
+      '0',
+    ]);
+  });
+
+  it('caches the impersonate target list after the first query and rotates per attempt', async () => {
+    const guard = makeService();
+    const t0 = await guard.impersonateTargetFor(0);
+    const t1 = await guard.impersonateTargetFor(1);
+    const t2 = await guard.impersonateTargetFor(2);
+    expect(t0).toBe('chrome');
+    expect(t1).toBe('chrome-131.0.6778.85');
+    expect(t2).toBe('safari17_0');
+    expect(calls.filter(a => a.includes('--list-impersonate-targets'))).toHaveLength(1);
+  });
+
+  it('returns undefined targets when yt-dlp cannot list them (never assumes names)', async () => {
+    const guard = makeService({
+      runYtDlp: () => Promise.reject(new Error('no curl_cffi')),
+    });
+    expect(await guard.impersonateTargetFor(0)).toBeUndefined();
+  });
+
+  it('guardRun dedupes the same key into one execution', async () => {
+    const guard = makeService();
+    let runs = 0;
+    const [a, b] = await Promise.all([
+      guard.guardRun('file:111', async () => {
+        runs++;
+        return 'x';
+      }),
+      guard.guardRun('file:111', async () => {
+        runs++;
+        return 'x';
+      }),
+    ]);
+    expect(runs).toBe(1);
+    expect(a).toBe('x');
+    expect(b).toBe('x');
+  });
+
+  it('guardRun runs different keys through the serial queue with a gap', async () => {
+    const guard = makeService();
+    const starts: number[] = [];
+    await Promise.all([
+      guard.guardRun('file:111', async () => {
+        starts.push(clock);
+      }),
+      guard.guardRun('file:222', async () => {
+        starts.push(clock);
+      }),
+    ]);
+    expect(starts[1] - starts[0]).toBeGreaterThanOrEqual(30);
+  });
+
+  it('handleFailure on a block stderr opens the breaker and rotates the jar once', () => {
+    const guard = makeService();
+    fs.writeFileSync(path.join(tmpDir, 'tiktok_cookies.txt'), 'ttwid jar');
+    guard.handleFailure('ERROR: Unable to download webpage: HTTP Error 403: Forbidden');
+    expect(guard.isBlocked()).toBe(true);
+    expect(guard.blockedMinutesLeft()).toBe(15);
+    expect(fs.existsSync(path.join(tmpDir, 'tiktok_cookies.txt'))).toBe(false);
+    expect(fs.existsSync(path.join(tmpDir, 'tiktok_cookies.txt.bak'))).toBe(true);
+    // same user request hits another method later: no double rotation
+    guard.handleFailure('ERROR: Your IP address is blocked');
+    expect(guard.blockedMinutesLeft()).toBe(15);
+  });
+
+  it('handleFailure on a non-block stderr does not open the breaker', () => {
+    const guard = makeService();
+    guard.handleFailure("ERROR: Failed to resolve 'www.tiktok.com' ([Errno -5])");
+    expect(guard.isBlocked()).toBe(false);
+  });
+
+  it('handleSuccess closes the breaker and resets backoff', () => {
+    const guard = makeService();
+    guard.handleFailure('HTTP Error 403: Forbidden');
+    clock += 16 * 60 * 1000;
+    guard.handleFailure('HTTP Error 403: Forbidden'); // level 2 → 30 min
+    clock += 31 * 60 * 1000;
+    guard.handleSuccess();
+    expect(guard.isBlocked()).toBe(false);
+    guard.handleFailure('HTTP Error 403: Forbidden');
+    expect(guard.blockedMinutesLeft()).toBe(15);
+  });
+
+  it('guardRun refuses to run and throws the friendly message while the breaker is open', async () => {
+    const guard = makeService();
+    guard.handleFailure('HTTP Error 403: Forbidden');
+    let taskRan = false;
+    await expect(
+      guard.guardRun('file:111', async () => {
+        taskRan = true;
+      }),
+    ).rejects.toThrow(/limitó temporalmente|~15 min/);
+    expect(taskRan).toBe(false);
+  });
+
+  it('serves and stores the per-video file cache', async () => {
+    const guard = makeService();
+    const source = path.join(tmpDir, 'downloaded.mp4');
+    fs.writeFileSync(source, 'video');
+    expect(guard.serveFromCache('111')).toBeNull();
+    guard.storeInCache('111', source);
+    const cached = guard.serveFromCache('111');
+    expect(cached).not.toBeNull();
+    expect(fs.existsSync(cached as string)).toBe(true);
+    expect(fs.existsSync(source)).toBe(false); // moved into the cache
+  });
+
+  it('memoizes the canonical resolution of the same short link (one redirect per URL)', async () => {
+    let fetches = 0;
+    const fakeFetch = (async () => {
+      fetches++;
+      return { url: 'https://www.tiktok.com/@user/video/7696749231666760967' };
+    }) as unknown as typeof fetch;
+    const guard = makeService({ fetchImpl: fakeFetch });
+    const short = 'https://vt.tiktok.com/ZSpbg9pN4/';
+    const [first, second] = await Promise.all([guard.canonical(short), guard.canonical(short)]);
+    expect(first).toBe('https://www.tiktok.com/@user/video/7696749231666760967');
+    expect(second).toBe(first);
+    expect(fetches).toBe(1);
+  });
+
+  it('TikTokBlockedError carries the minutes for the friendly reply', () => {
+    const error = new TikTokBlockedError(23);
+    expect(error.message).toContain('23');
+    expect(error.minutes).toBe(23);
   });
 });
