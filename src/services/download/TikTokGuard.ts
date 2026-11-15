@@ -77,3 +77,98 @@ export async function resolveCanonicalUrl(
     return url;
   }
 }
+
+/**
+ * Serial FIFO queue with a minimum gap between task starts: TikTok
+ * rate-limits bursts of requests from a single IP, so at most ONE yt-dlp
+ * invocation runs at a time and new ones start at least
+ * `minGapMs + random(0..jitterMs)` after the previous start.
+ */
+export class TikTokQueueTimeoutError extends Error {
+  constructor(waitedMs: number, maxWaitMs: number) {
+    super(
+      `La cola de descargas de TikTok está congestionada (esperaste ${Math.round(
+        waitedMs / 1000,
+      )}s de ${Math.round(maxWaitMs / 1000)}s máximo). Intenta de nuevo en un momento.`,
+    );
+    this.name = 'TikTokQueueTimeoutError';
+  }
+}
+
+export interface TikTokQueueOptions {
+  /** Minimum milliseconds between two task starts (default 15000). */
+  minGapMs?: number;
+  /** Extra random 0..jitterMs added to the gap (default 5000). */
+  jitterMs?: number;
+  /** Reject tasks whose estimated start delay exceeds this (default 180000). */
+  maxWaitMs?: number;
+  random?: () => number;
+  now?: () => number;
+  sleep?: (ms: number) => Promise<void>;
+}
+
+const defaultSleep = (ms: number): Promise<void> =>
+  new Promise(resolve => setTimeout(resolve, ms));
+
+export class TikTokQueue {
+  private readonly minGapMs: number;
+  private readonly jitterMs: number;
+  private readonly maxWaitMs: number;
+  private readonly random: () => number;
+  private readonly now: () => number;
+  private readonly sleep: (ms: number) => Promise<void>;
+
+  /** Tail of the execution chain; keeps FIFO order and concurrency 1. */
+  private chain: Promise<void> = Promise.resolve();
+  private lastStartAt: number | null = null;
+  private waiting = 0;
+
+  constructor(options: TikTokQueueOptions = {}) {
+    this.minGapMs = options.minGapMs ?? 15000;
+    this.jitterMs = options.jitterMs ?? 5000;
+    this.maxWaitMs = options.maxWaitMs ?? 180000;
+    this.random = options.random ?? Math.random;
+    this.now = options.now ?? Date.now;
+    this.sleep = options.sleep ?? defaultSleep;
+  }
+
+  /** Seconds until the next slot opens (for user-facing messages). */
+  secondsUntilNextSlot(): number {
+    if (this.waiting === 0 || this.lastStartAt === null) return 0;
+    const elapsed = this.now() - this.lastStartAt;
+    return Math.max(0, Math.ceil((this.minGapMs - elapsed) / 1000));
+  }
+
+  async enqueue<T>(
+    task: () => Promise<T>,
+    opts: { onQueued?: (position: number) => void } = {},
+  ): Promise<T> {
+    const enqueuedAt = this.now();
+    this.waiting++;
+    opts.onQueued?.(this.waiting);
+
+    const run = async (): Promise<T> => {
+      this.waiting--;
+      const elapsedSinceStart =
+        this.lastStartAt === null ? Infinity : this.now() - this.lastStartAt;
+      const gap = this.minGapMs + Math.floor(this.random() * this.jitterMs);
+      const delay = Math.max(0, gap - elapsedSinceStart);
+      const waited = this.now() - enqueuedAt;
+      if (waited + delay > this.maxWaitMs) {
+        throw new TikTokQueueTimeoutError(waited, this.maxWaitMs);
+      }
+      if (delay > 0) {
+        await this.sleep(delay);
+      }
+      this.lastStartAt = this.now();
+      return task();
+    };
+
+    const result = this.chain.then(run, run);
+    this.chain = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    return result;
+  }
+}
