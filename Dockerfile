@@ -50,9 +50,11 @@ RUN apt-get update \
 RUN pip3 install --no-cache-dir --timeout 120 --retries 10 --break-system-packages \
     "yt-dlp[default,curl-cffi]"
 
-# TikTok rejects non-browser TLS fingerprints (403); force Chrome impersonation
-# globally so every yt-dlp invocation (bot or manual) uses it
-RUN printf -- '--impersonate chrome\n' > /etc/yt-dlp.conf
+# TikTok rejects non-browser TLS fingerprints (403) and intermittently blocks
+# server IPs; force Chrome impersonation, retry webpage requests, and use
+# real-session cookies when the user drops them at /app/data/tiktok_cookies.txt
+# (missing file is tolerated: yt-dlp just runs with an empty cookie jar)
+RUN printf -- '--impersonate chrome\n--extractor-retries 3\n--cookies /app/data/tiktok_cookies.txt\n' > /etc/yt-dlp.conf
 
 RUN pip3 install --no-cache-dir --timeout 120 --retries 10 \
     pymupdf --break-system-packages
