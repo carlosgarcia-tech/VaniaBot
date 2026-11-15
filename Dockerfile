@@ -45,10 +45,14 @@ RUN apt-get update \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fL --retry 5 --connect-timeout 30 \
-    https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
-    -o /usr/local/bin/yt-dlp \
-    && chmod a+rx /usr/local/bin/yt-dlp
+# yt-dlp via pip with curl-cffi extra: TikTok requires browser TLS
+# impersonation and the standalone release binary ships without it
+RUN pip3 install --no-cache-dir --timeout 120 --retries 10 --break-system-packages \
+    "yt-dlp[default,curl-cffi]"
+
+# TikTok rejects non-browser TLS fingerprints (403); force Chrome impersonation
+# globally so every yt-dlp invocation (bot or manual) uses it
+RUN printf -- '--impersonate chrome\n' > /etc/yt-dlp.conf
 
 RUN pip3 install --no-cache-dir --timeout 120 --retries 10 \
     pymupdf --break-system-packages
