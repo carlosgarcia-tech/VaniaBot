@@ -440,3 +440,8 @@ export function ipFamilyArgs(family: 'auto' | '4' | '6'): string[] {
   if (family === '6') return ['--force-ipv6'];
   return [];
 }
+
+/** Last-resort mobile API fallback (tried once after web retries fail). */
+export function mobileApiArgs(): string[] {
+  return ['--extractor-args', 'tiktok:api_hostname=api22-normal-c-useast2a.tiktokv.com'];
+}

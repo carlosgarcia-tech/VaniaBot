@@ -16,6 +16,7 @@ import {
   parseImpersonateTargets,
   buildImpersonateCandidates,
   ipFamilyArgs,
+  mobileApiArgs,
 } from '../../../src/services/download/TikTokGuard.js';
 import { JsonFileStore } from '../../../src/utils/JsonFileStore.js';
 
@@ -522,5 +523,14 @@ describe('ipFamilyArgs', () => {
   it('adds -4 for ipv4 and --force-ipv6 for ipv6', () => {
     expect(ipFamilyArgs('4')).toEqual(['-4']);
     expect(ipFamilyArgs('6')).toEqual(['--force-ipv6']);
+  });
+});
+
+describe('mobileApiArgs', () => {
+  it('targets the mobile API hostname the plan specifies', () => {
+    expect(mobileApiArgs()).toEqual([
+      '--extractor-args',
+      'tiktok:api_hostname=api22-normal-c-useast2a.tiktokv.com',
+    ]);
   });
 });
