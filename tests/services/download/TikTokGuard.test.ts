@@ -9,6 +9,11 @@ import {
   resolveCanonicalUrl,
 } from '../../../src/services/download/TikTokGuard.js';
 import { TikTokQueue, TikTokFileCache, createInFlightDedupe } from '../../../src/services/download/TikTokGuard.js';
+import {
+  TikTokBreaker,
+  isTikTokBlockError,
+} from '../../../src/services/download/TikTokGuard.js';
+import { JsonFileStore } from '../../../src/utils/JsonFileStore.js';
 
 const CANONICAL = 'https://www.tiktok.com/@pepito_el_sigma67/video/7696749231666760967';
 
@@ -281,5 +286,135 @@ describe('createInFlightDedupe', () => {
     await expect(dedupe('111', failing)).rejects.toThrow('boom');
     await expect(dedupe('111', failing)).rejects.toThrow('boom');
     expect(calls).toBe(2);
+  });
+});
+
+describe('isTikTokBlockError', () => {
+  // Real strings captured in docs/TIKTOK_403_DEBUG.md
+  it('flags the 403 webpage error', () => {
+    expect(
+      isTikTokBlockError(
+        'ERROR: [TikTok] 7696749231666760967: Unable to download webpage: HTTP Error 403: Forbidden (caused by <HTTPError 403: Forbidden>)',
+      ),
+    ).toBe(true);
+  });
+
+  it('flags the explicit IP block message', () => {
+    expect(
+      isTikTokBlockError(
+        'ERROR: [TikTok] 7664304839815384351: Your IP address is blocked from accessing this post',
+      ),
+    ).toBe(true);
+  });
+
+  it('flags the bot-check "unexpected response" error', () => {
+    expect(
+      isTikTokBlockError(
+        'ERROR: [TikTok] 7696749231666760967: Unexpected response from webpage request; please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q=',
+      ),
+    ).toBe(true);
+  });
+
+  it('does NOT flag DNS failures (they are not IP reputation blocks)', () => {
+    expect(
+      isTikTokBlockError(
+        "ERROR: [TikTok] 7664304839815384351: Unable to download webpage: HTTPSConnection(host='www.tiktok.com', port=443): Failed to resolve 'www.tiktok.com' ([Errno -5])",
+      ),
+    ).toBe(false);
+  });
+
+  it('does NOT flag unsupported URL or impersonation warnings', () => {
+    expect(isTikTokBlockError('ERROR: Unsupported URL: https://www.tiktok.com/@user/photo/1')).toBe(
+      false,
+    );
+    expect(
+      isTikTokBlockError(
+        'WARNING: [TikTok] The extractor is attempting impersonation, but no impersonate target is available.',
+      ),
+    ).toBe(false);
+  });
+});
+
+describe('TikTokBreaker', () => {
+  let tmpDir: string;
+  let statePath: string;
+  let clock: number;
+
+  const makeBreaker = (storePath = statePath) =>
+    new TikTokBreaker({
+      store: new JsonFileStore<{ openUntil: number; backoffLevel: number }>({
+        filePath: storePath,
+        defaults: () => ({ openUntil: 0, backoffLevel: 0 }),
+      }),
+      baseMinMs: 15 * 60 * 1000,
+      maxMinMs: 120 * 60 * 1000,
+      now: () => clock,
+    });
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tiktok-breaker-'));
+    statePath = path.join(tmpDir, 'tiktok_breaker.json');
+    clock = Date.now();
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('starts closed', () => {
+    expect(makeBreaker().isOpen()).toBe(false);
+  });
+
+  it('opens for the base pause on the first block (15 min)', () => {
+    const breaker = makeBreaker();
+    breaker.recordBlock();
+    expect(breaker.isOpen()).toBe(true);
+    expect(breaker.minutesLeft()).toBe(15);
+  });
+
+  it('doubles the pause on consecutive blocks: 15 → 30 → 60 → 120 (capped)', () => {
+    const breaker = makeBreaker();
+    breaker.recordBlock();
+    expect(breaker.minutesLeft()).toBe(15);
+    clock += 16 * 60 * 1000; // the pause elapses, a new download hits the block again
+    breaker.recordBlock();
+    expect(breaker.minutesLeft()).toBe(30);
+    clock += 31 * 60 * 1000;
+    breaker.recordBlock();
+    expect(breaker.minutesLeft()).toBe(60);
+    clock += 61 * 60 * 1000;
+    breaker.recordBlock();
+    expect(breaker.minutesLeft()).toBe(120);
+    clock += 121 * 60 * 1000;
+    breaker.recordBlock();
+    expect(breaker.minutesLeft()).toBe(120); // capped
+  });
+
+  it('resets the backoff after a success', () => {
+    const breaker = makeBreaker();
+    breaker.recordBlock();
+    clock += 16 * 60 * 1000;
+    breaker.recordBlock(); // level 2 → 30 min
+    clock += 31 * 60 * 1000;
+    breaker.recordSuccess();
+    expect(breaker.isOpen()).toBe(false);
+    breaker.recordBlock();
+    expect(breaker.minutesLeft()).toBe(15); // back to base
+  });
+
+  it('keeps serving the cache while open (isOpen does not affect cache reads)', () => {
+    const breaker = makeBreaker();
+    breaker.recordBlock();
+    // cache reads are independent: the guard just skips yt-dlp, not the cache
+    expect(breaker.isOpen()).toBe(true);
+    expect(breaker.minutesLeft()).toBeGreaterThan(0);
+  });
+
+  it('survives a restart through the persisted store', () => {
+    const breaker = makeBreaker();
+    breaker.recordBlock();
+    const rehydrated = makeBreaker(); // new instance, same file — like a container restart
+    expect(rehydrated.isOpen()).toBe(true);
+    expect(rehydrated.minutesLeft()).toBe(15);
   });
 });

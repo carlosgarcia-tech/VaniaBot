@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { logError } from '@/utils/logger.js';
+import { logError, logger } from '@/utils/logger.js';
+import { JsonFileStore } from '@/utils/JsonFileStore.js';
 
 /**
  * TikTokGuard.ts
@@ -276,4 +277,102 @@ export function createInFlightDedupe(): <T>(key: string, fn: () => Promise<T>) =
     inFlight.set(key, promise);
     return promise;
   };
+}
+
+/**
+ * Block detection from real yt-dlp stderr strings (see
+ * docs/TIKTOK_403_DEBUG.md). DNS failures and unsupported URLs are NOT
+ * blocks — they do not mean the IP's reputation is damaged.
+ */
+const TIKTOK_BLOCK_PATTERNS: RegExp[] = [
+  /HTTP Error 403/i,
+  /Your IP address is blocked/i,
+  /Unexpected response from webpage request/i,
+];
+
+export function isTikTokBlockError(message: string): boolean {
+  return TIKTOK_BLOCK_PATTERNS.some(pattern => pattern.test(message));
+}
+
+/** Persisted breaker state — survives container restarts via JsonFileStore. */
+export interface TikTokBreakerState {
+  /** Absolute ms timestamp until which the breaker stays open (0 = closed). */
+  openUntil: number;
+  /** Consecutive blocks since the last success; 0 = backoff at base. */
+  backoffLevel: number;
+}
+
+/**
+ * Persistent circuit breaker for TikTok: a confirmed block stops all yt-dlp
+ * TikTok calls for `base` minutes, doubling on each reopened block up to
+ * `max`; a success resets the backoff. State lives in /app/data so a
+ * redeploy does not immediately reopen traffic against a flagged IP.
+ */
+export class TikTokBreaker {
+  private readonly store: JsonFileStore<TikTokBreakerState>;
+  private readonly baseMinMs: number;
+  private readonly maxMinMs: number;
+  private readonly now: () => number;
+
+  constructor(options: {
+    store: JsonFileStore<TikTokBreakerState>;
+    baseMinMs?: number;
+    maxMinMs?: number;
+    now?: () => number;
+  }) {
+    this.store = options.store;
+    this.baseMinMs = options.baseMinMs ?? 15 * 60 * 1000;
+    this.maxMinMs = options.maxMinMs ?? 120 * 60 * 1000;
+    this.now = options.now ?? Date.now;
+  }
+
+  isOpen(): boolean {
+    return this.load().openUntil > this.now();
+  }
+
+  /** Whole minutes left until the breaker reopens (0 when closed). */
+  minutesLeft(): number {
+    const openUntil = this.load().openUntil;
+    if (openUntil <= this.now()) return 0;
+    return Math.max(1, Math.ceil((openUntil - this.now()) / 60000));
+  }
+
+  /**
+   * Registers a confirmed block. No-ops while the breaker is already open so
+   * one user request (which may fail in several internal methods) cannot
+   * open it twice.
+   */
+  recordBlock(reason?: string): void {
+    const state = this.load();
+    if (state.openUntil > this.now()) return;
+
+    const level = Math.min(state.backoffLevel + 1, this.backoffCap());
+    const pauseMs = Math.min(this.baseMinMs * 2 ** (level - 1), this.maxMinMs);
+    const openUntil = this.now() + pauseMs;
+    this.store.save({ openUntil, backoffLevel: level });
+    logError(
+      'TikTokBreaker',
+      new Error(
+        `TikTok block detected — breaker OPEN for ${Math.round(pauseMs / 60000)} min ` +
+          `(level ${level})${reason ? `: ${reason.slice(0, 300)}` : ''}`,
+      ),
+    );
+  }
+
+  /** Registers a successful download: closes the breaker and resets backoff. */
+  recordSuccess(): void {
+    const state = this.load();
+    if (state.openUntil === 0 && state.backoffLevel === 0) return;
+    this.store.save({ openUntil: 0, backoffLevel: 0 });
+    logger.info('[TikTokBreaker] Success — breaker CLOSED, backoff reset');
+  }
+
+  /** 2^(level-1) capped so that base * 2^(cap-1) == max. */
+  private backoffCap(): number {
+    return Math.max(1, Math.round(Math.log2(this.maxMinMs / this.baseMinMs)) + 1);
+  }
+
+  private load(): TikTokBreakerState {
+    return this.store.load();
+  }
 }
