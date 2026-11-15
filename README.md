@@ -342,6 +342,26 @@ Auth on first run: scan the QR, or use `USE_PAIRING_CODE=true` with `PHONE_NUMBE
 | `LOG_LEVEL`               | `error` / `warn` / `info` / `debug`    | `info`       |
 | `NODE_ENV`                | `development` / `production`           | `production` |
 
+### TikTok downloads
+
+`!tiktok` routes every yt-dlp call through an anti-block guard: canonical URL
+resolution, a serial queue with a minimum gap, a per-video cache, a persistent
+circuit breaker and impersonation-target rotation (rationale and diagnosis:
+[docs/TIKTOK_403_DEBUG.md](docs/TIKTOK_403_DEBUG.md)).
+
+| Variable                 | Description                                                    | Default     |
+| ------------------------ | -------------------------------------------------------------- | ----------- |
+| `TIKTOK_MIN_GAP_MS`      | Minimum gap between TikTok requests                            | `15000`     |
+| `TIKTOK_JITTER_MS`       | Extra random 0..N ms added to the gap                          | `5000`      |
+| `TIKTOK_CACHE_TTL_MS`    | Per-video download cache TTL                                   | `21600000`  |
+| `TIKTOK_CACHE_MAX_MB`    | Total cache size limit (oldest entries evicted first)          | `500`       |
+| `TIKTOK_BREAKER_BASE_MIN`| Breaker pause after a confirmed TikTok block (minutes)         | `15`        |
+| `TIKTOK_BREAKER_MAX_MIN` | Breaker pause cap (doubles per reopened block, minutes)        | `120`       |
+| `TIKTOK_IP_FAMILY`       | `auto`, `4` (IPv4 only) or `6` (IPv6 only) for TikTok requests  | `auto`      |
+
+Cache, cookie jar and breaker state live under `data/` (the persistent
+`/app/data` volume in Docker), so they survive restarts.
+
 See [.env.example](.env.example) for the complete annotated list.
 
 ---
