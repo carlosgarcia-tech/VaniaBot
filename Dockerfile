@@ -22,7 +22,8 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
     ffmpeg \
     python3 \
@@ -42,11 +43,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-noto-color-emoji \
     tzdata \
     curl \
-    && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
-    -o /usr/local/bin/yt-dlp \
-    && chmod a+rx /usr/local/bin/yt-dlp \
-    && pip3 install --no-cache-dir pymupdf --break-system-packages \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fL --retry 5 --connect-timeout 30 \
+    https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+    -o /usr/local/bin/yt-dlp \
+    && chmod a+rx /usr/local/bin/yt-dlp
+
+RUN pip3 install --no-cache-dir --timeout 120 --retries 10 \
+    pymupdf --break-system-packages
 
 ENV TZ=America/Mexico_City
 
