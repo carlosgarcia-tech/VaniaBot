@@ -48,7 +48,7 @@ export class WatermarkCommand extends Command {
   description =
     'Marca una imagen con un logo (watermark). Responde a la imagen y adjunta el logo en el caption.';
   category = CommandCategory.MEDIA;
-  aliases = ['wm', 'marcadeagua', 'marcar'];
+  aliases = ['marcadeagua', 'marcar'];
   usage =
     '!watermark [posición|tile] [opacidad%] [filasxcolumnas] [nobg] (responde a imagen + adjunta logo en caption)';
   examples = [

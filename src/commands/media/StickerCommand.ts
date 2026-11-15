@@ -4,6 +4,9 @@
  * media command `sticker` — Convert image/video to sticker
  * Usage: !sticker <reply to image/video>
  *
+ * Every sticker is branded with pack metadata (pack name + author/copyright)
+ * via StickerService.addExif. Edit STICKER_BRANDING below to change the text.
+ *
  * @author **Carlos G**
  */
 
@@ -12,6 +15,47 @@ import { CommandCategory, CommandContext, type MessageContext } from '@/types/in
 import { logError } from '@/utils/logger.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { StickerHelper } from '@/utils/StickerHelper.js';
+import { StickerService } from '@/services/media/StickerService.js';
+
+/**
+ * Pack metadata shown in WhatsApp's "sticker info" screen.
+ *
+ * WhatsApp shows `packname` as the title and `author` as the publisher line.
+ * Keep the FIRST line of each field short: long text gets cut with "..." in
+ * the sticker tray, and only the full info screen shows everything.
+ *
+ * If multi-line looks off on your WhatsApp version, replace "\n" with " · ".
+ */
+const BOT_NAME = 'ᴏʀʙɪᴛʙᴏᴛ';
+const CREATOR = 'ɪɴɢ. ᴄᴀʀʟᴏꜱ ɢᴀʀᴄɪᴀ';
+const BOT_VERSION = '𝚅𝟽.𝟷.𝟹';
+
+/** Fecha del último arranque del bot (no por sticker). */
+const generatedOn = new Date().toLocaleDateString('es-MX', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+});
+
+const STICKER_BRANDING = {
+  packname: `🪐 ${BOT_NAME} ꜱᴛɪᴄᴋᴇʀᴘᴀᴄᴋ`,
+
+  author: [
+    `✦ ᴄʀᴇᴀᴛᴏʀ & ᴅᴇᴠᴇʟᴏᴘᴇʀ`,
+    CREATOR,
+    `✦ ᴘʀᴏᴊᴇᴄᴛ: ${BOT_NAME}`,
+    `✦ ᴠᴇʀꜱɪᴏɴ: ${BOT_VERSION}`,
+    `✦ ᴘʀᴏᴄᴇꜱꜱᴇᴅ ᴡɪᴛʜ ${BOT_NAME}`,
+    `© ${new Date().getFullYear()} ${BOT_NAME}`,
+    `ᴛᴏᴅᴏꜱ ʟᴏꜱ ᴅᴇʀᴇᴄʜᴏꜱ ʀᴇꜱᴇʀᴠᴀᴅᴏꜱ`,
+    `ᴅᴇꜱᴀʀʀᴏʟʟᴏ ʏ ᴍᴀɴᴛᴇɴɪᴍɪᴇɴᴛᴏ ᴘᴏʀ`,
+    CREATOR,
+    `ᴘʀᴏʜɪʙɪᴅᴀ ʟᴀ ᴅɪꜱᴛʀɪʙᴜᴄɪᴏɴ`,
+    `ᴅᴇʟ ꜱᴏꜰᴛᴡᴀʀᴇ ᴏʀɪɢɪɴᴀʟ ꜱɪɴ ᴀᴜᴛᴏʀɪᴢᴀᴄɪᴏɴ`,
+    `ɴᴏ ᴀꜰɪʟɪᴀᴅᴏ ᴀ ᴡʜᴀᴛꜱᴀᴘᴘ ɴɪ ᴍᴇᴛᴀ`,
+    `✦ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴜᴛɪʟɪᴢᴀʀ ${BOT_NAME} ✦`,
+  ].join('\n'),
+} as const;
 
 /** Command handler for `!sticker`: Convert image/video to sticker. */
 export class StickerCommand extends Command {
@@ -22,6 +66,13 @@ export class StickerCommand extends Command {
   usage = '!sticker <reply to image/video>';
   examples = ['!sticker', '!s'];
   contexts = [CommandContext.BOTH];
+
+  private stickerService: StickerService;
+
+  constructor() {
+    super();
+    this.stickerService = new StickerService();
+  }
 
   async execute(ctx: MessageContext): Promise<void> {
     const quotedMsg = ctx.quoted;
@@ -66,7 +117,19 @@ export class StickerCommand extends Command {
       const buffer = (await downloadMediaMessage(messageToDownload, 'buffer', {})) as Buffer;
       const stickerBuffer = await StickerHelper.createSticker(buffer);
 
-      await ctx.sock.sendMessage(ctx.chat.jid, { sticker: stickerBuffer });
+      // Branding: si falla el exif, se envía el sticker sin metadatos en vez de romper el comando
+      let finalSticker: Buffer = stickerBuffer;
+      try {
+        finalSticker = await this.stickerService.addExif(
+          stickerBuffer,
+          STICKER_BRANDING.packname,
+          STICKER_BRANDING.author,
+        );
+      } catch (exifError) {
+        logError('[StickerCommand] addExif falló, enviando sin metadatos', exifError);
+      }
+
+      await ctx.sock.sendMessage(ctx.chat.jid, { sticker: finalSticker });
       await ctx.react('✅');
     } catch (error) {
       logError('[StickerCommand] Error', error);

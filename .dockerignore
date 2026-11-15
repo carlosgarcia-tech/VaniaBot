@@ -11,6 +11,7 @@ orbitsession/
 .orbit-session
 subbots/
 redis-data/
+orbit-backups/
 
 data/temp/
 data/wal/

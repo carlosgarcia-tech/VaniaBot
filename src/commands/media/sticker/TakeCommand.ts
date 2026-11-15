@@ -2,7 +2,16 @@
  * TakeCommand.ts
  *
  * media command `take` — Change sticker pack name and author
- * Usage: !take <packname>|<author>
+ * Usage: !take <text>  |  !take <packname>|<author>
+ *
+ * Behavior:
+ *  - `!wm Carlos`          → pack = "Carlos", author = "" (vacío, aparece una sola vez)
+ *  - `!wm Carlos|Garcia`   → pack = "Carlos", author = "Garcia"
+ *  - `!wm`                 → pack = "OrbitBot", author = "OrbitBot"
+ *
+ * The text is used EXACTLY as provided (any Unicode: emojis, math alphanumerics,
+ * combining marks, RTL scripts, decorative symbols). No normalization, no
+ * length-based slicing, no stripping of special characters.
  *
  * @author **Carlos G**
  */
@@ -13,14 +22,23 @@ import { logError } from '@/utils/logger.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { StickerService } from '@/services/media/StickerService.js';
 
+const DEFAULT_PACK = 'OrbitBot';
+const DEFAULT_AUTHOR = 'OrbitBot';
+const SEPARATOR = '|';
+
 /** Command handler for `!take`: Change sticker pack name and author. */
 export class TakeCommand extends Command {
   name = 'take';
   description = 'Change sticker pack name and author';
   category = CommandCategory.MEDIA;
-  aliases = ['tomar', 'robarsticker'];
-  usage = '!take <packname>|<author>';
-  examples = ['!take OrbitBot|Carlos', '!take MyPack|MyName'];
+  aliases = ['wm', 'robarsticker', 'tomar'];
+  usage = '!take <text> | !take <packname>|<author>';
+  examples = [
+    '!wm Carlos',
+    '!wm ٠࣪⭑ 𝓒𝓪𝓻𝓵𝓸𝓼 𝓖 ˖᯽',
+    '!take OrbitBot|Carlos',
+    '!wm Carlos|Garcia',
+  ];
   cooldown = 3000;
 
   private stickerService: StickerService;
@@ -28,6 +46,37 @@ export class TakeCommand extends Command {
   constructor() {
     super();
     this.stickerService = new StickerService();
+  }
+
+  /**
+   * Parses the user text into pack name and author.
+   * - empty text            → defaults
+   * - text without `|`      → text goes only to pack, author stays empty
+   * - text with `|`         → before = pack, after (rest) = author
+   * Only leading/trailing whitespace is trimmed; inner content is untouched.
+   */
+  private parseText(raw: string): { packname: string; author: string } {
+    const text = raw.trim();
+
+    if (!text) {
+      return { packname: DEFAULT_PACK, author: DEFAULT_AUTHOR };
+    }
+
+    // Sin "|": el texto va SOLO al packname, el autor queda vacío
+    if (!text.includes(SEPARATOR)) {
+      return { packname: text, author: '' };
+    }
+
+    const [packPart = '', ...authorParts] = text.split(SEPARATOR);
+    const packname = packPart.trim();
+    const author = authorParts.join(SEPARATOR).trim();
+
+    // "!wm |" or "!wm  | " → nothing useful provided, use defaults
+    if (!packname && !author) {
+      return { packname: DEFAULT_PACK, author: DEFAULT_AUTHOR };
+    }
+
+    return { packname, author };
   }
 
   async execute(ctx: MessageContext): Promise<void> {
@@ -40,9 +89,7 @@ export class TakeCommand extends Command {
       return;
     }
 
-    const text = ctx.args.join(' ');
-    const [packname = 'OrbitBot', ...authorParts] = text.split('|');
-    const author = authorParts.join('|') || 'OrbitBot';
+    const { packname, author } = this.parseText(ctx.args.join(' '));
 
     await ctx.react('⏳');
 
@@ -63,7 +110,7 @@ export class TakeCommand extends Command {
 
       const buffer = (await downloadMediaMessage(messageToDownload, 'buffer', {})) as Buffer;
 
-      const sticker = await this.stickerService.addExif(buffer, packname.trim(), author.trim());
+      const sticker = await this.stickerService.addExif(buffer, packname, author);
 
       await ctx.sock.sendMessage(ctx.chat.jid, { sticker: sticker });
       await ctx.react('✅');
