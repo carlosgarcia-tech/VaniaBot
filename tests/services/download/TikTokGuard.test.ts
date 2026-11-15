@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -244,6 +244,22 @@ describe('TikTokFileCache', () => {
     cache.store('111', writeSource('tiktok_1.mp4'));
     fs.rmSync(cacheDir, { recursive: true, force: true });
     expect(cache.get('111')).toBeNull();
+  });
+
+  it('falls back to copy+unlink when rename fails across devices (EXDEV)', () => {
+    const cache = new TikTokFileCache({ dir: cacheDir, now: () => clock });
+    const source = writeSource('cross-device.mp4', 'payload');
+    vi.spyOn(fs, 'renameSync').mockImplementationOnce(() => {
+      const error = new Error('cross-device link not permitted') as NodeJS.ErrnoException;
+      error.code = 'EXDEV';
+      throw error;
+    });
+    cache.store('444', source);
+    const cached = cache.get('444');
+    expect(cached).not.toBeNull();
+    expect(fs.readFileSync(cached as string, 'utf-8')).toBe('payload');
+    expect(fs.existsSync(source)).toBe(false); // original cleaned up
+    vi.restoreAllMocks();
   });
 
   it('evicts the oldest entries when the total size limit is exceeded', () => {
@@ -721,5 +737,18 @@ describe('TikTokGuardService', () => {
     const error = new TikTokBlockedError(23);
     expect(error.message).toContain('23');
     expect(error.minutes).toBe(23);
+  });
+
+  it('retryDelay uses the injected delay through the injected sleep', async () => {
+    let t = 0;
+    const guard = makeService({
+      retryDelayMs: () => 7,
+      now: () => t,
+      sleep: async (ms: number) => {
+        t += ms;
+      },
+    });
+    await guard.retryDelay();
+    expect(t).toBe(7);
   });
 });

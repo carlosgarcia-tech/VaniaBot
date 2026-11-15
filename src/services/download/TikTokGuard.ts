@@ -112,8 +112,7 @@ export interface TikTokQueueOptions {
   sleep?: (ms: number) => Promise<void>;
 }
 
-const defaultSleep = (ms: number): Promise<void> =>
-  new Promise(resolve => setTimeout(resolve, ms));
+const defaultSleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
 export class TikTokQueue {
   private readonly minGapMs: number;
@@ -190,7 +189,12 @@ export class TikTokFileCache {
   private readonly maxTotalBytes: number;
   private readonly now: () => number;
 
-  constructor(options: { dir: string; ttlMs?: number; maxTotalBytes?: number; now?: () => number }) {
+  constructor(options: {
+    dir: string;
+    ttlMs?: number;
+    maxTotalBytes?: number;
+    now?: () => number;
+  }) {
     this.dir = options.dir;
     this.ttlMs = options.ttlMs ?? 6 * 60 * 60 * 1000;
     this.maxTotalBytes = options.maxTotalBytes ?? 500 * 1024 * 1024;
@@ -219,7 +223,17 @@ export class TikTokFileCache {
     try {
       fs.mkdirSync(this.dir, { recursive: true });
       const target = this.pathFor(videoId);
-      fs.renameSync(sourcePath, target);
+      try {
+        fs.renameSync(sourcePath, target);
+      } catch (error) {
+        // Different filesystems (e.g. tests with a tmpdir cache) cannot rename.
+        if ((error as NodeJS.ErrnoException).code === 'EXDEV') {
+          fs.copyFileSync(sourcePath, target);
+          fs.unlinkSync(sourcePath);
+        } else {
+          throw error;
+        }
+      }
       // Preserve the original download time for TTL purposes.
       const nowMs = this.now();
       fs.utimesSync(target, nowMs / 1000, nowMs / 1000);
@@ -253,9 +267,7 @@ export class TikTokFileCache {
       });
     let total = files.reduce((sum, f) => sum + f.size, 0);
     if (total <= this.maxTotalBytes) return;
-    const deletable = files
-      .filter(f => f.file !== protectedPath)
-      .sort((a, b) => a.mtime - b.mtime);
+    const deletable = files.filter(f => f.file !== protectedPath).sort((a, b) => a.mtime - b.mtime);
     for (const entry of deletable) {
       if (total <= this.maxTotalBytes) break;
       try {
@@ -488,6 +500,8 @@ export class TikTokGuardService {
   private readonly ipFamily: 'auto' | '4' | '6';
   private readonly now: () => number;
   private readonly fetchImpl: typeof fetch;
+  private readonly sleep: (ms: number) => Promise<void>;
+  private readonly retryDelayMs: () => number;
 
   /** Impersonation targets from this installation; null = not queried yet. */
   private targets: string[] | null = null;
@@ -506,6 +520,7 @@ export class TikTokGuardService {
     baseMinMs?: number;
     maxMinMs?: number;
     ipFamily?: 'auto' | '4' | '6';
+    retryDelayMs?: () => number;
     now?: () => number;
     sleep?: (ms: number) => Promise<void>;
     random?: () => number;
@@ -517,6 +532,9 @@ export class TikTokGuardService {
     this.ipFamily = options.ipFamily ?? 'auto';
     this.now = now;
     this.fetchImpl = options.fetchImpl ?? fetch;
+    this.sleep = options.sleep ?? (ms => new Promise(resolve => setTimeout(resolve, ms)));
+    // Plan: 5-10s between retries of the same download.
+    this.retryDelayMs = options.retryDelayMs ?? (() => 5000 + Math.floor(Math.random() * 5001));
     this.queue = new TikTokQueue({
       minGapMs: options.minGapMs ?? envNumber('TIKTOK_MIN_GAP_MS', 15000),
       jitterMs: options.jitterMs ?? envNumber('TIKTOK_JITTER_MS', 5000),
@@ -564,8 +582,7 @@ export class TikTokGuardService {
   /** Per-invocation yt-dlp args shared by every TikTok call. */
   buildBaseArgs(impersonateTarget?: string): string[] {
     const target =
-      impersonateTarget ??
-      (this.targets === null ? 'chrome' : this.targets[0] || undefined);
+      impersonateTarget ?? (this.targets === null ? 'chrome' : this.targets[0] || undefined);
     return [
       '--cookies',
       this.cookiesPath,
@@ -618,6 +635,11 @@ export class TikTokGuardService {
   /** A successful download resets the breaker. */
   handleSuccess(): void {
     this.breaker.recordSuccess();
+  }
+
+  /** Wait between retries of the same download (plan: 5-10s). */
+  async retryDelay(): Promise<void> {
+    await this.sleep(this.retryDelayMs());
   }
 
   serveFromCache(videoId: string): string | null {
