@@ -107,7 +107,9 @@ export class MuteCommand extends Command {
       );
 
       const cacheKey = `${ctx.chat.jid}:${mentionedJid}`;
-      middlewareCache.userMuted.set(cacheKey, { value: true });
+      // TTL = mute duration: an expired mute must stop applying on its own
+      // (the cache-wide 24h default kept deleting messages long after expiry).
+      middlewareCache.userMuted.set(cacheKey, { value: true }, { ttlMs: duration });
 
       const durationText = formatTimeRemaining(duration, 'en');
 

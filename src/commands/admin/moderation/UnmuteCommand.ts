@@ -48,17 +48,19 @@ export class UnmuteCommand extends Command {
     try {
       const targetUser = await serviceManager.userService.getUser(mentionedJid);
 
-      const muteKey = `${ctx.chat.jid}:${mentionedJid}`;
-      const wasMuted = middlewareCache.userMuted.get(muteKey);
+      // The DB is the source of truth; the in-memory cache is just an
+      // accelerator and can be gone (restart, eviction, rejoin).
+      const isMuted = await serviceManager.moderationService.isMuted(ctx.chat.jid, mentionedJid);
 
-      if (!wasMuted) {
+      if (!isMuted) {
+        middlewareCache.userMuted.delete(`${ctx.chat.jid}:${mentionedJid}`); // drop stale flags
         await ctx.reply('Este usuario no está muteado');
         await ctx.react('❌');
         return;
       }
 
-      middlewareCache.userMuted.delete(muteKey);
       await serviceManager.moderationService.unmuteUser(ctx.chat.jid, mentionedJid);
+      middlewareCache.userMuted.delete(`${ctx.chat.jid}:${mentionedJid}`);
 
       await ctx.reply(
         `*Silence quitado*\n\n` +

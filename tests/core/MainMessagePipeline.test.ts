@@ -60,6 +60,9 @@ vi.mock('../../src/services/system/Servicemanager.js', () => ({
     nsfwToggleService: {
       isEnabled: (...args: unknown[]) => mockNsfwEnabled(...args),
     },
+    moderationService: {
+      getMuteInfo: vi.fn().mockResolvedValue(null),
+    },
   },
 }));
 

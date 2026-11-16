@@ -46,7 +46,7 @@ import { persistenceService } from '@/services/system/PersistenceService.js';
 import { antiDeleteService } from '@/services/system/AntiDeleteService.js';
 import { runtimeStateRepository } from '@/repositories/RuntimeStateRepository.js';
 import { processedMessagesRepository } from '@/repositories/ProcessedMessagesRepository.js';
-import { middlewareCache } from '@/middlewares/MiddlewareCache.js';
+import { MuteMiddleware } from '@/middlewares/MuteMiddleware.js';
 import { contactsCache } from '@/utils/ContactsCache.js';
 import { antilinkService } from '@/services/moderation/AntilinkService.js';
 import { chatSummaryService } from '@/services/chat/ChatSummaryService.js';
@@ -350,9 +350,8 @@ export class MainMessagePipeline {
   private async handleMutedUser(ctx: MessageContext, messageId: string): Promise<boolean> {
     await ctx.loadBotPermissions();
 
-    const muteCacheKey = `${ctx.chat.jid}:${ctx.sender.jid}`;
-    const mutedCached = middlewareCache.userMuted.get<{ value: boolean }>(muteCacheKey);
-    if (mutedCached?.value !== true) return false;
+    const muted = await MuteMiddleware.resolveMute(ctx.chat.jid, ctx.sender.jid);
+    if (!muted) return false;
 
     if (ctx.chat.isBotAdmin) {
       try {

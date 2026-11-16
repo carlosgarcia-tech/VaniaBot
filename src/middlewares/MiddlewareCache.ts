@@ -44,8 +44,8 @@ export class MiddlewareCache {
     return this.cache.get(key) as T | undefined;
   }
 
-  set<T extends {}>(key: string, value: T): void {
-    this.cache.set(key, value);
+  set<T extends {}>(key: string, value: T, opts?: { ttlMs?: number }): void {
+    this.cache.set(key, value, opts?.ttlMs !== undefined ? { ttl: opts.ttlMs } : undefined);
   }
 
   has(key: string): boolean {
