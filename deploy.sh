@@ -592,6 +592,15 @@ else
     ok "Permissions set for ${NEON_GREEN}${BOLD}${vol}${NC}"
   done
 
+  # Assets live in the image, but /app/data is a persistent volume that
+  # shadows them — sync the repo's assets into the volume on every deploy.
+  if [ -d "data/assets" ]; then
+    docker run --rm -v "$PWD/data/assets:/src:ro" -v "orbit_database:/data" alpine \
+      sh -c "mkdir -p /data/assets && cp -r /src/. /data/assets/" 2>/dev/null \
+      && ok "Assets synced to /app/data/assets" \
+      || warn "Could not sync assets to the data volume"
+  fi
+
   step 4 "Purgando contenedores anteriores"
   if docker rm -f orbit orbit-redis 2>/dev/null; then
     ok "Contenedores anteriores eliminados"
