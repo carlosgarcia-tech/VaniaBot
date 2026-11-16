@@ -70,6 +70,7 @@ RUN groupadd --system --gid 1001 orbit \
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY tsconfig.json ./
+COPY package.json ./
 COPY src/ ./src/
 COPY panel/ ./panel/
 COPY data/ ./data/
