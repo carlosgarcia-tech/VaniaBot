@@ -50,3 +50,5 @@ orbitsession/
 subbots/
 .orbit-session
 cards-test
+# Deploy backups (created by deploy.sh, root-owned redis dirs inside)
+orbit-backups/
