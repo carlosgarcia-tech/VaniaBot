@@ -1,6 +1,6 @@
 {
   "name": "orbit",
-  "version": "7.3.1",
+  "version": "7.3.2",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
@@ -50,6 +50,7 @@
     "mongodb": "^7.1.0",
     "mumaker": "^2.0.0",
     "node-webpmux": "^3.2.1",
+    "opentype.js": "^2.0.0",
     "pdf-lib": "^1.17.1",
     "pino": "^9.5.0",
     "qrcode-terminal": "^0.12.0",
