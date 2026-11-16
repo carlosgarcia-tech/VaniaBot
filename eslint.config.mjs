@@ -13,6 +13,7 @@ export default [
       'data/temp/**',
       'logs/**',
       'redis-data/**',
+      'orbit-backups/**',
       '**/*.js',
     ],
   },

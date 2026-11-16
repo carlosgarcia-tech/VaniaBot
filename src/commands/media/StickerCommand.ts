@@ -31,7 +31,7 @@ const CREATOR = 'ɪɴɢ. ᴄᴀʀʟᴏꜱ ɢᴀʀᴄɪᴀ';
 const BOT_VERSION = '𝚅𝟽.𝟷.𝟹';
 
 /** Fecha del último arranque del bot (no por sticker). */
-const generatedOn = new Date().toLocaleDateString('es-MX', {
+const _generatedOn = new Date().toLocaleDateString('es-MX', {
   day: '2-digit',
   month: 'long',
   year: 'numeric',

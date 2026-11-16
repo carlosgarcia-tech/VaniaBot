@@ -33,12 +33,7 @@ export class TakeCommand extends Command {
   category = CommandCategory.MEDIA;
   aliases = ['wm', 'robarsticker', 'tomar'];
   usage = '!take <text> | !take <packname>|<author>';
-  examples = [
-    '!wm Carlos',
-    '!wm ٠࣪⭑ 𝓒𝓪𝓻𝓵𝓸𝓼 𝓖 ˖᯽',
-    '!take OrbitBot|Carlos',
-    '!wm Carlos|Garcia',
-  ];
+  examples = ['!wm Carlos', '!wm ٠࣪⭑ 𝓒𝓪𝓻𝓵𝓸𝓼 𝓖 ˖᯽', '!take OrbitBot|Carlos', '!wm Carlos|Garcia'];
   cooldown = 3000;
 
   private stickerService: StickerService;
