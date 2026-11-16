@@ -73,6 +73,10 @@ export class TikTokDownloader extends DownloadService {
   }
 
   async getVideoInfo(url: string): Promise<Either<NetworkError, TikTokVideo>> {
+    const validation = this.validateUrl(url);
+    if (validation._tag === 'Left') {
+      return left(new NetworkError(validation.left.message));
+    }
     try {
       const canonical = await this.guard.canonical(url);
       const videoId = extractVideoId(canonical);
@@ -127,12 +131,16 @@ export class TikTokDownloader extends DownloadService {
     if (videoId) {
       const cached = this.guard.serveFromCache(videoId);
       if (cached) {
-        logger.debug('[TikTok] Serving from cache: ' + videoId);
-        return right({
-          filePath: cached,
-          size: (fs.statSync(cached).size / (1024 * 1024)).toFixed(2),
-          source: 'tiktok cache',
-        });
+        try {
+          logger.debug('[TikTok] Serving from cache: ' + videoId);
+          return right({
+            filePath: cached,
+            size: (fs.statSync(cached).size / (1024 * 1024)).toFixed(2),
+            source: 'tiktok cache',
+          });
+        } catch {
+          // File vanished between the cache check and the stat — download fresh.
+        }
       }
     }
 

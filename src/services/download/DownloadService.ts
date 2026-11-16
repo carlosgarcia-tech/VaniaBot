@@ -96,6 +96,11 @@ export class DownloadService {
         return left(new ValidationError('Solo URLs HTTP/HTTPS permitidas'));
       }
 
+      // Option-like strings would be forwarded to yt-dlp as CLI flags.
+      if (url.trim().startsWith('-')) {
+        return left(new ValidationError('URL inválida'));
+      }
+
       for (const pattern of BLOCKED_URL_PATTERNS) {
         if (pattern.test(url)) {
           return left(new ValidationError('URL contiene patrones bloqueados'));

@@ -234,7 +234,7 @@ export class TikTokFileCache {
           throw error;
         }
       }
-      // Preserve the original download time for TTL purposes.
+      // Touch mtime to now: the TTL counts from the moment it was cached.
       const nowMs = this.now();
       fs.utimesSync(target, nowMs / 1000, nowMs / 1000);
       this.evictIfNeeded(target);
@@ -367,7 +367,12 @@ export class TikTokBreaker {
     const level = Math.min(state.backoffLevel + 1, this.backoffCap());
     const pauseMs = Math.min(this.baseMinMs * 2 ** (level - 1), this.maxMinMs);
     const openUntil = this.now() + pauseMs;
-    this.store.save({ openUntil, backoffLevel: level });
+    try {
+      this.store.save({ openUntil, backoffLevel: level });
+    } catch (error) {
+      // An unwritable state file must not crash the caller's error path.
+      logError('TikTokBreaker.recordBlock', error);
+    }
     logError(
       'TikTokBreaker',
       new Error(
@@ -477,10 +482,10 @@ export class TikTokBlockedError extends Error {
   }
 }
 
-/** Env parsing with the plan's defaults; invalid/absent values fall back. */
-function envNumber(name: string, fallback: number): number {
+/** Env parsing with the plan's defaults; invalid values fall back. 0 is valid (e.g. jitter off). */
+export function envNumber(name: string, fallback: number): number {
   const value = Number(process.env[name]);
-  return Number.isFinite(value) && value > 0 ? value : fallback;
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
 }
 
 /**
@@ -567,6 +572,7 @@ export class TikTokGuardService {
     const value = await this.dedupe(`canonical:${url}`, () =>
       resolveCanonicalUrl(url, this.fetchImpl),
     );
+    if (this.canonicalMemo.size > 100) this.canonicalMemo.clear();
     this.canonicalMemo.set(url, { value, ts: this.now() });
     return value;
   }

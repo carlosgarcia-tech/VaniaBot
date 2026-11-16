@@ -184,4 +184,23 @@ describe('TikTokDownloader guard integration', () => {
     expect(fs.existsSync(cachedPath)).toBe(true); // cache stays warm
     expect(fs.existsSync(tempFile)).toBe(false);
   });
+
+  it('rejects option-like URLs before spawning yt-dlp', async () => {
+    const info = await downloader.getVideoInfo('--exec=tiktok.com/x');
+    expect(isLeft(info)).toBe(true);
+    expect(downloader.commands).toHaveLength(0);
+
+    const download = await downloader.downloadVideo('--config-location=tiktok.com/y', '720');
+    expect(isLeft(download)).toBe(true);
+    expect(downloader.commands.filter(a => !a.includes('--list-impersonate-targets'))).toHaveLength(
+      0,
+    );
+  });
+
+  it('falls through to a download when the cached file vanishes between check and stat', async () => {
+    (guard as unknown as { serveFromCache: () => string }).serveFromCache = () =>
+      path.join(tmpDir, 'ghost.mp4'); // reported cached, file gone
+    const result = await downloader.downloadVideo(CANONICAL, '720');
+    expect(isRight(result)).toBe(true);
+  });
 });

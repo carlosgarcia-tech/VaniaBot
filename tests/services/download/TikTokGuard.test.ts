@@ -19,7 +19,10 @@ import {
   mobileApiArgs,
   TikTokGuardService,
   TikTokBlockedError,
+  envNumber,
 } from '../../../src/services/download/TikTokGuard.js';
+import type { JsonFileStore } from '../../../src/utils/JsonFileStore.js';
+import type { TikTokBreakerState } from '../../../src/services/download/TikTokGuard.js';
 import { JsonFileStore } from '../../../src/utils/JsonFileStore.js';
 
 const CANONICAL = 'https://www.tiktok.com/@pepito_el_sigma67/video/7696749231666760967';
@@ -750,5 +753,36 @@ describe('TikTokGuardService', () => {
     });
     await guard.retryDelay();
     expect(t).toBe(7);
+  });
+
+  it('recordBlock survives an unwritable state file (breaker open is best-effort)', () => {
+    const breaker = new TikTokBreaker({
+      store: {
+        load: () => ({ openUntil: 0, backoffLevel: 0 }),
+        save: () => {
+          throw new Error('EACCES: read-only volume');
+        },
+      } as never as JsonFileStore<TikTokBreakerState>,
+      now: () => clock,
+    });
+    expect(() => breaker.recordBlock('HTTP Error 403')).not.toThrow();
+    expect(breaker.isOpen()).toBe(false); // state could not be persisted
+  });
+
+  it('envNumber accepts 0-valued knobs (jitter can be disabled)', () => {
+    process.env.TIKTOK_TEST_ZERO = '0';
+    expect(envNumber('TIKTOK_TEST_ZERO', 5)).toBe(0);
+    delete process.env.TIKTOK_TEST_ZERO;
+    expect(envNumber('TIKTOK_TEST_UNSET', 5)).toBe(5);
+  });
+
+  it('canonical memo does not grow unbounded', async () => {
+    const guard = makeService();
+    for (let i = 0; i < 120; i++) {
+      await guard.canonical(`https://www.tiktok.com/@user/video/${1000000 + i}`);
+    }
+    expect((guard as unknown as { canonicalMemo: Map<string, unknown> }).canonicalMemo.size).toBeLessThanOrEqual(
+      101,
+    );
   });
 });
