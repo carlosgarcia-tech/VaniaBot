@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+# Single source of truth for the version: package.json (overridable as 2nd arg).
+PKG_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "7.1.3")
 NEON_GREEN='\033[38;5;82m'
 MATRIX='\033[38;5;46m'
 ELECTRIC='\033[38;5;51m'
@@ -27,12 +29,12 @@ case "${DEPLOY_ENV}" in
     exit 1
     ;;
 esac
-VERSION="${2:-6.12.18}"
+VERSION="${2:-$PKG_VERSION}"
 RAW_MODE="${3:-}"
 # ./deploy.sh production update — modo como 2º arg, versión default
 if [[ "$RAW_MODE" == "" ]]; then
   case "$VERSION" in
-    update|--update|-u) RAW_MODE="$VERSION"; VERSION="6.12.18" ;;
+    update|--update|-u) RAW_MODE="$VERSION"; VERSION="$PKG_VERSION" ;;
   esac
 fi
 IMAGE="ghcr.io/carlosgarcia-tech/orbit:${VERSION}"

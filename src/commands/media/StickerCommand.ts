@@ -16,6 +16,7 @@ import { logError } from '@/utils/logger.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { StickerHelper } from '@/utils/StickerHelper.js';
 import { StickerService } from '@/services/media/StickerService.js';
+import pkg from '../../../package.json' with { type: 'json' };
 
 /**
  * Pack metadata shown in WhatsApp's "sticker info" screen.
@@ -28,7 +29,8 @@ import { StickerService } from '@/services/media/StickerService.js';
  */
 const BOT_NAME = 'ᴏʀʙɪᴛʙᴏᴛ';
 const CREATOR = 'ɪɴɢ. ᴄᴀʀʟᴏꜱ ɢᴀʀᴄɪᴀ';
-const BOT_VERSION = '𝚅𝟽.𝟷.𝟹';
+/** Single source: package.json — `npm version minor` is all it takes. */
+const BOT_VERSION = `𝚟${pkg.version}`;
 
 /** Fecha del último arranque del bot (no por sticker). */
 const _generatedOn = new Date().toLocaleDateString('es-MX', {
