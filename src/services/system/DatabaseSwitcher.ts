@@ -28,9 +28,22 @@ export interface SwitcherConfig {
   dbPath?: string;
 }
 
+/**
+ * REDIS_URL wins; otherwise REDIS_HOST/REDIS_PORT (as passed by deploy.sh)
+ * build the URL; otherwise localhost.
+ */
+export function resolveRedisUrl(env: {
+  REDIS_URL?: string;
+  REDIS_HOST?: string;
+  REDIS_PORT?: string;
+}): string {
+  if (env.REDIS_URL) return env.REDIS_URL;
+  return `redis://${env.REDIS_HOST || 'localhost'}:${env.REDIS_PORT || '6379'}`;
+}
+
 const DEFAULT_CONFIG: SwitcherConfig = {
   useRedis: process.env.USE_REDIS === 'true',
-  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
+  redisUrl: resolveRedisUrl(process.env),
   redisHost: process.env.REDIS_HOST || 'localhost',
   redisPort: parseInt(process.env.REDIS_PORT || '6379'),
   dbPath: process.env.DB_PATH || './storage/database/orbit.db',
