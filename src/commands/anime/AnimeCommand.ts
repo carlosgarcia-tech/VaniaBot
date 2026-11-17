@@ -10,6 +10,7 @@ import { Command } from '../Command.js';
 import { AnimeBase } from './AnimeBase.js';
 import { DeliriusAnimeBase } from './DeliriusAnimeBase.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
+import { nekosBestService } from '@/services/external/NekosBestService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -18,7 +19,8 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-type AnimeService = 'animebase' | 'deliriusbase' | 'reactions' | 'nsfw' | 'random' | 'anime';
+type AnimeService =
+  'animebase' | 'nekos' | 'deliriusbase' | 'reactions' | 'nsfw' | 'random' | 'anime';
 
 interface AnimeCommandDef {
   name: string;
@@ -41,15 +43,18 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     aliases: ['neko', 'nekos', 'nekochan'],
     react: '🐱',
     endpoint: 'neko',
-    service: 'animebase',
+    service: 'nekos',
   },
   {
+    // nekos.best has no megumin and waifu.pics (the planned replacement) died;
+    // left disabled until another source appears.
     name: 'megumin',
     description: 'Obtiene una imagen aleatoria de Megumin',
     aliases: ['megumin'],
     react: '🔥',
     endpoint: 'megumin',
     service: 'animebase',
+    enabled: false,
   },
   {
     name: 'waifu',
@@ -57,7 +62,7 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     aliases: ['waifu'],
     react: '👧',
     endpoint: 'waifu',
-    service: 'animebase',
+    service: 'nekos',
   },
   {
     name: 'randomanime',
@@ -65,7 +70,7 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     aliases: ['randomanime', 'random_anime'],
     react: '🎲',
     endpoint: 'random',
-    service: 'animebase',
+    service: 'nekos',
   },
   {
     name: 'hneko',
@@ -95,15 +100,6 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     enabled: false,
   },
   {
-    name: 'loli',
-    description: 'Obtiene una imagen de loli',
-    aliases: ['loli'],
-    react: '💢',
-    endpoint: 'loli',
-    service: 'animebase',
-    enabled: false,
-  },
-  {
     name: 'milf',
     description: 'Obtiene una imagen de milf',
     aliases: ['milf'],
@@ -114,12 +110,13 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
   },
 
   {
+    // nekos.best 'kitsune' replaces the dead Delirius foxgirl.
     name: 'foxgirl',
     description: 'Obtiene una imagen de foxgirl',
     aliases: ['foxgirl'],
     react: '🦊',
-    endpoint: 'foxgirl',
-    service: 'deliriusbase',
+    endpoint: 'kitsune',
+    service: 'nekos',
   },
   {
     name: 'gacha',
@@ -243,28 +240,34 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     service: 'reactions',
   },
   {
+    // Not in nekos.best; waifu.pics (the planned fallback) is dead.
     name: 'bully',
     description: 'Muestra una imagen de anime bullying',
     aliases: ['bully', 'intimidar'],
     react: '👊',
     endpoint: 'bully',
     service: 'reactions',
+    enabled: false,
   },
   {
+    // Not in nekos.best; waifu.pics (the planned fallback) is dead.
     name: 'confy',
     description: 'Muestra una imagen de anime confortable',
     aliases: ['confy', 'confort'],
     react: '😌',
     endpoint: 'confy',
     service: 'reactions',
+    enabled: false,
   },
   {
+    // Not in nekos.best; waifu.pics (the planned fallback) is dead.
     name: 'cringe',
     description: 'Muestra una imagen de anime cringe',
     aliases: ['cringe'],
     react: '😬',
     endpoint: 'cringe',
     service: 'reactions',
+    enabled: false,
   },
   {
     name: 'cuddle',
@@ -275,28 +278,34 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     service: 'reactions',
   },
   {
+    // Not in nekos.best; waifu.pics (the planned fallback) is dead.
     name: 'eevee',
     description: 'Muestra una imagen de Eevee',
     aliases: ['eevee', 'eve'],
     react: '🐾',
     endpoint: 'eevee',
     service: 'reactions',
+    enabled: false,
   },
   {
+    // Not in nekos.best; waifu.pics (the planned fallback) is dead.
     name: 'fluff',
     description: 'Muestra una imagen de anime fluffy',
     aliases: ['fluff'],
     react: '🦊',
     endpoint: 'fluff',
     service: 'reactions',
+    enabled: false,
   },
   {
+    // Not in nekos.best; waifu.pics (the planned fallback) is dead.
     name: 'glomp',
     description: 'Muestra una imagen de anime glomp',
     aliases: ['glomp', 'saltar'],
     react: '🤗',
     endpoint: 'glomp',
     service: 'reactions',
+    enabled: false,
   },
   {
     name: 'handhold',
@@ -329,22 +338,27 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     react: '🔪',
     endpoint: 'kill',
     service: 'reactions',
+    // Not in nekos.best; waifu.pics (the planned fallback) is dead.
+    enabled: false,
   },
   {
+    // 'lay' has no category in nekos.best; 'sleep' is the closest gif.
     name: 'lay',
     description: 'Muestra una imagen de anime recostado',
     aliases: ['lay', 'recostar'],
     react: '🛌',
-    endpoint: 'lay',
+    endpoint: 'sleep',
     service: 'reactions',
   },
   {
+    // Not in nekos.best; waifu.pics (the planned fallback) is dead.
     name: 'lick',
     description: 'Muestra una imagen de anime lamiendo',
     aliases: ['lick', 'lamer'],
     react: '👅',
     endpoint: 'lick',
     service: 'reactions',
+    enabled: false,
   },
   {
     name: 'nom',
@@ -395,11 +409,12 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     service: 'reactions',
   },
   {
+    // nekos.best 'wag' (moving tail gif).
     name: 'tail',
     description: 'Muestra una imagen de anime moviendo la cola',
     aliases: ['tail', 'cola'],
     react: '🐕',
-    endpoint: 'tail',
+    endpoint: 'wag',
     service: 'reactions',
   },
   {
@@ -659,6 +674,55 @@ function getAnimeCommand(name: string): AnimeCommandDef {
   return cmd;
 }
 
+/** Random pick among nekos.best image categories (for `randomanime`). */
+const NEKO_RANDOM_CATEGORIES = ['neko', 'waifu', 'kitsune', 'husbando'];
+
+/** Direct JSON image sources replacing the dead Delirius `random` category. */
+const RANDOM_JSON_URLS: Record<string, string> = {
+  dog: 'https://dog.ceo/api/breeds/image/random',
+  duck: 'https://random-d.uk/api/v2/random',
+  coffee: 'https://coffee.alexflipnote.dev/random.json',
+};
+
+async function fetchJsonObject(url: string): Promise<Record<string, never>> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'OrbitBot/7.3 (WhatsApp bot)' },
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} from ${url}`);
+    }
+    return (await response.json()) as Record<string, never>;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/** Resolves a `random`-service endpoint to an image URL. */
+export async function resolveRandomImage(endpoint: string): Promise<string> {
+  if (endpoint === 'picsum') {
+    return `https://picsum.photos/600/400?r=${Date.now()}`;
+  }
+  const jsonUrl = RANDOM_JSON_URLS[endpoint];
+  if (!jsonUrl) {
+    // Unknown endpoint keeps its old (dead) Delirius wiring so the failure
+    // stays visible instead of silently disappearing.
+    return deliriusService.getRandomImage(endpoint);
+  }
+  const data = await fetchJsonObject(jsonUrl);
+  const imageUrl =
+    (data as { message?: string }).message ??
+    (data as { url?: string }).url ??
+    (data as { image?: string }).image;
+  if (!imageUrl) {
+    throw new Error(`No image URL in response from ${jsonUrl}`);
+  }
+  return imageUrl;
+}
+
 function createAnimeCommand(def: AnimeCommandDef): Command {
   const cooldown = def.cooldown ?? 8000;
   const enabled = def.enabled ?? true;
@@ -685,18 +749,35 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
           await new AnimeBase().sendImage(ctx, def.endpoint);
           break;
         }
+        case 'nekos': {
+          try {
+            const category =
+              def.endpoint === 'random'
+                ? NEKO_RANDOM_CATEGORIES[Math.floor(Math.random() * NEKO_RANDOM_CATEGORIES.length)]
+                : def.endpoint;
+            const imageUrl = await nekosBestService.getImageUrl(category);
+            await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: imageUrl } });
+            await ctx.react('✅');
+          } catch (error) {
+            logError(`[${def.name}Command]`, error);
+            await ctx.react('❌');
+            await ctx.reply('❌ No pude obtener la imagen. Intenta de nuevo.');
+          }
+          break;
+        }
         case 'deliriusbase': {
           await new DeliriusAnimeBase().sendImage(ctx, def.endpoint);
           break;
         }
         case 'reactions': {
           try {
-            const imageUrl = await deliriusService.getReactionsImage(def.endpoint);
+            // nekos.best serves GIFs; convert to mp4 once and cache for
+            // gifPlayback playback (WhatsApp cannot play raw GIFs).
+            const video = await nekosBestService.getReactionVideo(def.endpoint);
             await ctx.sock.sendMessage(ctx.chat.jid, {
-              video: { url: imageUrl },
-              gifPlayback: def.gifPlayback ? true : undefined,
+              video: video,
+              gifPlayback: true,
             });
-            await ctx.react('✅');
             await ctx.react('✅');
           } catch (error) {
             logError(`[${def.name}Command]`, error);
@@ -719,7 +800,7 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
         }
         case 'random': {
           try {
-            const imageUrl = await deliriusService.getRandomImage(def.endpoint);
+            const imageUrl = await resolveRandomImage(def.endpoint);
             await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: imageUrl } });
             await ctx.react('✅');
           } catch (error) {
@@ -731,7 +812,9 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
         }
         case 'anime': {
           try {
-            const imageUrl = await deliriusService.getAnimeImage(def.endpoint);
+            const imageUrl = def.endpoint.startsWith('avatar')
+              ? `https://api.dicebear.com/9.x/pixel-art/png?seed=${Math.random().toString(36).slice(2)}`
+              : await deliriusService.getAnimeImage(def.endpoint);
             await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: imageUrl } });
             await ctx.react('✅');
           } catch (error) {
@@ -788,7 +871,6 @@ export const randomanimeCommand = createAnimeCommand(getAnimeCommand('randomanim
 export const hnekoCommand = createAnimeCommand(getAnimeCommand('hneko'));
 export const hwaifuCommand = createAnimeCommand(getAnimeCommand('hwaifu'));
 export const konachanCommand = createAnimeCommand(getAnimeCommand('konachan'));
-export const loliCommand = createAnimeCommand(getAnimeCommand('loli'));
 export const milfCommand = createAnimeCommand(getAnimeCommand('milf'));
 export const foxgirlCommand = createAnimeCommand(getAnimeCommand('foxgirl'));
 export const gachaCommand = createAnimeCommand(getAnimeCommand('gacha'));
