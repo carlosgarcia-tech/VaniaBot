@@ -45,8 +45,7 @@ export class TTSCommand extends Command {
     await ctx.react('🔊');
 
     try {
-      const audioUrl = await ttsService.textToSpeech(text);
-      const audioBuffer = await ttsService.downloadAudio(audioUrl);
+      const audioBuffer = await ttsService.synthesize(text);
 
       await ctx.sock.sendMessage(ctx.chat.jid, {
         audio: audioBuffer,
