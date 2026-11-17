@@ -17,11 +17,25 @@
 
 import type { MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
+import { findAssetFile } from '@/utils/assetHelper.js';
 
 /** WhatsApp never answers picture queries for token-less users — bound the wait. */
 const PROFILE_PIC_TIMEOUT_MS = 8_000;
 
 export class ImageHelper {
+  /** data URI of the packaged default avatar; computed once, reused. */
+  private static defaultProfileUri: string | null | undefined;
+
+  private static getDefaultProfileUri(): string | null {
+    if (ImageHelper.defaultProfileUri === undefined) {
+      const buf = findAssetFile('default-profile.jpg');
+      ImageHelper.defaultProfileUri = buf
+        ? `data:image/jpeg;base64,${buf.toString('base64')}`
+        : null;
+    }
+    return ImageHelper.defaultProfileUri;
+  }
+
   /**
    * WhatsApp refuses to answer picture queries for users it has no privacy
    * token for, and Baileys' profilePictureUrl has NO default timeout — it
@@ -59,7 +73,10 @@ export class ImageHelper {
   static async getProfileImage(ctx: MessageContext): Promise<string | null> {
     const mentionedJid = ctx.mentionedJid;
     const targetJid = mentionedJid || ctx.sender.jid;
-    return ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
+    const url = await ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
+    // Only when there is genuinely no picture to fetch: fall back to the
+    // packaged default avatar so picture-based commands never run empty.
+    return url ?? ImageHelper.getDefaultProfileUri();
   }
 
   /**
@@ -76,11 +93,8 @@ export class ImageHelper {
       ? await ImageHelper.safeProfilePicUrl(ctx.sock, mentionedJid)
       : null;
 
-    if (!image2 && image1) {
-      return [image1, image1];
-    }
-
-    return [image1, image2];
+    const fallback = image1 ?? image2 ?? ImageHelper.getDefaultProfileUri();
+    return [image1 ?? fallback, image2 ?? fallback];
   }
 
   /**
@@ -105,6 +119,7 @@ export class ImageHelper {
     }
 
     const targetJid = mentionedJid || quotedSender || ctx.sender.jid;
-    return ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
+    const profileUrl = await ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
+    return profileUrl ?? ImageHelper.getDefaultProfileUri();
   }
 }

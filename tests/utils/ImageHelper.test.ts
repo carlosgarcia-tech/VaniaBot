@@ -44,3 +44,26 @@ describe('ImageHelper.safeProfilePicUrl', () => {
     await expect(pending).resolves.toBeNull();
   });
 });
+
+describe('ImageHelper.getProfileImage', () => {
+  it('returns the real picture URL when one exists', async () => {
+    const ctx = {
+      sock: { profilePictureUrl: vi.fn().mockResolvedValue('http://pic/real') },
+      mentionedJid: undefined,
+      sender: { jid: 'user@s.whatsapp.net' },
+    } as unknown as MessageContext;
+
+    await expect(ImageHelper.getProfileImage(ctx)).resolves.toBe('http://pic/real');
+  });
+
+  it('falls back to the packaged default avatar when the user has none', async () => {
+    const ctx = {
+      sock: { profilePictureUrl: vi.fn().mockRejectedValue(new Error('item-not-found')) },
+      mentionedJid: undefined,
+      sender: { jid: 'user@s.whatsapp.net' },
+    } as unknown as MessageContext;
+
+    const url = await ImageHelper.getProfileImage(ctx);
+    expect(url).toMatch(/^data:image\/jpeg;base64,/);
+  });
+});
