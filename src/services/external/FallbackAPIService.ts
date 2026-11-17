@@ -34,14 +34,29 @@ const JOKE_FALLBACK = [
   '¿Cómo se dice pañuelo en japonés?\nSaka-moe',
 ];
 
+/** One formatting for both sources so the reply shape never changes. */
+function formatAnime(
+  title: string | undefined,
+  episodes: number | undefined,
+  description: string | undefined,
+): string {
+  const text = (description ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return `*${title ?? 'Desconocido'}*\n📺 ${episodes ?? '?'} episodios\n📝 ${text.slice(0, 150) || 'Sin descripción'}...`;
+}
+
 export class FallbackAPIService {
   private static instance: FallbackAPIService;
-  private malCache = new Map<string, { data: string; timestamp: number }>();
+  private animeCache = new Map<string, { data: string; timestamp: number }>();
   private tmdbCache = new Map<string, { data: string; timestamp: number }>();
   private jokeCache: string[] = [];
   private jokeCacheTimestamp = 0;
   private readonly CACHE_TTL = 30 * 60 * 1000;
-  private readonly MAL_API = 'https://api.jikan.moe/v4/top/anime';
+  // Jikan's public API shut down on 2026-10-01; chain is AniList → Kitsu.
+  private readonly ANILIST_API = 'https://graphql.anilist.co';
+  private readonly KITSU_API = 'https://kitsu.io/api/edge/anime';
   private readonly TMDB_API = 'https://api.themoviedb.org/3';
 
   static getInstance(): FallbackAPIService {
@@ -57,30 +72,66 @@ export class FallbackAPIService {
 
   async getAnimeRecommendation(genre?: string): Promise<string> {
     const cacheKey = genre?.toLowerCase() ?? 'top';
-    const cached = this.malCache.get(cacheKey);
+    const cached = this.animeCache.get(cacheKey);
 
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
       return cached.data;
     }
 
+    const result = (await this.fromAniList()) ?? (await this.fromKitsu());
+    if (!result) return this.getRandomFallback(ANIME_FALLBACK);
+    this.animeCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    return result;
+  }
+
+  /** Top anime via AniList GraphQL; null when unreachable/empty. */
+  private async fromAniList(): Promise<string | null> {
     try {
-      const response = await axios.get(this.MAL_API, {
-        params: { limit: 10 },
+      const response = await axios.post(
+        this.ANILIST_API,
+        {
+          query: `query {
+            Page(perPage: 10) {
+              media(type: ANIME, sort: SCORE_DESC) {
+                title { romaji }
+                episodes
+                description(as: HTML)
+              }
+            }
+          }`,
+        },
+        { timeout: 5000 },
+      );
+
+      const media = response.data?.data?.Page?.media;
+      if (Array.isArray(media) && media.length > 0) {
+        const pick = media[Math.floor(Math.random() * Math.min(5, media.length))];
+        return formatAnime(pick.title?.romaji, pick.episodes, pick.description);
+      }
+    } catch (error) {
+      logError('FallbackAPIService.fromAniList', error);
+    }
+    return null;
+  }
+
+  /** Kitsu REST fallback when AniList is down. */
+  private async fromKitsu(): Promise<string | null> {
+    try {
+      const response = await axios.get(this.KITSU_API, {
+        params: { 'page[limit]': 10, sort: '-userCount' },
         timeout: 5000,
       });
 
-      const anime = response.data?.data;
-      if (anime && anime.length > 0) {
-        const pick = anime[Math.floor(Math.random() * Math.min(5, anime.length))];
-        const result = `*${pick.title}*\n📺 ${pick.episodes ?? '?'} episodios\n📝 ${pick.synopsis?.slice(0, 150) ?? 'Sin descripción'}...`;
-        this.malCache.set(cacheKey, { data: result, timestamp: Date.now() });
-        return result;
+      const list = response.data?.data;
+      if (Array.isArray(list) && list.length > 0) {
+        const pick = list[Math.floor(Math.random() * Math.min(5, list.length))];
+        const attrs = pick.attributes ?? {};
+        return formatAnime(attrs.canonicalTitle, attrs.episodeCount, attrs.synopsis);
       }
     } catch (error) {
-      logError('FallbackAPIService.getAnimeRecommendation', error);
+      logError('FallbackAPIService.fromKitsu', error);
     }
-
-    return this.getRandomFallback(ANIME_FALLBACK);
+    return null;
   }
 
   async getMovieRecommendation(_genre?: string): Promise<string> {
