@@ -78,7 +78,7 @@ export class XnxxcardCommand extends Command {
     let imageUrl: string | null = null;
 
     try {
-      const pic = await ctx.sock.profilePictureUrl(targetJid, 'image');
+      const pic = await ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
       imageUrl = pic ?? null;
     } catch (e) {
       logger.info(

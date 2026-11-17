@@ -52,7 +52,7 @@ export class GaycardCommand extends Command {
       targetJid = mentioned;
       name = await contactsCache.getContactName(ctx, mentioned);
       try {
-        const pic = await ctx.sock.profilePictureUrl(mentioned, 'image');
+        const pic = await ImageHelper.safeProfilePicUrl(ctx.sock, mentioned);
         imageUrl = pic ?? null;
       } catch (error) {
         logError('[GaycardCommand]', error);

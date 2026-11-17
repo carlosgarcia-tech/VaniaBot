@@ -15,6 +15,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { formatNumber, formatTime } from '@/utils/helpers.js';
 import type { User } from '@/services/database/UserService.js';
 import { findAssetFile } from '@/utils/assetHelper.js';
+import { ImageHelper } from '@/utils/ImageHelper.js';
 import { ProfileCardService } from '@services/canvas/ProfileCardService.js';
 
 interface LevelProgress {
@@ -133,24 +134,13 @@ export class ProfileCommand extends Command {
 
   /**
    * Resolves the WhatsApp profile picture URL for a JID.
-   * Returns null if unavailable (private account, timeout, etc.).
+   * Returns null if unavailable (private account, no privacy token, etc.).
    */
   private async getProfilePictureUrl(
     ctx: MessageContext,
     targetJid: string,
   ): Promise<string | null> {
-    try {
-      let normalizedJid = targetJid;
-      if (targetJid.includes('@lid')) {
-        const phoneNumber = targetJid.split('@')[0];
-        normalizedJid = `${phoneNumber}@s.whatsapp.net`;
-      }
-
-      const url = await ctx.sock.profilePictureUrl(normalizedJid, 'image');
-      return url ?? null;
-    } catch {
-      return null;
-    }
+    return ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
   }
 
   /**

@@ -22,6 +22,7 @@ import { logger, logError } from '@/utils/logger.js';
 import { circuitBreakerManager } from './CircuitBreakerService.js';
 import { cacheManager } from '@/core/CacheManager.js';
 import { findAssetFile } from '@/utils/assetHelper.js';
+import { ImageHelper } from '@/utils/ImageHelper.js';
 
 export interface WelcomeConfig {
   enabled: boolean;
@@ -184,7 +185,7 @@ hola @user ✦
       let profilePicBuffer: Buffer | null = null;
       if (useProfilePic) {
         try {
-          const profilePicUrl = await sock.profilePictureUrl(userJid, 'image');
+          const profilePicUrl = await ImageHelper.safeProfilePicUrl(sock, userJid);
           if (profilePicUrl) {
             const response = await fetch(profilePicUrl);
             profilePicBuffer = Buffer.from(await response.arrayBuffer());
@@ -257,7 +258,7 @@ hola @user ✦
       let profilePicBuffer: Buffer | null = null;
       if (useProfilePic) {
         try {
-          const profilePicUrl = await sock.profilePictureUrl(userJid, 'image');
+          const profilePicUrl = await ImageHelper.safeProfilePicUrl(sock, userJid);
           if (profilePicUrl) {
             const response = await fetch(profilePicUrl);
             profilePicBuffer = Buffer.from(await response.arrayBuffer());

@@ -46,7 +46,7 @@ export class GayCommand extends Command {
       targetJid = mentioned;
       targetTag = await contactsCache.getContactName(ctx, mentioned);
       try {
-        const pic = await ctx.sock.profilePictureUrl(mentioned, 'image');
+        const pic = await ImageHelper.safeProfilePicUrl(ctx.sock, mentioned);
         imageUrl = pic ?? null;
       } catch (error) {
         logError('[GayCommand]', error);

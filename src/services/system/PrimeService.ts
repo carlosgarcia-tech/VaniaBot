@@ -12,6 +12,7 @@
 import type { WASocket } from 'baileys';
 import type { GroupService } from '../database/GroupService.js';
 import { cacheManager } from '@/core/CacheManager.js';
+import { ImageHelper } from '@/utils/ImageHelper.js';
 
 export class PrimeService {
   private static instance: PrimeService;
@@ -86,7 +87,7 @@ export class PrimeService {
     }
 
     try {
-      const picUrl = await sock.profilePictureUrl(groupJid, 'image');
+      const picUrl = await ImageHelper.safeProfilePicUrl(sock, groupJid);
       if (picUrl) {
         this.groupPicCache.set(groupJid, { url: picUrl, timestamp: Date.now() });
       }

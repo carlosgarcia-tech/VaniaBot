@@ -41,7 +41,7 @@ export class PetgifCommand extends Command {
 
     if (mentioned) {
       try {
-        const pic = await ctx.sock.profilePictureUrl(mentioned, 'image');
+        const pic = await ImageHelper.safeProfilePicUrl(ctx.sock, mentioned);
         imageUrl = pic ?? null;
       } catch {
         imageUrl = null;

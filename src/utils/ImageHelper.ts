@@ -18,7 +18,40 @@
 import type { MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
 
+/** WhatsApp never answers picture queries for token-less users — bound the wait. */
+const PROFILE_PIC_TIMEOUT_MS = 8_000;
+
 export class ImageHelper {
+  /**
+   * WhatsApp refuses to answer picture queries for users it has no privacy
+   * token for, and Baileys' profilePictureUrl has NO default timeout — it
+   * hangs forever. Every lookup goes through here: bounded wait, null on any
+   * failure, so a missing picture can never stall or crash a command.
+   */
+  static async safeProfilePicUrl(
+    sock: MessageContext['sock'],
+    jid: string,
+  ): Promise<string | null> {
+    try {
+      // Race against our own timer: the third arg covers Baileys' protocol
+      // timeouts, but only this race guarantees we bail out when the server
+      // stays silent (no privacy token for that user).
+      const url = await Promise.race([
+        sock.profilePictureUrl(jid, 'image', PROFILE_PIC_TIMEOUT_MS),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`profile picture query timed out: ${jid}`)),
+            PROFILE_PIC_TIMEOUT_MS,
+          ),
+        ),
+      ]);
+      return url || null;
+    } catch (error) {
+      logError('[ImageHelper]', error);
+      return null;
+    }
+  }
+
   /**
    * Profile picture of the mentioned user, falling back to the sender's.
    * @returns Image URL, or null when neither has a picture.
@@ -26,14 +59,7 @@ export class ImageHelper {
   static async getProfileImage(ctx: MessageContext): Promise<string | null> {
     const mentionedJid = ctx.mentionedJid;
     const targetJid = mentionedJid || ctx.sender.jid;
-
-    try {
-      const profileUrl = await ctx.sock.profilePictureUrl(targetJid, 'image');
-      return profileUrl || null;
-    } catch (error) {
-      logError('[ImageHelper]', error);
-      return null;
-    }
+    return ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
   }
 
   /**
@@ -45,29 +71,13 @@ export class ImageHelper {
   static async getTwoProfileImages(ctx: MessageContext): Promise<[string | null, string | null]> {
     const mentionedJid = ctx.mentionedJid;
 
-    let image1: string | null = null;
-    let image2: string | null = null;
-
-    try {
-      const url1 = await ctx.sock.profilePictureUrl(ctx.sender.jid, 'image');
-      image1 = url1 || null;
-    } catch (error) {
-      logError('[ImageHelper]', error);
-      image1 = null;
-    }
-
-    if (mentionedJid) {
-      try {
-        const url2 = await ctx.sock.profilePictureUrl(mentionedJid, 'image');
-        image2 = url2 || null;
-      } catch (error) {
-        logError('[ImageHelper]', error);
-        image2 = null;
-      }
-    }
+    const image1 = await ImageHelper.safeProfilePicUrl(ctx.sock, ctx.sender.jid);
+    const image2 = mentionedJid
+      ? await ImageHelper.safeProfilePicUrl(ctx.sock, mentionedJid)
+      : null;
 
     if (!image2 && image1) {
-      image2 = image1;
+      return [image1, image1];
     }
 
     return [image1, image2];
@@ -95,12 +105,6 @@ export class ImageHelper {
     }
 
     const targetJid = mentionedJid || quotedSender || ctx.sender.jid;
-    try {
-      const profileUrl = await ctx.sock.profilePictureUrl(targetJid, 'image');
-      return profileUrl || null;
-    } catch (error) {
-      logError('[ImageHelper]', error);
-      return null;
-    }
+    return ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
   }
 }

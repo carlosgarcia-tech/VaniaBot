@@ -14,6 +14,7 @@ import { StickerHelper } from '@/utils/StickerHelper.js';
 import { ImageProcessor } from '@/utils/imageProcessor.js';
 import { contactsCache } from '@/utils/ContactsCache.js';
 import { escapeXml, wrapText } from '@/utils/helpers.js';
+import { ImageHelper } from '@/utils/ImageHelper.js';
 import { logError } from '@/utils/logger.js';
 import axios from 'axios';
 
@@ -64,7 +65,7 @@ export class QcCommand extends Command {
     try {
       let pp = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
       try {
-        const pic = await ctx.sock.profilePictureUrl(targetJid, 'image');
+        const pic = await ImageHelper.safeProfilePicUrl(ctx.sock, targetJid);
         if (pic) pp = pic;
       } catch (error) {
         logError('[QcCommand]', error);

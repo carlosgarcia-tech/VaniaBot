@@ -16,6 +16,7 @@ import { serviceManager } from '@/services/system/Servicemanager.js';
 import { primeService } from '@/services/system/PrimeService.js';
 import { logError, logger } from '@/utils/logger.js';
 import { findAssetFile } from '@/utils/assetHelper.js';
+import { ImageHelper } from '@/utils/ImageHelper.js';
 import axios from 'axios';
 
 const charset: Record<string, string> = {
@@ -227,7 +228,7 @@ export class HelpCommand extends Command {
       // User's own profile picture first, as they asked, then the prime-group
       // picture, then the packaged logo.
       try {
-        const userPicUrl = await ctx.sock.profilePictureUrl(ctx.sender.jid, 'image');
+        const userPicUrl = await ImageHelper.safeProfilePicUrl(ctx.sock, ctx.sender.jid);
         if (userPicUrl) {
           try {
             const response = await axios.get(userPicUrl, { responseType: 'arraybuffer' });
