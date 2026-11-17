@@ -14,7 +14,7 @@
 | 2 | **Prince Techn** | `api.princetechn.com` | 🔴 **MUERTA** (TLS *unrecognized name* — app Heroku eliminada) | 9 comandos anime | neko/waifu/hneko/loli/milf… |
 | 3 | **Laurine TTS** | `www.laurine.site` | 🔴 **MUERTA** (dominio NXDOMAIN — expirado) | cadena TTS | primer eslabón de TTS |
 | 4 | Open-Meteo (+geocoding) | `api.open-meteo.com` | 🟢 viva | 1 comando | clima |
-| 5 | Jikan (MyAnimeList) | `api.jikan.moe` | 🟡 DNS activo (A: 135.181.39.91), inaccesible desde esta máquina | anime info/top | info anime |
+| 5 | Jikan (MyAnimeList) | `api.jikan.moe` | 🔴 **MUERTA** (cierre público 1-oct-2026) → **migrada a AniList + Kitsu** en `FallbackAPIService` | anime info/top | info anime |
 | 6 | TMDB | `api.themoviedb.org` | 🟢 responde (204 sin key) ⚠️ necesita `TMDB_API_KEY` | películas | películas |
 | 7 | Newsdata.io | `newsdata.io` | 🟢 responde (401 sin key) ⚠️ necesita `NEWSDATA_API_KEY` | noticias | noticias |
 | 8 | Pexels | `api.pexels.com` | 🟢 responde (401 sin key) ⚠️ `PEXELS_API_KEY` | imágenes | cadena de imágenes |
