@@ -66,6 +66,8 @@ export class StickerCommand extends Command {
   category = CommandCategory.MEDIA;
   aliases = ['s'];
   usage = '!sticker <reply to image/video>';
+  /** Pipeline default is 30s; video download + ffmpeg conversion needs more. */
+  timeout = 60_000;
   examples = ['!sticker', '!s'];
   contexts = [CommandContext.BOTH];
 
@@ -136,7 +138,28 @@ export class StickerCommand extends Command {
     } catch (error) {
       logError('[StickerCommand] Error', error);
       await ctx.react('❌');
-      await ctx.reply('❌ No pude convertir el sticker, intenta de nuevo.');
+      await ctx.reply(describeStickerError(error));
     }
   }
+}
+
+/** Turns opaque conversion errors into a reply that names the actual cause. */
+function describeStickerError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+
+  if (message.includes('timed out')) {
+    return '⏱️ El video es demasiado largo para convertirlo a tiempo. Intenta con uno de menos de 10 segundos.';
+  }
+  if (message.startsWith('FFmpeg video failed:')) {
+    const reason = message.slice('FFmpeg video failed:'.length).trim().slice(0, 140);
+    return `❌ No pude convertir el video a sticker. ffmpeg: ${reason || 'error desconocido'}`;
+  }
+  if (message.startsWith('FFmpeg failed:')) {
+    const reason = message.slice('FFmpeg failed:'.length).trim().slice(0, 140);
+    return `❌ No pude convertir la imagen a sticker. ffmpeg: ${reason || 'error desconocido'}`;
+  }
+  if (/download|ENOENT|aborted/i.test(message)) {
+    return '❌ No pude descargar el media. Intenta reenviarlo y volver a responder con !sticker.';
+  }
+  return `❌ No pude convertir el sticker: ${message.slice(0, 140)}`;
 }

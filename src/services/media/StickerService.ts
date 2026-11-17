@@ -35,6 +35,8 @@ interface FileTypeModule {
 export class StickerService {
   private static readonly TEMP_DIR = './data/temp';
   private static readonly STICKER_SIZE = 512;
+  /** WhatsApp rejects animated stickers above ~500KB. */
+  private static readonly MAX_VIDEO_STICKER_BYTES = 450 * 1024;
 
   constructor() {
     if (!existsSync(StickerService.TEMP_DIR)) {
@@ -167,32 +169,42 @@ export class StickerService {
     const type = await this.getFileType(buffer);
     const tempInput = join(StickerService.TEMP_DIR, `video-${Date.now()}.${type?.ext || 'mp4'}`);
     const tempOutput = join(StickerService.TEMP_DIR, `sticker-${Date.now()}.webp`);
+    const tempLight = `${tempOutput}.light.webp`;
     try {
       writeFileSync(tempInput, buffer);
       await this.ffmpegVideoProcess(tempInput, tempOutput);
-      const resultBuffer = readFileSync(tempOutput);
-      this.cleanup(tempInput, tempOutput);
+      let resultBuffer = readFileSync(tempOutput);
+      // WhatsApp rejects animated stickers over ~500KB; re-encode lighter once.
+      if (resultBuffer.length > StickerService.MAX_VIDEO_STICKER_BYTES) {
+        await this.ffmpegVideoProcess(tempInput, tempLight, 10, 50);
+        resultBuffer = readFileSync(tempLight);
+      }
+      this.cleanup(tempInput, tempOutput, tempLight);
       return resultBuffer;
     } catch (error) {
-      this.cleanup(tempInput, tempOutput);
+      this.cleanup(tempInput, tempOutput, tempLight);
       throw error;
     }
   }
 
-  private ffmpegVideoProcess(input: string, output: string): Promise<void> {
+  private ffmpegVideoProcess(input: string, output: string, fps = 15, qscale = 75): Promise<void> {
     return new Promise((resolve, reject) => {
       const args = [
         '-y',
+        // Input-side cut: palettegen otherwise swallows the WHOLE video
+        // building its palette, so long videos blew the command timeout.
+        '-t',
+        '10',
         '-i',
         input,
         '-vf',
-        "scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15,pad=320:320:-1:-1:color=white@0.0,split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse",
+        `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=${fps},pad=320:320:-1:-1:color=white@0.0,split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`,
         '-vcodec',
         'libwebp',
         '-lossless',
         '0',
         '-qscale',
-        '75',
+        String(qscale),
         '-preset',
         'default',
         '-loop',
