@@ -51,6 +51,7 @@ import { contactsCache } from '@/utils/ContactsCache.js';
 import { antilinkService } from '@/services/moderation/AntilinkService.js';
 import { chatSummaryService } from '@/services/chat/ChatSummaryService.js';
 import { PinVerificationMiddleware } from '@/middlewares/PinVerificationMiddleware.js';
+import { mediaMessageCache } from '@/services/media/MediaMessageCache.js';
 import type { RealTimeMessageProcessor } from './RealTimeMessageProcessor.js';
 
 /** Entry in the middleware chain; see Client.ts for the field semantics. */
@@ -131,6 +132,10 @@ export class MainMessagePipeline {
         if (msg.message?.imageMessage) {
           mediaGroupBuffer.add(chatJid, senderJid, msg);
         }
+
+        // Quoted-media commands (sticker, IA enhance…) need the ORIGINAL
+        // message — contextInfo stubs arrive without the CDN url.
+        mediaMessageCache.put(msg);
 
         if (msg.message?.reactionMessage) {
           handleReaccion(this.sock, msg).catch(err => logError('handleReaccion', err));

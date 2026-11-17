@@ -16,6 +16,7 @@ import { logError } from '@/utils/logger.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { StickerHelper } from '@/utils/StickerHelper.js';
 import { StickerService } from '@/services/media/StickerService.js';
+import { mediaMessageCache } from '@/services/media/MediaMessageCache.js';
 import pkg from '../../../package.json' with { type: 'json' };
 
 /**
@@ -103,20 +104,29 @@ export class StickerCommand extends Command {
         ? ctx.quotedParticipant || ctx.chat.jid
         : ctx.message.key?.remoteJid || ctx.chat.jid;
 
-      const messageToDownload: WAMessage = {
-        key: {
-          id: msgId || '',
-          remoteJid: remoteJid,
-          fromMe: isQuoted ? false : ctx.message.key?.fromMe || false,
-        },
-        message: {
-          imageMessage: message.imageMessage || undefined,
-          videoMessage: message.videoMessage || undefined,
-        },
-        messageTimestamp: Date.now(),
-        pushName: '',
-        status: 0,
-      };
+      // Quoted media stubs carry no CDN url — resolve the ORIGINAL message
+      // captured at reception, or the download will fail outright.
+      let messageToDownload: WAMessage | undefined;
+      if (isQuoted && msgId) {
+        messageToDownload = mediaMessageCache.get(ctx.chat.jid, msgId);
+      }
+
+      if (!messageToDownload) {
+        messageToDownload = {
+          key: {
+            id: msgId || '',
+            remoteJid: remoteJid,
+            fromMe: isQuoted ? false : ctx.message.key?.fromMe || false,
+          },
+          message: {
+            imageMessage: message.imageMessage || undefined,
+            videoMessage: message.videoMessage || undefined,
+          },
+          messageTimestamp: Date.now(),
+          pushName: '',
+          status: 0,
+        };
+      }
 
       const buffer = (await downloadMediaMessage(messageToDownload, 'buffer', {})) as Buffer;
       const stickerBuffer = await StickerHelper.createSticker(buffer);

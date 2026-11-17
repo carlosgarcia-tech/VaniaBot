@@ -37,7 +37,11 @@ const VIDEO_MSG = {
   videoMessage: { mimetype: 'video/mp4', seconds: 120 },
 } as never;
 
-const createCtx = (): MessageContext =>
+const IMG_MSG = {
+  imageMessage: { mimetype: 'image/jpeg' },
+} as never;
+
+const createCtx = (overrides: Partial<Record<string, unknown>> = {}): MessageContext =>
   ({
     message: { key: { id: 'm1', remoteJid: 'chat@g.us', fromMe: false }, message: VIDEO_MSG },
     quoted: undefined,
@@ -47,6 +51,7 @@ const createCtx = (): MessageContext =>
     sock: { sendMessage: vi.fn().mockResolvedValue(undefined) },
     reply: vi.fn().mockResolvedValue(undefined),
     react: vi.fn().mockResolvedValue(undefined),
+    ...overrides,
   }) as unknown as MessageContext;
 
 describe('StickerCommand error reporting', () => {
@@ -91,5 +96,35 @@ describe('StickerCommand error reporting', () => {
 
     const reply = (ctx.reply as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string;
     expect(reply).toContain('descargar');
+  });
+
+  it('downloads quoted media from the original cached message, not the url-less stub', async () => {
+    const original = {
+      key: { id: 'Q1', remoteJid: 'chat@g.us', fromMe: false, participant: 'x@s.whatsapp.net' },
+      message: { imageMessage: { url: 'https://mmg.whatsapp.net/full', mediaKey: Buffer.from('k') } },
+    };
+    const { mediaMessageCache } = await import('@/services/media/MediaMessageCache.js');
+    mediaMessageCache.put(original);
+
+    mockedDownload.mockResolvedValue(Buffer.from('img'));
+    mockedCreate.mockResolvedValue(Buffer.from('sticker'));
+
+    const quotedCtx = createCtx({
+      message: {
+        key: { id: 'cmd1', remoteJid: 'chat@g.us', fromMe: false },
+        message: { extendedTextMessage: { text: '!sticker' } },
+      },
+      quoted: { imageMessage: { mimetype: 'image/jpeg' } },
+      quotedMessageId: 'Q1',
+      quotedParticipant: 'x@s.whatsapp.net',
+    });
+
+    await command.execute(quotedCtx);
+
+    expect(mockedDownload.mock.calls[0]?.[0]).toBe(original);
+    expect(quotedCtx.sock?.sendMessage).toHaveBeenCalledWith(
+      'chat@g.us',
+      expect.objectContaining({ sticker: expect.anything() }),
+    );
   });
 });
