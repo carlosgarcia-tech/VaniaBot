@@ -6,7 +6,7 @@
  * @author **Carlos G**
  */
 
-import axios, { type AxiosResponse } from 'axios';
+import axios from 'axios';
 import { logger } from '@/utils/logger.js';
 import { env } from '@/config/env.js';
 
@@ -47,14 +47,6 @@ interface PixabayHit {
 
 interface PixabayResponse {
   hits: PixabayHit[];
-}
-
-interface AxiosWithResponseUrl extends AxiosResponse {
-  request?: {
-    res?: {
-      responseUrl?: string;
-    };
-  };
 }
 
 /**
@@ -120,19 +112,8 @@ export class ImageService {
       }
     }
 
-    if (!results.length) {
-      try {
-        logger.info('[ImageService] 🔍 Buscando en Unsplash Source:', query);
-        results = await this.searchUnsplashSource(query, perPage);
-        if (results.length) {
-          logger.info(
-            `[ImageService] ✅ Unsplash devolvió ${results.length} resultados para: ${query}`,
-          );
-        }
-      } catch (err) {
-        logger.warn('[ImageService] Unsplash Source falló:', err);
-      }
-    }
+    // Unsplash Source removed: retired by Unsplash (permanent 503).
+    // Picsum below is the final fallback.
 
     if (!results.length) {
       logger.warn(`[ImageService] 📷 Usando Lorem Picsum fallback para: ${query}`);
@@ -210,47 +191,6 @@ export class ImageService {
       logger.debug('[ImageService] Pixabay error:', error);
       return [];
     }
-  }
-
-  /**
-   * Unsplash Source redirects to a real Unsplash image without needing a key.
-   */
-  private async searchUnsplashSource(query: string, count: number): Promise<ImageResult[]> {
-    const results: ImageResult[] = [];
-    const encoded = encodeURIComponent(query);
-    const maxAttempts = Math.min(count, 3);
-
-    for (let i = 0; i < maxAttempts; i++) {
-      const seed = Math.floor(Math.random() * 10000) + i * 1000;
-      const url = `https://source.unsplash.com/800x800/?${encoded}&sig=${seed}`;
-
-      try {
-        const resp = await axios.get<ArrayBuffer>(url, {
-          timeout: 6000,
-          maxRedirects: 5,
-          responseType: 'arraybuffer',
-          validateStatus: s => s < 400,
-        });
-
-        if (resp.status === 200) {
-          const axiosResp = resp as AxiosWithResponseUrl;
-          const finalUrl = axiosResp.request?.res?.responseUrl ?? url;
-          results.push({
-            id: seed,
-            url: finalUrl,
-            photographer: 'Unsplash',
-            alt: query,
-            width: 800,
-            height: 800,
-          });
-        }
-      } catch (error) {
-        // Image source is down: return what accumulated, with fallbacks.
-        logger.debug(`[ImageService] Unsplash query failed for "${query}":`, error);
-      }
-    }
-
-    return results;
   }
 
   private getPicsumFallback(query: string, count: number): ImageResult[] {
