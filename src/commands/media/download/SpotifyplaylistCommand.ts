@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { spotifyService } from '@/services/external/SpotifyService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -48,35 +48,17 @@ export class SpotifyplaylistCommand extends Command {
     await ctx.reply('📋 Buscando y descargando playlist de Spotify...');
 
     try {
-      const data = (await deliriusService.getJson('download', 'spotifyplaylist', { url })) as {
-        result?: string;
-        download?: string;
-        url?: string;
-        tracks?: string[];
-        name?: string;
-      };
-
-      const downloadUrl = data?.result || data?.download || data?.url;
-
-      if (downloadUrl) {
-        await ctx.reply(`📋 *Playlist descargada*\n\n⬇️ Descarga: ${downloadUrl}`);
-        await ctx.react('✅');
-      } else if (data?.tracks?.length) {
-        const playlistName = data.name || 'Playlist';
-        await ctx.reply(`📋 *${playlistName}*\n\n🎵 ${data.tracks.length} canciones`);
-        for (const track of data.tracks.slice(0, 5)) {
-          await ctx.reply(track);
-        }
-        if (data.tracks.length > 5) {
-          await ctx.reply(`... y ${data.tracks.length - 5} más`);
-        }
-      } else {
-        await ctx.reply('❌ No pude descargar la playlist. Intenta de nuevo.');
-      }
+      // Free path: the embed page exposes the full trackList (no API key).
+      const tracks = await spotifyService.getTrackList(url);
+      const list = tracks.map((t, i) => `${i + 1}. *${t.title}* — ${t.artist}`).join('\n');
+      await ctx.reply(
+        `💿 *Tracklist* (máx 20)\n\n${list}\n\n▶️ Descarga cada tema con !play <título>`,
+      );
+      await ctx.react('✅');
     } catch (error) {
       logError('[SpotifyplaylistCommand]', error);
       await ctx.react('❌');
-      await ctx.reply('❌ Error al descargar playlist de Spotify. Intenta de nuevo.');
+      await ctx.reply('❌ No pude leer la tracklist. Intenta de nuevo.');
     }
   }
 }

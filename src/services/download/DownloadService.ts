@@ -89,33 +89,39 @@ export class DownloadService {
       return left(new ValidationError('URL muy larga (máx 2048 caracteres)'));
     }
 
-    try {
-      const parsed = new URL(url);
+    // yt-dlp search queries (ytsearch1:…) are not parseable URLs but are
+    // legitimate media args; everything else must still be a real URL.
+    const isYtDlpQuery = /^ytsearch\d*:/.test(url);
+    let hostname = '';
+    if (!isYtDlpQuery) {
+      try {
+        const parsed = new URL(url);
 
-      if (!['http:', 'https:'].includes(parsed.protocol)) {
-        return left(new ValidationError('Solo URLs HTTP/HTTPS permitidas'));
-      }
-
-      // Option-like strings would be forwarded to yt-dlp as CLI flags.
-      if (url.trim().startsWith('-')) {
-        return left(new ValidationError('URL inválida'));
-      }
-
-      for (const pattern of BLOCKED_URL_PATTERNS) {
-        if (pattern.test(url)) {
-          return left(new ValidationError('URL contiene patrones bloqueados'));
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          return left(new ValidationError('Solo URLs HTTP/HTTPS permitidas'));
         }
+        hostname = parsed.hostname.toLowerCase();
+      } catch {
+        return left(new InvalidURLError(url, 'formato inválido'));
       }
-
-      const hostname = parsed.hostname.toLowerCase();
-      if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return left(new ValidationError('URLs localhost no permitidas'));
-      }
-
-      return right(url);
-    } catch {
-      return left(new InvalidURLError(url, 'formato inválido'));
     }
+
+    // Option-like strings would be forwarded to yt-dlp as CLI flags.
+    if (url.trim().startsWith('-')) {
+      return left(new ValidationError('URL inválida'));
+    }
+
+    for (const pattern of BLOCKED_URL_PATTERNS) {
+      if (pattern.test(url)) {
+        return left(new ValidationError('URL contiene patrones bloqueados'));
+      }
+    }
+
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return left(new ValidationError('URLs localhost no permitidas'));
+    }
+
+    return right(url);
   }
 
   protected runCommand(cmd: string, args: string[], timeout: number = 90000): Promise<string> {

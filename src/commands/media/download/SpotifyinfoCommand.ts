@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { spotifyService } from '@/services/external/SpotifyService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -48,28 +48,18 @@ export class SpotifyinfoCommand extends Command {
     await ctx.reply('🎵 Obteniendo información de Spotify...');
 
     try {
-      const data = (await deliriusService.getJson('download', 'spotifyinfo', { url })) as {
-        name?: string;
-        artist?: string;
-        album?: string;
-        image?: string;
-        duration?: string;
-        release?: string;
-        result?: string;
-      };
-
-      if (data?.result) {
-        await ctx.reply(data.result);
-      } else if (data?.name) {
-        const info = `🎵 *${data.name}*\n👤 Artista: ${data.artist || 'Desconocido'}\n💿 Álbum: ${data.album || 'Desconocido'}\n⏱️ Duración: ${data.duration || 'N/A'}\n📅 Lanzamiento: ${data.release || 'N/A'}`;
-        await ctx.reply(info);
+      const info = await spotifyService.getTrackInfo(url);
+      const caption = `🎵 *${info.title}*\n\n▶️ Descarga el audio con !spotify ${url}`;
+      if (info.thumbnailUrl) {
+        await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: info.thumbnailUrl }, caption });
       } else {
-        await ctx.reply('❌ No pude obtener la información. Intenta de nuevo.');
+        await ctx.reply(caption);
       }
+      await ctx.react('✅');
     } catch (error) {
       logError('[SpotifyinfoCommand]', error);
       await ctx.react('❌');
-      await ctx.reply('❌ Error al obtener información de Spotify. Intenta de nuevo.');
+      await ctx.reply('❌ No pude obtener la información. Intenta de nuevo.');
     }
   }
 }

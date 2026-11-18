@@ -8,7 +8,8 @@
  */
 
 import { Command } from '../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { spotifyService } from '@/services/external/SpotifyService.js';
+import { ytDlpDownloader } from '@/services/download/YtDlpDownloader.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -52,23 +53,16 @@ export class SpotifyCommand extends Command {
     await ctx.reply('🎵 Buscando y descargando de Spotify...');
 
     try {
-      const data = (await deliriusService.getJson('download', 'spotifydl', { url })) as {
-        result?: string;
-        audio?: string;
-        download?: string;
-      };
+      // Free path: oEmbed title -> YouTube search -> yt-dlp mp3.
+      const result = await spotifyService.downloadTrack(url);
+      if (result._tag === 'Left') throw new Error(result.left.message);
 
-      const downloadUrl = data?.result || data?.audio || data?.download;
-
-      if (downloadUrl) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          audio: { url: downloadUrl },
-          mimetype: 'audio/mpeg',
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No pude descargar el audio. Intenta de nuevo.');
-      }
+      await ctx.sock.sendMessage(ctx.chat.jid, {
+        audio: { url: result.right.filePath },
+        mimetype: 'audio/mpeg',
+      });
+      await ctx.react('✅');
+      await ytDlpDownloader.cleanup(result.right.filePath);
     } catch (error) {
       logError('[SpotifyCommand]', error);
       await ctx.react('❌');
