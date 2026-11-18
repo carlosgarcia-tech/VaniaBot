@@ -64,8 +64,8 @@ export class StickerService {
   /** 0.0–1.0. Lower = more discreet. */
   private static readonly WATERMARK_OPACITY = 0.35;
   /** Watermark width in px (static stickers are 512px, animated ones 320px). */
-  private static readonly WATERMARK_WIDTH_IMAGE = 96;
-  private static readonly WATERMARK_WIDTH_VIDEO = 56;
+  private static readonly WATERMARK_WIDTH_IMAGE = 128;
+  private static readonly WATERMARK_WIDTH_VIDEO = 72;
 
   constructor() {
     if (!existsSync(StickerService.TEMP_DIR)) {
