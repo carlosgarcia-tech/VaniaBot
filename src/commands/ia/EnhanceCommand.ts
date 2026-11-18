@@ -8,9 +8,9 @@
  */
 
 import { Command } from '../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
+import { mediaMessageCache } from '@/services/media/MediaMessageCache.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import axios from 'axios';
 
@@ -52,16 +52,22 @@ export class EnhanceCommand extends Command {
     await ctx.reply(`✨ Mejorando imagen (${scale}x)...`);
 
     try {
-      const data = (await deliriusService.getIa('enhance', {
-        image: imageUrl,
-        scale: scale.toString(),
-      })) as {
-        result?: string;
-        image?: string;
-        url?: string;
-      };
+      const key = process.env.DEEPAI_API_KEY;
+      if (!key) {
+        await ctx.reply(
+          '⚠️ Este comando necesita *DEEPAI_API_KEY* configurada en el servidor (gratis en deepai.org).',
+        );
+        return;
+      }
 
-      const resultUrl = data?.result || data?.image || data?.url;
+      const form = new FormData();
+      form.append('image', imageUrl);
+      const response = await axios.postForm('https://api.deepai.org/api/torch-srgan', form, {
+        headers: { 'api-key': key },
+        timeout: 60000,
+      });
+
+      const resultUrl = (response.data as { output_url?: string })?.output_url;
 
       if (resultUrl) {
         await ctx.sock.sendMessage(ctx.chat.jid, {
@@ -98,19 +104,22 @@ export class EnhanceCommand extends Command {
 
     if (quotedMsg?.imageMessage && quotedMsgId) {
       try {
-        const messageToDownload: WAMessage = {
-          key: {
-            id: quotedMsgId,
-            remoteJid: quotedParticipant || ctx.chat.jid,
-            fromMe: false,
-          },
-          message: {
-            imageMessage: quotedMsg.imageMessage,
-          },
-          messageTimestamp: Date.now(),
-          pushName: '',
-          status: 0,
-        };
+        // Quoted stubs lack the CDN url — resolve the ORIGINAL cached message.
+        const messageToDownload =
+          mediaMessageCache.get(ctx.chat.jid, quotedMsgId) ??
+          ({
+            key: {
+              id: quotedMsgId,
+              remoteJid: quotedParticipant || ctx.chat.jid,
+              fromMe: false,
+            },
+            message: {
+              imageMessage: quotedMsg.imageMessage,
+            },
+            messageTimestamp: Date.now(),
+            pushName: '',
+            status: 0,
+          } as WAMessage);
         const buffer = (await downloadMediaMessage(messageToDownload, 'buffer', {})) as Buffer;
         const uploaded = await this.uploadToImgbb(buffer);
         return uploaded;
