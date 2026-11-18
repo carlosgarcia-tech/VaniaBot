@@ -8,7 +8,7 @@
 
 | # | API | Causa de muerte | Impacto | Reemplazo planeado | Estado |
 |---|-----|-----------------|---------|--------------------|--------|
-| 1 | **Delirius API** (`api.delirius.store`) | Subdominio `api.` sin registro A/AAAA en el mundo (su web dice ONLINE pero es falso) | Descargas (§6.1), ia-mail, nsfw, 6 búsquedas sin key (Genius, PlayStore, Pinterest, SpotifySearch, Tenor, YoutubeSearch) y 8 defs sin reemplazo (gacha, hentaivid, lolipc, maid, selfie, uniform, marin, mori, oppai, newsanime) | yt-dlp/cobalt (descargas), mail.tm (ia), keys/scrapers para búsquedas restantes | ⏳ Pendiente (reacciones, random, foxgirl y 7 búsquedas ya migrados) |
+| 1 | **Delirius API** (`api.delirius.store`) | Subdominio `api.` sin registro A/AAAA en el mundo (su web dice ONLINE pero es falso) | Descargas (§6.1), ia-mail (mailcreate/mailmessages), nsfw, 6 búsquedas sin key (Genius, PlayStore, Pinterest, SpotifySearch, Tenor, YoutubeSearch) y 8 defs sin reemplazo (gacha, hentaivid, lolipc, maid, selfie, uniform, marin, mori, oppai, newsanime) | yt-dlp/cobalt (descargas), mail.tm (ia), keys/scrapers para búsquedas restantes | ⏳ Pendiente (reacciones, random, foxgirl, 7 búsquedas y enhance/upscale ya migrados) |
 | 2 | **Waifu fallbacks** (`api.waifu.pics`, `api.waifu.im`) | NXDOMAIN en el mundo (verificado 17-nov-2026) | Ninguno directo: eran los *reemplazos* del plan, no dependencias | `pic.re` (🟢 verificada viva) como fallback de imágenes de waifu; para GIFs de reacciones nekos.best queda sin plan B | 📌 Nota |
 
 ## Ya no muertas (migraciones hechas — fuera de esta lista)
@@ -21,6 +21,7 @@
 | ~~Laurine TTS~~ | Edge TTS (`msedge-tts`, voz es-MX-DaliaNeural, sin key) verificado en vivo; la cadena muerta de Laurine eliminada | 7.4.1 |
 | ~~Unsplash Source~~ | Eliminado de la cadena de imágenes; Picsum queda como fallback final (503 permanente) | 7.4.2 |
 | ~~Delirius (búsquedas, 7 comandos)~~ | !wiki→Wikipedia REST, !npm→registry, !animesearch→AniList, !mangasearch→MangaDex, !movie→TMDB, !google→DuckDuckGo (existente), !gimage→ImageService (existente) — todas verificadas en vivo | 7.4.3 |
+| ~~Delirius (ia enhance/upscale)~~ | DeepAI `torch-srgan` (patrón existente de ToAnime); mensaje claro si falta `DEEPAI_API_KEY`; media citado resuelto con MediaMessageCache | 7.4.4 |
 
 ## Reglas de la migración (del plan del usuario)
 
