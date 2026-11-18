@@ -4,11 +4,13 @@
  * anime command `cat` — Gets a random cat image
  * Usage: !cat [texto]
  *
+ * cataas.com serves the images directly (verified alive 18-nov-2026); the old
+ * Delirius glue is dead.
+ *
  * @author **Carlos G**
  */
 
 import { Command } from '../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -32,9 +34,11 @@ export class CatCommand extends Command {
   async execute(ctx: MessageContext): Promise<void> {
     await ctx.react('🐱');
     try {
-      const text = ctx.args?.join(' ').trim() || '';
-      const endpoint = text ? `cat?text=${encodeURIComponent(text)}` : 'cat';
-      const imageUrl = await deliriusService.getRandomImage(endpoint);
+      const text = ctx.args?.join(' ').trim() ?? '';
+      // `cache=bust` avoids WhatsApp reusing the previous cat for every call.
+      const imageUrl = text
+        ? `https://cataas.com/cat/says/${encodeURIComponent(text)}?t=${Date.now()}`
+        : `https://cataas.com/cat?t=${Date.now()}`;
       await ctx.sock.sendMessage(ctx.chat.jid, {
         image: { url: imageUrl },
       });

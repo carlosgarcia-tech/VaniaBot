@@ -1,14 +1,16 @@
 /**
  * AnimeinfoCommand.ts
  *
- * anime command `animeinfo` — Shows information about an anime
+ * anime command `animeinfo` — Shows anime information by title
  * Usage: !animeinfo <nombre>
+ *
+ * Data comes from AniList's public GraphQL API (free, no key).
  *
  * @author **Carlos G**
  */
 
 import { Command } from '../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { animeInfoService, formatAnimeInfo } from '@/services/external/AnimeInfoService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -17,16 +19,18 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!animeinfo`: Shows information about an anime. */
+/** Command handler for `!animeinfo`: Shows anime information by title. */
 export class AnimeinfoCommand extends Command {
   name = 'animeinfo';
+  /** AniList + cover on a slow link. */
+  timeout = 60000;
   description = 'Muestra información de un anime';
   category = CommandCategory.ANIME;
   aliases = ['animeinfo'];
   cooldown = 10000;
   contexts = [CommandContext.BOTH];
   usage = '!animeinfo <nombre>';
-  examples = ['!animeinfo Naruto', '!animeinfo Death Note'];
+  examples = ['!animeinfo Naruto'];
   permissions = { user: [PermissionLevel.USER], bot: [] };
 
   async execute(ctx: MessageContext): Promise<void> {
@@ -39,11 +43,16 @@ export class AnimeinfoCommand extends Command {
 
     await ctx.react('📺');
     try {
-      const imageUrl = await deliriusService.getAnimeImage(
-        `animeinfo?query=${encodeURIComponent(query)}`,
-      );
+      const info = await animeInfoService.search(query);
+      if (!info) {
+        await ctx.react('❌');
+        await ctx.reply('❌ No encontré ese anime.');
+        return;
+      }
+
       await ctx.sock.sendMessage(ctx.chat.jid, {
-        image: { url: imageUrl },
+        image: { url: info.coverUrl },
+        caption: formatAnimeInfo(info),
       });
       await ctx.react('✅');
     } catch (error) {

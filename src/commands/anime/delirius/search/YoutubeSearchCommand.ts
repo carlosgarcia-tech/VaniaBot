@@ -4,11 +4,14 @@
  * anime command `ytsearch` — Searches videos on YouTube
  * Usage: !ytsearch <busqueda>
  *
+ * Search runs through yt-dlp (ytsearch1, already required by !ytmp3/!ytmp4);
+ * the old Delirius glue is dead.
+ *
  * @author **Carlos G**
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { searchVideo } from '@/services/download/YouTubeSearchService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -20,6 +23,8 @@ import {
 /** Command handler for `!ytsearch`: Searches videos on YouTube. */
 export class YoutubeSearchCommand extends Command {
   name = 'ytsearch';
+  /** yt-dlp search can take a while on a slow link. */
+  timeout = 90000;
   description = 'Busca videos en YouTube';
   category = CommandCategory.ANIME;
   aliases = ['ytsearch', 'yts'];
@@ -39,16 +44,19 @@ export class YoutubeSearchCommand extends Command {
 
     await ctx.react('🔍');
     try {
-      const data = (await deliriusService.search('ytsearch', { q: query })) as { result?: string };
+      const video = await searchVideo(query);
 
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
+      if (!video) {
+        await ctx.react('❌');
         await ctx.reply('❌ No se encontraron resultados.');
+        return;
       }
+
+      await ctx.sock.sendMessage(ctx.chat.jid, {
+        image: { url: video.thumbnail },
+        caption: `🎬 *${video.title}*\n⏱️ ${video.duration}\n🔗 ${video.url}`,
+      });
+      await ctx.react('✅');
     } catch (error) {
       logError('[YoutubeSearchCommand]', error);
       await ctx.react('❌');

@@ -7,6 +7,7 @@
  *  - neko/waifu → nekos.best images
  *  - dog/duck/coffee/picsum → direct sources
  *  - avatar → dicebear
+ *  - unknown random endpoints fail loudly (Delirius is gone)
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -157,11 +158,7 @@ describe('resolveRandomImage', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it('falls through unknown endpoints to Delirius (still wired there)', async () => {
-    const { deliriusService } = await import('@/services/external/DeliriusService.js');
-    const getRandom = vi.spyOn(deliriusService, 'getRandomImage').mockResolvedValue('https://x/y.jpg');
-
-    expect(await resolveRandomImage('loremflickr')).toBe('https://x/y.jpg');
-    expect(getRandom).toHaveBeenCalledWith('loremflickr');
+  it('rejects an unmapped endpoint instead of calling the dead Delirius API', async () => {
+    await expect(resolveRandomImage('loremflickr')).rejects.toThrow('desconocido');
   });
 });

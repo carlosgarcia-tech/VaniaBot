@@ -3,16 +3,21 @@
  *
  * OrbitBot commands module exposing `NhentaisearchCommand`.
  *
+ * nhentai API v2 search (verified 18-nov-2026); blacklisted galleries are
+ * skipped instead of shown.
+ *
  * @author **Carlos G**
  */
 
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { nhentaiService } from '@/services/external/NhentaiService.js';
 import { NsfwMediaBase } from './NsfwMediaBase.js';
 import { CommandContext, type MessageContext } from '@/types/index.js';
 
 export class NhentaisearchCommand extends NsfwMediaBase {
   name = 'nhentaisearch';
-  description = 'Busca en NHentai';
+  /** search + up to 3 gallery lookups (blacklist) on a slow link. */
+  timeout = 90000;
+  description = 'Busca un doujin en NHentai';
   aliases = ['nhentaisearch'];
   usage = '!nhentaisearch <busqueda>';
   examples = ['!nhentaisearch lisa'];
@@ -22,7 +27,11 @@ export class NhentaisearchCommand extends NsfwMediaBase {
 
   protected async fetchMedia(ctx: MessageContext): Promise<string | null> {
     const query = ctx.args?.join(' ').trim() ?? '';
-    return deliriusService.getAnimeImage(`nhentaiseARCH?query=${encodeURIComponent(query)}`);
+    if (!query) {
+      return null;
+    }
+    const gallery = await nhentaiService.search(query);
+    return gallery?.coverUrl ?? null;
   }
 
   protected buildMessage(mediaUrl: string): { image: { url: string } } {

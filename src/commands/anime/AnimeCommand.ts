@@ -8,8 +8,6 @@
 
 import { Command } from '../Command.js';
 import { AnimeBase } from './AnimeBase.js';
-import { DeliriusAnimeBase } from './DeliriusAnimeBase.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
 import { nekosBestService } from '@/services/external/NekosBestService.js';
 import { purrbotService } from '@/services/external/PurrbotService.js';
 import { nekobotService } from '@/services/external/NekobotService.js';
@@ -29,7 +27,6 @@ type AnimeService =
   | 'nekos'
   | 'nekobot'
   | 'booru'
-  | 'deliriusbase'
   | 'reactions'
   | 'nsfw'
   | 'random'
@@ -145,24 +142,20 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     description: 'Obtiene un personaje aleatorio de gacha',
     aliases: [],
     react: '🎰',
-    endpoint: 'gacha',
-    service: 'deliriusbase',
+    // Restored via Danbooru (game CG art).
+    endpoint: 'danbooru',
+    tags: 'game_cg rating:g',
+    service: 'booru',
   },
   {
+    // Restored via nekobot (pgif), behind the !nsfw toggle.
     name: 'hentaivid',
     description: 'Obtiene un video hentai aleatorio',
     aliases: ['hentaivideo'],
     react: '🎬',
-    endpoint: 'hentaivid',
-    service: 'deliriusbase',
-  },
-  {
-    name: 'lolipc',
-    description: 'Obtiene una imagen de loli en PC',
-    aliases: [],
-    react: '🖥️',
-    endpoint: 'lolipc',
-    service: 'deliriusbase',
+    endpoint: 'pgif',
+    service: 'nekobot',
+    nsfw: true,
   },
   {
     // Restored via Danbooru.
@@ -179,8 +172,10 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     description: 'Obtiene una selfie anime aleatoria',
     aliases: [],
     react: '🤳',
-    endpoint: 'selfie',
-    service: 'deliriusbase',
+    // Restored via Danbooru.
+    endpoint: 'danbooru',
+    tags: 'selfie rating:g',
+    service: 'booru',
   },
   {
     // Restored via Danbooru.
@@ -643,7 +638,7 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     description: 'Obtiene un avatar anime aleatorio',
     aliases: ['avataranime'],
     react: '🎭',
-    endpoint: 'avatar/delirius?style=pixel-art',
+    endpoint: 'avatar',
     service: 'anime',
   },
   {
@@ -732,9 +727,7 @@ export async function resolveRandomImage(endpoint: string): Promise<string> {
   }
   const jsonUrl = RANDOM_JSON_URLS[endpoint];
   if (!jsonUrl) {
-    // Unknown endpoint keeps its old (dead) Delirius wiring so the failure
-    // stays visible instead of silently disappearing.
-    return deliriusService.getRandomImage(endpoint);
+    throw new Error(`Endpoint aleatorio desconocido: ${endpoint}`);
   }
   const data = await fetchJsonObject(jsonUrl);
   const imageUrl =
@@ -788,10 +781,6 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
             await ctx.react('❌');
             await ctx.reply('❌ No pude obtener la imagen. Intenta de nuevo.');
           }
-          break;
-        }
-        case 'deliriusbase': {
-          await new DeliriusAnimeBase().sendImage(ctx, def.endpoint);
           break;
         }
         case 'reactions': {
@@ -874,9 +863,7 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
         }
         case 'anime': {
           try {
-            const imageUrl = def.endpoint.startsWith('avatar')
-              ? `https://api.dicebear.com/9.x/pixel-art/png?seed=${Math.random().toString(36).slice(2)}`
-              : await deliriusService.getAnimeImage(def.endpoint);
+            const imageUrl = `https://api.dicebear.com/9.x/pixel-art/png?seed=${Math.random().toString(36).slice(2)}`;
             await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: imageUrl } });
             await ctx.react('✅');
           } catch (error) {
@@ -937,7 +924,6 @@ export const milfCommand = createAnimeCommand(getAnimeCommand('milf'));
 export const foxgirlCommand = createAnimeCommand(getAnimeCommand('foxgirl'));
 export const gachaCommand = createAnimeCommand(getAnimeCommand('gacha'));
 export const hentaividCommand = createAnimeCommand(getAnimeCommand('hentaivid'));
-export const lolipcCommand = createAnimeCommand(getAnimeCommand('lolipc'));
 export const maidCommand = createAnimeCommand(getAnimeCommand('maid'));
 export const selfieCommand = createAnimeCommand(getAnimeCommand('selfie'));
 export const uniformCommand = createAnimeCommand(getAnimeCommand('uniform'));
