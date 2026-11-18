@@ -1,7 +1,7 @@
 # Comandos migrados / arreglados — checklist de prueba manual
 
-> Todo lo de abajo quedó arreglado entre **v7.3.1 y v7.4.4**. Probar con el bot desplegado
-> (`./deploy.sh develop update` — pendiente el fix del build IPv6).
+> Todo lo de abajo quedó arreglado entre **v7.3.1 y v7.4.11**. Probar con el bot desplegado
+> (`./deploy.sh develop update`).
 > Leyenda: ✅ debe funcionar · ⚠️ depende de key/config · ❌ mensaje de error esperado (no crash)
 
 ---
@@ -109,6 +109,59 @@ Primera vez de cada gif tarda ~2–4 s (ffmpeg convierte gif→mp4 una vez y lo 
 | Reacciones de `!InteractionCommand` (agarrarnalgas, etc.) | comparten patrón gifPlayback — no se tocaron, pero conviene smoke-test |
 | `!pelicula` (recomendación) | usa el mismo `FallbackAPIService` que se tocó para AniList |
 | `!chiste` | mismo servicio (no debió cambiar) |
+
+## 11. Reacciones y boorus (v7.4.5–7.4.6)
+
+| Prueba | Cómo | Resultado esperado |
+|--------|------|--------------------|
+| Reacciones SFW | `!hug`, `!pat`, `!kiss` | ✅ gif como video `gifPlayback` |
+| Reacciones NSFW | `!nsfw on` + `!fuck`, `!yuri`, `!solo` | ✅ video NSFW (Purrbot) |
+| Imágenes NSFW | `!boobs`, `!hneko`, `!hentai` | ✅ imagen (nekobot) |
+| Booru por tag | `!booru marin_kitagawa` | ✅ imagen SFW; tag prohibido → mensaje de filtrado |
+| Personajes | `!megumin`, `!marin`, `!mori`, `!maid`, `!uniform` | ✅ imagen (Danbooru) |
+
+## 12. Descargas y TTS (v7.4.7–7.4.10)
+
+| Prueba | Cómo | Resultado esperado |
+|--------|------|--------------------|
+| TTS | `!tts hola mundo` | ✅ **nota de voz** (OGG/Opus) en ~2–5 s; antes se quedaba muda |
+| TTS largo | `!tts <texto de 400 caracteres>` | ✅ audio o ❌ error a los 60 s, nunca silencio |
+| Canción | `!play bad bunny` | ✅ mp3 ~1.5–3 MB y se **envía** (antes moría a los 145 s por `spawnSync`) |
+| Canción en enlace lento | `!play <algo poco popular>` | ✅ espera hasta 10 min sin tumbar la sesión |
+| Video | `!ytmp4 <url>` | ✅ video ≤480p |
+| Otras descargas | `!soundcloud`, `!threads`, `!snackvideo`, `!facebookv2`, `!xnxx`, `!xvideos`, `!pornhub` | ✅ archivo enviado |
+| Enlaces de archivo | `!gofile <url>`, `!imgur <url>` | ✅ archivo (imgur necesita `IMGUR_CLIENT_ID`) |
+| Spotify | `!spotify <canción>` | ✅ audio (oEmbed + ytsearch1) |
+
+## 13. Búsquedas nuevas (v7.4.9–7.4.11)
+
+| Prueba | Cómo | Resultado esperado |
+|--------|------|--------------------|
+| Correo temporal | `!mailcreate` | ✅ dirección mail.tm guardada |
+| Bandeja | `!mailmessages` | ✅ lista (o vacía si aún no llega nada) |
+| Play Store | `!playstore whatsapp` | ✅ ficha de la app |
+| Noticias anime | `!newsanime` | ✅ titulares de ANN |
+| GIFs Giphy | `!tenor happy` (requiere `GIPHY_API_KEY`) | ✅ gif como video; sin key → aviso claro |
+| Anime por nombre | `!animeinfo naruto` | ✅ portada + episodios + score (AniList) |
+| Anime por link MAL | `!animeinfourl https://myanimelist.net/anime/20/Naruto` | ✅ misma ficha |
+| Gatos | `!cat` y `!cat cute` | ✅ imagen (cataas) |
+| Avatar aleatorio | `!avatarrandom` y `!avatarrandom pixel-art` | ✅ avatar DiceBear |
+| Buscar video | `!ytsearch coqueta bocchi` | ✅ miniatura + título + link |
+| Buscar canción | `!spotifysrc despacito` | ✅ portada + artista + álbum (iTunes) |
+
+## 14. NSFW que debe seguir vivo (v7.4.11)
+
+> Gate: primero `!nsfw on` en el chat. Sin gate, todos responden con el aviso 🔞.
+
+| Prueba | Cómo | Resultado esperado |
+|--------|------|--------------------|
+| Regla 34 | `!rule34 anime` | ✅ imagen explícita (Danbooru `rating:e`) |
+| Regla 34 tag inexistente | `!rule34 hentai` | ✅ igual responde con un post explícito (fallback) |
+| Doujin por código | `!nhentai 696728` | ✅ portada del doujin |
+| Doujin bloqueado | `!nhentai 698288` (tag `shotacon`) | ❌ mensaje de bloqueo por lista negra (no se muestra) |
+| Buscar doujin | `!nhentaisearch office lady` | ✅ portada del primer resultado limpio |
+| Video hentai | `!hentaivid` | ✅ video (nekobot `pgif`) |
+| Agresiones | `!anal`, `!blowjob`, `!cum`, `!pussylick` | ✅ video NSFW |
 
 ---
 
