@@ -14,9 +14,7 @@
  * @created 2026-11-17
  */
 
-import { spawn } from 'child_process';
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { gifUrlToMp4 } from '@/services/media/GifToMp4.js';
 
 const TIMEOUT_MS = 20000;
 const USER_AGENT = 'OrbitBot/7.3 (WhatsApp bot; nekos.best client)';
@@ -34,50 +32,12 @@ export class NekosBestService {
   }
 
   /**
-   * GIF category → mp4 Buffer, ready for `gifPlayback` sending. Converted
-   * results are cached in TEMP_DIR keyed by the gif's unique file name.
+   * GIF category → mp4 Buffer, ready for `gifPlayback` sending. The shared
+   * GifToMp4 helper downloads, converts and disk-caches by unique gif name.
    */
   async getReactionVideo(category: string): Promise<Buffer> {
     const url = await this.getImageUrl(category);
-    const gifName = url.split('/').pop() ?? `${category}.gif`;
-    const mp4Path = join(this.TEMP_DIR, `nk-${gifName.replace(/\.gif$/, '')}.mp4`);
-
-    if (existsSync(mp4Path)) {
-      return readFileSync(mp4Path);
-    }
-
-    if (!existsSync(this.TEMP_DIR)) {
-      mkdirSync(this.TEMP_DIR, { recursive: true });
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-    let gifBuffer: Buffer;
-    try {
-      const response = await fetch(url, {
-        headers: { 'User-Agent': USER_AGENT },
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        throw new Error(`nekos.best: image download failed (${response.status})`);
-      }
-      gifBuffer = Buffer.from(await response.arrayBuffer());
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    const tempGif = join(this.TEMP_DIR, `nk-${gifName}`);
-    writeFileSync(tempGif, gifBuffer);
-    try {
-      await this.convertGifToMp4(tempGif, mp4Path);
-      return readFileSync(mp4Path);
-    } finally {
-      try {
-        unlinkSync(tempGif);
-      } catch {
-        // best-effort cleanup
-      }
-    }
+    return await gifUrlToMp4(url);
   }
 
   private async fetchJson(category: string): Promise<{ results?: Array<{ url?: string }> }> {
@@ -96,34 +56,6 @@ export class NekosBestService {
     } finally {
       clearTimeout(timeoutId);
     }
-  }
-
-  private convertGifToMp4(input: string, output: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const ffmpeg = spawn('ffmpeg', [
-        '-y',
-        '-i',
-        input,
-        '-movflags',
-        'faststart',
-        '-pix_fmt',
-        'yuv420p',
-        '-vf',
-        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
-        '-r',
-        '15',
-        output,
-      ]);
-      let stderr = '';
-      ffmpeg.stderr.on('data', (data: Buffer) => {
-        stderr += data.toString();
-      });
-      ffmpeg.on('close', code => {
-        if (code === 0) resolve();
-        else reject(new Error(`ffmpeg failed (${code}): ${stderr.slice(-200)}`));
-      });
-      ffmpeg.on('error', reject);
-    });
   }
 }
 

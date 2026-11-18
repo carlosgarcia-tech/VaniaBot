@@ -10,9 +10,16 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { hugCommand, nekoCommand, dogCommand, picsumCommand } from '@/commands/anime/AnimeCommand.js';
+import {
+  hugCommand,
+  nekoCommand,
+  dogCommand,
+  picsumCommand,
+  fuckCommand,
+} from '@/commands/anime/AnimeCommand.js';
 import { resolveRandomImage } from '@/commands/anime/AnimeCommand.js';
 import { nekosBestService } from '@/services/external/NekosBestService.js';
+import { purrbotService } from '@/services/external/PurrbotService.js';
 import type { MessageContext } from '@/types/index.js';
 
 vi.mock('@/services/external/NekosBestService.js', () => ({
@@ -22,8 +29,15 @@ vi.mock('@/services/external/NekosBestService.js', () => ({
   },
 }));
 
+vi.mock('@/services/external/PurrbotService.js', () => ({
+  purrbotService: {
+    getReactionVideo: vi.fn(),
+  },
+}));
+
 const mockedReaction = nekosBestService.getReactionVideo as ReturnType<typeof vi.fn>;
 const mockedImageUrl = nekosBestService.getImageUrl as ReturnType<typeof vi.fn>;
+const mockedPurrbot = purrbotService.getReactionVideo as ReturnType<typeof vi.fn>;
 
 const createCtx = (): MessageContext =>
   ({
@@ -65,6 +79,23 @@ describe('AnimeCommand routing', () => {
       'chat@g.us',
       expect.objectContaining({ image: { url: 'https://nekos.best/api/v2/neko/abc.png' } }),
     );
+  });
+
+  it('routes NSFW fuck to purrbot with the nsfw gate flag on', async () => {
+    mockedPurrbot.mockResolvedValue(Buffer.from('mp4'));
+    const ctx = createCtx();
+
+    await fuckCommand.execute(ctx);
+
+    expect(mockedPurrbot).toHaveBeenCalledWith('nsfw/fuck');
+    expect(mockedReaction).not.toHaveBeenCalled();
+    expect(ctx.sock.sendMessage).toHaveBeenCalledWith(
+      'chat@g.us',
+      expect.objectContaining({ video: Buffer.from('mp4'), gifPlayback: true }),
+    );
+    // The pipeline gates on command.nsfw with !nsfw on — must be true.
+    expect((fuckCommand as unknown as { nsfw: boolean }).nsfw).toBe(true);
+    expect((hugCommand as unknown as { nsfw: boolean }).nsfw).toBe(false);
   });
 
   it('reports the failure instead of throwing when the provider fails', async () => {

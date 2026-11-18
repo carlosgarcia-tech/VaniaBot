@@ -11,6 +11,7 @@ import { AnimeBase } from './AnimeBase.js';
 import { DeliriusAnimeBase } from './DeliriusAnimeBase.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { nekosBestService } from '@/services/external/NekosBestService.js';
+import { purrbotService } from '@/services/external/PurrbotService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -31,7 +32,10 @@ interface AnimeCommandDef {
   service: AnimeService;
   cooldown?: number;
   enabled?: boolean;
-  gifPlayback?: boolean;
+  /** NSFW commands are gated by the !nsfw toggle in the pipeline. */
+  nsfw?: boolean;
+  /** gif provider when the category is not on nekos.best. */
+  provider?: 'purrbot';
   usage?: string;
   examples?: string[];
 }
@@ -453,94 +457,103 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
   },
 
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'anal',
     description: 'Imagen NSFW de anal',
     aliases: ['anal'],
     react: '🔞',
-    endpoint: 'anal',
+    endpoint: 'nsfw/anal',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'blowjob',
     description: 'Imagen NSFW de blowjob',
     aliases: ['blowjob', 'mamada'],
     react: '🔞',
-    endpoint: 'blowjob',
+    endpoint: 'nsfw/blowjob',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'cum',
     description: 'Imagen NSFW de cum',
     aliases: ['cum', 'semen'],
     react: '🔞',
-    endpoint: 'cum',
+    endpoint: 'nsfw/cum',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'fuck',
     description: 'Imagen NSFW de fuck',
     aliases: ['fuck', 'coger'],
     react: '🔞',
-    endpoint: 'fuck',
+    endpoint: 'nsfw/fuck',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'nekonsfw',
     description: 'Imagen NSFW de neko',
     aliases: ['nekonsfw'],
     react: '🔞',
-    endpoint: 'nekonsfw',
+    endpoint: 'nsfw/neko',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'nekosfw',
-    description: 'Imagen NSFW de neko',
+    description: 'Imagen SFW de neko gif',
     aliases: ['nekosfw'],
     react: '🔞',
-    endpoint: 'nekosfw',
+    endpoint: 'sfw/neko',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'pussylick',
     description: 'Imagen NSFW de pussylick',
     aliases: ['pussylick'],
     react: '🔞',
-    endpoint: 'pussylick',
+    endpoint: 'nsfw/pussylick',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'solo',
     description: 'Imagen NSFW de solo',
     aliases: ['solo'],
     react: '🔞',
-    endpoint: 'solo',
+    endpoint: 'nsfw/solo',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
   {
+    // Restored via Purrbot (api.purrbot.site/v2, verified alive).
     name: 'yuri',
     description: 'Imagen NSFW de yuri',
     aliases: ['yuri'],
     react: '🔞',
-    endpoint: 'yuri',
+    endpoint: 'nsfw/yuri',
     service: 'reactions',
-    enabled: false,
-    gifPlayback: true,
+    provider: 'purrbot',
+    nsfw: true,
   },
 
   {
@@ -736,6 +749,7 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
     aliases = def.aliases;
     cooldown = cooldown;
     enabled = enabled;
+    nsfw = def.nsfw ?? false;
     contexts = [CommandContext.BOTH];
     usage = usage;
     examples = examples;
@@ -773,7 +787,10 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
           try {
             // nekos.best serves GIFs; convert to mp4 once and cache for
             // gifPlayback playback (WhatsApp cannot play raw GIFs).
-            const video = await nekosBestService.getReactionVideo(def.endpoint);
+            const video =
+              def.provider === 'purrbot'
+                ? await purrbotService.getReactionVideo(def.endpoint)
+                : await nekosBestService.getReactionVideo(def.endpoint);
             await ctx.sock.sendMessage(ctx.chat.jid, {
               video: video,
               gifPlayback: true,
