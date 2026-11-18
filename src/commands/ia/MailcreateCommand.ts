@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { mailService } from '@/services/external/MailService.js';
 import { logError } from '@/utils/logger.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 
@@ -27,25 +27,16 @@ export class MailcreateCommand extends Command {
     await ctx.reply('📧 Creando email temporal...');
 
     try {
-      const data = (await deliriusService.getIa('mailcreate')) as {
-        result?: string;
-        email?: string;
-        address?: string;
-      };
-
-      const email = data?.result || data?.email || data?.address;
-
-      if (email) {
-        await ctx.reply(
-          `📧 *Email temporal creado* ✉️\n\n` +
-            `✩ *Email:* ${email}\n\n` +
-            `⏰ Este email es temporal.\n` +
-            `💬 Usa *!mailmessages ${email}* para ver los mensajes.`,
-        );
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No pude crear el email. Intenta de nuevo.');
-      }
+      // mail.tm (gratuito, verificado en vivo). La cuenta persiste en
+      // data/temp/mail-accounts.json para que !mailmessages pueda re-loguear.
+      const account = await mailService.createAccount();
+      await ctx.reply(
+        `📧 *Email temporal creado* ✉️\n\n` +
+          `✩ *Email:* ${account.address}\n\n` +
+          `⏰ Este email es temporal.\n` +
+          `💬 Usa *!mailmessages ${account.address}* para ver los mensajes.`,
+      );
+      await ctx.react('✅');
     } catch (error) {
       logError('[MailcreateCommand]', error);
       await ctx.react('❌');

@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { playStoreService } from '@/services/external/PlayStoreService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -39,16 +39,20 @@ export class PlayStoreCommand extends Command {
 
     await ctx.react('📱');
     try {
-      const data = (await deliriusService.search('playstore', { q: query })) as { result?: string };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
+      // google-play-scraper (gratuito, verificado en vivo).
+      const apps = await playStoreService.search(query);
+      if (apps.length === 0) {
         await ctx.reply('❌ No se encontraron resultados.');
+        return;
       }
+      const list = apps
+        .map(
+          a =>
+            `📱 *${a.title}*\n👤 ${a.developer}\n⭐ ${a.score.toFixed(1)}\n🔗 https://play.google.com/store/apps/details?id=${a.appId}`,
+        )
+        .join('\n\n');
+      await ctx.reply(`🔎 *Resultados para:* ${query}\n\n${list}`);
+      await ctx.react('✅');
     } catch (error) {
       logError('[PlayStoreCommand]', error);
       await ctx.react('❌');

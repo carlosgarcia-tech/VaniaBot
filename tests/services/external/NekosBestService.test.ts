@@ -45,8 +45,8 @@ const HUG_JSON = {
   results: [{ url: 'https://nekos.best/api/v2/hug/350aee04-6ec3-40a9-b45e-15c754b9c25d.gif' }],
 };
 const TEMP_DIR = './data/temp';
-const CACHED_MP4 = join(TEMP_DIR, 'nk-350aee04-6ec3-40a9-b45e-15c754b9c25d.mp4');
-const TEMP_GIF = join(TEMP_DIR, 'nk-350aee04-6ec3-40a9-b45e-15c754b9c25d.gif');
+const CACHED_MP4 = join(TEMP_DIR, 'gifmp4-350aee04-6ec3-40a9-b45e-15c754b9c25d.mp4');
+const TEMP_GIF = join(TEMP_DIR, 'gifmp4-350aee04-6ec3-40a9-b45e-15c754b9c25d.gif');
 
 describe('NekosBestService', () => {
   let service: NekosBestService;

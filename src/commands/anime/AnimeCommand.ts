@@ -14,6 +14,7 @@ import { nekosBestService } from '@/services/external/NekosBestService.js';
 import { purrbotService } from '@/services/external/PurrbotService.js';
 import { nekobotService } from '@/services/external/NekobotService.js';
 import { booruService } from '@/services/external/BooruService.js';
+import { animeNewsService } from '@/services/external/AnimeNewsService.js';
 import { gifUrlToMp4 } from '@/services/media/GifToMp4.js';
 import { logError } from '@/utils/logger.js';
 import {
@@ -32,7 +33,8 @@ type AnimeService =
   | 'reactions'
   | 'nsfw'
   | 'random'
-  | 'anime';
+  | 'anime'
+  | 'animenews';
 
 interface AnimeCommandDef {
   name: string;
@@ -678,12 +680,13 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     nsfw: true,
   },
   {
+    // Restored via ANN RSS (verified alive).
     name: 'newsanime',
     description: 'Muestra las últimas noticias de anime',
     aliases: ['anime_news', 'noticiasanime'],
     react: '📰',
     endpoint: 'newsanime',
-    service: 'anime',
+    service: 'animenews',
     cooldown: 10000,
   },
 ];
@@ -853,6 +856,19 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
             logError(`[${def.name}Command]`, error);
             await ctx.react('❌');
             await ctx.reply('❌ No pude obtener la imagen. Intenta de nuevo.');
+          }
+          break;
+        }
+        case 'animenews': {
+          try {
+            const items = await animeNewsService.latestNews();
+            const list = items.map(n => `📰 *${n.title}*\n🔗 ${n.link}`).join('\n\n');
+            await ctx.reply(`📰 *Últimas noticias de anime (ANN)*\n\n${list}`);
+            await ctx.react('✅');
+          } catch (error) {
+            logError(`[${def.name}Command]`, error);
+            await ctx.react('❌');
+            await ctx.reply('❌ No pude leer las noticias. Intenta de nuevo.');
           }
           break;
         }

@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { mailService } from '@/services/external/MailService.js';
 import { logError } from '@/utils/logger.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 
@@ -44,37 +44,23 @@ export class MailmessagesCommand extends Command {
     await ctx.reply('📬 Verificando mensajes...');
 
     try {
-      const data = (await deliriusService.getIa('mailmessages', { query: email })) as {
-        result?: string;
-        messages?: Array<{
-          from?: string;
-          subject?: string;
-          body?: string;
-          date?: string;
-        }>;
-      };
+      // mail.tm (gratuito, verificado en vivo): re-login con la contraseña
+      // persistida por !mailcreate.
+      const messages = await mailService.listMessages(email);
 
-      if (data?.messages && data.messages.length > 0) {
+      if (messages.length > 0) {
         let response = `📬 *Mensajes para:* ${email}\n\n`;
-        for (const msg of data.messages.slice(0, 5)) {
-          response += `📧 *De:* ${msg.from || 'Desconocido'}\n`;
-          response += `📝 *Asunto:* ${msg.subject || 'Sin asunto'}\n`;
-          response += `📅 *Fecha:* ${msg.date || 'N/A'}\n`;
-          if (msg.body) {
-            const bodyPreview = msg.body.substring(0, 100);
-            response += `💬 ${bodyPreview}${msg.body.length > 100 ? '...' : ''}\n`;
-          }
+        for (const msg of messages.slice(0, 5)) {
+          response += `📝 *Vista previa:* ${msg.intro || 'Sin contenido'}\n`;
           response += '────────────────────\n';
         }
 
-        if (data.messages.length > 5) {
-          response += `\n... y ${data.messages.length - 5} más`;
+        if (messages.length > 5) {
+          response += `\n... y ${messages.length - 5} más`;
         }
 
         await ctx.reply(response);
         await ctx.react('✅');
-      } else if (data?.result) {
-        await ctx.reply(data.result);
       } else {
         await ctx.reply('📭 No hay mensajes nuevos para este email.');
       }

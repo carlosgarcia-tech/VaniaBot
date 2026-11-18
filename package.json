@@ -41,6 +41,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.2",
     "file-type": "^19.6.0",
+    "google-play-scraper": "^10.1.4",
     "groq-sdk": "^0.37.0",
     "helmet": "^8.1.0",
     "jimp": "^1.6.0",

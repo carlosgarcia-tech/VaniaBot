@@ -28,18 +28,20 @@ Subdominio `api.` sin registro DNS en el mundo. Lo que queda pegado a ella:
 
 `!mailcreate`, `!mailmessages`
 
-### Defs dinámicas en `AnimeCommand` — 14 rotas sin reemplazo limpio
+### Defs dinámicas en `AnimeCommand` — 3 rotas sin reemplazo (se eliminan en §8.6)
 
-- `deliriusbase`: `gacha`, `hentaivid`, `lolipc`, `maid`, `selfie`, `uniform` (6)
-- `anime`: `marin`, `mori`, `oppai`, `newsanime` (4)
-- `animebase` (Prince, deshabilitadas): `megumin`, `hneko`, `hwaifu`, `konachan`, `milf` (5)
+- `deliriusbase`: `gacha`, `hentaivid`, `lolipc`, `selfie` (4)
+- ~~`anime`: `marin`, `mori`, `oppai`~~ → **Danbooru/nekobot (v7.4.6)**
+- ~~`deliriusbase`: `maid`, `uniform`~~ → **Danbooru (v7.4.6)**
+- ~~`animebase` (Prince): `megumin`, `konachan`, `milf`, `hneko`, `hwaifu`~~ → **nekobot/boorus (v7.4.6)**
+- `anime`: `newsanime` (ANN RSS, pendiente §8.5)
 
-### NSFW — 19 comandos/defs muertos, decisión pendiente (§7 del plan)
+### NSFW — estado tras v7.4.5–7.4.6
 
-- Comandos propios: `rule34`, `nhentai`, `nhentaisearch`, `hitomi`, `pixiv`, `hentaitv`, `tiktoknsfw`, `characterlist`, `totalcharacters`
-- Defs `nsfw` en AnimeCommand: `boobs`, `corean`, `girls`, `hentai`
-- Reacciones NSFW-gif: `anal`, `blowjob`, `cum`, `fuck`, `nekonsfw`, `nekosfw`, `pussylick`, `solo`, `yuri`
-- Única opción acotada: waifu.pics `/nsfw/...` — **también murió** (ver §3). Recomendación: eliminar o dejar deshabilitadas.
+- Comandos propios pendientes de eliminar (§8.6): `nhentai`, `nhentaisearch`, `hitomi`, `pixiv`, `hentaitv`, `tiktoknsfw`, `characterlist`, `totalcharacters`, `rule34` (doujins con menores no filtrables, OAuth, personas reales; danbooru cubre rule34 vía `!booru`)
+- ~~Defs `nsfw`: `boobs`, `corean`, `girls`, `hentai`~~ → `boobs`/`hentai` **nekobot (v7.4.6)**; `corean`/`girls` **eliminadas** (personas reales)
+- ~~Reacciones NSFW-gif (9)~~ → **Purrbot (v7.4.5)**
+- Nuevo: **`!booru <tag>`** (Danbooru SFW con lista negra, v7.4.6)
 
 ---
 
