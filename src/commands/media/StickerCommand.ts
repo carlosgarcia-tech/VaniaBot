@@ -30,34 +30,23 @@ import pkg from '../../../package.json' with { type: 'json' };
  */
 const BOT_NAME = 'ᴏʀʙɪᴛʙᴏᴛ';
 const CREATOR = 'ɪɴɢ. ᴄᴀʀʟᴏꜱ ɢᴀʀᴄɪᴀ';
-/** Single source: package.json — `npm version minor` is all it takes. */
 const BOT_VERSION = `𝚟${pkg.version}`;
-
-/** Fecha del último arranque del bot (no por sticker). */
-const _generatedOn = new Date().toLocaleDateString('es-MX', {
-  day: '2-digit',
-  month: 'long',
-  year: 'numeric',
-});
+const REPO_URL = 'https://github.com/carlosgarcia-tech/VaniaBot';
 
 const STICKER_BRANDING = {
-  packname: `🪐 ${BOT_NAME} ꜱᴛɪᴄᴋᴇʀᴘᴀᴄᴋ`,
+  packname: `👑 ${BOT_NAME} ꜱᴛɪᴄᴋᴇʀꜱ`,
 
   author: [
-    `✦ ᴄʀᴇᴀᴛᴏʀ & ᴅᴇᴠᴇʟᴏᴘᴇʀ`,
+    `✦ ᴇʟ ʙᴏᴛ ᴍᴀꜱ ɢʀᴀɴᴅᴇ ᴅᴇ ᴡʜᴀᴛꜱᴀᴘᴘ`,
+    `✦ ᴍɪ ᴄʀᴇᴀᴅᴏʀ (ʟᴏ ʜɪᴢᴏ ʙɪᴇɴ):`,
     CREATOR,
-    `✦ ᴘʀᴏᴊᴇᴄᴛ: ${BOT_NAME}`,
-    `✦ ᴠᴇʀꜱɪᴏɴ: ${BOT_VERSION}`,
-    `✦ ᴘʀᴏᴄᴇꜱꜱᴇᴅ ᴡɪᴛʜ ${BOT_NAME}`,
-    `© ${new Date().getFullYear()} ${BOT_NAME}`,
-    `ᴛᴏᴅᴏꜱ ʟᴏꜱ ᴅᴇʀᴇᴄʜᴏꜱ ʀᴇꜱᴇʀᴠᴀᴅᴏꜱ`,
-    `ᴅᴇꜱᴀʀʀᴏʟʟᴏ ʏ ᴍᴀɴᴛᴇɴɪᴍɪᴇɴᴛᴏ ᴘᴏʀ`,
-    CREATOR,
-    `ᴘʀᴏʜɪʙɪᴅᴀ ʟᴀ ᴅɪꜱᴛʀɪʙᴜᴄɪᴏɴ`,
-    `ᴅᴇʟ ꜱᴏꜰᴛᴡᴀʀᴇ ᴏʀɪɢɪɴᴀʟ ꜱɪɴ ᴀᴜᴛᴏʀɪᴢᴀᴄɪᴏɴ`,
-    `ɴᴏ ᴀꜰɪʟɪᴀᴅᴏ ᴀ ᴡʜᴀᴛꜱᴀᴘᴘ ɴɪ ᴍᴇᴛᴀ`,
-    `✦ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴜᴛɪʟɪᴢᴀʀ ${BOT_NAME} ✦`,
-  ].join('\n'),
+    `✦ ᴏᴘᴇɴ ꜱᴏᴜʀᴄᴇ: ᴘᴇʀꜰᴇᴄᴄɪᴏɴ ᴘᴀʀᴀ ᴇꜱᴛᴜᴅɪᴀʀ · ${BOT_VERSION}`,
+    REPO_URL ? `✦ ${REPO_URL}` : '',
+    `✦ ᴛᴜ ꜱᴛɪᴄᴋᴇʀ, ᴍɪ ᴛᴀʟᴇɴᴛᴏ`,
+    `ɴᴏ ᴀꜰɪʟɪᴀᴅᴏ ᴀ ᴡʜᴀᴛꜱᴀᴘᴘ ɴɪ ᴍᴇᴛᴀ · ᴅᴇᴍᴀꜱɪᴀᴅᴏ ɢʀᴀɴᴅᴇ ᴘᴀʀᴀ ᴇʟʟᴏꜱ`,
+  ]
+    .filter(Boolean)
+    .join('\n'),
 } as const;
 
 /** Command handler for `!sticker`: Convert image/video to sticker. */
@@ -67,7 +56,6 @@ export class StickerCommand extends Command {
   category = CommandCategory.MEDIA;
   aliases = ['s'];
   usage = '!sticker <reply to image/video>';
-  /** Pipeline default is 30s; video download + ffmpeg conversion needs more. */
   timeout = 60_000;
   examples = ['!sticker', '!s'];
   contexts = [CommandContext.BOTH];
@@ -104,8 +92,6 @@ export class StickerCommand extends Command {
         ? ctx.quotedParticipant || ctx.chat.jid
         : ctx.message.key?.remoteJid || ctx.chat.jid;
 
-      // Quoted media stubs carry no CDN url — resolve the ORIGINAL message
-      // captured at reception, or the download will fail outright.
       let messageToDownload: WAMessage | undefined;
       if (isQuoted && msgId) {
         messageToDownload = mediaMessageCache.get(ctx.chat.jid, msgId);
@@ -131,7 +117,6 @@ export class StickerCommand extends Command {
       const buffer = (await downloadMediaMessage(messageToDownload, 'buffer', {})) as Buffer;
       const stickerBuffer = await StickerHelper.createSticker(buffer);
 
-      // Branding: si falla el exif, se envía el sticker sin metadatos en vez de romper el comando
       let finalSticker: Buffer = stickerBuffer;
       try {
         finalSticker = await this.stickerService.addExif(

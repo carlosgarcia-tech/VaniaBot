@@ -13,12 +13,16 @@
  * combining marks, RTL scripts, decorative symbols). No normalization, no
  * length-based slicing, no stripping of special characters.
  *
+ * Banned terms (see `@/utils/bannedWords.js`) are rejected before anything is
+ * downloaded or modified. Normalization is used only for detection.
+ *
  * @author **Carlos G**
  */
 
 import { Command } from '../../Command.js';
 import { CommandCategory, type MessageContext } from '@/types/index.js';
 import { logError } from '@/utils/logger.js';
+import { containsBannedWord } from '@/utils/bannedWords.js';
 import { downloadMediaMessage, type WAMessage } from 'baileys';
 import { StickerService } from '@/services/media/StickerService.js';
 
@@ -84,7 +88,16 @@ export class TakeCommand extends Command {
       return;
     }
 
-    const { packname, author } = this.parseText(ctx.args.join(' '));
+    const rawText = ctx.args.join(' ');
+    const { packname, author } = this.parseText(rawText);
+
+    // Banned words filter: checks the raw input, pack and author separately,
+    // so splitting across the `|` separator ("p|io") is also caught.
+    if (containsBannedWord(rawText, packname, author)) {
+      await ctx.react('🚫');
+      await ctx.reply('🚫 *That text is not allowed.*');
+      return;
+    }
 
     await ctx.react('⏳');
 

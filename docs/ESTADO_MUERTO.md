@@ -72,7 +72,7 @@ Toda respuesta pasa por la lista negra de tags (`loli`, `lolicon`, `shota`,
 
 | Problema | Estado |
 |----------|--------|
-| **Deploy** | Contenedor en **7.4.4**; el código ya está en **7.4.11**. Falta `./deploy.sh develop update` |
+| **Deploy** | Contenedor en **7.4.10**; el código ya está en **7.4.11**. Falta `./deploy.sh develop update` |
 | **Prueba real TikTok** (única permitida, `https://vt.tiktok.com/ZSpbg9pN4/`) | ⏳ Espera deploy de 7.4.11 |
 | `GIPHY_API_KEY` en `.env` | Falta pegar la key (el usuario ya la tiene); sin ella `!tenor` avisa |
 | `IMGUR_CLIENT_ID` en `.env` | Falta — `!imgur` no puede subir |
