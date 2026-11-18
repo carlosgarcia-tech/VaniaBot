@@ -8,10 +8,8 @@
 
 | # | API | Causa de muerte | Impacto | Reemplazo planeado | Estado |
 |---|-----|-----------------|---------|--------------------|--------|
-| 1 | **Delirius API** (`api.delirius.store`) | Subdominio `api.` sin registro A/AAAA en el mundo (su web dice ONLINE pero es falso) | Búsquedas (§6.2), descargas (§6.1), ia-mail, nsfw y 8 defs sin reemplazo (gacha, hentaivid, lolipc, maid, selfie, uniform, marin, mori, oppai, newsanime) | yt-dlp/cobalt (descargas), APIs oficiales por servicio (búsquedas), mail.tm (ia) | ⏳ Pendiente (reacciones, random y foxgirl ya migrados) |
-| 2 | **Laurine TTS** (`www.laurine.site`) | Dominio NXDOMAIN (expirado) | Primer eslabón de la cadena TTS | Edge TTS (`node-edge-tts`/`msedge-tts`) → ttsmp3 (🟢 viva) → local | ⏳ Pendiente |
-| 4 | **Unsplash Source** (`source.unsplash.com`) | 503 permanente (servicio retirado por Unsplash) | Penúltimo fallback de imágenes | Quitarlo de la cadena; Picsum (🟢 viva) queda como último; opcional Openverse (🟢 verificada) antes | ⏳ Pendiente |
-| 5 | **Waifu fallbacks** (`api.waifu.pics`, `api.waifu.im`) | NXDOMAIN en el mundo (verificado 17-nov-2026) | Ninguno directo: eran los *reemplazos* del plan, no dependencias | `pic.re` (🟢 verificada viva) como fallback de imágenes de waifu; para GIFs de reacciones nekos.best queda sin plan B | ⏳ Nota para §9.2 |
+| 1 | **Delirius API** (`api.delirius.store`) | Subdominio `api.` sin registro A/AAAA en el mundo (su web dice ONLINE pero es falso) | Descargas (§6.1), ia-mail, nsfw, 6 búsquedas sin key (Genius, PlayStore, Pinterest, SpotifySearch, Tenor, YoutubeSearch) y 8 defs sin reemplazo (gacha, hentaivid, lolipc, maid, selfie, uniform, marin, mori, oppai, newsanime) | yt-dlp/cobalt (descargas), mail.tm (ia), keys/scrapers para búsquedas restantes | ⏳ Pendiente (reacciones, random, foxgirl y 7 búsquedas ya migrados) |
+| 2 | **Waifu fallbacks** (`api.waifu.pics`, `api.waifu.im`) | NXDOMAIN en el mundo (verificado 17-nov-2026) | Ninguno directo: eran los *reemplazos* del plan, no dependencias | `pic.re` (🟢 verificada viva) como fallback de imágenes de waifu; para GIFs de reacciones nekos.best queda sin plan B | 📌 Nota |
 
 ## Ya no muertas (migraciones hechas — fuera de esta lista)
 
@@ -20,6 +18,9 @@
 | ~~Jikan~~ | Reemplazada por AniList GraphQL + Kitsu fallback en `FallbackAPIService` (verificada en vivo) | 7.3.8 |
 | ~~Prince Techn (animebase)~~ | neko/waifu/foxgirl/randomanime → nekos.best; megumin y las NSFW sin reemplazo quedaron `enabled: false`; `loli` eliminada | 7.4.0 |
 | ~~Delirius (reacciones + random)~~ | 25 reacciones SFW → nekos.best (gif→mp4 con cache); dog/duck/coffee/picsum → dog.ceo/random-d.uk/alexflipnote/picsum; avatar → DiceBear; 8 reacciones sin categoría quedaron deshabilitadas | 7.4.0 |
+| ~~Laurine TTS~~ | Edge TTS (`msedge-tts`, voz es-MX-DaliaNeural, sin key) verificado en vivo; la cadena muerta de Laurine eliminada | 7.4.1 |
+| ~~Unsplash Source~~ | Eliminado de la cadena de imágenes; Picsum queda como fallback final (503 permanente) | 7.4.2 |
+| ~~Delirius (búsquedas, 7 comandos)~~ | !wiki→Wikipedia REST, !npm→registry, !animesearch→AniList, !mangasearch→MangaDex, !movie→TMDB, !google→DuckDuckGo (existente), !gimage→ImageService (existente) — todas verificadas en vivo | 7.4.3 |
 
 ## Reglas de la migración (del plan del usuario)
 
