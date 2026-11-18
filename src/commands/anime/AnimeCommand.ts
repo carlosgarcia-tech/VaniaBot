@@ -12,6 +12,9 @@ import { DeliriusAnimeBase } from './DeliriusAnimeBase.js';
 import { deliriusService } from '@/services/external/DeliriusService.js';
 import { nekosBestService } from '@/services/external/NekosBestService.js';
 import { purrbotService } from '@/services/external/PurrbotService.js';
+import { nekobotService } from '@/services/external/NekobotService.js';
+import { booruService } from '@/services/external/BooruService.js';
+import { gifUrlToMp4 } from '@/services/media/GifToMp4.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -21,7 +24,15 @@ import {
 } from '@/types/index.js';
 
 type AnimeService =
-  'animebase' | 'nekos' | 'deliriusbase' | 'reactions' | 'nsfw' | 'random' | 'anime';
+  | 'animebase'
+  | 'nekos'
+  | 'nekobot'
+  | 'booru'
+  | 'deliriusbase'
+  | 'reactions'
+  | 'nsfw'
+  | 'random'
+  | 'anime';
 
 interface AnimeCommandDef {
   name: string;
@@ -36,6 +47,8 @@ interface AnimeCommandDef {
   nsfw?: boolean;
   /** gif provider when the category is not on nekos.best. */
   provider?: 'purrbot';
+  /** Booru tag query (`tags=a b`, max 2 for danbooru anonymous). */
+  tags?: string;
   usage?: string;
   examples?: string[];
 }
@@ -50,15 +63,14 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     service: 'nekos',
   },
   {
-    // nekos.best has no megumin and waifu.pics (the planned replacement) died;
-    // left disabled until another source appears.
+    // Restored via Danbooru (2-tag anonymous limit: tag + rating).
     name: 'megumin',
     description: 'Obtiene una imagen aleatoria de Megumin',
     aliases: ['megumin'],
     react: '🔥',
-    endpoint: 'megumin',
-    service: 'animebase',
-    enabled: false,
+    endpoint: 'danbooru',
+    tags: 'megumin rating:g',
+    service: 'booru',
   },
   {
     name: 'waifu',
@@ -77,40 +89,44 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     service: 'nekos',
   },
   {
+    // Restored via nekobot.xyz, behind the !nsfw toggle.
     name: 'hneko',
     description: 'Obtiene una imagen aleatoria de hneko NSFW',
     aliases: ['hneko', 'hnekonsfw'],
     react: '😺',
     endpoint: 'hneko',
-    service: 'animebase',
-    enabled: false,
+    service: 'nekobot',
+    nsfw: true,
   },
   {
+    // Restored via nekobot.xyz (hkitsune), behind the !nsfw toggle.
     name: 'hwaifu',
     description: 'Obtiene una imagen aleatoria de hwaifu NSFW',
     aliases: ['hwaifu'],
     react: '😈',
-    endpoint: 'hwaifu',
-    service: 'animebase',
-    enabled: false,
+    endpoint: 'hkitsune',
+    service: 'nekobot',
+    nsfw: true,
   },
   {
+    // Restored via Konachan.net (SFW mirror, verified alive).
     name: 'konachan',
     description: 'Obtiene una imagen de Konachan',
     aliases: ['konachan'],
     react: '🖼️',
-    endpoint: 'konachan',
-    service: 'animebase',
-    enabled: false,
+    endpoint: 'konachan_net',
+    service: 'booru',
   },
   {
+    // Restored via Danbooru (yande.re has no milf pool), behind !nsfw.
     name: 'milf',
     description: 'Obtiene una imagen de milf',
     aliases: ['milf'],
     react: '🍑',
-    endpoint: 'milf',
-    service: 'animebase',
-    enabled: false,
+    endpoint: 'danbooru',
+    tags: 'milf rating:g',
+    service: 'booru',
+    nsfw: true,
   },
 
   {
@@ -147,12 +163,14 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     service: 'deliriusbase',
   },
   {
+    // Restored via Danbooru.
     name: 'maid',
     description: 'Obtiene una imagen de maid anime',
     aliases: [],
     react: '👗',
-    endpoint: 'maid',
-    service: 'deliriusbase',
+    endpoint: 'danbooru',
+    tags: 'maid rating:g',
+    service: 'booru',
   },
   {
     name: 'selfie',
@@ -163,12 +181,14 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     service: 'deliriusbase',
   },
   {
+    // Restored via Danbooru.
     name: 'uniform',
     description: 'Obtiene una imagen de uniforme anime',
     aliases: [],
     react: '👔',
-    endpoint: 'uniform',
-    service: 'deliriusbase',
+    endpoint: 'danbooru',
+    tags: 'school_uniform rating:g',
+    service: 'booru',
   },
 
   {
@@ -594,44 +614,26 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
   },
 
   {
+    // Restored via nekobot, behind the !nsfw toggle.
     name: 'boobs',
     description: 'Obtiene una imagen de tetinas',
     aliases: ['boobs', 'tetas'],
     react: '🔞',
     endpoint: 'boobs',
-    service: 'nsfw',
+    service: 'nekobot',
     cooldown: 10000,
-    enabled: false,
+    nsfw: true,
   },
   {
-    name: 'corean',
-    description: 'Obtiene una imagen coreana NSFW',
-    aliases: ['corean'],
-    react: '🔞',
-    endpoint: 'corean',
-    service: 'nsfw',
-    cooldown: 10000,
-    enabled: false,
-  },
-  {
-    name: 'girls',
-    description: 'Obtiene una imagen de chicas NSFW',
-    aliases: ['girls'],
-    react: '🔞',
-    endpoint: 'girls',
-    service: 'nsfw',
-    cooldown: 10000,
-    enabled: false,
-  },
-  {
+    // Restored via nekobot, behind the !nsfw toggle.
     name: 'hentai',
     description: 'Obtiene una imagen hentai aleatoria',
     aliases: ['hentai'],
     react: '🔞',
     endpoint: 'hentai',
-    service: 'nsfw',
+    service: 'nekobot',
     cooldown: 10000,
-    enabled: false,
+    nsfw: true,
   },
 
   {
@@ -643,31 +645,37 @@ const ANIME_COMMANDS: AnimeCommandDef[] = [
     service: 'anime',
   },
   {
+    // Restored via Danbooru.
     name: 'marin',
     description: 'Obtiene una imagen de Marin Kitagawa',
     aliases: ['marin_kitagawa'],
     react: '🎀',
-    endpoint: 'marin_kitagawa',
-    service: 'anime',
+    endpoint: 'danbooru',
+    tags: 'kitagawa_marin rating:g',
+    service: 'booru',
     cooldown: 10000,
   },
   {
+    // Restored via Danbooru (Mori Calliope, VTuber de Hololive).
     name: 'mori',
     description: 'Obtiene una imagen de Mori Calliope',
     aliases: ['mori_calliope'],
     react: '👼',
-    endpoint: 'mori_calliope',
-    service: 'anime',
+    endpoint: 'danbooru',
+    tags: 'mori_calliope rating:g',
+    service: 'booru',
     cooldown: 10000,
   },
   {
+    // Restored via nekobot (boobs), behind the !nsfw toggle.
     name: 'oppai',
     description: 'Obtiene una imagen de oppai',
     aliases: ['oppai'],
     react: '🍈',
-    endpoint: 'oppai',
-    service: 'anime',
+    endpoint: 'boobs',
+    service: 'nekobot',
     cooldown: 10000,
+    nsfw: true,
   },
   {
     name: 'newsanime',
@@ -803,15 +811,36 @@ function createAnimeCommand(def: AnimeCommandDef): Command {
           }
           break;
         }
-        case 'nsfw': {
+        case 'nekobot': {
           try {
-            const imageUrl = await deliriusService.getNsfwImage(def.endpoint);
-            await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: imageUrl } });
+            const imageUrl = await nekobotService.getImage(def.endpoint);
+            if (imageUrl.endsWith('.gif')) {
+              // nekobot also serves gifs; WhatsApp needs mp4 for playback.
+              const video = await gifUrlToMp4(imageUrl);
+              await ctx.sock.sendMessage(ctx.chat.jid, { video, gifPlayback: true });
+            } else {
+              await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: imageUrl } });
+            }
             await ctx.react('✅');
           } catch (error) {
             logError(`[${def.name}Command]`, error);
             await ctx.react('❌');
             await ctx.reply('❌ No pude obtener la imagen. Intenta de nuevo.');
+          }
+          break;
+        }
+        case 'booru': {
+          try {
+            const imageUrl = await booruService.randomPost(
+              def.endpoint as 'konachan_net' | 'yandere' | 'danbooru',
+              def.tags,
+            );
+            await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: imageUrl } });
+            await ctx.react('✅');
+          } catch (error) {
+            logError(`[${def.name}Command]`, error);
+            await ctx.react('❌');
+            await ctx.reply('❌ No encontré imagen (o fue filtrada por seguridad).');
           }
           break;
         }
@@ -901,8 +930,6 @@ export const dogCommand = createAnimeCommand(getAnimeCommand('dog'));
 export const duckCommand = createAnimeCommand(getAnimeCommand('duck'));
 export const picsumCommand = createAnimeCommand(getAnimeCommand('picsum'));
 export const boobsCommand = createAnimeCommand(getAnimeCommand('boobs'));
-export const coreanCommand = createAnimeCommand(getAnimeCommand('corean'));
-export const girlsCommand = createAnimeCommand(getAnimeCommand('girls'));
 export const hentaiCommand = createAnimeCommand(getAnimeCommand('hentai'));
 export const avatarCommand = createAnimeCommand(getAnimeCommand('avatar'));
 export const marinCommand = createAnimeCommand(getAnimeCommand('marin'));
