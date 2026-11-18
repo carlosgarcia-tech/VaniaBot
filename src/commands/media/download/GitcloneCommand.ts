@@ -1,15 +1,19 @@
 /**
  * GitcloneCommand.ts
  *
- * media command `gitclone` — Clones GitHub repositories
+ * media command `gitclone` — Downloads a GitHub repository as a zip document.
  * Usage: !gitclone <url>
+ *
+ * Direct GitHub flow (no dead API): the public repo API resolves the default
+ * branch, then the codeload zip is downloaded to temp and sent as a document.
  *
  * @author **Carlos G**
  */
 
 import { Command } from '../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
 import { logError } from '@/utils/logger.js';
+import { writeFileSync, unlinkSync } from 'fs';
+import { join } from 'path';
 import {
   CommandCategory,
   CommandContext,
@@ -17,12 +21,17 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!gitclone`: Clones GitHub repositories. */
+const TEMP_DIR = './data/temp/downloads';
+
+/** Command handler for `!gitclone`: Downloads a GitHub repo as a zip. */
 export class GitcloneCommand extends Command {
   name = 'gitclone';
-  description = 'Clona repositorios de GitHub';
+  /** Downloads legitimately exceed the 30s default pipeline timeout. */
+  timeout = 180000;
+  parallelizable = true;
+  description = 'Descarga un repositorio de GitHub como zip';
   category = CommandCategory.MEDIA;
-  aliases = ['ghclone', 'gitcl'];
+  aliases = ['gitclone'];
   cooldown = 30000;
   contexts = [CommandContext.BOTH];
   usage = '!gitclone <url>';
@@ -31,43 +40,60 @@ export class GitcloneCommand extends Command {
 
   async execute(ctx: MessageContext): Promise<void> {
     const url = ctx.args?.join(' ').trim();
+    const match = url?.match(/^https?:\/\/github\.com\/([\w.-]+)\/([\w.-]+)/i);
 
-    if (!url) {
+    if (!match) {
       await ctx.reply(
-        '✍️ *Uso:* !gitclone <url>\n_Ejemplo: !gitclone https://github.com/user/repo_',
+        '❌ Debes proporcionar una URL válida de GitHub\n_Ejemplo: !gitclone https://github.com/user/repo_',
       );
       return;
     }
 
-    if (!url.includes('github.com')) {
-      await ctx.reply('❌ Debes proporcionar una URL válida de GitHub');
-      return;
-    }
-
+    const [, owner, repo] = match;
     await ctx.react('📦');
-    await ctx.reply('📦 Procesando repositorio de GitHub...');
 
     try {
-      const data = (await deliriusService.getJson('download', 'gitclone', { url })) as {
-        result?: string;
-        message?: string;
-        success?: boolean;
-        zip?: string;
-        download?: string;
-      };
+      const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+      if (!repoResponse.ok) {
+        throw new Error(`no encontré el repositorio (${repoResponse.status})`);
+      }
+      const branch =
+        ((await repoResponse.json()) as { default_branch?: string }).default_branch ?? 'main';
 
-      if (data?.result || data?.message) {
-        await ctx.reply(data.result ?? data.message ?? '');
-      } else if (data?.zip || data?.download) {
-        const downloadUrl = data.zip || data.download;
-        await ctx.reply(`📦 *Repositorio listo*\n\n⬇️ Descarga: ${downloadUrl}`);
-      } else {
-        await ctx.reply('❌ No pude clonar el repositorio. Intenta de nuevo.');
+      await ctx.react('⏳');
+      const zipResponse = await fetch(
+        `https://github.com/${owner}/${repo}/archive/refs/heads/${branch}.zip`,
+      );
+      if (!zipResponse.ok) {
+        throw new Error(`no pude descargar el zip (${zipResponse.status})`);
+      }
+      const zip = Buffer.from(await zipResponse.arrayBuffer());
+      if (zip.length === 0) {
+        throw new Error('zip vacío');
+      }
+
+      const filePath = join(TEMP_DIR, `${repo}_${branch}_${Date.now()}.zip`);
+      writeFileSync(filePath, zip);
+      try {
+        await ctx.sock.sendMessage(ctx.chat.jid, {
+          document: { url: filePath },
+          mimetype: 'application/zip',
+          fileName: `${repo}-${branch}.zip`,
+        });
+        await ctx.react('✅');
+      } finally {
+        setTimeout(() => {
+          try {
+            unlinkSync(filePath);
+          } catch {
+            // best-effort cleanup
+          }
+        }, 30000);
       }
     } catch (error) {
       logError('[GitcloneCommand]', error);
       await ctx.react('❌');
-      await ctx.reply('❌ Error al clonar el repositorio. Intenta de nuevo.');
+      await ctx.reply(`❌ ${error instanceof Error ? error.message : 'Error al clonar'}`);
     }
   }
 }

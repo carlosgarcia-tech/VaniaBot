@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../Command.js';
-import { downloadService } from '@/services/external/DownloadService.js';
+import { ytDlpDownloader } from '@/services/download/YtDlpDownloader.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -20,6 +20,8 @@ import {
 /** Command handler for `!pornhub`: Downloads Pornhub video. */
 export class PornhubCommand extends Command {
   name = 'pornhub';
+  /** Adult content: gated by the !nsfw toggle in the pipeline. */
+  nsfw = true;
   /** Media downloads legitimately exceed the 30s default pipeline timeout. */
   timeout = 180000;
   /** Independent network downloads: safe to run concurrently. */
@@ -44,11 +46,19 @@ export class PornhubCommand extends Command {
     await ctx.react('🔞');
 
     try {
-      const mediaUrl = await downloadService.getMediaUrl('pornhub', { url });
-      await ctx.sock.sendMessage(ctx.chat.jid, {
-        video: { url: mediaUrl },
-      });
-      await ctx.react('✅');
+      const result = await ytDlpDownloader.downloadVideo(url);
+      if (result._tag === 'Left') throw new Error(result.left.message);
+
+      const filePath = result.right.filePath;
+      try {
+        await ctx.sock.sendMessage(ctx.chat.jid, {
+          video: { url: filePath },
+          mimetype: 'video/mp4',
+        });
+        await ctx.react('✅');
+      } finally {
+        await ytDlpDownloader.cleanup(filePath);
+      }
     } catch (error) {
       logError('[PornhubCommand]', error);
       await ctx.react('❌');

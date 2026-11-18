@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../Command.js';
-import { downloadService } from '@/services/external/DownloadService.js';
+import { ytDlpDownloader } from '@/services/download/YtDlpDownloader.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -40,25 +40,15 @@ export class ThreadsCommand extends Command {
     await ctx.react('📥');
 
     try {
-      const data = (await downloadService.getJson('threads', { url })) as {
-        result?: string;
-        video?: string;
-        image?: string;
-      };
+      const result = await ytDlpDownloader.downloadVideo(url);
+      if (result._tag === 'Left') throw new Error(result.left.message);
 
-      const mediaUrl = data?.result || data?.video || data?.image;
-      if (!mediaUrl) throw new Error('No media found');
-
-      if (mediaUrl.endsWith('.mp4')) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          video: { url: mediaUrl },
-        });
-      } else {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: mediaUrl },
-        });
-      }
+      await ctx.sock.sendMessage(ctx.chat.jid, {
+        video: { url: result.right.filePath },
+        mimetype: 'video/mp4',
+      });
       await ctx.react('✅');
+      await ytDlpDownloader.cleanup(result.right.filePath);
     } catch (error) {
       logError('[ThreadsCommand]', error);
       await ctx.react('❌');

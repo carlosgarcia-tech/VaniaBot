@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../Command.js';
-import { downloadService } from '@/services/external/DownloadService.js';
+import { ytDlpDownloader } from '@/services/download/YtDlpDownloader.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -46,19 +46,15 @@ export class SoundcloudCommand extends Command {
     await ctx.react('🎵');
 
     try {
-      const data = (await downloadService.getJson('soundcloud', { url })) as {
-        result?: string;
-        audio?: string;
-      };
-
-      const mediaUrl = data?.result || data?.audio;
-      if (!mediaUrl) throw new Error('No audio found');
+      const result = await ytDlpDownloader.downloadAudio(url);
+      if (result._tag === 'Left') throw new Error(result.left.message);
 
       await ctx.sock.sendMessage(ctx.chat.jid, {
-        audio: { url: mediaUrl },
-        mimetype: 'audio/mp4',
+        audio: { url: result.right.filePath },
+        mimetype: 'audio/mpeg',
       });
       await ctx.react('✅');
+      await ytDlpDownloader.cleanup(result.right.filePath);
     } catch (error) {
       logError('[SoundcloudCommand]', error);
       await ctx.react('❌');

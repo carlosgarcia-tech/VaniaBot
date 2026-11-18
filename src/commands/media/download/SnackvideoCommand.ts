@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { ytDlpDownloader } from '@/services/download/YtDlpDownloader.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -45,24 +45,15 @@ export class SnackvideoCommand extends Command {
 
     await ctx.react('🎬');
     try {
-      const data = (await deliriusService.getJson('download', 'snackvideo', { url })) as {
-        video?: string;
-        url?: string;
-        download?: string;
-        result?: string;
-      };
+      const result = await ytDlpDownloader.downloadVideo(url);
+      if (result._tag === 'Left') throw new Error(result.left.message);
 
-      const videoUrl = data?.video || data?.url || data?.download || data?.result;
-
-      if (videoUrl) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          video: { url: videoUrl },
-          caption: '🎬 Video de SnackVideo',
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No pude descargar el video. Intenta de nuevo.');
-      }
+      await ctx.sock.sendMessage(ctx.chat.jid, {
+        video: { url: result.right.filePath },
+        mimetype: 'video/mp4',
+      });
+      await ctx.react('✅');
+      await ytDlpDownloader.cleanup(result.right.filePath);
     } catch (error) {
       logError('[SnackvideoCommand]', error);
       await ctx.react('❌');

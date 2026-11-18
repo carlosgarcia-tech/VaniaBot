@@ -8,7 +8,8 @@
  */
 
 import { Command } from '../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { FacebookDownloader } from '@/services/download/FacebookDownloader.js';
+import { isRight } from '@/utils/either.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -52,23 +53,20 @@ export class Facebookv2Command extends Command {
     await ctx.reply('📹 Descargando video de Facebook...');
 
     try {
-      const data = (await deliriusService.getJson('download', 'facebookv2', { url })) as {
-        video?: string;
-        url?: string;
-        download?: string;
-        result?: string;
-      };
+      // Same yt-dlp pipeline as !facebook (the v2 API died with Delirius).
+      const downloader = new FacebookDownloader();
+      const result = await downloader.downloadVideo(url);
+      if (!isRight(result)) throw new Error(result.left.message);
 
-      const videoUrl = data?.video || data?.url || data?.download || data?.result;
-
-      if (videoUrl) {
+      const filePath = result.right.filePath;
+      try {
         await ctx.sock.sendMessage(ctx.chat.jid, {
-          video: { url: videoUrl },
-          caption: '📹 Video de Facebook',
+          video: { url: filePath },
+          mimetype: 'video/mp4',
         });
         await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No pude descargar el video. Intenta de nuevo.');
+      } finally {
+        await downloader.cleanup(filePath);
       }
     } catch (error) {
       logError('[Facebookv2Command]', error);
