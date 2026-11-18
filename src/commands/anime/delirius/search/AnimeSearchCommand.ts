@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { searchSourcesService } from '@/services/external/SearchSourcesService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -39,16 +39,18 @@ export class AnimeSearchCommand extends Command {
 
     await ctx.react('🔍');
     try {
-      const data = (await deliriusService.search('anilist', { q: query })) as { result?: string };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No se encontraron resultados.');
+      const a = await searchSourcesService.searchAnime(query);
+      if (!a) {
+        await ctx.reply('❌ No encontré ese anime en AniList.');
+        return;
       }
+      const caption = `🎬 *${a.title}*${a.year ? ` (${a.year})` : ''}\n⭐ ${a.score ?? '?'}/100 · 📺 ${a.episodes ?? '?'} episodios`;
+      if (a.coverUrl) {
+        await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: a.coverUrl }, caption });
+      } else {
+        await ctx.reply(caption);
+      }
+      await ctx.react('✅');
     } catch (error) {
       logError('[AnimeSearchCommand]', error);
       await ctx.react('❌');

@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { searchSourcesService } from '@/services/external/SearchSourcesService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -39,16 +39,16 @@ export class NpmCommand extends Command {
 
     await ctx.react('📦');
     try {
-      const data = (await deliriusService.search('npm', { q: query })) as { result?: string };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No se encontraron resultados.');
+      const list = await searchSourcesService.searchNpm(query);
+      if (!list.length) {
+        await ctx.reply('❌ No se encontraron paquetes.');
+        return;
       }
+      const text = list
+        .map((p, i) => `${i + 1}. *${p.name}@${p.version}*\n   ${p.description}`)
+        .join('\n\n');
+      await ctx.reply(`📦 *npm: ${query}*\n\n${text}`);
+      await ctx.react('✅');
     } catch (error) {
       logError('[NpmCommand]', error);
       await ctx.react('❌');

@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { searchSourcesService } from '@/services/external/SearchSourcesService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -39,18 +39,18 @@ export class MangaSearchCommand extends Command {
 
     await ctx.react('📚');
     try {
-      const data = (await deliriusService.search('mangasearch', { q: query })) as {
-        result?: string;
-      };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No se encontraron resultados.');
+      const m = await searchSourcesService.searchManga(query);
+      if (!m) {
+        await ctx.reply('❌ No encontré ese manga en MangaDex.');
+        return;
       }
+      const caption = `📖 *${m.title}*${m.year ? ` (${m.year})` : ''}\n🔗 manga.dex`;
+      if (m.coverUrl) {
+        await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: m.coverUrl }, caption });
+      } else {
+        await ctx.reply(caption);
+      }
+      await ctx.react('✅');
     } catch (error) {
       logError('[MangaSearchCommand]', error);
       await ctx.react('❌');

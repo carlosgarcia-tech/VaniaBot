@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { searchSourcesService } from '@/services/external/SearchSourcesService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -39,16 +39,20 @@ export class MovieCommand extends Command {
 
     await ctx.react('🎬');
     try {
-      const data = (await deliriusService.search('movie', { query })) as { result?: string };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No se encontraron resultados.');
+      const m = await searchSourcesService.searchMovie(query);
+      if (!m) {
+        await ctx.reply(
+          '❌ No encontré esa película (¿TMDB_API_KEY está configurada en el servidor?)',
+        );
+        return;
       }
+      const caption = `🎬 *${m.title}*${m.year ? ` (${m.year})` : ''}${m.rating ? `\n⭐ ${m.rating.toFixed(1)}/10` : ''}${m.overview ? `\n\n${m.overview.slice(0, 300)}` : ''}`;
+      if (m.posterUrl) {
+        await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: m.posterUrl }, caption });
+      } else {
+        await ctx.reply(caption);
+      }
+      await ctx.react('✅');
     } catch (error) {
       logError('[MovieCommand]', error);
       await ctx.react('❌');

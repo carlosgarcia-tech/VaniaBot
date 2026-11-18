@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { searchSourcesService } from '@/services/external/SearchSourcesService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -39,20 +39,13 @@ export class WikiCommand extends Command {
 
     await ctx.react('🔍');
     try {
-      const data = (await deliriusService.search('wiki', { q: query })) as { result?: string };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No se encontraron resultados.');
-      }
+      const r = await searchSourcesService.searchWiki(query);
+      await ctx.reply(`📚 *${r.title}*\n\n${r.extract}${r.url ? `\n\n🔗 ${r.url}` : ''}`);
+      await ctx.react('✅');
     } catch (error) {
       logError('[WikiCommand]', error);
       await ctx.react('❌');
-      await ctx.reply('❌ Error al buscar. Intenta de nuevo.');
+      await ctx.reply('❌ No encontré el artículo. Prueba con otro término.');
     }
   }
 }

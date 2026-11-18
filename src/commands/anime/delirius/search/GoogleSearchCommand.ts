@@ -8,7 +8,8 @@
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { webSearchService } from '@/services/download/WebSearchService.js';
+import { isRight } from '@/utils/either.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -39,16 +40,16 @@ export class GoogleSearchCommand extends Command {
 
     await ctx.react('🔍');
     try {
-      const data = (await deliriusService.search('googlesearch', { query })) as { result?: string };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
+      const results = await webSearchService.search(query, 5);
+      if (!isRight(results) || !results.right.length) {
         await ctx.reply('❌ No se encontraron resultados.');
+        return;
       }
+      const text = results.right
+        .map((r, i) => `${i + 1}. *${r.title}*\n${r.snippet}\n🔗 ${r.url}`)
+        .join('\n\n');
+      await ctx.reply(`🔎 *Google: ${query}*\n\n${text}`);
+      await ctx.react('✅');
     } catch (error) {
       logError('[GoogleSearchCommand]', error);
       await ctx.react('❌');

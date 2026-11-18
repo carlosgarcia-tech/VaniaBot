@@ -8,7 +8,7 @@
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { imageService } from '@/services/external/ImageService.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -39,16 +39,14 @@ export class GimageCommand extends Command {
 
     await ctx.react('🖼️');
     try {
-      const data = (await deliriusService.search('gimage', { query })) as { result?: string };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No se encontraron resultados.');
+      const results = await imageService.searchImages(query, 3);
+      const first = results.find(r => r.url);
+      if (!first) {
+        await ctx.reply('❌ No se encontraron imágenes.');
+        return;
       }
+      await ctx.sock.sendMessage(ctx.chat.jid, { image: { url: first.url } });
+      await ctx.react('✅');
     } catch (error) {
       logError('[GimageCommand]', error);
       await ctx.react('❌');
