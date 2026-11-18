@@ -7,7 +7,6 @@
  */
 
 import fs from 'fs';
-import { spawnSync } from 'child_process';
 import { left, right } from '@/utils/either.js';
 import { DownloadService, type DownloadResult } from './DownloadService.js';
 import { searchVideo, type YouTubeVideo } from './YouTubeSearchService.js';
@@ -85,8 +84,9 @@ export class YouTubeDownloader extends DownloadService {
           '-x',
           '--audio-format',
           'mp3',
+          // 7 ≈ 64kbps: a 3-min song is ~1.5MB, uploadable on a slow link.
           '--audio-quality',
-          '5',
+          '7',
           '--concurrent-fragments',
           '8',
           '--buffer-size',
@@ -270,15 +270,10 @@ export class YouTubeDownloader extends DownloadService {
       try {
         logger.debug(`${tag} Trying ${method.name}...`);
 
-        const result = spawnSync(method.cmd, method.args, {
-          timeout: 180000,
-          stdio: 'pipe',
-        });
-
-        if (result.status !== 0) {
-          const errorMsg = result.stderr?.toString() || result.error?.message || 'Unknown error';
-          throw new Error(errorMsg);
-        }
+        // NEVER spawnSync here: a synchronous 3-minute download blocks the
+        // event loop, WhatsApp loses its heartbeats and the socket drops
+        // ("Connection Closed") before the file can be sent.
+        await this.runCommand(method.cmd, method.args, 600000);
 
         let resolvedPath = outputPath;
         if (this.resolveOutputPath) {

@@ -220,7 +220,10 @@ export class DownloadService {
       try {
         logger.debug(`${tag} Trying ${method.name}...`);
 
-        await this.runCommand(method.cmd, method.args, 180000);
+        // 10 min: a slow home uplink can legitimately need >3 min for a
+        // single audio/video file. The pipeline soft deadline already frees
+        // the command queue, so waiting costs nothing.
+        await this.runCommand(method.cmd, method.args, 600000);
 
         let resolvedPath = outputPath;
         if (this.resolveOutputPath) {

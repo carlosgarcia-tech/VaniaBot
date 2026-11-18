@@ -1,14 +1,19 @@
 /**
  * TenorCommand.ts
  *
- * anime command `tenor` — Searches GIFs on Tenor
+ * anime command `tenor` — Searches GIFs on Giphy
  * Usage: !tenor <busqueda>
+ *
+ * Tenor's old Delirius glue is dead; Giphy's public API replaces it. The gif
+ * is transcoded to mp4 so WhatsApp can play it with gifPlayback. Needs a free
+ * GIPHY_API_KEY registered at developers.giphy.com.
  *
  * @author **Carlos G**
  */
 
 import { Command } from '../../../Command.js';
-import { deliriusService } from '@/services/external/DeliriusService.js';
+import { giphyService } from '@/services/external/GiphyService.js';
+import { gifUrlToMp4 } from '@/services/media/GifToMp4.js';
 import { logError } from '@/utils/logger.js';
 import {
   CommandCategory,
@@ -17,10 +22,12 @@ import {
   type MessageContext,
 } from '@/types/index.js';
 
-/** Command handler for `!tenor`: Searches GIFs on Tenor. */
+/** Command handler for `!tenor`: Searches GIFs on Giphy. */
 export class TenorCommand extends Command {
   name = 'tenor';
-  description = 'Busca GIFs en Tenor';
+  /** gif download + ffmpeg transcode on a slow link. */
+  timeout = 120000;
+  description = 'Busca GIFs en Giphy';
   category = CommandCategory.ANIME;
   aliases = ['tenor', 'gif'];
   cooldown = 10000;
@@ -37,22 +44,27 @@ export class TenorCommand extends Command {
       return;
     }
 
+    if (!process.env.GIPHY_API_KEY) {
+      await ctx.reply(
+        '⚠️ Este comando necesita *GIPHY_API_KEY* configurada (gratis en developers.giphy.com).',
+      );
+      return;
+    }
+
     await ctx.react('🎬');
     try {
-      const data = (await deliriusService.search('tenor', { q: query })) as { result?: string };
-
-      if (data?.result) {
-        await ctx.sock.sendMessage(ctx.chat.jid, {
-          image: { url: data.result },
-        });
-        await ctx.react('✅');
-      } else {
-        await ctx.reply('❌ No se encontraron resultados.');
-      }
+      const gifUrl = await giphyService.searchGif(query);
+      const video = await gifUrlToMp4(gifUrl);
+      await ctx.sock.sendMessage(ctx.chat.jid, { video, gifPlayback: true });
+      await ctx.react('✅');
     } catch (error) {
       logError('[TenorCommand]', error);
       await ctx.react('❌');
-      await ctx.reply('❌ Error al buscar. Intenta de nuevo.');
+      await ctx.reply(
+        error instanceof Error && error.message.includes('Sin resultados')
+          ? '❌ No se encontraron resultados.'
+          : '❌ Error al buscar. Intenta de nuevo.',
+      );
     }
   }
 }

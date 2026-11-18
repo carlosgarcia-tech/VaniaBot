@@ -18,7 +18,13 @@ const TEMP_DIR = './data/temp';
 
 /** Downloads a gif URL and returns the converted mp4 Buffer (cached). */
 export async function gifUrlToMp4(url: string): Promise<Buffer> {
-  const gifName = url.split('/').pop() ?? `${Date.now()}.gif`;
+  const parts = url.split('/').filter(Boolean);
+  const fileName = parts.pop() ?? `${Date.now()}.gif`;
+  // Giphy names every file "giphy.gif": include its id segment or all gifs
+  // would share one cache entry.
+  const gifName = /^giphy\.(gif|mp4|webp)$/i.test(fileName)
+    ? `${parts.pop() ?? 'giphy'}-${fileName}`
+    : fileName;
   const mp4Path = join(TEMP_DIR, `gifmp4-${gifName.replace(/\.gif$/, '')}.mp4`);
 
   if (existsSync(mp4Path)) {

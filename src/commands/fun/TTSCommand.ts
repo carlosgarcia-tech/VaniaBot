@@ -20,6 +20,8 @@ import {
 /** Command handler for `!tts`: Converts text to speech. */
 export class TTSCommand extends Command {
   name = 'tts';
+  /** neural synthesis + ffmpeg transcode on a slow link. */
+  timeout = 120000;
   description = 'Convierte texto a voz';
   category = CommandCategory.FUN;
   aliases = ['speak', 'say', 'hablar', 'ttsvoz'];
@@ -49,7 +51,8 @@ export class TTSCommand extends Command {
 
       await ctx.sock.sendMessage(ctx.chat.jid, {
         audio: audioBuffer,
-        mimetype: 'audio/mp3',
+        // Voice notes must be OGG/Opus; an mp3 ptt is dropped silently.
+        mimetype: 'audio/ogg; codecs=opus',
         ptt: true,
       });
 
