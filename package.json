@@ -1,6 +1,6 @@
 {
   "name": "orbit",
-  "version": "7.4.11",
+  "version": "7.4.12",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
