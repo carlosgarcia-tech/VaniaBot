@@ -12,7 +12,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY package.json package-lock.json* ./
 
 ENV SHARP_IGNORE_GLOBAL_LIBVIPS=1
-RUN npm ci
+# Every release bumps the version in package.json, which invalidates the COPY
+# above and with it this layer: npm ci runs again on each deploy. The cache
+# mount keeps npm's tarball cache outside the image, so a re-run is served from
+# disk instead of re-downloading 600+ packages (~527s on a slow link, ~12s
+# warm). The mount is not committed to the image, only /app/node_modules is.
+RUN --mount=type=cache,target=/root/.npm,sharing=locked npm ci
 
 FROM node:20-bookworm-slim AS runner
 
