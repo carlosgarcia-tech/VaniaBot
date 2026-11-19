@@ -7,8 +7,8 @@
  */
 
 import { PALETTE } from '../../utils/cli.js';
-import type { Canvas, CanvasRenderingContext2D } from 'canvas';
-import { createCanvas, loadImage } from 'canvas';
+import type { Canvas, SKRSContext2D } from '@napi-rs/canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 export interface ProfileCardOptions {
   avatarUrl: string;
@@ -35,7 +35,7 @@ function formatNum(n: number): string {
 }
 
 function roundRect(
-  ctx: CanvasRenderingContext2D,
+  ctx: SKRSContext2D,
   x: number,
   y: number,
   w: number,
