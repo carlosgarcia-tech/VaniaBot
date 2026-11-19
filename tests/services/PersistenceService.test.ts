@@ -64,7 +64,7 @@ describe('PersistenceService', () => {
     service.stop();
   });
 
-  it('addReminder persiste y no lanza aunque el save falle', async () => {
+  it('addReminder persists and does not throw even when save fails', async () => {
     mockDb.set.mockRejectedValueOnce(new Error('disk full'));
 
     await expect(
@@ -81,7 +81,7 @@ describe('PersistenceService', () => {
     });
   });
 
-  it('el fallo al enviar el recordatorio se loguea y el recordatorio se limpia', async () => {
+  it('a failed reminder delivery is logged and the reminder is cleared', async () => {
     const sock = { sendMessage: vi.fn().mockRejectedValue(new Error('connection closed')) };
     service.setSocket(sock as never);
 
@@ -100,7 +100,7 @@ describe('PersistenceService', () => {
     });
   });
 
-  it('el envío exitoso del recordatorio no loguea errores', async () => {
+  it('a successful reminder delivery logs no errors', async () => {
     const sock = { sendMessage: vi.fn().mockResolvedValue(undefined) };
     service.setSocket(sock as never);
 
@@ -115,7 +115,7 @@ describe('PersistenceService', () => {
     );
   });
 
-  it('removeReminder limpia el timer y persiste el cambio', async () => {
+  it('removeReminder clears the timer and persists the change', async () => {
     service.addReminder(makeReminder());
     service.removeReminder('R-1');
 
@@ -125,7 +125,7 @@ describe('PersistenceService', () => {
     });
   });
 
-  it('los saves sin base de datos son no-ops', () => {
+  it('saves without a database are no-ops', () => {
     const bare = new PersistenceService();
     expect(() => bare.addReminder(makeReminder())).not.toThrow();
     bare.stop();

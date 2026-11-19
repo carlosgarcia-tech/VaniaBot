@@ -59,7 +59,7 @@ describe('AntiArabService', () => {
     service = new AntiArabService();
   });
 
-  it('configuración por defecto: desactivado y con la lista de prefijos estándar', () => {
+  it('default configuration: disabled with the standard prefix list', () => {
     const config = service.getGroupConfig(GROUP);
 
     expect(config.enabled).toBe(false);
@@ -71,7 +71,7 @@ describe('AntiArabService', () => {
     expect(config.prefixes.length).toBeGreaterThanOrEqual(16);
   });
 
-  it('enable/disable cambia el estado por grupo', () => {
+  it('enable/disable changes state per group', () => {
     expect(service.isEnabled(GROUP)).toBe(false);
 
     service.enableGroup(GROUP);
@@ -81,14 +81,14 @@ describe('AntiArabService', () => {
     expect(service.isEnabled(GROUP)).toBe(false);
   });
 
-  it('shouldBlockNumber ignora grupos desactivados', () => {
+  it('shouldBlockNumber ignores disabled groups', () => {
     service.enableGroup(GROUP);
     service.disableGroup(GROUP);
 
     expect(service.shouldBlockNumber('212555123456')).toBe(false);
   });
 
-  it('shouldBlockNumber bloquea números que empiezan con un prefijo configurado', () => {
+  it('shouldBlockNumber blocks numbers that start with a configured prefix', () => {
     service.enableGroup(GROUP);
 
     expect(service.shouldBlockNumber('212555123456')).toBe(true);
@@ -100,7 +100,7 @@ describe('AntiArabService', () => {
     expect(service.shouldBlockNumber('15551234567')).toBe(false);
   });
 
-  it('addPrefix añade prefijos nuevos normalizados a solo dígitos', () => {
+  it('addPrefix adds new prefixes normalized to digits only', () => {
     // The '+' is stripped: shouldBlockNumber compares against '+'-less numbers
     service.addPrefix(GROUP, '+91');
 
@@ -117,13 +117,13 @@ describe('AntiArabService', () => {
     expect(service.getGroupConfig(GROUP).prefixes.length).toBe(before);
   });
 
-  it('removePrefix elimina solo si existe y devuelve el resultado', () => {
+  it('removePrefix removes only if present and returns the result', () => {
     expect(service.removePrefix(GROUP, '212')).toBe(true);
     expect(service.getGroupConfig(GROUP).prefixes).not.toContain('212');
     expect(service.removePrefix(GROUP, '212')).toBe(false);
   });
 
-  it('getBlockedPrefixesForNumber agrega prefijos coincidentes sin duplicar entre grupos', () => {
+  it('getBlockedPrefixesForNumber aggregates matching prefixes without duplicating across groups', () => {
     service.enableGroup(GROUP);
     service.addPrefix(GROUP, '34');
 
@@ -138,14 +138,14 @@ describe('AntiArabService', () => {
     expect(blocked.filter(p => p === '212')).toHaveLength(1);
   });
 
-  it('getBlockedPrefixesForNumber devuelve vacío si nada coincide o no hay grupos activos', () => {
+  it('getBlockedPrefixesForNumber returns empty when nothing matches or no groups are active', () => {
     expect(service.getBlockedPrefixesForNumber('212555')).toEqual([]);
 
     service.enableGroup(GROUP);
     expect(service.getBlockedPrefixesForNumber('521555')).toEqual([]);
   });
 
-  it('mantiene configuraciones independientes por grupo', () => {
+  it('keeps independent configuration per group', () => {
     const groupA = '111@g.us';
     const groupB = '222@g.us';
 

@@ -21,12 +21,12 @@ describe('ShopService', () => {
     service = ShopService.getInstance();
   });
 
-  it('es un singleton: getInstance siempre devuelve la misma instancia', () => {
+  it('it is a singleton: getInstance always returns the same instance', () => {
     expect(ShopService.getInstance()).toBe(shopService);
     expect(ShopService.getInstance()).toBe(service);
   });
 
-  it('el catálogo tiene items con datos completos', () => {
+  it('the catalog has items with complete data', () => {
     const items = service.getItems();
 
     expect(items.length).toBeGreaterThanOrEqual(10);
@@ -39,19 +39,19 @@ describe('ShopService', () => {
     }
   });
 
-  it('los IDs del catálogo son únicos', () => {
+  it('catalog IDs are unique', () => {
     const items = service.getItems();
     const ids = items.map(i => i.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('todos los items tienen un tipo válido', () => {
+  it('all items have a valid type', () => {
     for (const item of service.getItems()) {
       expect(VALID_TYPES).toContain(item.type);
     }
   });
 
-  it('los items con duración usan valores razonables (1h..30d)', () => {
+  it('items with a duration use reasonable values (1h..30d)', () => {
     const HOUR = 60 * 60 * 1000;
     for (const item of service.getItems()) {
       if (item.duration !== undefined) {
@@ -64,12 +64,12 @@ describe('ShopService', () => {
     }
   });
 
-  it('getItemById encuentra por id exacto y devuelve undefined para desconocidos', () => {
+  it('getItemById finds by exact id and returns undefined for unknown', () => {
     expect(service.getItemById('vip_role')?.name).toBe('VIP Role');
     expect(service.getItemById('no-existe')).toBeUndefined();
   });
 
-  it('getItemByIndex es 1-based (índice 0 no existe)', () => {
+  it('getItemByIndex is 1-based (index 0 does not exist)', () => {
     const items = service.getItems();
     expect(service.getItemByIndex(1)).toBe(items[0]);
     expect(service.getItemByIndex(items.length)).toBe(items[items.length - 1]);
@@ -89,7 +89,7 @@ describe('ShopService', () => {
     expect(service.getItemsByType('cosmetic')).toBeInstanceOf(Array);
   });
 
-  it('precios escalan por rareza de rol (VIP < Legend)', () => {
+  it('prices scale by role rarity (VIP < Legend)', () => {
     const vip = service.getItemById('vip_role');
     const legend = service.getItemById('legend_role');
     expect(vip && legend ? legend.price > vip.price : true).toBe(true);

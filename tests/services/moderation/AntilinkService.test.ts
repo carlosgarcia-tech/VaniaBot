@@ -60,7 +60,7 @@ describe('AntilinkService', () => {
     service = new AntilinkService();
   });
 
-  it('configuración por defecto: desactivado, modo kick, todos los bloques activos', () => {
+  it('default configuration: disabled, kick mode, all blocks active', () => {
     const config = service.getConfig(GROUP);
 
     expect(config).toEqual({
@@ -73,7 +73,7 @@ describe('AntilinkService', () => {
     });
   });
 
-  it('enable/disable cambia el estado persistido por grupo', () => {
+  it('enable/disable changes the persisted state per group', () => {
     expect(service.isEnabled(GROUP)).toBe(false);
 
     service.enable(GROUP);
@@ -83,12 +83,12 @@ describe('AntilinkService', () => {
     expect(service.isEnabled(GROUP)).toBe(false);
   });
 
-  it('checkMessage ignora mensajes cuando está desactivado', () => {
+  it('checkMessage ignores messages while disabled', () => {
     const result = service.checkMessage(GROUP, 'entra https://chat.whatsapp.com/AbCdEf');
     expect(result).toBeNull();
   });
 
-  it('checkMessage detecta enlaces de grupo de WhatsApp', () => {
+  it('checkMessage detects WhatsApp group links', () => {
     service.enable(GROUP);
 
     const link = service.checkMessage(GROUP, 'únete https://chat.whatsapp.com/AbC123 ya');
@@ -97,7 +97,7 @@ describe('AntilinkService', () => {
     expect(link?.domain).toContain('chat.whatsapp.com');
   });
 
-  it('checkMessage detecta enlaces de canal y otros dominios', () => {
+  it('checkMessage detects channel links and other domains', () => {
     service.enable(GROUP);
 
     const channel = service.checkMessage(GROUP, 'mira https://whatsapp.com/channel/001234');
@@ -108,12 +108,12 @@ describe('AntilinkService', () => {
     expect(other?.domain).toBe('ejemplo.com');
   });
 
-  it('checkMessage devuelve null para texto sin enlaces', () => {
+  it('checkMessage returns null for text without links', () => {
     service.enable(GROUP);
     expect(service.checkMessage(GROUP, 'hola a todos, ¿cómo están?')).toBeNull();
   });
 
-  it('la whitelist permite dominios y subdominios permitidos', () => {
+  it('the whitelist allows allowed domains and subdomains', () => {
     service.enable(GROUP);
     expect(service.addToWhitelist(GROUP, 'https://www.Ejemplo.com/docs')).toBe(true);
 
@@ -128,7 +128,7 @@ describe('AntilinkService', () => {
     expect(service.checkMessage(GROUP, 'va https://otro.com')).not.toBeNull();
   });
 
-  it('removeFromWhitelist devuelve true/false según exista el dominio', () => {
+  it('removeFromWhitelist returns true/false depending on whether the domain exists', () => {
     service.addToWhitelist(GROUP, 'ejemplo.com');
 
     expect(service.removeFromWhitelist(GROUP, 'noexiste.com')).toBe(false);
@@ -136,7 +136,7 @@ describe('AntilinkService', () => {
     expect(service.getWhitelist(GROUP)).toEqual([]);
   });
 
-  it('setMode cambia la acción entre kick y delete', () => {
+  it('setMode switches the action between kick and delete', () => {
     service.setMode(GROUP, 'delete');
     expect(service.getConfig(GROUP).mode).toBe('delete');
 
@@ -144,7 +144,7 @@ describe('AntilinkService', () => {
     expect(service.getConfig(GROUP).mode).toBe('kick');
   });
 
-  it('setBlockType permite desactivar el bloqueo por tipo de enlace', () => {
+  it('setBlockType allows disabling blocking per link type', () => {
     service.enable(GROUP);
     service.setBlockType(GROUP, 'others', false);
 
@@ -153,7 +153,7 @@ describe('AntilinkService', () => {
     expect(service.checkMessage(GROUP, 'va https://chat.whatsapp.com/XyZ')).not.toBeNull();
   });
 
-  it('getBlockedLinkInfo devuelve el contrato completo del pipeline', () => {
+  it('getBlockedLinkInfo returns the full pipeline contract', () => {
     service.enable(GROUP);
     service.setMode(GROUP, 'delete');
 
@@ -166,7 +166,7 @@ describe('AntilinkService', () => {
     expect(clean).toEqual({ blocked: false, link: null, action: 'delete' });
   });
 
-  it('mantiene configuraciones independientes por grupo', () => {
+  it('keeps independent configuration per group', () => {
     const groupA = '111@g.us';
     const groupB = '222@g.us';
 

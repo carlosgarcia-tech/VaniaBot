@@ -32,7 +32,7 @@ async function ownerJid(): Promise<string> {
   return `${ownerPhone}@s.whatsapp.net`;
 }
 
-describe('e2e: contextos de comando (grupo vs privado)', () => {
+describe('e2e: command contexts (group vs private)', () => {
   let socket: BootState['socket'];
   let caseCounter = 0;
 
@@ -58,7 +58,7 @@ describe('e2e: contextos de comando (grupo vs privado)', () => {
   });
 
   it(
-    'un comando de grupo se rechaza en privado con el nombre del contexto',
+    'a group-only command is rejected in private with the context name',
     async () => {
       // !sleep is GROUP-only.
       socket.receive(dmTextMessage('!sleep 5m', senderJid(610)));
@@ -73,7 +73,7 @@ describe('e2e: contextos de comando (grupo vs privado)', () => {
   );
 
   it(
-    'un comando de privado se rechaza en grupo con el nombre del contexto',
+    'a private-only command is rejected in a group with the context name',
     async () => {
       const group = await freshGroup();
 
@@ -91,7 +91,7 @@ describe('e2e: contextos de comando (grupo vs privado)', () => {
   );
 
   it(
-    'el mismo comando de grupo sí funciona dentro del grupo',
+    'the same group command does work inside the group',
     async () => {
       const group = await freshGroup();
       const adminJid = await ownerJid();

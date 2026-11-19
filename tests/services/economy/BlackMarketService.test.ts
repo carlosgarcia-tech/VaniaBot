@@ -92,20 +92,20 @@ describe('BlackMarketService', () => {
     vi.restoreAllMocks();
   });
 
-  it('listar un item inexistente en el registro falla', async () => {
+  it('listing an item missing from the registry fails', async () => {
     const result = await service.listItem(SELLER, 'no-existe', 100);
     expect(result.success).toBe(false);
     expect(result.message).toContain('no válido');
   });
 
-  it('listar sin tener el item en el inventario falla', async () => {
+  it('listing without the item in the inventory fails', async () => {
     await mockUserService.getUser(SELLER);
     const result = await service.listItem(SELLER, 'diamond', 1000);
     expect(result.success).toBe(false);
     expect(result.message).toContain('No tienes ese item');
   });
 
-  it('listar con precio sobre el valor original falla', async () => {
+  it('listing above the original value fails', async () => {
     const seller = await mockUserService.getUser(SELLER);
     seller.inventory.push({ itemId: 'diamond', name: 'Diamante' });
 
@@ -114,7 +114,7 @@ describe('BlackMarketService', () => {
     expect(result.message).toContain('Precio muy alto');
   });
 
-  it('listado válido: remueve el item del vendedor y crea el listing', async () => {
+  it('valid listing: removes the item from the seller and creates the listing', async () => {
     const seller = await mockUserService.getUser(SELLER);
     seller.inventory.push({ itemId: 'iron', name: 'Hierro' });
 
@@ -128,7 +128,7 @@ describe('BlackMarketService', () => {
     expect(service.getListings()).toHaveLength(1);
   });
 
-  it('buyItem transfiere dinero e inventario y retira el listing', async () => {
+  it('buyItem transfers money and inventory and removes the listing', async () => {
     const seller = await mockUserService.getUser(SELLER);
     seller.inventory.push({ itemId: 'iron', name: 'Hierro' });
     seller.money = 0;
@@ -146,7 +146,7 @@ describe('BlackMarketService', () => {
     expect(service.getListings()).toHaveLength(0);
   });
 
-  it('buyItem bloquea comprar tu propio listing', async () => {
+  it('buyItem blocks buying your own listing', async () => {
     const seller = await mockUserService.getUser(SELLER);
     seller.inventory.push({ itemId: 'iron', name: 'Hierro' });
     const { listing } = await service.listItem(SELLER, 'iron', 100);
@@ -157,7 +157,7 @@ describe('BlackMarketService', () => {
     expect(result.message).toContain('tu propio item');
   });
 
-  it('buyItem rechaza sin fondos suficientes', async () => {
+  it('buyItem rejects without enough funds', async () => {
     const seller = await mockUserService.getUser(SELLER);
     seller.inventory.push({ itemId: 'diamond', name: 'Diamante' });
     const { listing } = await service.listItem(SELLER, 'diamond', 1900);
@@ -172,13 +172,13 @@ describe('BlackMarketService', () => {
     expect(service.getListings()).toHaveLength(1);
   });
 
-  it('buyItem con listing inexistente falla', async () => {
+  it('buyItem with a missing listing fails', async () => {
     const result = await service.buyItem(BUYER, 'no-existe');
     expect(result.success).toBe(false);
     expect(result.message).toContain('not found');
   });
 
-  it('cancelListing devuelve el item al vendedor', async () => {
+  it('cancelListing returns the item to the seller', async () => {
     const seller = await mockUserService.getUser(SELLER);
     seller.inventory.push({ itemId: 'iron', name: 'Hierro' });
     const { listing } = await service.listItem(SELLER, 'iron', 100);
@@ -190,7 +190,7 @@ describe('BlackMarketService', () => {
     expect(service.getListings()).toHaveLength(0);
   });
 
-  it('cancelListing solo permite al dueño y solo si existe', async () => {
+  it('cancelListing only allows the owner and only if it exists', async () => {
     const seller = await mockUserService.getUser(SELLER);
     seller.inventory.push({ itemId: 'iron', name: 'Hierro' });
     const { listing } = await service.listItem(SELLER, 'iron', 100);
@@ -202,7 +202,7 @@ describe('BlackMarketService', () => {
     expect(fake.success).toBe(false);
   });
 
-  it('los listings expirados se limpian automáticamente (24h)', async () => {
+  it('expired listings are cleaned up automatically (24h)', async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-09-27T12:00:00Z'));
 
@@ -218,7 +218,7 @@ describe('BlackMarketService', () => {
     vi.useRealTimers();
   });
 
-  it('getListings ordena por precio de venta ascendente', async () => {
+  it('getListings sorts by sale price ascending', async () => {
     const s1 = await mockUserService.getUser('s1@x');
     const s2 = await mockUserService.getUser('s2@x');
     const s3 = await mockUserService.getUser('s3@x');
@@ -234,7 +234,7 @@ describe('BlackMarketService', () => {
     expect(prices).toEqual([50, 150, 1800]);
   });
 
-  it('getUserListings filtra por vendedor', async () => {
+  it('getUserListings filters by seller', async () => {
     const s1 = await mockUserService.getUser('s1@x');
     const s2 = await mockUserService.getUser('s2@x');
     s1.inventory.push({ itemId: 'iron', name: 'Hierro' });
@@ -246,7 +246,7 @@ describe('BlackMarketService', () => {
     expect(service.getUserListings('s1@x')).toHaveLength(1);
   });
 
-  it('getRandomItems devuelve hasta 8 items del catálogo', () => {
+  it('getRandomItems returns up to 8 items from the catalog', () => {
     const items = service.getRandomItems();
     expect(items.length).toBeLessThanOrEqual(8);
     expect(items[0]).toHaveProperty('itemId');

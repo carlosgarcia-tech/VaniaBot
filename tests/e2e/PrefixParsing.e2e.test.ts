@@ -29,7 +29,7 @@ const TIMEOUT = 30_000;
 /** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-describe('e2e: parsing de prefijos y resolución de comandos', () => {
+describe('e2e: prefix parsing and command resolution', () => {
   let socket: BootState['socket'];
 
   beforeAll(async () => {
@@ -41,7 +41,7 @@ describe('e2e: parsing de prefijos y resolución de comandos', () => {
   });
 
   it(
-    'prefijo punto: .ping responde con la latencia',
+    'dot prefix: .ping replies with the latency',
     async () => {
       socket.receive(dmTextMessage('.ping', senderJid(1)));
       await wait();
@@ -54,7 +54,7 @@ describe('e2e: parsing de prefijos y resolución de comandos', () => {
   );
 
   it(
-    'prefijo exclamación: !ping responde con la latencia',
+    'exclamation prefix: !ping replies with the latency',
     async () => {
       socket.receive(dmTextMessage('!ping', senderJid(2)));
       await wait();
@@ -67,7 +67,7 @@ describe('e2e: parsing de prefijos y resolución de comandos', () => {
   );
 
   it(
-    'alias: !latency responde como ping',
+    'alias: !latency replies like ping',
     async () => {
       socket.receive(dmTextMessage('!latency', senderJid(3)));
       await wait();
@@ -81,7 +81,7 @@ describe('e2e: parsing de prefijos y resolución de comandos', () => {
   );
 
   it(
-    'el nombre del comando se normaliza a minúsculas (!PING)',
+    'the command name is lowercased (!PING)',
     async () => {
       socket.receive(dmTextMessage('!PING', senderJid(4)));
       await wait();

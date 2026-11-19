@@ -70,7 +70,7 @@ async function sendSpaced(
   return socket.texts();
 }
 
-describe('e2e: límites de tasa del pipeline', () => {
+describe('e2e: pipeline rate limits', () => {
   let socket: BootState['socket'];
 
   beforeAll(async () => {
@@ -86,7 +86,7 @@ describe('e2e: límites de tasa del pipeline', () => {
   });
 
   it(
-    'en DM el cuarto mensaje del mismo segundo se bloquea por escritura rápida',
+    'in a DM the fourth message in the same second is blocked as fast typing',
     async () => {
       const sender = senderJid(1);
 
@@ -103,7 +103,7 @@ describe('e2e: límites de tasa del pipeline', () => {
   );
 
   it(
-    'tras un segundo de silencio el remitente puede volver a escribir',
+    'after a second of silence the sender can write again',
     async () => {
       const sender = senderJid(2);
 
@@ -125,7 +125,7 @@ describe('e2e: límites de tasa del pipeline', () => {
   );
 
   it(
-    'superar los 20 mensajes por minuto banea al remitente y el siguiente mensaje confirma el bloqueo',
+    'exceeding 20 messages per minute bans the sender and the next message confirms the block',
     async () => {
       const sender = senderJid(3);
 
@@ -146,7 +146,7 @@ describe('e2e: límites de tasa del pipeline', () => {
   );
 
   it(
-    'en grupo el cuarto comando seguido del mismo usuario se corta antes de ejecutar',
+    'in a group the user fourth command in a row is cut before running',
     async () => {
       const group = '120363032222222201@g.us';
       const { serviceManager } = await import('@/services/system/Servicemanager.js');
@@ -167,7 +167,7 @@ describe('e2e: límites de tasa del pipeline', () => {
   );
 
   it(
-    'la carga del grupo se avisa, luego se recuerda y acaba bloqueando el chat',
+    'group load is warned, then reminded and finally blocks the chat',
     async () => {
       const group = '120363032222222202@g.us';
       const { serviceManager } = await import('@/services/system/Servicemanager.js');
@@ -190,7 +190,7 @@ describe('e2e: límites de tasa del pipeline', () => {
   );
 
   it(
-    'un usuario sin actividad no hereda el bloqueo de flood de otro',
+    'an inactive user does not inherit another user flood block',
     async () => {
       const group = '120363032222222203@g.us';
       const { serviceManager } = await import('@/services/system/Servicemanager.js');

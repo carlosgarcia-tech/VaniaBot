@@ -160,7 +160,7 @@ describe('AntiDeleteService config', () => {
     }).not.toThrow();
   });
 
-  it('el cleanup timer elimina mensajes con mas de 24h', async () => {
+  it('the cleanup timer removes messages older than 24h', async () => {
     vi.useFakeTimers();
     try {
       // The instance must be constructed ALREADY with fake timers so the

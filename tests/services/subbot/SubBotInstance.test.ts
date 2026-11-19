@@ -193,7 +193,7 @@ describe('SubBotInstance', () => {
     }
   });
 
-  it('sesión nueva: emite connecting, pide pairing code a los 8s y lo formatea', async () => {
+  it('new session: emits connecting, requests the pairing code at 8s and formats it', async () => {
     makeInstance(false);
     await instance.start();
     await flush();
@@ -211,7 +211,7 @@ describe('SubBotInstance', () => {
     );
   });
 
-  it('sesión existente: no solicita pairing code', async () => {
+  it('existing session: does not request a pairing code', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -224,7 +224,7 @@ describe('SubBotInstance', () => {
     expect(createdSockets[0].requestPairingCode).not.toHaveBeenCalled();
   });
 
-  it('pairing code falla con Connection Closed y reintenta a los 5s', async () => {
+  it('pairing code fails with Connection Closed and retries at 5s', async () => {
     makeInstance(false);
     const sock = createdSockets.length ? undefined : undefined; // populated on start
     void sock;
@@ -244,7 +244,7 @@ describe('SubBotInstance', () => {
     );
   });
 
-  it('connection=open conecta: status connected, ready una sola vez y ping cada 30s', async () => {
+  it('connection=open connects: status connected, ready only once and ping every 30s', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -273,7 +273,7 @@ describe('SubBotInstance', () => {
     expect(readyEvents).toBe(1);
   });
 
-  it('creds.update con sesión registrada también dispara la conexión completa', async () => {
+  it('creds.update with a registered session also triggers the full connection', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -288,7 +288,7 @@ describe('SubBotInstance', () => {
     expect(statusEvents).toContain('connected');
   });
 
-  it('515/network: reconecta con el delay base de 15s', async () => {
+  it('515/network: reconnects with the 15s base delay', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -310,7 +310,7 @@ describe('SubBotInstance', () => {
     expect(createdSockets).toHaveLength(2);
   });
 
-  it('440 conflicto: cierra el socket viejo de inmediato y reconecta a los 20s fijos', async () => {
+  it('440 conflict: closes the old socket immediately and reconnects at a fixed 20s', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -336,7 +336,7 @@ describe('SubBotInstance', () => {
     expect(createdSockets).toHaveLength(2);
   });
 
-  it('401: primer cierre reintenta; segundo confirma revocación, limpia sesión y emite sessionInvalid', async () => {
+  it('401: the first close retries; the second confirms revocation, clears the session and emits sessionInvalid', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -368,7 +368,7 @@ describe('SubBotInstance', () => {
     expect(existsSync(join(tempSessionDir, 'creds.json'))).toBe(false);
   });
 
-  it('badSession (500): reconecta sin limpiar la sesión', async () => {
+  it('badSession (500): reconnects without clearing the session', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -390,7 +390,7 @@ describe('SubBotInstance', () => {
     expect(createdSockets).toHaveLength(2);
   });
 
-  it('messages.upsert: solo notifica mensajes de otros con contenido y tipo notify', async () => {
+  it('messages.upsert: only notifies messages from others with content and type notify', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -416,7 +416,7 @@ describe('SubBotInstance', () => {
     expect(received[0]).toBe(msg);
   });
 
-  it('groups.update invalida la metadata cacheada del grupo', async () => {
+  it('groups.update invalidates the cached group metadata', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -429,7 +429,7 @@ describe('SubBotInstance', () => {
     expect(mockInvalidateGroupMetadata).toHaveBeenCalledWith('grupo@g.us');
   });
 
-  it('health check: socket muerto se confirma a los 60s y reconecta a los 15s', async () => {
+  it('health check: a dead socket is confirmed at 60s and reconnects at 15s', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -453,7 +453,7 @@ describe('SubBotInstance', () => {
     expect(createdSockets).toHaveLength(2);
   });
 
-  it('fallo de arranque: marca error y reintenta a los 15s con éxito', async () => {
+  it('startup failure: marks error and retries successfully at 15s', async () => {
     mockUseEncrypted.mockRejectedValueOnce(new Error('disk full'));
     makeInstance(false);
 
@@ -472,7 +472,7 @@ describe('SubBotInstance', () => {
     expect(createdSockets).toHaveLength(1);
   });
 
-  it('stop(): destruye la instancia, cierra el socket y ya no reconecta ni pinguea', async () => {
+  it('stop(): destroys the instance, closes the socket and no longer reconnects or pings', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),
@@ -497,7 +497,7 @@ describe('SubBotInstance', () => {
     expect(createdSockets).toHaveLength(1);
   });
 
-  it('isConnected refleja el estado real del socket', async () => {
+  it('isConnected reflects the real socket state', async () => {
     mockUseEncrypted.mockResolvedValue({
       state: { creds: { registered: true } },
       saveCreds: vi.fn(async () => {}),

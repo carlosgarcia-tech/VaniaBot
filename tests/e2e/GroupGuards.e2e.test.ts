@@ -35,7 +35,7 @@ const OTHER_GROUP = '120363026666666666@g.us'; // never enabled
 /** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-describe('e2e: guards de grupo', () => {
+describe('e2e: group guards', () => {
   let socket: BootState['socket'];
 
   beforeAll(async () => {
@@ -53,7 +53,7 @@ describe('e2e: guards de grupo', () => {
   });
 
   it(
-    'un comando normal funciona en un grupo habilitado',
+    'a normal command works in an enabled group',
     async () => {
       socket.receive(groupTextMessage('!ping', GROUP, senderJid(1)));
       await wait();
@@ -68,7 +68,7 @@ describe('e2e: guards de grupo', () => {
   );
 
   it(
-    'los prefijos alternativos también resuelven en grupo',
+    'alternative prefixes resolve in groups too',
     async () => {
       socket.receive(groupTextMessage('.latency', GROUP, senderJid(2)));
       await wait();
@@ -79,7 +79,7 @@ describe('e2e: guards de grupo', () => {
   );
 
   it(
-    'en un grupo nunca habilitado el bot responde con silencio',
+    'in a never-enabled group the bot stays silent',
     async () => {
       socket.receive(groupTextMessage('!ping', OTHER_GROUP, senderJid(3)));
       await wait();

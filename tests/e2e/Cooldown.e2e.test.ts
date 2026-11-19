@@ -30,7 +30,7 @@ const TIMEOUT = 30_000;
 /** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-describe('e2e: cooldown de comandos', () => {
+describe('e2e: command cooldown', () => {
   let socket: BootState['socket'];
 
   beforeAll(async () => {
@@ -46,7 +46,7 @@ describe('e2e: cooldown de comandos', () => {
   });
 
   it(
-    'segundo uso dentro del cooldown responde con la espera restante',
+    'a second use within the cooldown replies with the remaining wait',
     async () => {
       const sender = senderJid(1);
 
@@ -66,7 +66,7 @@ describe('e2e: cooldown de comandos', () => {
   );
 
   it(
-    'tras vencer el cooldown el comando vuelve a ejecutarse',
+    'once the cooldown expires the command runs again',
     async () => {
       const sender = senderJid(2);
 

@@ -61,7 +61,7 @@ async function spamFrom(
   return socket.texts();
 }
 
-describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
+describe('e2e: group anti-spam (per-user moderation)', () => {
   let socket: BootState['socket'];
   let groupCounter = 0;
 
@@ -93,7 +93,7 @@ describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
   });
 
   it(
-    'el undécimo mensaje del usuario dispara el primer aviso',
+    'the user eleventh message triggers the first warning',
     async () => {
       const group = await freshGroup();
       await clearParticipants(socket, group);
@@ -108,7 +108,7 @@ describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
   );
 
   it(
-    'el siguiente exceso avisa que es la última advertencia',
+    'the next excess warns that it is the last warning',
     async () => {
       const group = await freshGroup();
       await clearParticipants(socket, group);
@@ -122,7 +122,7 @@ describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
   );
 
   it(
-    'sin permisos de admin el tercer exceso avisa pero no expulsa a nadie',
+    'without admin permissions the third excess warns but removes nobody',
     async () => {
       const group = await freshGroup();
       await clearParticipants(socket, group);
@@ -136,7 +136,7 @@ describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
   );
 
   it(
-    'con el bot admin el tercer exceso expulsa al usuario que hace spam',
+    'with the bot as admin the third excess removes the spamming user',
     async () => {
       const group = await freshGroup();
       const sender = senderJid(4);
@@ -153,7 +153,7 @@ describe('e2e: anti-spam de grupo (moderador por usuario)', () => {
   );
 
   it(
-    'el contador es por usuario: otro spammer no hereda los avisos',
+    'the counter is per user: another spammer does not inherit the warnings',
     async () => {
       const group = await freshGroup();
       await clearParticipants(socket, group);

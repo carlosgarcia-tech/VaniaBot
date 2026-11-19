@@ -164,23 +164,23 @@ async function flush(): Promise<void> {
 
 // --- Tests -----------------------------------------------------------------
 
-describe('WADisconnectPolicy (política de reconexión compartida)', () => {
+describe('WADisconnectPolicy (shared reconnection policy)', () => {
   describe('extractDisconnectInfo', () => {
-    it('extrae statusCode y message del payload de Baileys', () => {
+    it('extracts statusCode and message from the Baileys payload', () => {
       const info = extractDisconnectInfo({
         error: { output: { statusCode: 515 }, message: 'restart required' },
       });
       expect(info).toEqual({ statusCode: 515, message: 'restart required' });
     });
 
-    it('devuelve vacío cuando no hay error', () => {
+    it('returns empty when there is no error', () => {
       expect(extractDisconnectInfo(undefined)).toEqual({});
       expect(extractDisconnectInfo({})).toEqual({});
     });
   });
 
   describe('classifyDisconnect', () => {
-    it('clasifica los códigos semánticos principales', () => {
+    it('classifies the main semantic codes', () => {
       expect(classifyDisconnect(DisconnectReason.connectionReplaced)).toBe('conflict');
       expect(classifyDisconnect(440)).toBe('conflict');
       expect(classifyDisconnect(DisconnectReason.loggedOut)).toBe('loggedOut');
@@ -196,7 +196,7 @@ describe('WADisconnectPolicy (política de reconexión compartida)', () => {
       expect(classifyDisconnect(DisconnectReason.badSession)).toBe('badSession');
     });
 
-    it('clasifica códigos desconocidos y undefined como unknown', () => {
+    it('classifies unknown and undefined codes as unknown', () => {
       expect(classifyDisconnect(undefined)).toBe('unknown');
       expect(classifyDisconnect(999)).toBe('unknown');
     });
@@ -212,7 +212,7 @@ describe('WADisconnectPolicy (política de reconexión compartida)', () => {
       expect(computeReconnectDelayMs(4, base, max)).toBe(3375);
     });
 
-    it('computeReconnectDelayMs acota en maxDelayMs y tolera attempt <= 0', () => {
+    it('computeReconnectDelayMs clamps to maxDelayMs and tolerates attempt <= 0', () => {
       const base = 1000;
       const max = 5000;
       expect(computeReconnectDelayMs(1, base, max)).toBe(1000);
@@ -220,7 +220,7 @@ describe('WADisconnectPolicy (política de reconexión compartida)', () => {
       expect(computeReconnectDelayMs(0, base, max)).toBe(1000);
     });
 
-    it('nextBackoff escala desde el delay actual y acota en el máximo', () => {
+    it('nextBackoff scales from the current delay and clamps to the maximum', () => {
       expect(nextBackoff(1000, 300_000)).toBe(1500);
       expect(nextBackoff(1500, 300_000)).toBe(2250);
       expect(nextBackoff(4000, 5000)).toBe(5000);
@@ -228,7 +228,7 @@ describe('WADisconnectPolicy (política de reconexión compartida)', () => {
   });
 
   describe('socketTransportState', () => {
-    it('lee readyState/hasUser del socket', async () => {
+    it('reads readyState/hasUser from the socket', async () => {
       const { socketTransportState } = await import('../../src/core/WADisconnectPolicy.js');
       expect(socketTransportState(null)).toEqual({ readyState: undefined, hasUser: false });
       const sock = makeMockSock();
@@ -239,8 +239,8 @@ describe('WADisconnectPolicy (política de reconexión compartida)', () => {
     });
   });
 
-  describe('clearSessionFiles (implementación real)', () => {
-    it('borra todos los archivos del directorio y devuelve el conteo', async () => {
+  describe('clearSessionFiles (real implementation)', () => {
+    it('deletes every file in the directory and returns the count', async () => {
       const { clearSessionFiles } = await vi.importActual<
         typeof import('../../src/core/WADisconnectPolicy.js')
       >('../../src/core/WADisconnectPolicy.js');
@@ -297,13 +297,13 @@ describe('AuthManager', () => {
     }
   });
 
-  it('arranca desconectado y sin socket', () => {
+  it('starts disconnected with no socket', () => {
     const manager = makeAuth();
     expect(manager.isConnected()).toBe(false);
     expect(manager.getCurrentSocket()).toBeNull();
   });
 
-  it('createSocket crea el socket, se suscribe a eventos y lo expone', async () => {
+  it('createSocket creates the socket, subscribes to events and exposes it', async () => {
     const manager = makeAuth();
     const sock = await manager.createSocket();
 
@@ -314,7 +314,7 @@ describe('AuthManager', () => {
     expect(mockUseMultiFileAuthState).toHaveBeenCalledWith(tempSessionDir);
   });
 
-  it('connection=open marca conectado e inicia ping y health check', async () => {
+  it('connection=open marks connected and starts ping and health check', async () => {
     const manager = makeAuth();
     const sock = (await manager.createSocket()) as unknown as MockSock;
 
@@ -332,7 +332,7 @@ describe('AuthManager', () => {
     expect(manager.isConnected()).toBe(true);
   });
 
-  it('connection=close por error de red programa la reconexión vía callback', async () => {
+  it('connection=close from a network error schedules reconnection via callback', async () => {
     const manager = makeAuth();
     manager.setOnSocketRecreate(recreateMock);
     const sock = (await manager.createSocket()) as unknown as MockSock;
@@ -357,7 +357,7 @@ describe('AuthManager', () => {
     expect(manager.getCurrentSocket()).not.toBe(sock);
   });
 
-  it('escala el backoff exponencial entre reconexiones sucesivas (1s, 1.5s, 2.25s)', async () => {
+  it('scales exponential backoff across successive reconnections (1s, 1.5s, 2.25s)', async () => {
     const manager = makeAuth();
     manager.setOnSocketRecreate(recreateMock);
     const sock = (await manager.createSocket()) as unknown as MockSock;
@@ -391,7 +391,7 @@ describe('AuthManager', () => {
     expect(recreateMock).toHaveBeenCalledTimes(3);
   });
 
-  it('error 515 espera 3s antes de reconectar (budget propio)', async () => {
+  it('error 515 waits 3s before reconnecting (own budget)', async () => {
     const manager = makeAuth();
     manager.setOnSocketRecreate(recreateMock);
     const sock = (await manager.createSocket()) as unknown as MockSock;
@@ -417,7 +417,7 @@ describe('AuthManager', () => {
     expect(recreateMock).toHaveBeenCalledTimes(1);
   });
 
-  it('cierra de sesión desde el teléfono (401): 3 strikes limpian la sesión', async () => {
+  it('logged out from the phone (401): 3 strikes clear the session', async () => {
     const manager = makeAuth();
     manager.setOnSocketRecreate(recreateMock);
     const sock = (await manager.createSocket()) as unknown as MockSock;
@@ -448,7 +448,7 @@ describe('AuthManager', () => {
     expect(manager.isConnected()).toBe(false);
   });
 
-  it('sesión corrupta (badSession) acumula strikes por separado y limpia al tercero', async () => {
+  it('corrupt session (badSession) accrues separate strikes and clears on the third', async () => {
     const manager = makeAuth();
     manager.setOnSocketRecreate(recreateMock);
     const sock = (await manager.createSocket()) as unknown as MockSock;
@@ -475,7 +475,7 @@ describe('AuthManager', () => {
     expect(mockClearSessionFiles).toHaveBeenCalledTimes(1);
   });
 
-  it('health check detecta el socket muerto y fuerza la reconexión', async () => {
+  it('health check detects the dead socket and forces reconnection', async () => {
     const manager = makeAuth();
     manager.setOnSocketRecreate(recreateMock);
     const sock = (await manager.createSocket()) as unknown as MockSock;
@@ -494,7 +494,7 @@ describe('AuthManager', () => {
     expect(recreateMock).toHaveBeenCalledTimes(1);
   });
 
-  it('si falla la recreación del socket, reintenta en el siguiente ciclo', async () => {
+  it('when socket recreation fails, it retries on the next cycle', async () => {
     const manager = makeAuth();
     const failingRecreate = vi.fn(async () => {
       throw new Error('boom');
@@ -518,7 +518,7 @@ describe('AuthManager', () => {
     expect(failingRecreate).toHaveBeenCalledTimes(2);
   });
 
-  it('QR se muestra hasta MAX_QR_RETRIES y luego limpia sesión y reconecta', async () => {
+  it('QR is shown up to MAX_QR_RETRIES and then clears the session and reconnects', async () => {
     const manager = makeAuth();
     manager.setOnSocketRecreate(recreateMock);
     const sock = (await manager.createSocket()) as unknown as MockSock;
@@ -537,7 +537,7 @@ describe('AuthManager', () => {
     expect(mockClearSessionFiles).toHaveBeenCalledWith(tempSessionDir, '[AuthManager]');
   });
 
-  it('QR de refresh se ignora cuando la sesión ya está registrada', async () => {
+  it('refresh QR is ignored when the session is already registered', async () => {
     mockUseMultiFileAuthState.mockResolvedValue({
       state: { creds: { registered: true, me: { id: 'x:1@s.whatsapp.net', name: 'Bot' } } },
       saveCreds: vi.fn(async () => {}),
@@ -552,7 +552,7 @@ describe('AuthManager', () => {
     expect(mockClearSessionFiles).not.toHaveBeenCalled();
   });
 
-  it('modo pairing code solicita y muestra el código de pareamiento', async () => {
+  it('pairing code mode requests and shows the pairing code', async () => {
     mockConfig.auth.usePairingCode = true;
     mockConfig.auth.phoneNumber = '+52 1 55 1234 5678';
 
@@ -567,7 +567,7 @@ describe('AuthManager', () => {
     expect(mockDisplayPairingCode).toHaveBeenCalledWith('ABCD-1234');
   });
 
-  it('fallo transitorio del pairing code (timeout) reagenda la reconexión', async () => {
+  it('transient pairing code failure (timeout) reschedules the reconnection', async () => {
     mockConfig.auth.usePairingCode = true;
     mockConfig.auth.phoneNumber = '+5215512345678';
 
@@ -584,7 +584,7 @@ describe('AuthManager', () => {
     expect(recreateMock).toHaveBeenCalledTimes(1);
   });
 
-  it('shutdown cierra el socket, limpia estado y deja de pinguear', async () => {
+  it('shutdown closes the socket, clears state and stops pinging', async () => {
     const manager = makeAuth();
     const sock = (await manager.createSocket()) as unknown as MockSock;
 

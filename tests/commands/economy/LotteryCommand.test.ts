@@ -153,14 +153,14 @@ describe('LotteryCommand', () => {
     command = new LotteryCommand();
   });
 
-  it('propiedades del comando', () => {
+  it('command properties', () => {
     expect(command.name).toBe('loteria');
     expect(command.aliases).toContain('lottery');
     expect(command.aliases).toContain('ticket');
     expect(command.aliases).not.toContain('comprar');
   });
 
-  it('sin acción muestra el estado por defecto', async () => {
+  it('with no action it shows the default status', async () => {
     const ctx = makeCtx({ args: [] });
     await command.execute(ctx);
 
@@ -168,7 +168,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('ESTADO DE LOTERÍA');
   });
 
-  it('acción desconocida muestra la ayuda', async () => {
+  it('unknown action shows the help', async () => {
     const ctx = makeCtx({ args: ['noexiste'] });
     await command.execute(ctx);
 
@@ -177,7 +177,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('!loteria reiniciar (owner)');
   });
 
-  it('compra válida: cobra, emite tickets, suma al pozo y persiste', async () => {
+  it('valid purchase: charges, issues tickets, adds to the pot and persists', async () => {
     (await mockUserService.getUser(USER)).money = 10_000;
 
     const ctx = makeCtx({ args: ['comprar', '3'] });
@@ -193,7 +193,7 @@ describe('LotteryCommand', () => {
     expect(rawState()['prizePool']).toBe(2400);
   });
 
-  it('rechaza cantidades fuera de rango', async () => {
+  it('rejects amounts out of range', async () => {
     (await mockUserService.getUser(USER)).money = 10_000;
 
     for (const [amount, calls] of [
@@ -208,7 +208,7 @@ describe('LotteryCommand', () => {
     }
   });
 
-  it('rechaza sin fondos suficientes', async () => {
+  it('rejects without enough funds', async () => {
     (await mockUserService.getUser(USER)).money = 500;
 
     const ctx = makeCtx({ args: ['comprar', '2'] });
@@ -219,7 +219,7 @@ describe('LotteryCommand', () => {
     expect(rawState()['tickets']).toHaveLength(0);
   });
 
-  it('compra parcial: cobra solo los tickets efectivamente entregados', async () => {
+  it('partial purchase: charges only the tickets actually delivered', async () => {
     (await mockUserService.getUser(USER)).money = 150_000;
 
     // Buy 10 tickets per iteration until the max (100) fills up
@@ -238,7 +238,7 @@ describe('LotteryCommand', () => {
     expect(mockUserService.removeMoney).toHaveBeenCalledTimes(10);
   });
 
-  it('estado muestra el pozo, ventas y los tickets del usuario', async () => {
+  it('status shows the pot, sales and the user tickets', async () => {
     (await mockUserService.getUser(USER)).money = 50_000;
 
     const buyCtx = makeCtx({ args: ['comprar', '2'] });
@@ -252,7 +252,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('Tus tickets');
   });
 
-  it('estado sin tickets indica que no participa', async () => {
+  it('status without tickets reports that the user is not participating', async () => {
     await mockUserService.getUser(USER);
     const ctx = makeCtx({ args: ['estado'] });
     await command.execute(ctx);
@@ -260,7 +260,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('No tienes tickets');
   });
 
-  it('draw sin tickets avisa y no paga nada', async () => {
+  it('draw without tickets warns and pays nothing', async () => {
     const ctx = makeCtx({
       args: ['resultado'],
       sender: { jid: 'owner@test.com', pushName: 'Owner', isOwner: true, isAdmin: true },
@@ -271,7 +271,7 @@ describe('LotteryCommand', () => {
     expect(mockUserService.addMoney).not.toHaveBeenCalled();
   });
 
-  it('draw por no-owner es ignorado', async () => {
+  it('draw by a non-owner is ignored', async () => {
     (await mockUserService.getUser(USER)).money = 10_000;
 
     const buyCtx = makeCtx({ args: ['comprar', '1'] });
@@ -284,7 +284,7 @@ describe('LotteryCommand', () => {
     expect(mockUserService.addMoney).not.toHaveBeenCalled();
   });
 
-  it('draw del owner paga al ganador el 80% del pozo, resetea y persiste', async () => {
+  it('owner draw pays the winner 80% of the pot, resets and persists', async () => {
     (await mockUserService.getUser('a@test.com')).money = 10_000;
     (await mockUserService.getUser('b@test.com')).money = 10_000;
 
@@ -325,7 +325,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(statusCtx)).toContain('0/100');
   });
 
-  it('el estado sobrevive un reinicio: un módulo recién cargado lee del store', async () => {
+  it('state survives a restart: a freshly loaded module reads from the store', async () => {
     (await mockUserService.getUser(USER)).money = 10_000;
 
     const buyCtx = makeCtx({ args: ['comprar', '2'] });
@@ -341,7 +341,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('Tus tickets');
   });
 
-  it('un archivo corrupto cae a defaults en lugar de romper el comando', async () => {
+  it('a corrupt file falls back to defaults instead of breaking the command', async () => {
     // The real JsonFileStore resets to defaults on invalid JSON; the mock
     // replicates that contract by validating malformed shapes into defaults.
     backing.set(LOTTERY_FILE, { tickets: 'no-soy-un-array', prizePool: -50 });
@@ -353,7 +353,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('$0'); // pozo saneado a 0
   });
 
-  it('reiniciar del owner vacía tickets y pozo sin pagar a nadie', async () => {
+  it('owner reset clears tickets and the pot without paying anyone', async () => {
     (await mockUserService.getUser(USER)).money = 10_000;
     await command.execute(makeCtx({ args: ['comprar', '3'] }));
     mockUserService.addMoney.mockClear();
@@ -370,7 +370,7 @@ describe('LotteryCommand', () => {
     expect(rawState()['lastDraw']).toBeGreaterThan(0);
   });
 
-  it('reiniciar por no-owner es ignorado', async () => {
+  it('reset by a non-owner is ignored', async () => {
     (await mockUserService.getUser(USER)).money = 10_000;
     await command.execute(makeCtx({ args: ['comprar', '2'] }));
 
@@ -382,14 +382,14 @@ describe('LotteryCommand', () => {
     expect(rawState()['prizePool']).toBe(1600);
   });
 
-  it('reiniciar acepta el alias reset y funciona con la lotería vacía', async () => {
+  it('reset accepts the reset alias and works with an empty lottery', async () => {
     const ctx = await resetAsOwner('reset');
 
     expect(lastReply(ctx)).toContain('SORTEO REINICIADO');
     expect(rawState()['lastDraw']).toBeGreaterThan(0);
   });
 
-  it('el reinicio persiste: un módulo recién cargado arranca limpio', async () => {
+  it('the reset persists: a freshly loaded module starts clean', async () => {
     (await mockUserService.getUser(USER)).money = 10_000;
     await command.execute(makeCtx({ args: ['comprar', '2'] }));
 
@@ -405,7 +405,7 @@ describe('LotteryCommand', () => {
     expect(lastReply(ctx)).toContain('No tienes tickets');
   });
 
-  it('los números de ticket se generan con crypto: 5 hexadecimales en mayúsculas', async () => {
+  it('ticket numbers are generated with crypto: 5 uppercase hex digits', async () => {
     (await mockUserService.getUser(USER)).money = 10_000;
 
     const ctx = makeCtx({ args: ['comprar', '10'] });

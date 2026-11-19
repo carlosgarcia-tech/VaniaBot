@@ -250,7 +250,7 @@ describe('SubBotManager', () => {
     if (sessionsDir) rmSync(sessionsDir, { recursive: true, force: true });
   });
 
-  it('initialize arranca los intervalos y shutdown los detiene', async () => {
+  it('initialize starts the intervals and shutdown stops them', async () => {
     await manager.initialize();
     await vi.advanceTimersByTimeAsync(3 * 60_000);
     expect(instances.size).toBe(0);
@@ -260,7 +260,7 @@ describe('SubBotManager', () => {
     expect(instances.size).toBe(0);
   });
 
-  it('initialize relanza instancias de slots connected/linking', async () => {
+  it('initialize relaunches instances for connected/linking slots', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'connected', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -271,7 +271,7 @@ describe('SubBotManager', () => {
     expect(instances.get('bot1')).toBeDefined();
   });
 
-  it('initialize omite la auto-reconexión de slots disconnected', async () => {
+  it('initialize skips auto-reconnect for disconnected slots', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'disconnected', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -282,7 +282,7 @@ describe('SubBotManager', () => {
     expect(instances.size).toBe(0);
   });
 
-  it('requestSubBot reserva, activa, lanza la instancia y marca pending', async () => {
+  it('requestSubBot reserves, activates, launches the instance and marks pending', async () => {
     mockDb.getFreeSlot.mockReturnValue(freeSlot(3));
     const slotRef: SubBotSlot = { slot: 3, status: 'reserved' };
     mockDb.getSlot.mockReturnValue(slotRef);
@@ -307,7 +307,7 @@ describe('SubBotManager', () => {
     expect(result.subConfig).toBe(subConfig);
   });
 
-  it('requestSubBot sin slots libres lanza error y no reserva nada', async () => {
+  it('requestSubBot with no free slots throws and reserves nothing', async () => {
     mockDb.getFreeSlot.mockReturnValue(undefined);
 
     await expect(manager.requestSubBot('owner@x', 'Owner', '555')).rejects.toThrow(
@@ -316,7 +316,7 @@ describe('SubBotManager', () => {
     expect(mockDb.reserveSlot).not.toHaveBeenCalled();
   });
 
-  it('requestSubBot respeta solicitudes públicas desactivadas salvo para el owner', async () => {
+  it('requestSubBot honors disabled public requests except for the owner', async () => {
     mockDb.isPublicRequestsEnabled.mockReturnValue(false);
     mockDb.getFreeSlot.mockReturnValue(freeSlot(2));
 
@@ -333,7 +333,7 @@ describe('SubBotManager', () => {
     expect(instances.get('bot2')).toBeDefined();
   });
 
-  it('pairingCode: envía el código al owner y reenvía recordatorio a los 180s', async () => {
+  it('pairingCode: sends the code to the owner and resends a reminder at 180s', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'linking', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -356,7 +356,7 @@ describe('SubBotManager', () => {
     });
   });
 
-  it('ready: marca connected, precarga grupos y notifica al owner', async () => {
+  it('ready: marks connected, preloads groups and notifies the owner', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'linking', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -380,7 +380,7 @@ describe('SubBotManager', () => {
     );
   });
 
-  it('sessionInvalid: marca disconnected, borra la sesión y notifica al owner', async () => {
+  it('sessionInvalid: marks disconnected, deletes the session and notifies the owner', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'connected', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -403,7 +403,7 @@ describe('SubBotManager', () => {
     );
   });
 
-  it('disconnected actualiza el estado del slot', async () => {
+  it('disconnected updates the slot state', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'linking', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -429,7 +429,7 @@ describe('SubBotManager', () => {
     expect(instances.get('bot1')).toBeDefined();
   });
 
-  it('health check reinicia slots linking stale (>5 min sin conectar)', async () => {
+  it('health check restarts stale linking slots (>5 min without connecting)', async () => {
     const staleSlot = {
       slot: 2,
       id: 'bot2',
@@ -455,7 +455,7 @@ describe('SubBotManager', () => {
     expect(instances.get('bot2')).not.toBe(before);
   });
 
-  it('health check resetea slots pending con pairing stale (>5 min)', async () => {
+  it('health check resets pending slots with stale pairing (>5 min)', async () => {
     // The in-memory runtime state only exists after launchInstance, so the
     // real flow is: requestSubBot → pending → owner never uses the code → stale
     mockDb.isPublicRequestsEnabled.mockReturnValue(true);
@@ -484,7 +484,7 @@ describe('SubBotManager', () => {
     expect(mockDb.save).toHaveBeenCalled();
   });
 
-  it('stopSubBot detiene la instancia del owner y marca disconnected', async () => {
+  it('stopSubBot stops the owner instance and marks disconnected', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'linking', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -501,11 +501,11 @@ describe('SubBotManager', () => {
     expect(mockDb.updateSlotStatus).toHaveBeenCalledWith(1, 'disconnected');
   });
 
-  it('stopSubBot sin subbot activa lanza error', async () => {
+  it('stopSubBot with no active subbot throws', async () => {
     await expect(manager.stopSubBot('o@x')).rejects.toThrow('No tienes una subbot activa.');
   });
 
-  it('deleteSubBot detiene, borra sesión y runtime, y libera el slot', async () => {
+  it('deleteSubBot stops, deletes the session and runtime, and frees the slot', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'connected', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -531,7 +531,7 @@ describe('SubBotManager', () => {
     expect(mockDb.releaseSlot).toHaveBeenCalledWith(1);
   });
 
-  it('reconnectByOwner relanza la instancia y pasa por pending→linking', async () => {
+  it('reconnectByOwner relaunches the instance and goes through pending→linking', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'connected', ownerJid: OWNER_JID } as SubBotSlot,
     ]);
@@ -550,7 +550,7 @@ describe('SubBotManager', () => {
     expect(mockDb.updateSlotStatus).toHaveBeenCalledWith(1, 'linking');
   });
 
-  it('recoverOrphanedSessions recupera sesiones huérfanas en slots free', async () => {
+  it('recoverOrphanedSessions recovers orphaned sessions into free slots', async () => {
     mkdirSync(join(sessionsDir, 'orphan1'), { recursive: true });
     writeFileSync(join(sessionsDir, 'orphan1', 'creds.json'), '{}');
     mockDb.getAllSlots.mockReturnValue([
@@ -562,7 +562,7 @@ describe('SubBotManager', () => {
     expect(mockDb.updateSlotStatus).toHaveBeenCalledWith(5, 'disconnected');
   });
 
-  it('recoverOrphanedSessions ignora sesiones sin slot correspondiente', async () => {
+  it('recoverOrphanedSessions ignores sessions without a matching slot', async () => {
     mkdirSync(join(sessionsDir, 'desconocida'), { recursive: true });
     writeFileSync(join(sessionsDir, 'desconocida', 'creds.json'), '{}');
     mockDb.getAllSlots.mockReturnValue([
@@ -574,7 +574,7 @@ describe('SubBotManager', () => {
     expect(mockDb.updateSlotStatus).not.toHaveBeenCalled();
   });
 
-  it('getStatus y getters delegan en la base de datos', () => {
+  it('getStatus and the getters delegate to the database', () => {
     const owned = { slot: 7, id: 'b7', status: 'connected', ownerJid: 'o@x' } as SubBotSlot;
     mockDb.getSlot.mockReturnValue(owned);
     mockDb.getAllSlots.mockReturnValue([owned, { slot: 8 } as SubBotSlot]);
@@ -590,7 +590,7 @@ describe('SubBotManager', () => {
     expect(manager.getSlotInfo(7)).toBe(owned);
   });
 
-  it('shutdown persiste el runtime state y detiene todas las instancias', async () => {
+  it('shutdown persists the runtime state and stops all instances', async () => {
     mockDb.getActiveSlots.mockReturnValue([
       { slot: 1, id: 'bot1', status: 'linking', ownerJid: OWNER_JID } as SubBotSlot,
     ]);

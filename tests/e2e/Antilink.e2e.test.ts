@@ -35,7 +35,7 @@ const GROUP = '120363031111111111@g.us';
 /** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-describe('e2e: guard de antilink por grupo', () => {
+describe('e2e: per-group antilink guard', () => {
   let socket: BootState['socket'];
 
   beforeAll(async () => {
@@ -62,7 +62,7 @@ describe('e2e: guard de antilink por grupo', () => {
   });
 
   it(
-    'con el bot sin admin borra el mensaje con enlace y avisa del dominio',
+    'with the bot as non-admin it deletes the message with a link and reports the domain',
     async () => {
       await clearParticipants(socket, GROUP);
       const sender = senderJid(1);
@@ -82,7 +82,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'con el bot admin y modo kick expulsa al remitente en vez de borrar',
+    'with the bot as admin and kick mode it removes the sender instead of deleting',
     async () => {
       const { antilinkService } = await import('@/services/moderation/AntilinkService.js');
       antilinkService.setMode(GROUP, 'kick');
@@ -106,7 +106,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'un dominio en la whitelist no se bloquea',
+    'a domain on the whitelist is not blocked',
     async () => {
       const { antilinkService } = await import('@/services/moderation/AntilinkService.js');
       antilinkService.addToWhitelist(GROUP, 'ejemplo.com');
@@ -123,7 +123,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'un comando cuyo texto lleva un dominio permitido llega a ejecutarse',
+    'a command whose text carries an allowed domain still runs',
     async () => {
       // The guard also inspects commands: if the domain is allowed the
       // command runs and replies (otherwise the Pong wouldn't exist).
@@ -141,7 +141,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'un comando con un dominio bloqueado no llega a ejecutarse',
+    'a command with a blocked domain never runs',
     async () => {
       await clearParticipants(socket, GROUP);
 
@@ -157,7 +157,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'un subdominio del dominio permitido también pasa',
+    'a subdomain of an allowed domain passes too',
     async () => {
       const { antilinkService } = await import('@/services/moderation/AntilinkService.js');
       antilinkService.addToWhitelist(GROUP, 'ejemplo.com');
@@ -174,7 +174,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'otro dominio sigue bloqueado aunque uno esté en la whitelist',
+    'another domain stays blocked even when one is whitelisted',
     async () => {
       const { antilinkService } = await import('@/services/moderation/AntilinkService.js');
       antilinkService.addToWhitelist(GROUP, 'ejemplo.com');
@@ -192,7 +192,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'un admin del grupo está exento del guard',
+    'a group admin is exempt from the guard',
     async () => {
       const sender = senderJid(6);
       await setParticipants(socket, GROUP, [{ id: sender, admin: 'admin' }]);
@@ -208,7 +208,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'los owners no son moderados aunque el bot sea admin',
+    'owners are not moderated even when the bot is admin',
     async () => {
       const { antilinkService } = await import('@/services/moderation/AntilinkService.js');
       antilinkService.setMode(GROUP, 'kick');
@@ -233,7 +233,7 @@ describe('e2e: guard de antilink por grupo', () => {
   );
 
   it(
-    'un mensaje sin enlaces pasa intacto',
+    'a message with no links passes through untouched',
     async () => {
       await clearParticipants(socket, GROUP);
 

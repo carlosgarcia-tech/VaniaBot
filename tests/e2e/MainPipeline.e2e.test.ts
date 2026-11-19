@@ -32,7 +32,7 @@ const TIMEOUT = 30_000;
 /** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-describe('e2e: pipeline principal con socket falso', () => {
+describe('e2e: main pipeline with a fake socket', () => {
   let socket: BootState['socket'];
 
   beforeAll(async () => {
@@ -46,7 +46,7 @@ describe('e2e: pipeline principal con socket falso', () => {
   });
 
   it(
-    '!ping responde con la latencia a través del socket falso',
+    '!ping replies with the latency through the fake socket',
     async () => {
       socket.receive(dmTextMessage('!ping'));
       await wait();
@@ -63,7 +63,7 @@ describe('e2e: pipeline principal con socket falso', () => {
   );
 
   it(
-    'mensaje sin prefijo en DM no produce ninguna respuesta',
+    'a message without a prefix in a DM produces no reply',
     async () => {
       socket.receive(dmTextMessage('hola mundo sin prefijo', senderJid(2)));
       await wait();
@@ -74,7 +74,7 @@ describe('e2e: pipeline principal con socket falso', () => {
   );
 
   it(
-    'los mensajes duplicados (mismo id) se procesan una sola vez',
+    'duplicate messages (same id) are processed only once',
     async () => {
       const msg = dmTextMessage('!ping', senderJid(3));
       socket.receive(msg);
@@ -88,7 +88,7 @@ describe('e2e: pipeline principal con socket falso', () => {
   );
 
   it(
-    'un mensaje con timestamp anterior al arranque se descarta como eco offline',
+    'a message timestamped before startup is dropped as an offline echo',
     async () => {
       // The pipeline recorded the startup timestamp when connection open
       // arrived during boot; a past timestamp must land in isPreStartupEcho.

@@ -50,11 +50,11 @@ describe('SubBotRuntimeStore', () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it('load devuelve null cuando el archivo no existe', () => {
+  it('load returns null when the file does not exist', () => {
     expect(store.load('bot1')).toBeNull();
   });
 
-  it('save/load hace round-trip de los Maps y campos escalares', () => {
+  it('save/load round-trips the Maps and scalar fields', () => {
     const state = freshState('bot1');
     state.recentMessageIds.set('g@g.us|u@s.whatsapp.net|m1', NOW - 1000);
     state.contactNameCache.set('u@s.whatsapp.net', { name: 'Ulises', cachedAt: NOW - 2000 });
@@ -85,7 +85,7 @@ describe('SubBotRuntimeStore', () => {
     expect(existsSync(join(dir, 'bot1.json'))).toBe(true);
   });
 
-  it('load rechaza estados con TTL vencido', () => {
+  it('load rejects states with an expired TTL', () => {
     const state = freshState('bot1');
     store.save(state);
 
@@ -95,14 +95,14 @@ describe('SubBotRuntimeStore', () => {
     expect(store.load('bot1')).toBeNull();
   });
 
-  it('load acepta estados justo dentro del TTL', () => {
+  it('load accepts states just within the TTL', () => {
     store.save(freshState('bot1'));
     vi.advanceTimersByTime(SUBBOT_CONFIG.BOT_RUNTIME_STATE_TTL_MS - 1000);
 
     expect(store.load('bot1')).not.toBeNull();
   });
 
-  it('load rechaza archivos cuyo id no coincide con el bot pedido', () => {
+  it('load rejects files whose id does not match the requested bot', () => {
     store.save(freshState('bot1'));
 
     // bot1.json holds another bot's id (copied/renamed)
@@ -124,7 +124,7 @@ describe('SubBotRuntimeStore', () => {
     expect(store.load('bot3')).toBeNull();
   });
 
-  it('entradas malformadas de recentMessageIds se descartan sin romper la carga', () => {
+  it('malformed recentMessageIds entries are dropped without breaking the load', () => {
     writeFileSync(
       join(dir, 'bot1.json'),
       JSON.stringify({
@@ -147,7 +147,7 @@ describe('SubBotRuntimeStore', () => {
     expect([...loaded!.recentMessageIds.keys()]).toEqual(['k1']);
   });
 
-  it('entradas malformadas de contactNameCache se descartan sin romper la carga', () => {
+  it('malformed contactNameCache entries are dropped without breaking the load', () => {
     writeFileSync(
       join(dir, 'bot1.json'),
       JSON.stringify({
@@ -169,7 +169,7 @@ describe('SubBotRuntimeStore', () => {
     expect([...loaded!.contactNameCache.keys()]).toEqual(['a@x']);
   });
 
-  it('las entradas vencidas se podan en carga (dedup y contactos)', () => {
+  it('expired entries are pruned on load (dedup and contacts)', () => {
     writeFileSync(
       join(dir, 'bot1.json'),
       JSON.stringify({
@@ -192,7 +192,7 @@ describe('SubBotRuntimeStore', () => {
     expect([...loaded!.contactNameCache.keys()]).toEqual(['vivo@x']);
   });
 
-  it('save poda las entradas vencidas del estado en memoria antes de escribir', () => {
+  it('save prunes expired entries from the in-memory state before writing', () => {
     const state = freshState('bot1');
     state.recentMessageIds.set('fresco', NOW - 1000);
     state.recentMessageIds.set('vencido', NOW - (SUBBOT_CONFIG.MESSAGE_DEDUP_TTL_MS + 1000));
@@ -212,7 +212,7 @@ describe('SubBotRuntimeStore', () => {
     expect(raw.contactNameCache.map(e => (e as [string])[0])).toEqual(['vivo@x']);
   });
 
-  it('campos escalares inválidos caen a defaults sanos', () => {
+  it('invalid scalar fields fall back to sane defaults', () => {
     writeFileSync(
       join(dir, 'bot1.json'),
       JSON.stringify({
@@ -231,7 +231,7 @@ describe('SubBotRuntimeStore', () => {
     expect(loaded!.pairingPendingAt).toBeUndefined();
   });
 
-  it('botId con caracteres de path lanza/ignora en vez de salirse del dir', () => {
+  it('botId with path characters throws/ignores instead of escaping the dir', () => {
     expect(store.load('../escape')).toBeNull();
 
     const state = freshState('otro-bot');
@@ -241,7 +241,7 @@ describe('SubBotRuntimeStore', () => {
     expect(readdirSync(dir)).toEqual([]);
   });
 
-  it('delete borra el archivo y es tolerante a archivos inexistentes', () => {
+  it('delete removes the file and tolerates missing files', () => {
     store.save(freshState('bot1'));
     expect(existsSync(join(dir, 'bot1.json'))).toBe(true);
 
@@ -251,7 +251,7 @@ describe('SubBotRuntimeStore', () => {
     expect(() => store.delete('nunca-existio')).not.toThrow();
   });
 
-  it('ensureDir crea el directorio si no existe', () => {
+  it('ensureDir creates the directory when missing', () => {
     const nested = join(dir, 'a', 'b');
     const nestedStore = new SubBotRuntimeStore(nested);
     nestedStore.ensureDir();
@@ -259,7 +259,7 @@ describe('SubBotRuntimeStore', () => {
     expect(existsSync(nested)).toBe(true);
   });
 
-  it('save falla en silencio (best-effort) si el dir no se puede crear', () => {
+  it('save fails silently (best-effort) when the dir cannot be created', () => {
     // An "archive" where the parent dir should be: mkdir fails
     const blockingFile = join(dir, 'bloqueo');
     mkdirSync(dir, { recursive: true });
@@ -269,7 +269,7 @@ describe('SubBotRuntimeStore', () => {
     expect(() => brokenStore.save(freshState('bot1'))).not.toThrow();
   });
 
-  it('sin override usa SUBBOT_CONFIG.RUNTIME_STATE_DIR dinámicamente', () => {
+  it('without an override it uses SUBBOT_CONFIG.RUNTIME_STATE_DIR dynamically', () => {
     const dynStore = new SubBotRuntimeStore();
 
     const original = SUBBOT_CONFIG.RUNTIME_STATE_DIR;

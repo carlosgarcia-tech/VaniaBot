@@ -11,7 +11,7 @@ describe('HealthCheckService - Module Structure', () => {
     expect(module.AutoRestartService).toBeDefined();
   });
 
-  it('ServiceManager expone el health check y el auto-restart sin ciclo de imports', async () => {
+  it('ServiceManager exposes the health check and auto-restart without an import cycle', async () => {
     const { serviceManager } = await import('@/services/system/Servicemanager.js');
     expect(serviceManager.healthCheckService).toBeDefined();
     expect(serviceManager.autoRestartService).toBeDefined();
@@ -89,7 +89,7 @@ describe('HealthCheckService - Constants', () => {
 });
 
 describe('AutoRestartService - Configuration', () => {
-  it('expone la configuración por defecto real', async () => {
+  it('exposes the real default configuration', async () => {
     const { DEFAULT_RESTART_CONFIG } = await import('@/services/system/HealthCheckService.js');
 
     expect(DEFAULT_RESTART_CONFIG.enabled).toBe(true);
@@ -99,7 +99,7 @@ describe('AutoRestartService - Configuration', () => {
     expect(DEFAULT_RESTART_CONFIG.restartThreshold.errorRate).toBe(20);
   });
 
-  it('getInstance devuelve siempre la misma instancia', async () => {
+  it('getInstance always returns the same instance', async () => {
     const { AutoRestartService } = await import('@/services/system/HealthCheckService.js');
 
     expect(AutoRestartService.getInstance()).toBe(AutoRestartService.getInstance());

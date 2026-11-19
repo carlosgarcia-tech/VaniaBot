@@ -27,7 +27,7 @@ vi.mock('@/services/external/AIService.js', () => ({
 const TIMEOUT = 30_000;
 const wait = (ms = 400) => new Promise(resolve => setTimeout(resolve, ms));
 
-describe('e2e: cadena de middlewares', () => {
+describe('e2e: middleware chain', () => {
   let socket: BootState['socket'];
 
   beforeAll(async () => {
@@ -39,7 +39,7 @@ describe('e2e: cadena de middlewares', () => {
   });
 
   it(
-    'un comando en privado suma al contador del usuario',
+    'a private command increments the user counter',
     async () => {
       const jid = senderJid(640);
       const { serviceManager } = await import('@/services/system/Servicemanager.js');
@@ -57,7 +57,7 @@ describe('e2e: cadena de middlewares', () => {
   );
 
   it(
-    'un comando en grupo suma a los contadores del usuario y del grupo',
+    'a group command increments both the user and the group counters',
     async () => {
       const group = `1203630366666666${String(Date.now() % 100).padStart(2, '0')}@g.us`;
       const jid = senderJid(641);

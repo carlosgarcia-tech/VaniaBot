@@ -43,7 +43,7 @@ async function ownerJid(): Promise<string> {
   return `${ownerPhone}@s.whatsapp.net`;
 }
 
-describe('e2e: silenciar y desmutear usuarios en grupo', () => {
+describe('e2e: muting and unmuting users in a group', () => {
   let socket: BootState['socket'];
   let caseCounter = 0;
 
@@ -93,7 +93,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   });
 
   it(
-    'un admin silencia a un usuario y sus mensajes dejan de responder',
+    'an admin mutes a user and their messages stop getting replies',
     async () => {
       const { group, moderator, target } = await freshCase();
 
@@ -116,7 +116,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   );
 
   it(
-    'un miembro sin permisos no puede silenciar a nadie',
+    'a member without permissions cannot mute anyone',
     async () => {
       const { group, moderator, target } = await freshCase();
 
@@ -135,7 +135,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   );
 
   it(
-    'sin admin el bot no puede ejecutar el silencio',
+    'without admin the bot cannot perform the mute',
     async () => {
       // Owner running things, group with no admins at all: the user's
       // permission passes but the bot's does not.
@@ -159,7 +159,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   );
 
   it(
-    'el bot cuenta como admin si el grupo tiene algún admin aunque no esté en la lista',
+    'the bot counts as admin when the group has any admin, even if not listed',
     async () => {
       // BotPermissionChecker doesn't find the bot among the participants and
       // falls back to "if any participant is admin, so is the bot".
@@ -176,7 +176,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   );
 
   it(
-    'sin mención el comando pide un usuario objetivo',
+    'without a mention the command asks for a target user',
     async () => {
       const { group, moderator } = await freshCase();
 
@@ -191,7 +191,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   );
 
   it(
-    'un admin no puede silenciarse a sí mismo',
+    'an admin cannot mute themselves',
     async () => {
       const { group, moderator } = await freshCase();
 
@@ -206,7 +206,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   );
 
   it(
-    'un admin no puede silenciar a un owner',
+    'an admin cannot mute an owner',
     async () => {
       const { group, moderator } = await freshCase();
 
@@ -221,7 +221,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   );
 
   it(
-    'tras !unmute el usuario vuelve a poder usar comandos',
+    'after !unmute the user can use commands again',
     async () => {
       const { group, moderator, target } = await freshCase();
 
@@ -247,7 +247,7 @@ describe('e2e: silenciar y desmutear usuarios en grupo', () => {
   );
 
   it(
-    'sin admin en el grupo el mensaje silenciado no se borra, pero tampoco responde',
+    'without an admin in the group the muted message is not deleted, but gets no reply either',
     async () => {
       // handleMutedUser only deletes when the bot is admin; the mute is
       // still live in the pipeline and the command never gets to run.

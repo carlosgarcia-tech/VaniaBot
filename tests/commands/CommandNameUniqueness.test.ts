@@ -122,19 +122,19 @@ function duplicates(map: Map<string, ParsedCommand[]>): string[] {
   return dups;
 }
 
-describe('Unicidad de nombres y aliases de comandos', () => {
-  it('no tiene nombres de comando duplicados (escaneo estático)', () => {
+describe('Command name and alias uniqueness', () => {
+  it('has no duplicate command names (static scan)', () => {
     const { byName, total } = buildCommandMap();
     expect(total).toBeGreaterThan(200);
     expect(duplicates(byName)).toEqual([]);
   });
 
-  it('no tiene aliases duplicados entre comandos distintos (escaneo estático)', () => {
+  it('has no duplicate aliases across different commands (static scan)', () => {
     const { byAlias } = buildCommandMap();
     expect(duplicates(byAlias)).toEqual([]);
   });
 
-  it('ningun alias NUEVO colisiona con el name de otro comando (escaneo estatico)', () => {
+  it('no NEW alias collides with another command name (static scan)', () => {
     // The registry resolves names and aliases into separate maps: an alias
     // matching another command's name isn't detected as a duplicate, but
     // real-time registration silently re-maps the alias and leaves the
@@ -163,7 +163,7 @@ describe('Unicidad de nombres y aliases de comandos', () => {
     expect(clashes).toEqual([]);
   });
 
-  it('cada comando tiene un name válido y sin aliases repetidos en su propio array', () => {
+  it('every command has a valid name and no repeated aliases in its own array', () => {
     for (const file of collectCommandFiles(COMMANDS_DIR)) {
       const source = readFileSync(file, 'utf-8');
       const commands = [...parseClassCommands(source, file), ...parseAnimeDefs(source, file)];
@@ -185,7 +185,7 @@ describe('Unicidad de nombres y aliases de comandos', () => {
   });
 
   it(
-    'el registro completo del PluginLoader no produce colisiones de name/alias',
+    'the full PluginLoader registry produces no name/alias collisions',
     async () => {
       const { PluginLoader } = await import('../../src/core/PluginLoader');
       const loader = PluginLoader.getInstance();

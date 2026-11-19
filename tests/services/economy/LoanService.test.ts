@@ -75,7 +75,7 @@ describe('LoanService', () => {
     vi.useRealTimers();
   });
 
-  it('rechaza montos fuera de los límites [1000, 100000]', async () => {
+  it('rejects amounts outside the limits [1000, 100000]', async () => {
     userWith(LENDER, 1_000_000);
 
     const tooLow = await service.requestLoan(LENDER, BORROWER, 500);
@@ -87,7 +87,7 @@ describe('LoanService', () => {
     expect(tooHigh.message).toContain('máximo es $100000');
   });
 
-  it('rechaza si el prestamista no tiene fondos', async () => {
+  it('rejects when the lender has no funds', async () => {
     userWith(LENDER, 500);
 
     const result = await service.requestLoan(LENDER, BORROWER, 1000);
@@ -95,7 +95,7 @@ describe('LoanService', () => {
     expect(result.message).toContain('No tienes suficiente dinero');
   });
 
-  it('solicitud válida: crea préstamo pending con 10% de interés', async () => {
+  it('valid request: creates a pending loan with 10% interest', async () => {
     userWith(LENDER, 50_000);
 
     const result = await service.requestLoan(LENDER, BORROWER, 10_000);
@@ -112,7 +112,7 @@ describe('LoanService', () => {
     expect(mockGameStateService.setLoans).toHaveBeenCalledTimes(1);
   });
 
-  it('un borrower no puede tener dos solicitudes pendientes', async () => {
+  it('a borrower cannot have two pending requests', async () => {
     userWith(LENDER, 50_000);
 
     await service.requestLoan(LENDER, BORROWER, 1000);
@@ -122,7 +122,7 @@ describe('LoanService', () => {
     expect(second.message).toContain('pendiente');
   });
 
-  it('acceptLoan solo lo puede aceptar el borrower y solo si está pending', async () => {
+  it('acceptLoan can only be accepted by the borrower and only while pending', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
 
@@ -138,7 +138,7 @@ describe('LoanService', () => {
     expect(again.message).toContain('ya fue procesado');
   });
 
-  it('acceptLoan transfiere el dinero lender→borrower y activa el préstamo', async () => {
+  it('acceptLoan transfers the money lender→borrower and activates the loan', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
 
@@ -156,7 +156,7 @@ describe('LoanService', () => {
     expect(loan?.dueDate).toBe(Date.now() + 7 * 24 * 60 * 60 * 1000);
   });
 
-  it('acceptLoan rechaza si el lender ya no tiene fondos y marca rejected', async () => {
+  it('acceptLoan rejects when the lender no longer has funds and marks it rejected', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
 
@@ -168,7 +168,7 @@ describe('LoanService', () => {
     expect(service.getLoanById(loanId!)?.status).toBe('rejected');
   });
 
-  it('repayLoan transfiere el total con intereses al lender y cierra el préstamo', async () => {
+  it('repayLoan transfers the total with interest to the lender and closes the loan', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
     userWith(LENDER, 50_000);
@@ -188,7 +188,7 @@ describe('LoanService', () => {
     expect(loan?.remaining).toBe(0);
   });
 
-  it('repayLoan rechaza si el borrower no alcanza el total', async () => {
+  it('repayLoan rejects when the borrower cannot cover the total', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
     userWith(LENDER, 50_000);
@@ -202,7 +202,7 @@ describe('LoanService', () => {
     expect(service.getLoanById(loanId!)?.status).toBe('active');
   });
 
-  it('rejectLoan marca rejected y puede consultarse', async () => {
+  it('rejectLoan marks it rejected and it can be queried', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
 
@@ -213,7 +213,7 @@ describe('LoanService', () => {
     expect(mockUserService.removeMoney).not.toHaveBeenCalled();
   });
 
-  it('checkOverdueLoans marca defaulted los vencidos y devuelve la lista', async () => {
+  it('checkOverdueLoans marks overdue loans defaulted and returns the list', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
     userWith(LENDER, 50_000);
@@ -232,7 +232,7 @@ describe('LoanService', () => {
     expect(service.checkOverdueLoans()).toHaveLength(0);
   });
 
-  it('los getters filtran por rol y estado', async () => {
+  it('the getters filter by role and state', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
 
@@ -248,7 +248,7 @@ describe('LoanService', () => {
     expect(service.getPendingLoans(BORROWER)).toHaveLength(0);
   });
 
-  it('formatLoanDetails formatea según el estado', async () => {
+  it('formatLoanDetails formats according to the state', async () => {
     userWith(LENDER, 50_000);
     const { loanId } = await service.requestLoan(LENDER, BORROWER, 5000);
 
@@ -260,7 +260,7 @@ describe('LoanService', () => {
     expect(service.formatLoanDetails('PR-9999')).toBeNull();
   });
 
-  it('loadFromPersistence restaura préstamos y continúa el contador de IDs', () => {
+  it('loadFromPersistence restores loans and continues the ID counter', () => {
     mockGameStateService.getLoans.mockReturnValue([
       {
         id: 'PR-0041',

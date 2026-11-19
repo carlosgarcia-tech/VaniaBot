@@ -40,7 +40,7 @@ const wait = (ms = 400) => new Promise(resolve => setTimeout(resolve, ms));
 
 const PONG = (text: string) => text.startsWith('🏓 Pong!');
 
-describe('e2e: formas de mensaje', () => {
+describe('e2e: message shapes', () => {
   let socket: BootState['socket'];
   let caseCounter = 0;
 
@@ -64,7 +64,7 @@ describe('e2e: formas de mensaje', () => {
   });
 
   it(
-    'un extendedTextMessage ejecuta el comando igual que un texto plano',
+    'an extendedTextMessage runs the command like plain text',
     async () => {
       socket.receive(dmExtendedTextMessage('!ping', senderJid(520)));
       await wait();
@@ -75,7 +75,7 @@ describe('e2e: formas de mensaje', () => {
   );
 
   it(
-    'un extendedTextMessage de grupo también ejecuta el comando',
+    'a group extendedTextMessage runs the command too',
     async () => {
       const group = await freshGroup();
 
@@ -88,7 +88,7 @@ describe('e2e: formas de mensaje', () => {
   );
 
   it(
-    'un comando escrito en el pie de una imagen se ejecuta',
+    'a command written in an image caption runs',
     async () => {
       socket.receive(dmImageCaptionMessage('!ping', senderJid(522)));
       await wait();
@@ -110,7 +110,7 @@ describe('e2e: formas de mensaje', () => {
   );
 
   it(
-    'un mensaje enviado por el propio bot se ignora',
+    'a message sent by the bot itself is ignored',
     async () => {
       socket.receive(dmFromMeMessage('!ping', senderJid(524)));
       await wait();
@@ -121,7 +121,7 @@ describe('e2e: formas de mensaje', () => {
   );
 
   it(
-    'un pie de foto sin comando no dispara nada',
+    'a photo caption without a command triggers nothing',
     async () => {
       socket.receive(dmImageCaptionMessage('solo un texto', senderJid(525)));
       await wait();

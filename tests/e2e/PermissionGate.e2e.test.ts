@@ -29,7 +29,7 @@ const TIMEOUT = 30_000;
 /** Waits for the pipeline (queueMicrotask + setImmediate) to drain. */
 const wait = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-describe('e2e: puerta de permisos', () => {
+describe('e2e: permission gate', () => {
   let socket: BootState['socket'];
 
   beforeAll(async () => {
@@ -41,7 +41,7 @@ describe('e2e: puerta de permisos', () => {
   });
 
   it(
-    'un usuario normal recibe la denegación al usar un comando OWNER-only',
+    'a normal user gets denied when using an OWNER-only command',
     async () => {
       socket.receive(dmTextMessage('!metrics', senderJid(1)));
       await wait();
@@ -55,7 +55,7 @@ describe('e2e: puerta de permisos', () => {
   );
 
   it(
-    'el alias de un comando OWNER-only pasa por la misma puerta',
+    'an OWNER-only command alias goes through the same gate',
     async () => {
       socket.receive(dmTextMessage('!botstats', senderJid(2)));
       await wait();
@@ -66,7 +66,7 @@ describe('e2e: puerta de permisos', () => {
   );
 
   it(
-    'un owner de configuración sí puede usar el comando OWNER-only',
+    'a configured owner can use the OWNER-only command',
     async () => {
       const { config } = await import('@/config/index.js');
       const ownerPhone = config.owners.find(owner => !owner.includes('@lid'));
@@ -83,7 +83,7 @@ describe('e2e: puerta de permisos', () => {
   );
 
   it(
-    'un owner es tratado como admin en grupo y pasa un comando ADMIN-only',
+    'an owner is treated as a group admin and passes an ADMIN-only command',
     async () => {
       const group = `1203630355555555${String(Date.now() % 100).padStart(2, '0')}@g.us`;
       const { config } = await import('@/config/index.js');
